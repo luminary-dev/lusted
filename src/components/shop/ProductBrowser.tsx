@@ -239,9 +239,10 @@ export default function ProductBrowser() {
           {results.length ? (
             <>
               <div className="product-grid">
-                {shown.map((p) => (
-                  <ProductCard key={p.slug} product={p} />
-                ))}
+                {shown.map((p) => {
+                  const color = p.colors.find((c) => selColors.includes(c)); // filtered by colour → show that colourway
+                  return <ProductCard key={`${p.slug}-${color ?? ""}`} product={p} color={color} />;
+                })}
               </div>
               {pages > 1 && (
                 <nav className="pager" aria-label="Pages">

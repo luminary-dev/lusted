@@ -2837,6 +2837,24 @@ svg {
   padding-inline: 2px;
 }
 
+.swatches .swatch {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.swatches .swatch:hover {
+  transform: scale(1.12);
+}
+
+.swatches .swatch.is-active {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 0 0 2px var(--cream),
+    0 0 0 3px var(--ink);
+}
+
 .swatch {
   display: inline-block;
   width: 14px;
