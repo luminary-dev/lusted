@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { setColorChoice } from "@/lib/color-choice";
 import { bag } from "@/lib/bag";
 import {
   colors,
@@ -19,6 +20,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
   const product = getProduct(slug)!;
   const oneSize = product.sizes.length === 1;
   const [color, setColor] = useState<ColorKey>(product.colors[0]);
+  useEffect(() => setColorChoice(slug, color), [slug, color]); // the gallery follows the picked colour
   const [size, setSize] = useState<string | null>(
     oneSize ? product.sizes[0] : null,
   );

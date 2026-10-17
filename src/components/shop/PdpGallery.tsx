@@ -2,14 +2,22 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { Product } from "@/lib/products";
+import { useColorChoice } from "@/lib/color-choice";
+import type { ColorKey, Product } from "@/lib/products";
 import { Badges } from "./ProductCard";
 
 // The product page gallery: the front view large, the other views as small thumbnails underneath. Choosing a
 // thumbnail cross-fades it into the main frame (and the main view drops down into the thumbnails).
 export default function PdpGallery({ product }: { product: Product }) {
-  const { views } = product;
+  // the picked colour's photos when that colour has been photographed, otherwise the main colour's
+  const color = useColorChoice(product.slug, product.colors[0]) as ColorKey;
+  const views = product.colorViews[color] ?? product.views;
   const [active, setActive] = useState(0);
+  const [shownColor, setShownColor] = useState(color);
+  if (shownColor !== color) {
+    setShownColor(color); // a new colour starts on its front view
+    setActive(0);
+  }
 
   return (
     <div className="pdp-gallery">
