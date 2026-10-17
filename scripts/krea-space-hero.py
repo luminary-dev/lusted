@@ -1,6 +1,6 @@
 """Generate Lusted hero images on the owner's private Space dhanikaa/Krea-2-Turbo_v2.
 
-Usage: python3 scripts/krea-space-hero.py <look 1-8> <out.png> [seed] [steps] [gpu_budget]
+Usage: python3 scripts/krea-space-hero.py <look 1-11> <out.png> [seed] [steps] [gpu_budget]
 Uses the official Krea 2 Turbo weights (Comfy-Org/Krea-2, fp8) as a custom base model and leaves every
 LoRA/slider at 0, so output stays clean fashion photography. Reads the local `hf` login token; never prints it.
 """
@@ -30,6 +30,8 @@ FRAME = (
     "third; the left half is soft, uncluttered, glowing negative space for headline text; the bottom-right corner stays soft "
     "and simple. Sensual but non-explicit fashion photography — revealing cuts, but no nudity."
 )
+
+COVERED = " Every intimate area stays fully covered by opaque, lined fabric: no nudity, no nipples."
 
 LOOKS = {
     1: "Scene — blush lace lingerie: she reclines seductively against plush blush silk-satin pillows on a cloud-soft bed, one "
@@ -88,6 +90,33 @@ LOOKS = {
     "high-cut lace thong brief, lace suspender straps to sheer ivory thigh-high stockings, and a long sheer ivory chiffon robe "
     "streaming off her shoulders in a warm breeze. Warm lantern light glows on her skin against the deep-blue dusk, a softly "
     "blurred sea and twinkling coastline lights behind her, white jasmine out of focus in the foreground, no other people.",
+    # ── 9–11: the most daring cuts of the set, in the same warm, hazy candle-and-golden-hour mood as 1–8 ──
+    # (the site's hero-11 and hero-13 were made by hand from more daring variants of 9 and 11 — the exact prompts are
+    # embedded in refs/krea/final/hero/src-31.png and src-30.png)
+    9: "Scene — thread-thin black string harness by candlelight: alone in a candlelit boudoir, she kneels upright on "
+    "rumpled champagne silk sheets at the foot of a bed, knees apart, back deeply arched, one arm raised with her fingers "
+    "buried in her hair, the other hand trailing slowly down her bare stomach, chin lowered with a dark, smouldering stare "
+    "into the lens, lips parted. She wears a black strappy string lingerie set and "
+    "nothing else: two tiny black micro triangle cups on thin black string ties, a black micro G-string, and thin black "
+    "string straps crossing her chest, ribs, waist and hips with small gold rings; her stomach, hips and thighs bare. Warm "
+    "amber candlelight, deep-wine velvet drapes, a gold-framed mirror and flickering candles dissolve into warm golden "
+    "bokeh behind her, no other people.",
+    10: "Scene — emerald micro string bikini on sun-warmed rocks at golden hour: alone on smooth sun-bleached rocks above a "
+    "turquoise Mediterranean cove, she lies back propped on her elbows, back deeply arched, one knee raised, wet hair "
+    "slicked back, head tilted with a slow, naughty half-smile into the lens. She wears the tiniest emerald-green satin "
+    "micro string bikini — small fully lined triangles on whisper-thin strings and a micro thong tied in little bows high "
+    "on her bare hips — with a delicate gold body chain at her waist. Wet, glistening sun-kissed skin with sparkling "
+    "droplets, a low golden sun flaring behind her, glittering turquoise water and a hazy peach-and-rose sky melting into "
+    "soft bokeh, no other people.",
+    11: "Scene — black fishnet bodystocking at sunset: alone in a sunlit Parisian bedroom at golden hour, she lies "
+    "stretched out full length along a rumpled ivory silk bed, propped on one elbow, back arched, one long leg bent and "
+    "raised so her whole body shows from head to pointed toes, one hand sliding slowly up her thigh, gazing into the lens "
+    "through her lashes with a sultry, naughty, teasing smile. She wears a daring one-piece black fishnet bodystocking — a "
+    "single sheer second-skin layer of fine black fishnet with long sleeves, covering her arms, torso, hips and both legs "
+    "all the way down to her feet, with a neckline plunging to the waist — and underneath it only two tiny opaque black "
+    "satin micro triangles on string ties and a black string micro thong, so the fishnet shows almost all of her skin. "
+    "Fishnet visibly on her arms and long legs. Warm low sunlight streams through sheer ivory curtains, blush roses and a "
+    "champagne coupe blur in the foreground, golden haze, no other people.",
 }
 
 
@@ -103,7 +132,7 @@ def main():
     seed = int(sys.argv[3]) if len(sys.argv) > 3 else 2026
     steps = int(sys.argv[4]) if len(sys.argv) > 4 else 12
     budget = int(sys.argv[5]) if len(sys.argv) > 5 else 0
-    prompt = LOOK + LOOKS[n] + FRAME
+    prompt = LOOK + LOOKS[n] + FRAME + COVERED
     data = [
         "text2image", prompt, "", None, None,
         WIDTH, HEIGHT, 4.0, 768, 1.0, 1.0,

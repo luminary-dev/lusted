@@ -10,6 +10,9 @@ import hero7 from "@/assets/images/hero/hero-7.webp";
 import hero8 from "@/assets/images/hero/hero-8.webp";
 import hero9 from "@/assets/images/hero/hero-9.webp";
 import hero10 from "@/assets/images/hero/hero-10.webp";
+import hero11 from "@/assets/images/hero/hero-11.webp";
+import hero12 from "@/assets/images/hero/hero-12.webp";
+import hero13 from "@/assets/images/hero/hero-13.webp";
 import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import HeroSlides, { type HeroSlide } from "./HeroSlides";
@@ -18,7 +21,7 @@ import { ArrowRight, WhatsApp } from "./icons";
 // Krea 2 campaign images (originals in refs/krea/final/hero). pos / posMobile are the crop focal points
 // that keep each face clear of the headline on desktop and centred in frame on phones.
 // Ordered so no two neighbouring slides share a colour story (the loop wraps from the last back to the first):
-// blush → wine → sea → champagne → sea → blush → black → peach → wine → blue dusk.
+// blush → wine → sea → champagne → candlelit black → sea → blush → black → peach → wine → emerald sea → blue dusk → sunlit ivory.
 const slides: HeroSlide[] = [
   {
     src: hero1,
@@ -43,6 +46,12 @@ const slides: HeroSlide[] = [
     alt: "Model in a champagne sequin slip dress on a velvet chaise by candlelight",
     pos: "72% 25%",
     posMobile: "81% 25%",
+  },
+  {
+    src: hero11,
+    alt: "Model kneeling on champagne silk sheets by candlelight in a black string harness",
+    pos: "72% 20%",
+    posMobile: "64% 20%",
   },
   {
     src: hero2,
@@ -75,10 +84,22 @@ const slides: HeroSlide[] = [
     posMobile: "72% 25%",
   },
   {
+    src: hero12,
+    alt: "Model in an emerald micro string bikini on sunlit rocks above a turquoise cove",
+    pos: "72% 20%",
+    posMobile: "60% 25%",
+  },
+  {
     src: hero10,
     alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk",
     pos: "0% 20%",
     posMobile: "52% 20%",
+  },
+  {
+    src: hero13,
+    alt: "Model in a black fishnet bodystocking lying across an ivory silk bed at golden hour",
+    pos: "50% 40%",
+    posMobile: "58% 50%",
   },
 ];
 
