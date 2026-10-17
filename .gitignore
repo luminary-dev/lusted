@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+# local image tools (Real-ESRGAN binary + models)
+.tools/
+
+# raw generation outputs and originals (hundreds of MB) — kept locally, the site uses src/assets
+/refs/
