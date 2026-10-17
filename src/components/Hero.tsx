@@ -98,9 +98,9 @@ const slides: HeroSlide[] = [
   },
   {
     src: hero14,
-    alt: "Model in a backless wine silk gown slit to the hip in an empty candlelit lounge",
-    pos: "60% 0%",
-    posMobile: "64% 0%",
+    alt: "Model crouching low in a backless wine silk gown slit to the hip in an empty candlelit lounge",
+    pos: "60% 20%",
+    posMobile: "63% 20%",
   },
   {
     src: hero13,

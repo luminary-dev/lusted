@@ -29,7 +29,7 @@ const jobs = [
   ["hero/hero-11.webp", "hero", 31],
   ["hero/hero-12.webp", "hero", 27],
   ["hero/hero-13.webp", "hero", 30],
-  ["hero/hero-14.webp", "hero", 32],
+  ["hero/hero-14.webp", "hero", 33],
   ["how-it-works.webp", "hero", 21],
   ["cat-lingerie.webp", "vertical", 7],
   ["cat-swim.webp", "vertical", 6],
