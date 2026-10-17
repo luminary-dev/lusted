@@ -18,21 +18,13 @@ export default function Nav() {
   const home = pathname === "/";
   const [spy, setSpy] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const { count } = useBag();
   const favCount = useFavourites().length;
 
-  // Frosted bar once past the top; hide while scrolling down, reveal on scroll up.
+  // Frosted bar (and the blur behind it) once past the top. It stays put while you scroll, in both directions.
   useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 40);
-      if (y > 240 && y > last + 4) setHidden(true);
-      if (y < last - 4 || y < 240) setHidden(false);
-      last = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -56,7 +48,7 @@ export default function Nav() {
   const solid = scrolled || open || !home;
 
   return (
-    <header className={`nav ${solid ? "is-solid" : ""} ${hidden && !open ? "is-hidden" : ""} ${open ? "is-open" : ""}`}>
+    <header className={`nav ${solid ? "is-solid" : ""} ${open ? "is-open" : ""}`}>
       <div className="container">
         <div className="nav-bar">
           <Link href="/" className="nav-logo" aria-label="Lusted — home" onClick={() => setOpen(false)}>

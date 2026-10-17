@@ -418,6 +418,142 @@ svg {
   }
 }
 
+/* ───────── scroll: no browser scrollbar; ScrollRail.tsx draws a progress line and a section rail instead ───────── */
+
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 70;
+  height: 2px;
+  background: linear-gradient(90deg, var(--wine), var(--rose));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rose) 60%, transparent);
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+.scroll-rail {
+  position: fixed;
+  top: 50%;
+  right: 18px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 28px;
+  transform: translateY(-50%);
+}
+
+/* the thread the hearts hang on, fading out at both ends */
+.scroll-rail::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--rose) 70%, transparent) 14%, color-mix(in srgb, var(--rose) 70%, transparent) 86%, transparent);
+  transform: translateX(-50%);
+}
+
+.scroll-rail-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* a tiny diamond between hearts, like a bead on the thread */
+.scroll-rail-gem {
+  width: 4px;
+  height: 4px;
+  margin-block: 7px;
+  background: var(--rose);
+  opacity: 0.75;
+  transform: rotate(45deg);
+}
+
+.scroll-rail button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--rose);
+  cursor: pointer;
+}
+
+.scroll-rail svg {
+  width: 11px;
+  height: 11px;
+  fill: color-mix(in srgb, var(--rose) 18%, transparent);
+  stroke: currentColor;
+  stroke-width: 1.6;
+  transition:
+    width 0.45s var(--ease),
+    height 0.45s var(--ease),
+    fill 0.45s var(--ease),
+    filter 0.45s var(--ease);
+}
+
+.scroll-rail button:hover svg {
+  width: 14px;
+  height: 14px;
+}
+
+.scroll-rail button.is-active svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--rose) 85%, transparent));
+}
+
+/* the section's name slides out to the left on hover / keyboard focus */
+.scroll-rail-label {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--hair);
+  color: var(--ink);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(6px, -50%);
+  transition:
+    opacity 0.3s var(--ease),
+    transform 0.3s var(--ease);
+  pointer-events: none;
+}
+
+.scroll-rail button:hover .scroll-rail-label,
+.scroll-rail button:focus-visible .scroll-rail-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+@media (max-width: 899px) {
+  .scroll-rail {
+    display: none;
+  }
+}
+
 /* ───────── nav ───────── */
 
 .nav {
@@ -435,22 +571,18 @@ svg {
   padding-top: 12px;
 }
 
-.nav.is-hidden {
-  transform: translateY(-110%);
-}
-
-/* a soft, full-width blur along the top of the screen, fading out downwards, so the page blurs as it
-   scrolls up under the floating header instead of sliding past it sharply */
+/* a full-width frosted band behind the floating header: everything that scrolls up under it is blurred, easing
+   back to sharp just below the header */
 .nav::before {
   content: "";
   position: absolute;
-  inset: 0 0 -28px;
+  inset: 0 0 -40px;
   z-index: -1;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--cream) 45%, transparent), transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
-  mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--cream) 55%, transparent), color-mix(in srgb, var(--cream) 15%, transparent));
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.5s var(--ease);
@@ -1080,6 +1212,8 @@ svg {
   margin: 6px -2vw clamp(44px, 4.5vw, 64px);
   overflow: hidden;
   background: linear-gradient(180deg, #f7ddd3, #efcbbf);
+  /* the last shadow is a block of the previous section's colour (Best sellers) tilted with the tape, so above the
+     tape is one colour edge to edge and the size guide's own colour starts right beneath it */
   box-shadow:
     0 12px 30px rgba(90, 30, 40, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
@@ -1213,8 +1347,6 @@ svg {
 }
 
 .tape-back {
-  /* the last shadow is a block of the previous section's colour (Best sellers) tilted with the tape, so above the
-     tape is one colour edge to edge and the size guide's own colour starts right beneath it */
   fill: none;
   stroke: var(--rose);
   stroke-width: 2.4;
