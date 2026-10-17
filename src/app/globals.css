@@ -659,26 +659,6 @@ html::-webkit-scrollbar {
   padding-top: 12px;
 }
 
-/* a full-width frosted band behind the floating header: everything that scrolls up under it is blurred, easing
-   back to sharp just below the header */
-.nav::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 -40px;
-  z-index: -1;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--cream) 55%, transparent), color-mix(in srgb, var(--cream) 15%, transparent));
-  backdrop-filter: blur(22px) saturate(1.3);
-  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
-  mask-image: linear-gradient(to bottom, #000 70%, transparent);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s var(--ease);
-}
-
-.nav.is-solid::before {
-  opacity: 1;
-}
-
 .nav .container {
   position: relative;
 }
@@ -701,7 +681,7 @@ html::-webkit-scrollbar {
 .nav.is-solid .nav-bar,
 .nav.is-open .nav-bar {
   background: var(--nav-bg);
-  backdrop-filter: blur(24px) saturate(1.6);
+  backdrop-filter: blur(12px) saturate(1.3);
   border-color: var(--hair);
   box-shadow: 0 10px 40px var(--shadow);
   color: var(--ink);
