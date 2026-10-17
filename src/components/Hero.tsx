@@ -10,8 +10,8 @@ import hero7 from "@/assets/images/hero/hero-7.webp";
 import hero8 from "@/assets/images/hero/hero-8.webp";
 import hero9 from "@/assets/images/hero/hero-9.webp";
 import hero10 from "@/assets/images/hero/hero-10.webp";
-import { categories, getProduct } from "@/lib/products";
-import { featured, whatsappLink } from "@/lib/site";
+import { categories } from "@/lib/products";
+import { whatsappLink } from "@/lib/site";
 import HeroSlides, { type HeroSlide } from "./HeroSlides";
 import { ArrowRight, WhatsApp } from "./icons";
 
@@ -83,7 +83,6 @@ const slides: HeroSlide[] = [
 ];
 
 export default function Hero() {
-  const pick = getProduct(featured.product);
   return (
     <section id="top" className="hero">
       <HeroSlides slides={slides} />
@@ -127,29 +126,6 @@ export default function Hero() {
             </a>
           </div>
         </div>
-
-        {pick && (
-          <Link
-            href={`/products/${pick.slug}`}
-            className="hero-featured"
-            data-reveal
-            style={{ "--d": "0.45s" } as React.CSSProperties}
-          >
-            <span className="hero-featured-img">
-              <Image quality={90} src={pick.image} alt="" fill sizes="120px" />
-            </span>
-            <span className="hero-featured-copy">
-              <span className="hero-featured-eyebrow">{featured.eyebrow}</span>
-              <strong>{pick.name}</strong>
-              <span className="hero-featured-tag">
-                {featured.tagline.split(/(?<=\.)\s+/).map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </span>
-            </span>
-            <ArrowRight className="hero-featured-arrow" />
-          </Link>
-        )}
       </div>
     </section>
   );

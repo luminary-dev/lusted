@@ -23,10 +23,3 @@ export const navLinks = [
   { href: "/#ordering", label: "Ordering" },
   { href: "/#contact", label: "Contact" },
 ];
-
-// The "Featured" card in the hero — a product: its photo, name and page come from the catalogue by slug.
-export const featured = {
-  eyebrow: "Tonight's temptation",
-  product: "lola-fringe-micro-dress",
-  tagline: "Every bead swings. Every eye follows.",
-};
