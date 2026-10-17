@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 
 // Stands in for the (hidden) browser scrollbar: a thin rose line across the top that fills as you scroll and — on
 // pages made of sections — a string of flat pastel-pink hearts down the right edge, one per section, with tiny dots
-// between them. The thread fills pink down to where you are; the section you're in is a solid heart with a soft glow
-// and a slow heartbeat, the two either side are smaller and paler, the rest are outlines. Hover a heart for the section's
+// between them. The thread fills pink down to where you are; the section you're in is a solid heart with a soft glow,
+// the two either side are smaller and paler, the rest are outlines. Hover a heart for the section's
 // name; click to glide there.
 const LABELS: Record<string, string> = {
   top: "Welcome",
@@ -105,9 +105,7 @@ export default function ScrollRail() {
             {sections.map((id, i) => (
               <g key={id} transform={`translate(${CX} ${yAt(i)})`}>
                 <g className="heart" data-dist={Math.min(3, Math.abs(i - active))}>
-                  <g className="heart-beat">
-                    <path className="heart-body" d={HEART} />
-                  </g>
+                  <path className="heart-body" d={HEART} />
                 </g>
               </g>
             ))}

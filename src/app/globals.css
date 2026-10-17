@@ -560,7 +560,7 @@ html::-webkit-scrollbar {
     opacity 0.6s var(--ease);
 }
 
-/* the section you're in: a solid pastel heart with a soft glow and a slow heartbeat */
+/* the section you're in: a solid pastel heart with a soft glow */
 .heart[data-dist="0"] {
   transform: scale(1.35);
   filter: drop-shadow(0 0 5px color-mix(in srgb, currentColor 80%, transparent));
@@ -588,32 +588,6 @@ html::-webkit-scrollbar {
 .heart[data-dist="2"] .heart-body {
   fill: color-mix(in srgb, currentColor 35%, var(--paper));
   opacity: 0.85;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .heart[data-dist="0"] .heart-beat {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: heartbeat 1.7s ease-in-out infinite;
-  }
-}
-
-/* lub-dub, then rest */
-@keyframes heartbeat {
-  0%,
-  42%,
-  100% {
-    transform: scale(1);
-  }
-  12% {
-    transform: scale(1.14);
-  }
-  22% {
-    transform: scale(1.02);
-  }
-  30% {
-    transform: scale(1.1);
-  }
 }
 
 /* a click target over each heart */
