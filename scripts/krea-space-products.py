@@ -119,7 +119,7 @@ PRODUCTS = {
     "delilah-backless-string-dress": (6109, "D", "boudoir-night",
         "She wears the Delilah dress in black satin: a short black satin slip mini dress on thin straps with lined cups, its back completely bare from her shoulders down to the base of her spine, laced across with thin black criss-crossing strings. Her back and legs are bare."),
     "rouge-eyelash-lace-bodysuit": (6110, "B", "boudoir",
-        "She wears the Rouge bodysuit in red: a red eyelash lace bodysuit with lined cups and a deep V neckline plunging to her navel, extreme high-cut legs and a thong back; from behind, thin straps cross her bare open back. Her legs are bare."),
+        "She wears the Rouge bodysuit in red: a lingerie bodysuit made entirely of intricate red floral lace with scalloped eyelash-lace edges, lined lace cups and a deep V neckline plunging to her navel, extreme high-cut legs and a thong back; from behind, thin straps cross her bare open back. The lace pattern is clearly visible all over. Her legs are bare."),
     # ── new: the most daring swim ──
     "ibiza-slingshot-swimsuit": (6201, "B", "pool",
         "She wears the Ibiza swimsuit in deep wine red: a wine-red halter one-piece with a plunging neckline and very high-cut legs; from behind, her whole back is bare down to a tiny wine-red thong back. Her back and legs are bare."),
@@ -147,7 +147,7 @@ PRODUCTS = {
     "lola-fringe-micro-dress": (6305, "E", "rooftop",
         "She wears the Lola dress: a champagne beaded fringe mini dress with a plunging halter neckline and open sides, the beaded fringe swinging over her bare thighs."),
     "nightshade-crossstrap-mini": (6306, "B", "lounge",
-        "She wears the Nightshade dress in blush satin: a very short blush satin mini dress with fully lined satin cups and a deep plunge between them, laced across the plunge with thin criss-crossing satin straps down to her navel, and an open back."),
+        "She wears the Nightshade dress in blush satin: a very short blush satin mini dress with a deep V neckline plunging all the way down to her navel, the plunge laced shut with thin criss-crossing blush satin ties like a corset lace-up, so a strip of bare skin shows from her neckline to her navel between lined satin cups; thin straps and an open back."),
     "bijou-crystal-two-piece": (6307, "C", "lounge",
         "She wears the Bijou two-piece: a crystal-embellished ivory bralette with crystal fringe over her bare midriff and a matching crystal mini skirt slit high on one side."),
 }
