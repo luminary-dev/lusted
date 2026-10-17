@@ -94,6 +94,24 @@ import nightshadeCrossstrapMiniBack from "@/assets/products/nightshade-crossstra
 import nightshadeCrossstrapMiniSide from "@/assets/products/nightshade-crossstrap-mini-side.webp";
 import bijouCrystalTwoPieceBack from "@/assets/products/bijou-crystal-two-piece-back.webp";
 import bijouCrystalTwoPieceSide from "@/assets/products/bijou-crystal-two-piece-side.webp";
+import roseLaceBalconetteBraWine from "@/assets/products/rose-lace-balconette-bra--wine.webp";
+import roseLaceBalconetteBraWineBack from "@/assets/products/rose-lace-balconette-bra--wine-back.webp";
+import roseLaceBalconetteBraWineSide from "@/assets/products/rose-lace-balconette-bra--wine-side.webp";
+import roseLaceHighWaistBriefWine from "@/assets/products/rose-lace-high-waist-brief--wine.webp";
+import roseLaceHighWaistBriefWineBack from "@/assets/products/rose-lace-high-waist-brief--wine-back.webp";
+import roseLaceHighWaistBriefWineSide from "@/assets/products/rose-lace-high-waist-brief--wine-side.webp";
+import camilleSatinBowBraletteBlush from "@/assets/products/camille-satin-bow-bralette--blush.webp";
+import camilleSatinBowBraletteBlushBack from "@/assets/products/camille-satin-bow-bralette--blush-back.webp";
+import camilleSatinBowBraletteBlushSide from "@/assets/products/camille-satin-bow-bralette--blush-side.webp";
+import julietteLaceBodysuitBlush from "@/assets/products/juliette-lace-bodysuit--blush.webp";
+import julietteLaceBodysuitBlushBack from "@/assets/products/juliette-lace-bodysuit--blush-back.webp";
+import julietteLaceBodysuitBlushSide from "@/assets/products/juliette-lace-bodysuit--blush-side.webp";
+import margotSilkSlipWine from "@/assets/products/margot-silk-slip--wine.webp";
+import margotSilkSlipWineBack from "@/assets/products/margot-silk-slip--wine-back.webp";
+import margotSilkSlipWineSide from "@/assets/products/margot-silk-slip--wine-side.webp";
+import amelieGarterBeltBlush from "@/assets/products/amelie-garter-belt--blush.webp";
+import amelieGarterBeltBlushBack from "@/assets/products/amelie-garter-belt--blush-back.webp";
+import amelieGarterBeltBlushSide from "@/assets/products/amelie-garter-belt--blush-side.webp";
 
 export const productImages = {
   "rose-lace-balconette-bra": roseLaceBalconetteBra,
@@ -162,4 +180,14 @@ export const productViews: Partial<Record<keyof typeof productImages, Partial<Re
   "lola-fringe-micro-dress": { back: lolaFringeMicroDressBack, side: lolaFringeMicroDressSide },
   "nightshade-crossstrap-mini": { back: nightshadeCrossstrapMiniBack, side: nightshadeCrossstrapMiniSide },
   "bijou-crystal-two-piece": { back: bijouCrystalTwoPieceBack, side: bijouCrystalTwoPieceSide },
+};
+
+// other colourways of a piece: { slug: { colour: { front, back?, side? } } }
+export const colorImages: Partial<Record<keyof typeof productImages, Record<string, { front: StaticImageData } & Partial<Record<ProductView, StaticImageData>>>>> = {
+  "rose-lace-balconette-bra": { wine: { front: roseLaceBalconetteBraWine, back: roseLaceBalconetteBraWineBack, side: roseLaceBalconetteBraWineSide } },
+  "rose-lace-high-waist-brief": { wine: { front: roseLaceHighWaistBriefWine, back: roseLaceHighWaistBriefWineBack, side: roseLaceHighWaistBriefWineSide } },
+  "camille-satin-bow-bralette": { blush: { front: camilleSatinBowBraletteBlush, back: camilleSatinBowBraletteBlushBack, side: camilleSatinBowBraletteBlushSide } },
+  "juliette-lace-bodysuit": { blush: { front: julietteLaceBodysuitBlush, back: julietteLaceBodysuitBlushBack, side: julietteLaceBodysuitBlushSide } },
+  "margot-silk-slip": { wine: { front: margotSilkSlipWine, back: margotSilkSlipWineBack, side: margotSilkSlipWineSide } },
+  "amelie-garter-belt": { blush: { front: amelieGarterBeltBlush, back: amelieGarterBeltBlushBack, side: amelieGarterBeltBlushSide } },
 };

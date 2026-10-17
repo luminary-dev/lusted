@@ -19,6 +19,16 @@ const extra = []; // [slug, view]
 for (const p of catalog) for (const v of VIEWS) if (await exists(path.join(OUT, `${p.slug}-${v}.webp`))) extra.push([p.slug, v]);
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
+// colourways: <slug>--<colour>.webp (+ -back / -side) — the same piece photographed in its other colours
+const COLOURS = ["blush", "wine", "black", "ivory", "champagne", "mocha"];
+const ways = []; // [slug, colour, view | ""]
+for (const p of catalog)
+  for (const c of COLOURS)
+    if (c !== p.colors[0] && (await exists(path.join(OUT, `${p.slug}--${c}.webp`))))
+      for (const v of ["", ...VIEWS])
+        if (await exists(path.join(OUT, `${p.slug}--${c}${v ? `-${v}` : ""}.webp`))) ways.push([p.slug, c, v]);
+const wayId = (s, c, v) => `${id(s)}${cap(c)}${v ? cap(v) : ""}`;
+
 await writeFile(
   path.join(ROOT, "src/lib/product-images.ts"),
   "// Static imports so next/image gets dimensions + blur placeholders. One per catalog.json entry, plus extra views.\n" +
@@ -27,6 +37,8 @@ await writeFile(
     catalog.map((p) => `import ${id(p.slug)} from "@/assets/products/${p.slug}.webp";`).join("\n") +
     "\n" +
     extra.map(([s, v]) => `import ${id(s)}${cap(v)} from "@/assets/products/${s}-${v}.webp";`).join("\n") +
+    "\n" +
+    ways.map(([s, c, v]) => `import ${wayId(s, c, v)} from "@/assets/products/${s}--${c}${v ? `-${v}` : ""}.webp";`).join("\n") +
     "\n\nexport const productImages = {\n" +
     catalog.map((p) => `  "${p.slug}": ${id(p.slug)},`).join("\n") +
     "\n};\n\n" +
@@ -36,6 +48,17 @@ await writeFile(
       .filter((p) => extra.some(([s]) => s === p.slug))
       .map((p) => `  "${p.slug}": { ${extra.filter(([s]) => s === p.slug).map(([s, v]) => `${v}: ${id(s)}${cap(v)}`).join(", ")} },`)
       .join("\n") +
+    "\n};\n\n" +
+    "// other colourways of a piece: { slug: { colour: { front, back?, side? } } }\n" +
+    "export const colorImages: Partial<Record<keyof typeof productImages, Record<string, { front: StaticImageData } & Partial<Record<ProductView, StaticImageData>>>>> = {\n" +
+    [...new Set(ways.map(([s]) => s))]
+      .map((s) => {
+        const cs = [...new Set(ways.filter(([x]) => x === s).map(([, c]) => c))];
+        return `  "${s}": { ${cs
+          .map((c) => `${c}: { ${ways.filter(([x, y]) => x === s && y === c).map(([x, y, v]) => `${v || "front"}: ${wayId(x, y, v)}`).join(", ")} }`)
+          .join(", ")} },`;
+      })
+      .join("\n") +
     "\n};\n",
 );
-console.log(`product-images.ts: ${catalog.length}/${all.length} products photographed, ${extra.length} extra views`);
+console.log(`product-images.ts: ${catalog.length}/${all.length} products photographed, ${extra.length} extra views, ${ways.length} colourway photos`);

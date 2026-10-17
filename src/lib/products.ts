@@ -1,6 +1,6 @@
 import catalog from "./catalog.json";
 import type { StaticImageData } from "next/image";
-import { productImages, productViews } from "./product-images";
+import { colorImages, productImages, productViews } from "./product-images";
 
 // Product data lives in catalog.json (placeholder catalogue — replace with your real range).
 // Photos are generated from each entry's `shot` by scripts/generate-products.mjs.
@@ -55,24 +55,33 @@ export interface Product {
   backImage?: StaticImageData;
   /** every photo of the piece, front first (front, back and side where they exist) — the product page gallery */
   views: { label: string; src: StaticImageData }[];
+  /** the gallery per colour: the main colour (colors[0]) is `views`; other colours appear once they're photographed */
+  colorViews: Partial<Record<ColorKey, { label: string; src: StaticImageData }[]>>;
   isNew: boolean;
 }
+
+type ViewSet = { front: StaticImageData; back?: StaticImageData; side?: StaticImageData };
+const toViews = (v: ViewSet) => [
+  { label: "Front", src: v.front },
+  ...(v.back ? [{ label: "Back", src: v.back }] : []),
+  ...(v.side ? [{ label: "Side", src: v.side }] : []),
+];
 
 // The six most recently added pieces are flagged "New".
 const shot = catalog.filter((p) => p.slug in productImages); // pieces appear once they have a photo
 const newest = new Set([...shot].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug));
 
 export const products: Product[] = shot.map((p) => ({
-  ...(p as Omit<Product, "image" | "isNew" | "backImage" | "views">),
+  ...(p as Omit<Product, "image" | "isNew" | "backImage" | "views" | "colorViews">),
   image: productImages[p.slug as keyof typeof productImages],
   backImage: productViews[p.slug as keyof typeof productImages]?.back,
-  views: [
-    { label: "Front", src: productImages[p.slug as keyof typeof productImages] },
-    ...(["back", "side"] as const).flatMap((v) => {
-      const src = productViews[p.slug as keyof typeof productImages]?.[v];
-      return src ? [{ label: v === "back" ? "Back" : "Side", src }] : [];
-    }),
-  ],
+  views: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }),
+  colorViews: {
+    [p.colors[0]]: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }),
+    ...Object.fromEntries(
+      Object.entries(colorImages[p.slug as keyof typeof productImages] ?? {}).map(([c, v]) => [c, toViews(v)]),
+    ),
+  },
   isNew: newest.has(p.slug),
 }));
 

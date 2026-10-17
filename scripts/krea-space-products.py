@@ -76,7 +76,7 @@ SAFE = (
 
 # lingerie and swim only: without this the model sometimes dresses her in a slip or gown from behind
 ONLY_THE_SET = "She wears only this piece and nothing over it — no dress, no slip, no robe, no cover-up. "
-WITH_COVER = {"sakura-silk-kimono-set", "delilah-backless-string-dress"}  # a robe or a dress is the point here
+WITH_COVER = {"sakura-silk-kimono-set", "delilah-backless-string-dress", "margot-silk-slip"}  # a robe or a dress is the point here
 CATALOG = {p["slug"]: p for p in json.loads((pathlib.Path(__file__).resolve().parent.parent / "src/lib/catalog.json").read_text())}
 
 # slug: (seed, model, set, the design — distinct silhouettes, fabrics and details, front and back)
@@ -152,6 +152,17 @@ PRODUCTS = {
         "She wears the Bijou two-piece: a crystal-embellished ivory bralette with crystal fringe over her bare midriff and a matching crystal mini skirt slit high on one side."),
 }
 
+
+# Extra colourways: the same model, set and seed as the product's main shoot, the design re-coloured. Saved as
+# refs/krea/products/<slug>--<colour>-<view>.png; the shop shows them when that colour is picked.
+COLORWAYS = {
+    ("rose-lace-balconette-bra", "wine"): "She wears the Rosé balconette set in deep wine red: a fully lined deep wine-red floral lace balconette bra with scalloped edges, a deep centre gore and tiny satin bows on each strap, and a matching high-cut wine-red lace brief; from behind, a wide wine lace band with satin hook closure and a cheeky lace back.",
+    ("rose-lace-high-waist-brief", "wine"): "She wears the Rosé high-waist brief in dark burgundy wine red (deep dark red, not pink): a high-waisted brief of sheer-panelled dark wine-red floral lace with a scalloped waistband sitting at her navel and dramatic high-cut legs, worn with a tiny matching dark wine-red lace triangle bralette; from behind, a cheeky lace back with a satin bow at the base of her spine.",
+    ("camille-satin-bow-bralette", "blush"): "She wears the Camille set in blush pink satin: a soft fully lined blush-pink satin triangle bralette with an oversized satin bow tied at the centre, thin ribbon straps that cross and tie in a bow at her back, and a tiny blush-pink satin tanga with bow sides.",
+    ("juliette-lace-bodysuit", "blush"): "She wears the Juliette bodysuit in blush pink: a deep-plunge bodysuit of blush-pink Chantilly lace with fully lined cups, sheer mesh side panels, an extreme high-cut leg and a back open all the way to the waist, finishing in a thong back.",
+    ("margot-silk-slip", "wine"): "She wears the Margot slip in deep wine silk: a bias-cut deep wine-red silk chemise with a deep cowl neckline, lace-trimmed slits up to the hip on both sides, a very short hem, and spaghetti straps that cross over a bare, open back.",
+    ("amelie-garter-belt", "blush"): "She wears the Amélie garter belt in blush pink: a wide blush-pink lace garter belt sitting on her waist with four satin suspender straps clipped to sheer nude seamed stockings, over a blush-pink lace thong and a blush-pink lace balconette bra.",
+}
 
 class QuotaExhausted(Exception):
     pass
