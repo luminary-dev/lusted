@@ -50,6 +50,8 @@ export interface Product {
   fitNote: string;
   /** three short moments it's made for — the product page's "Made for…" line */
   moments: string[];
+  /** what the main photo shows when it isn't the front (e.g. "Side") — labels it in the product gallery */
+  mainView?: string;
   image: (typeof productImages)[keyof typeof productImages];
   /** model-shot pieces: the back view, shown on hover in cards */
   backImage?: StaticImageData;
@@ -61,8 +63,8 @@ export interface Product {
 }
 
 type ViewSet = { front: StaticImageData; back?: StaticImageData; side?: StaticImageData };
-const toViews = (v: ViewSet) => [
-  { label: "Front", src: v.front },
+const toViews = (v: ViewSet, mainLabel = "Front") => [
+  { label: mainLabel, src: v.front },
   ...(v.back ? [{ label: "Back", src: v.back }] : []),
   ...(v.side ? [{ label: "Side", src: v.side }] : []),
 ];
@@ -75,9 +77,9 @@ export const products: Product[] = shot.map((p) => ({
   ...(p as Omit<Product, "image" | "isNew" | "backImage" | "views" | "colorViews">),
   image: productImages[p.slug as keyof typeof productImages],
   backImage: productViews[p.slug as keyof typeof productImages]?.back,
-  views: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }),
+  views: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }, p.mainView),
   colorViews: {
-    [p.colors[0]]: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }),
+    [p.colors[0]]: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }, p.mainView),
     ...Object.fromEntries(
       Object.entries(colorImages[p.slug as keyof typeof productImages] ?? {}).map(([c, v]) => [c, toViews(v)]),
     ),
