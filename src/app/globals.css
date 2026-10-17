@@ -5027,6 +5027,7 @@ svg {
 
 .hero-featured-img img {
   object-fit: cover;
+  object-position: 50% 18%; /* a product's model shot: face and neckline */
   transition: transform 0.8s var(--ease);
 }
 

@@ -24,10 +24,9 @@ export const navLinks = [
   { href: "/#contact", label: "Contact" },
 ];
 
-// The "Featured" card in the hero — point it at any edit, filter or product.
+// The "Featured" card in the hero — a product: its photo, name and page come from the catalogue by slug.
 export const featured = {
   eyebrow: "Tonight's temptation",
-  title: "The Blush Edit",
-  tagline: "Soft lace. Bad intentions.",
-  href: "/products?color=blush",
+  product: "lola-fringe-micro-dress",
+  tagline: "Every bead swings. Every eye follows.",
 };

@@ -10,8 +10,7 @@ import hero7 from "@/assets/images/hero/hero-7.webp";
 import hero8 from "@/assets/images/hero/hero-8.webp";
 import hero9 from "@/assets/images/hero/hero-9.webp";
 import hero10 from "@/assets/images/hero/hero-10.webp";
-import featuredImg from "@/assets/images/thumb-lingerie.webp";
-import { categories } from "@/lib/products";
+import { categories, getProduct } from "@/lib/products";
 import { featured, whatsappLink } from "@/lib/site";
 import HeroSlides, { type HeroSlide } from "./HeroSlides";
 import { ArrowRight, WhatsApp } from "./icons";
@@ -21,19 +20,70 @@ import { ArrowRight, WhatsApp } from "./icons";
 // Ordered so no two neighbouring slides share a colour story (the loop wraps from the last back to the first):
 // blush → wine → sea → champagne → sea → blush → black → peach → wine → blue dusk.
 const slides: HeroSlide[] = [
-  { src: hero1, alt: "Model reclining on blush satin pillows in a pink lace bra, brief and suspenders", pos: "72% 25%", posMobile: "84% 25%" },
-  { src: hero4, alt: "Model kneeling on a velvet chaise in a wine lace bodysuit with garters", pos: "0% 20%", posMobile: "50% 20%" },
-  { src: hero9, alt: "Model in a crimson string bikini kneeling in the surf at golden hour", pos: "0% 20%", posMobile: "60% 20%" },
-  { src: hero3, alt: "Model in a champagne sequin slip dress on a velvet chaise by candlelight", pos: "72% 25%", posMobile: "81% 25%" },
-  { src: hero2, alt: "Model in an ivory string bikini on the deck of a yacht at golden hour", pos: "72% 25%", posMobile: "73% 25%" },
-  { src: hero7, alt: "Model by a window in a blush silk robe over a lace bralette", pos: "0% 25%", posMobile: "63% 25%" },
-  { src: hero8, alt: "Model in a sheer black lace bodysuit and chiffon robe on the rim of a marble bathtub by candlelight", pos: "72% 20%", posMobile: "68% 20%" },
-  { src: hero5, alt: "Model in a plunging gold swimsuit at the edge of an infinity pool at sunset", pos: "0% 20%", posMobile: "66% 20%" },
-  { src: hero6, alt: "Model on wine velvet cushions by candlelight in a ruby lace bra", pos: "72% 25%", posMobile: "72% 25%" },
-  { src: hero10, alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk", pos: "0% 20%", posMobile: "52% 20%" },
+  {
+    src: hero1,
+    alt: "Model reclining on blush satin pillows in a pink lace bra, brief and suspenders",
+    pos: "72% 25%",
+    posMobile: "84% 25%",
+  },
+  {
+    src: hero4,
+    alt: "Model kneeling on a velvet chaise in a wine lace bodysuit with garters",
+    pos: "0% 20%",
+    posMobile: "50% 20%",
+  },
+  {
+    src: hero9,
+    alt: "Model in a crimson string bikini kneeling in the surf at golden hour",
+    pos: "0% 20%",
+    posMobile: "60% 20%",
+  },
+  {
+    src: hero3,
+    alt: "Model in a champagne sequin slip dress on a velvet chaise by candlelight",
+    pos: "72% 25%",
+    posMobile: "81% 25%",
+  },
+  {
+    src: hero2,
+    alt: "Model in an ivory string bikini on the deck of a yacht at golden hour",
+    pos: "72% 25%",
+    posMobile: "73% 25%",
+  },
+  {
+    src: hero7,
+    alt: "Model by a window in a blush silk robe over a lace bralette",
+    pos: "0% 25%",
+    posMobile: "63% 25%",
+  },
+  {
+    src: hero8,
+    alt: "Model in a sheer black lace bodysuit and chiffon robe on the rim of a marble bathtub by candlelight",
+    pos: "72% 20%",
+    posMobile: "68% 20%",
+  },
+  {
+    src: hero5,
+    alt: "Model in a plunging gold swimsuit at the edge of an infinity pool at sunset",
+    pos: "0% 20%",
+    posMobile: "66% 20%",
+  },
+  {
+    src: hero6,
+    alt: "Model on wine velvet cushions by candlelight in a ruby lace bra",
+    pos: "72% 25%",
+    posMobile: "72% 25%",
+  },
+  {
+    src: hero10,
+    alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk",
+    pos: "0% 20%",
+    posMobile: "52% 20%",
+  },
 ];
 
 export default function Hero() {
+  const pick = getProduct(featured.product);
   return (
     <section id="top" className="hero">
       <HeroSlides slides={slides} />
@@ -42,37 +92,64 @@ export default function Hero() {
           <p className="eyebrow" data-reveal>
             {categories.map((c) => c.name).join(" · ")}
           </p>
-          <h1 className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
+          <h1
+            className="h1"
+            data-reveal
+            style={{ "--d": "0.1s" } as React.CSSProperties}
+          >
             Dressed to tempt. <em>Made to be undone.</em>
           </h1>
-          <p className="lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
-            Barely-there lace, sun-kissed strings and midnight silk — for the version of you that never asks permission.
+          <p
+            className="lede"
+            data-reveal
+            style={{ "--d": "0.2s" } as React.CSSProperties}
+          >
+            Barely-there lace, sun-kissed strings and midnight silk — for the
+            version of you that never asks permission.
           </p>
-          <div className="hero-actions" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
+          <div
+            className="hero-actions"
+            data-reveal
+            style={{ "--d": "0.3s" } as React.CSSProperties}
+          >
             <Link href="/products" className="btn btn-light">
               Find your temptation <ArrowRight className="arrow" />
             </Link>
-            <a href={whatsappLink("Hi Lusted! I'd love some help finding the right piece.")} target="_blank" rel="noopener noreferrer" className="hero-story">
+            <a
+              href={whatsappLink(
+                "Hi Lusted! I'd love some help finding the right piece.",
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero-story"
+            >
               <WhatsApp /> Whisper to us
             </a>
           </div>
         </div>
 
-        <Link href={featured.href} className="hero-featured" data-reveal style={{ "--d": "0.45s" } as React.CSSProperties}>
-          <span className="hero-featured-img">
-            <Image quality={90} src={featuredImg} alt="" fill sizes="120px" />
-          </span>
-          <span className="hero-featured-copy">
-            <span className="hero-featured-eyebrow">{featured.eyebrow}</span>
-            <strong>{featured.title}</strong>
-            <span className="hero-featured-tag">
-              {featured.tagline.split(/(?<=\.)\s+/).map((line) => (
-                <span key={line}>{line}</span>
-              ))}
+        {pick && (
+          <Link
+            href={`/products/${pick.slug}`}
+            className="hero-featured"
+            data-reveal
+            style={{ "--d": "0.45s" } as React.CSSProperties}
+          >
+            <span className="hero-featured-img">
+              <Image quality={90} src={pick.image} alt="" fill sizes="120px" />
             </span>
-          </span>
-          <ArrowRight className="hero-featured-arrow" />
-        </Link>
+            <span className="hero-featured-copy">
+              <span className="hero-featured-eyebrow">{featured.eyebrow}</span>
+              <strong>{pick.name}</strong>
+              <span className="hero-featured-tag">
+                {featured.tagline.split(/(?<=\.)\s+/).map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </span>
+            </span>
+            <ArrowRight className="hero-featured-arrow" />
+          </Link>
+        )}
       </div>
     </section>
   );
