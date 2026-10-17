@@ -29,7 +29,7 @@ npm run build && npm start   # production
 | Service, Contact | `Ordering.tsx` (“Here for you, every step” — packaging and perks), `Contact.tsx` | Contact: “Tell us what you desire” — WhatsApp and email links, a WhatsApp QR code (generated at build time with `qrcode`, hidden on phones) with a “Go on, scan me.” tease beside it and a list of channels |
 | Footer | `Footer.tsx`, `Newsletter.tsx` | Compact: logo, newsletter, links (shop links use the collection names), social icons |
 
-**Shop (`/products`)** — `components/shop/ProductBrowser.tsx`: search, collection tabs (Lace Secrets / Sun Kissed / Midnight Sins), filters (on sale / new / best sellers, size, colour, price), sort, active-filter chips. All filters live in the URL (e.g. `/products?cat=swim&size=M&sale=1`) so filtered views can be shared. On mobile the filters open as a bottom sheet. Product cards (`components/shop/ProductCard.tsx`) show the back view on hover, plus a quick add: the lower half of the photo melts into a frosted blur with the name, a frosted price pill, the sizes and a solid "Add to bag" button — pick a size, then add (mouse only; on touch screens a tap opens the product).
+**Shop (`/products`)** — `components/shop/ProductBrowser.tsx`: search, collection tabs (Lace Secrets / Sun Kissed / Midnight Sins), filters (on sale / new / best sellers, size, colour, price), sort, active-filter chips. All filters live in the URL (e.g. `/products?cat=swim&size=M&sale=1`) so filtered views can be shared. On mobile the filters open as a bottom sheet. Product cards (`components/shop/ProductCard.tsx`) show the back view on hover, plus a quick add: the lower half of the photo melts into a frosted blur with the name, a frosted price pill, the sizes and a solid "Add to bag" button — pick a size, then add (mouse only; on touch screens a tap opens the product). Clicking anywhere else on the photo or the panel opens the product page; only the size pills and the button are clickable.
 
 **Product page (`/products/[slug]`)** — `components/shop/PdpGallery.tsx`: the front photo large with the back and side views as small thumbnails underneath (choosing one cross-fades it into the main frame). Beside it: collection name, price/sale price, the description (which carries the piece's details and care), a script "Made for…" line, colour + size pickers with a one-line fit note (a three-step runs small / true to size / runs large meter), quantity, add to bag, "Order now on WhatsApp" and related pieces ("If the … tempted you"). Every photographed product's page is prerendered (products without a photo yet are hidden).
 
@@ -45,7 +45,7 @@ Sections fade in on scroll using pure-CSS scroll-driven animations (no JavaScrip
 
 ## Products
 
-The catalogue is **`src/lib/catalog.json`** — 28 placeholder products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
+The catalogue is **`src/lib/catalog.json`** — 31 placeholder products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
 
 - `salePrice` puts a product in the sale section and the "On sale" filter.
 - `bestSeller` (1–6) puts it in Best sellers, in that order.
@@ -59,8 +59,8 @@ The catalogue is **`src/lib/catalog.json`** — 28 placeholder products (names, 
   - the four sale bikinis (Pearl Seduction, Scarlet Sin, Noir Temptress, Golden Goddess): `scripts/krea-space-bikini.py <1-4>` (1152 × 2048, `refs/krea/bikini/`);
   - everything else: `scripts/krea-space-products.py [slug …]` (864 × 1536, `refs/krea/products/`). It skips views that already exist and stops cleanly when the Space's daily ZeroGPU quota runs out — just re-run it after the reset. Over-quota generation runs on prepaid ZeroGPU credits only through the Space's web UI (the API refuses), so the same prompts can also be pasted into the UI — same seed, 12 steps, the custom `Comfy-Org/Krea-2` turbo fp8 base — and the downloaded PNG saved as `<slug>-<view>.png`.
   - Prompt lessons: describe the garment plainly (a "web of straps" or "barely-there" pushes the model to put her in a dress from behind); lingerie and swim prompts add "nothing over it"; when a shot comes out in a different colour, the catalogue colour follows the photo (that's how Mocha joined the palette).
-  - 26 of 28 products are photographed; the Nightshade and Bijou dresses are still to shoot and stay hidden until they are.
-  - Then `node scripts/import-krea-products.mjs` converts the new shots into `src/assets/products/` and re-syncs `product-images.ts`. A product switches to its model shots as soon as its front exists; cards show the back on hover, the product page shows every view.
+  - All 31 products are photographed.
+  - Then `node scripts/import-krea-products.mjs` finishes the new shots into `src/assets/products/` — enhanced 2× with Real-ESRGAN (binary in the git-ignored `.tools/realesrgan/`; download the macOS release from github.com/xinntao/Real-ESRGAN) and watermarked with the Lusted wordmark bottom right, the same gap from the right and bottom edges — and re-syncs `product-images.ts`. `--all` re-finishes everything. The PNG originals live in the git-ignored `refs/`. A product switches to its model shots as soon as its front exists; cards show the back on hover, the product page shows every view.
 
 After adding or renaming products, generate the missing photos (this also updates `src/lib/product-images.ts`):
 
