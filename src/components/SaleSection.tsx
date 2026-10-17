@@ -1,0 +1,46 @@
+import Link from "next/link";
+import { maxDiscount, onSale, type ColorKey } from "@/lib/products";
+import { ArrowRight } from "./icons";
+import SaleCard from "./SaleCard";
+
+// Each card is tinted to its piece: the fade behind the text, the button glass and the glow beneath all take its colour.
+const TINT: Record<ColorKey, string> = {
+  ivory: "#86705c",
+  blush: "#9b5d66",
+  wine: "#6b1430",
+  black: "#241a1c",
+  champagne: "#8b6a35",
+  mocha: "#5a3d31",
+};
+
+export default function SaleSection() {
+  return (
+    <section id="sale" className="section sale">
+      <div className="container">
+        <header className="head">
+          <div data-reveal>
+            <p className="eyebrow">The Bikini Sale</p>
+            <h2 className="h2">
+              Barely there. <em>Now {maxDiscount}% off.</em>
+            </h2>
+          </div>
+          <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
+            <p>
+              Less fabric, and now less to pay. Consider it permission to show a little more — but only while your
+              size lasts.
+            </p>
+            <Link className="btn btn-wine" href="/products?sale=1">
+              Shop the bikini sale <ArrowRight className="arrow" />
+            </Link>
+          </div>
+        </header>
+
+        <div className="sale-products">
+          {onSale.slice(0, 4).map((p, i) => (
+            <SaleCard key={p.slug} product={p} tint={TINT[p.colors[0]]} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
