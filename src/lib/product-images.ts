@@ -32,6 +32,7 @@ import desireLatexMicroDress from "@/assets/products/desire-latex-micro-dress.we
 import lolaFringeMicroDress from "@/assets/products/lola-fringe-micro-dress.webp";
 import nightshadeCrossstrapMini from "@/assets/products/nightshade-crossstrap-mini.webp";
 import bijouCrystalTwoPiece from "@/assets/products/bijou-crystal-two-piece.webp";
+import fleurEmbroideredSatinSlip from "@/assets/products/fleur-embroidered-satin-slip.webp";
 import roseLaceBalconetteBraBack from "@/assets/products/rose-lace-balconette-bra-back.webp";
 import roseLaceBalconetteBraSide from "@/assets/products/rose-lace-balconette-bra-side.webp";
 import roseLaceHighWaistBriefBack from "@/assets/products/rose-lace-high-waist-brief-back.webp";
@@ -94,6 +95,8 @@ import nightshadeCrossstrapMiniBack from "@/assets/products/nightshade-crossstra
 import nightshadeCrossstrapMiniSide from "@/assets/products/nightshade-crossstrap-mini-side.webp";
 import bijouCrystalTwoPieceBack from "@/assets/products/bijou-crystal-two-piece-back.webp";
 import bijouCrystalTwoPieceSide from "@/assets/products/bijou-crystal-two-piece-side.webp";
+import fleurEmbroideredSatinSlipBack from "@/assets/products/fleur-embroidered-satin-slip-back.webp";
+import fleurEmbroideredSatinSlipSide from "@/assets/products/fleur-embroidered-satin-slip-side.webp";
 import roseLaceBalconetteBraWine from "@/assets/products/rose-lace-balconette-bra--wine.webp";
 import roseLaceBalconetteBraWineBack from "@/assets/products/rose-lace-balconette-bra--wine-back.webp";
 import roseLaceBalconetteBraWineSide from "@/assets/products/rose-lace-balconette-bra--wine-side.webp";
@@ -145,6 +148,7 @@ export const productImages = {
   "lola-fringe-micro-dress": lolaFringeMicroDress,
   "nightshade-crossstrap-mini": nightshadeCrossstrapMini,
   "bijou-crystal-two-piece": bijouCrystalTwoPiece,
+  "fleur-embroidered-satin-slip": fleurEmbroideredSatinSlip,
 };
 
 export type ProductView = "back" | "side";
@@ -180,6 +184,7 @@ export const productViews: Partial<Record<keyof typeof productImages, Partial<Re
   "lola-fringe-micro-dress": { back: lolaFringeMicroDressBack, side: lolaFringeMicroDressSide },
   "nightshade-crossstrap-mini": { back: nightshadeCrossstrapMiniBack, side: nightshadeCrossstrapMiniSide },
   "bijou-crystal-two-piece": { back: bijouCrystalTwoPieceBack, side: bijouCrystalTwoPieceSide },
+  "fleur-embroidered-satin-slip": { back: fleurEmbroideredSatinSlipBack, side: fleurEmbroideredSatinSlipSide },
 };
 
 // other colourways of a piece: { slug: { colour: { front, back?, side? } } }
