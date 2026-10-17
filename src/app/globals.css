@@ -1082,7 +1082,8 @@ svg {
   background: linear-gradient(180deg, #f7ddd3, #efcbbf);
   box-shadow:
     0 12px 30px rgba(90, 30, 40, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 -40px 0 20px var(--blush-bg);
   transform: rotate(-1.4deg);
 }
 
@@ -1145,7 +1146,7 @@ svg {
   position: relative;
   display: flex;
   flex-direction: column;
-  margin-top: calc(-1 * clamp(44px, 4.5vw, 64px) - 30px);
+  margin-top: calc(-1 * clamp(44px, 4.5vw, 64px) + 2px); /* just under the tape's edge, so her hair stays in view */
   margin-left: calc(-1 * max(var(--gutter), (100vw - var(--container)) / 2));
   margin-bottom: calc(-1 * clamp(64px, 6vw, 96px));
 }
@@ -1157,7 +1158,7 @@ svg {
 }
 
 .size-media img {
-  object-position: 50% 20%;
+  object-position: 50% 0%; /* never crop her hair — any trim comes off the bottom */
 }
 
 /* "Where the tape goes" (TapeGuide.tsx): a dress form with the tapes wrapped round it */
@@ -1212,6 +1213,8 @@ svg {
 }
 
 .tape-back {
+  /* the last shadow is a block of the previous section's colour (Best sellers) tilted with the tape, so above the
+     tape is one colour edge to edge and the size guide's own colour starts right beneath it */
   fill: none;
   stroke: var(--rose);
   stroke-width: 2.4;
@@ -2475,7 +2478,7 @@ svg {
     aspect-ratio: 1 / 1;
   }
   .size-media img {
-    object-position: 50% 15%;
+    object-position: 50% 0%;
   }
   .footer-cols {
     grid-template-columns: 1fr 1fr;
