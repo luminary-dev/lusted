@@ -6,7 +6,8 @@
 //  · enhanced — upscaled 4× with Real-ESRGAN (realesrgan-x4plus), brought to 2× and blended 75/25 with a plain Lanczos
 //    enlargement so lace, hair and eyes sharpen without plastic skin (same recipe as scripts/enhance-images.mjs). Needs
 //    the realesrgan-ncnn-vulkan binary: in .tools/realesrgan/ (git-ignored), ESRGAN_BIN or on PATH. Without it the photo is imported un-enhanced, with a warning.
-//  · watermarked — the Lusted wordmark in white, bottom right, softly shadowed.
+//  · cropped to exactly 9:16 (the frame the site shows), then watermarked — the Lusted wordmark in white, bottom right,
+//    the same gap from the right and bottom edges, softly shadowed.
 // The PNGs in refs/ stay clean originals.
 //
 // Usage: node scripts/import-krea-products.mjs [--all]   (--all re-finishes photos that are already imported)
@@ -83,6 +84,13 @@ async function finish(src, dest) {
     await rm(tmp, { recursive: true, force: true });
   } else {
     img = { buf: await sharp(src).removeAlpha().png().toBuffer(), W: width, H: height };
+  }
+  // crop to exactly 9:16 — the frame every card and the product page show — trimming the extra height mostly from the
+  // bottom (22% top / 78% bottom, the cards' object-position), so the watermark's margins look the same everywhere
+  const H916 = Math.round((img.W * 16) / 9);
+  if (img.H > H916) {
+    const top = Math.round((img.H - H916) * 0.22);
+    img = { buf: await sharp(img.buf).extract({ left: 0, top, width: img.W, height: H916 }).png().toBuffer(), W: img.W, H: H916 };
   }
   await sharp(img.buf)
     .composite(await watermark(img.W, img.H))
