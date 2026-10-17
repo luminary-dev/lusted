@@ -1,10 +1,12 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
-import { Chevron, Close, Search, Sliders } from "../icons";
+import { Chevron, ChevronNext, Close, Search, Sliders } from "../icons";
+
+const PER_PAGE = 15;
 
 const sorts = [
   { key: "featured", label: "Featured" },
@@ -40,6 +42,7 @@ export default function ProductBrowser() {
 
   function update(changes: Record<string, string | string[] | null>) {
     const next = new URLSearchParams(params.toString());
+    if (!("page" in changes)) next.delete("page"); // any filter, search or sort change starts again from page 1
     for (const [k, v] of Object.entries(changes)) {
       const value = Array.isArray(v) ? v.join(",") : v;
       if (value) next.set(k, value);
@@ -79,6 +82,16 @@ export default function ProductBrowser() {
     };
     return by[sort] ? [...out].sort(by[sort]) : out;
   }, [cat, urlQuery, selSizes, selColors, selPrice, selFlags, sort]);
+
+  // 15 pieces per page; the page lives in the URL (?page=2) like the filters
+  const pages = Math.max(1, Math.ceil(results.length / PER_PAGE));
+  const page = Math.min(pages, Math.max(1, Number(params.get("page")) || 1));
+  const shown = results.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const top = useRef<HTMLDivElement>(null);
+  const goTo = (n: number) => {
+    update({ page: n > 1 ? String(n) : null });
+    top.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const counts = useMemo(() => Object.fromEntries(categories.map((c) => [c.key, products.filter((p) => p.category === c.key).length])), []);
 
@@ -202,10 +215,12 @@ export default function ProductBrowser() {
           </aside>
         </div>
 
-        <div className="results">
+        <div className="results" ref={top}>
           <div className="results-bar">
             <p>
-              {results.length} {results.length === 1 ? "piece" : "pieces"}
+              {pages > 1
+                ? `${(page - 1) * PER_PAGE + 1}–${(page - 1) * PER_PAGE + shown.length} of ${results.length} pieces`
+                : `${results.length} ${results.length === 1 ? "piece" : "pieces"}`}
             </p>
             {chips.length > 0 && (
               <div className="chips">
@@ -222,11 +237,28 @@ export default function ProductBrowser() {
           </div>
 
           {results.length ? (
-            <div className="product-grid">
-              {results.map((p) => (
-                <ProductCard key={p.slug} product={p} />
-              ))}
-            </div>
+            <>
+              <div className="product-grid">
+                {shown.map((p) => (
+                  <ProductCard key={p.slug} product={p} />
+                ))}
+              </div>
+              {pages > 1 && (
+                <nav className="pager" aria-label="Pages">
+                  <button type="button" className="pager-step is-prev" onClick={() => goTo(page - 1)} disabled={page === 1} aria-label="Previous page">
+                    <ChevronNext />
+                  </button>
+                  {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+                    <button key={n} type="button" className={n === page ? "is-active" : ""} aria-current={n === page ? "page" : undefined} onClick={() => goTo(n)}>
+                      {n}
+                    </button>
+                  ))}
+                  <button type="button" className="pager-step" onClick={() => goTo(page + 1)} disabled={page === pages} aria-label="Next page">
+                    <ChevronNext />
+                  </button>
+                </nav>
+              )}
+            </>
           ) : (
             <div className="empty">
               <h3 className="h3">No pieces match those filters.</h3>

@@ -3483,6 +3483,62 @@ svg {
   cursor: pointer;
 }
 
+/* pagination under the product grid; changing page scrolls back to the results, clear of the fixed nav */
+.results {
+  scroll-margin-top: 110px;
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+.pager button {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+.pager button:hover:not(:disabled) {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.pager button.is-active {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff6f2;
+}
+
+.pager button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pager-step svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pager-step.is-prev svg {
+  transform: scaleX(-1);
+}
+
 .empty {
   display: grid;
   justify-items: start;
