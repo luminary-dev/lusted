@@ -3394,6 +3394,18 @@ svg {
   color: var(--cream);
 }
 
+/* the shop's size filter: all five sizes on one line, sharing the sidebar width */
+.filters .size-chips {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.filters .size-chips button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0;
+}
+
 .color-list {
   clear: both;
   display: grid;
