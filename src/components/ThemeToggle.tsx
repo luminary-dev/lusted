@@ -18,12 +18,27 @@ const getTheme = (): Theme => (document.documentElement.dataset.theme === "dark"
 export default function ThemeToggle() {
   const theme = useSyncExternalStore(subscribe, getTheme, () => null);
 
-  function toggle() {
+  // The new mood blooms out from the switch: a soft-edged circle of it spreads across the screen while the old one
+  // melts into a warm blur underneath (View Transitions; a plain colour fade where those aren't supported).
+  function toggle(e: React.MouseEvent<HTMLButtonElement>) {
+    const root = document.documentElement;
     const next: Theme = getTheme() === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem("lusted-theme", next);
-    } catch {}
+    const apply = () => {
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem("lusted-theme", next);
+      } catch {}
+    };
+    if (!document.startViewTransition || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return apply();
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = r.left + r.width / 2,
+      y = r.top + r.height / 2;
+    root.style.setProperty("--vt-x", `${x}px`);
+    root.style.setProperty("--vt-y", `${y}px`);
+    // far enough to cover the furthest corner, plus the feathered edge
+    root.style.setProperty("--vt-r", `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 260}px`);
+    root.classList.add("theme-shifting");
+    document.startViewTransition(apply).finished.finally(() => root.classList.remove("theme-shifting"));
   }
 
   const dark = theme === "dark";

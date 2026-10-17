@@ -655,7 +655,7 @@ export default function SizeTags3D({
         vy: number;
         turn: number;
       };
-      const REST = [-0.2, 0.14, -0.08, 0.18, -0.12]; // resting angle on the string, radians — small, so every tag reads
+      const REST = [0.16, 0.12, -0.05, 0.12, -0.08]; // resting angle on the string, radians — small, so every tag reads; XS (far left, seen most side-on) turns towards the camera
       const LEN = [0.4, 0.5, 0.36, 0.46, 0.42]; // string lengths — each tag hangs a little differently
       const items = latest.current.map((tag, i) => {
         const pivot = new THREE.Group();

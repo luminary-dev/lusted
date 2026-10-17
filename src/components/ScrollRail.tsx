@@ -1,11 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Stands in for the (hidden) browser scrollbar: a thin rose line across the top that fills as you scroll, and —
-// on pages made of sections — a rail down the right edge with a heart per section. The section you're in glows;
-// tap a heart to glide there.
+// Stands in for the (hidden) browser scrollbar: a thin rose line across the top that fills as you scroll and — on
+// pages made of sections — a string of hearts down the right edge, one per section, with tiny pearls between them.
+// The thread blushes rose down to where you are; the section you're in is a glossy heart with a slow heartbeat and a
+// glow, the two either side are smaller and softer, the rest are faint outlines. Hover a heart for the section's
+// name; click to glide there.
 const LABELS: Record<string, string> = {
   top: "Welcome",
   sale: "Sale",
@@ -19,31 +21,55 @@ const LABELS: Record<string, string> = {
 };
 const label = (id: string) => LABELS[id] ?? id.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
 
-function HeartMark() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.3 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3.1 1.6-1.9 3.1-3.1 5.2-3.1 3.5 0 5.4 3.5 4.1 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" />
-    </svg>
-  );
-}
+const STEP = 40; // px between hearts
+const PAD = 14;
+const W = 30;
+const CX = W / 2;
+// a full, slightly plump heart centred on 0,0 (about 16 px wide)
+const HEART = "M0 6.4C-2.6 4.6-8 1.2-8-3.1-8-6-5.9-7.6-3.9-7.6-2.1-7.6-.8-6.5 0-5.1.8-6.5 2.1-7.6 3.9-7.6 5.9-7.6 8-6 8-3.1 8 1.2 2.6 4.6 0 6.4Z";
+const SHINE = "M-5.6-3.6C-5.6-5.3-4.4-6.2-3.2-6.1-2.4-6-1.9-5.6-1.6-5.1-3.1-5-4.6-4.4-5.6-3.6Z";
 
 export default function ScrollRail() {
   const pathname = usePathname();
   const [sections, setSections] = useState<string[]>([]);
-  const [active, setActive] = useState("");
+  const [active, setActive] = useState(0);
+  const rail = useRef<HTMLElement>(null);
 
-  // the line across the top: a CSS variable updated once per frame
+  // find the page's top-level sections once it has mounted
   useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      const ids = [...document.querySelectorAll<HTMLElement>("main > section[id]")].map((el) => el.id);
+      setSections(ids.length >= 3 ? ids : []);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [pathname]);
+
+  // per frame while scrolling: the top line's fill, how far the lacing has reached, and which section is current
+  useEffect(() => {
+    const els = sections.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
     let frame = 0;
     const update = () => {
       frame = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      document.documentElement.style.setProperty("--scroll-progress", String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
+      const root = document.documentElement;
+      const max = root.scrollHeight - window.innerHeight;
+      root.style.setProperty("--scroll-progress", String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
+      if (els.length < 2) return;
+      // the section under the middle of the screen, and how far through it we are
+      const mid = window.scrollY + window.innerHeight * 0.5;
+      const tops = els.map((el) => el.getBoundingClientRect().top + window.scrollY);
+      let i = 0;
+      while (i < tops.length - 1 && mid >= tops[i + 1]) i++;
+      const next = i < tops.length - 1 ? tops[i + 1] : root.scrollHeight;
+      const frac = Math.max(0, Math.min(1, (mid - tops[i]) / Math.max(1, next - tops[i])));
+      const atEnd = window.scrollY >= max - 2;
+      const reach = atEnd ? 1 : Math.min(1, (i + frac * 0.999) / (els.length - 1));
+      rail.current?.style.setProperty("--reach", reach.toFixed(4));
+      setActive(atEnd ? els.length - 1 : i);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    update();
+    onScroll(); // first paint
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
@@ -51,52 +77,68 @@ export default function ScrollRail() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [pathname]);
-
-  // the rail: one heart per top-level section, the one filling the middle of the screen lit
-  useEffect(() => {
-    const els = [...document.querySelectorAll<HTMLElement>("main > section[id]")];
-    const found = requestAnimationFrame(() => setSections(els.length >= 3 ? els.map((el) => el.id) : [])); // after the page's sections mount
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) if (e.isIntersecting) setActive(e.target.id);
-      },
-      { rootMargin: "-45% 0px -50% 0px" },
-    );
-    if (els.length >= 3) els.forEach((el) => observer.observe(el));
-    return () => {
-      cancelAnimationFrame(found);
-      observer.disconnect();
-    };
-  }, [pathname]);
+  }, [sections]);
 
   const go = (id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (id === "top") window.scrollTo({ top: 0, behavior: smooth ? "smooth" : "auto" });
-    else el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    if (id === "top") window.scrollTo({ top: 0, behavior });
+    else el.scrollIntoView({ behavior, block: "start" });
   };
+
+  const n = sections.length;
+  const H = PAD * 2 + (n - 1) * STEP;
+  const yAt = (i: number) => PAD + i * STEP;
 
   return (
     <>
       <div className="scroll-progress" aria-hidden="true" />
-      {sections.length > 0 && (
-        <nav className="scroll-rail" aria-label="Sections">
+      {n > 0 && (
+        <nav className="scroll-rail" aria-label="Sections" ref={rail} style={{ width: W, height: H }}>
+          <svg className="hearts" viewBox={`0 0 ${W} ${H}`} width={W} height={H} aria-hidden="true">
+            <defs>
+              <radialGradient id="heart-gloss" cx="35%" cy="30%" r="80%">
+                <stop offset="0" stopColor="#ffd9de" />
+                <stop offset="0.35" stopColor="#ef6f8e" />
+                <stop offset="0.75" stopColor="#b3204a" />
+                <stop offset="1" stopColor="#6e0f2a" />
+              </radialGradient>
+              <radialGradient id="pearl" cx="35%" cy="30%" r="75%">
+                <stop offset="0" stopColor="#fff" />
+                <stop offset="0.6" stopColor="#f3dcd4" />
+                <stop offset="1" stopColor="#c9a197" />
+              </radialGradient>
+            </defs>
+            {/* the thread: faint all the way, blushing rose down to where you are */}
+            <line className="heart-thread" x1={CX} x2={CX} y1={0} y2={H} />
+            <line className="heart-thread-fill" x1={CX} x2={CX} y1={yAt(0)} y2={yAt(n - 1)} pathLength={1} />
+            {sections.slice(1).map((id, i) => (
+              <circle key={id} className="heart-pearl" cx={CX} cy={yAt(i) + STEP / 2} r={1.9} />
+            ))}
+            {sections.map((id, i) => (
+              <g key={id} transform={`translate(${CX} ${yAt(i)})`}>
+                <g className="heart" data-dist={Math.min(3, Math.abs(i - active))}>
+                  <g className="heart-beat">
+                    <path className="heart-body" d={HEART} />
+                    <path className="heart-shine" d={SHINE} />
+                  </g>
+                </g>
+              </g>
+            ))}
+          </svg>
           {sections.map((id, i) => (
-            <span key={id} className="scroll-rail-step">
-              {i > 0 && <i className="scroll-rail-gem" aria-hidden="true" />}
-              <button
-                type="button"
-                className={id === active ? "is-active" : ""}
-                aria-current={id === active ? "true" : undefined}
-                aria-label={label(id)}
-                onClick={() => go(id)}
-              >
-                <HeartMark />
-                <span className="scroll-rail-label">{label(id)}</span>
-              </button>
-            </span>
+            <button
+              key={id}
+              type="button"
+              className="heart-hit"
+              style={{ top: yAt(i) }}
+              aria-label={label(id)}
+              aria-current={i === active ? "true" : undefined}
+              onClick={() => go(id)}
+            >
+              <span className="scroll-rail-label">{label(id)}</span>
+            </button>
           ))}
         </nav>
       )}
