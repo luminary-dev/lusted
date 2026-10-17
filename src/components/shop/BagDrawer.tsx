@@ -1,0 +1,110 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect } from "react";
+import { bag, useBag, useBagOpen } from "@/lib/bag";
+import { colors, formatPrice, getProduct, priceOf } from "@/lib/products";
+import { whatsappLink } from "@/lib/site";
+import { ArrowRight, Close, WhatsApp } from "../icons";
+
+export default function BagDrawer() {
+  const open = useBagOpen();
+  const { items, count, subtotal } = useBag();
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && bag.setOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = "";
+    };
+  }, [open]);
+
+  const order = [
+    "Hi Lusted! I'd like to order:",
+    "",
+    ...items.map((i) => {
+      const p = getProduct(i.slug)!;
+      return `• ${p.name} — ${colors[i.color].label}, size ${i.size} × ${i.qty} (${formatPrice(priceOf(p) * i.qty)})`;
+    }),
+    "",
+    `Subtotal: ${formatPrice(subtotal)}`,
+  ].join("\n");
+
+  return (
+    <div className={`drawer-root ${open ? "is-open" : ""}`} aria-hidden={!open}>
+      <div className="drawer-scrim" onClick={() => bag.setOpen(false)} />
+      <aside className="drawer" role="dialog" aria-modal="true" aria-label="Your bag">
+        <header className="drawer-head">
+          <h2 className="h3">Your bag {count > 0 && <span>({count})</span>}</h2>
+          <button className="icon-btn" aria-label="Close bag" onClick={() => bag.setOpen(false)}>
+            <Close />
+          </button>
+        </header>
+
+        {items.length === 0 ? (
+          <div className="drawer-empty">
+            <p>Your bag is empty.</p>
+            <Link href="/products" className="btn btn-wine" onClick={() => bag.setOpen(false)}>
+              Browse the shop <ArrowRight className="arrow" />
+            </Link>
+          </div>
+        ) : (
+          <>
+            <ul className="bag-list">
+              {items.map((i) => {
+                const p = getProduct(i.slug)!;
+                return (
+                  <li key={`${i.slug}-${i.size}-${i.color}`} className="bag-item">
+                    <Link href={`/products/${p.slug}`} className="bag-thumb" onClick={() => bag.setOpen(false)}>
+                      <Image src={p.image} alt={p.name} fill sizes="88px" />
+                    </Link>
+                    <div className="bag-body">
+                      <Link href={`/products/${p.slug}`} onClick={() => bag.setOpen(false)}>
+                        {p.name}
+                      </Link>
+                      <span>
+                        {colors[i.color].label} · {i.size}
+                      </span>
+                      <div className="bag-row">
+                        <div className="stepper" aria-label="Quantity">
+                          <button aria-label="Decrease quantity" onClick={() => bag.setQty(i, i.qty - 1)}>
+                            −
+                          </button>
+                          <span>{i.qty}</span>
+                          <button aria-label="Increase quantity" onClick={() => bag.setQty(i, i.qty + 1)}>
+                            +
+                          </button>
+                        </div>
+                        <strong>{formatPrice(priceOf(p) * i.qty)}</strong>
+                      </div>
+                    </div>
+                    <button className="bag-remove" aria-label={`Remove ${p.name}`} onClick={() => bag.remove(i)}>
+                      <Close />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <footer className="drawer-foot">
+              <div className="drawer-total">
+                <span>Subtotal</span>
+                <strong>{formatPrice(subtotal)}</strong>
+              </div>
+              <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp. Always shipped in plain packaging.</p>
+              <a className="btn btn-wine" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
+                <WhatsApp /> Send order on WhatsApp
+              </a>
+              <button className="drawer-clear" onClick={() => bag.clear()}>
+                Clear bag
+              </button>
+            </footer>
+          </>
+        )}
+      </aside>
+    </div>
+  );
+}
