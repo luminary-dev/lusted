@@ -4593,16 +4593,7 @@ svg {
 }
 
 /* ───────── section breaks ─────────
-   Home sections alternate paper / cream / blush backgrounds and are divided by a hairline. */
-
-main > section + section {
-  border-top: 1px solid var(--hair);
-}
-
-/* the size guide's tape is its top edge — no hairline above it */
-main > section.size {
-  border-top: 0;
-}
+   Home sections alternate paper / cream / blush backgrounds — the change of colour is the break, no lines. */
 
 .sale {
   background: var(--paper);

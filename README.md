@@ -99,7 +99,7 @@ node scripts/build-logo-pack.mjs                        # → pack, zip, site lo
 ## Design
 
 - Icons: [lucide-react](https://lucide.dev) — the icon set used by shadcn/ui — wrapped in `src/components/icons.tsx`. Lucide ships no brand logos, so the WhatsApp and Instagram logos come from [Tabler Icons](https://tabler.io/icons) (`@tabler/icons-react`, another icon library shadcn/ui supports) — same 24px outline style, no custom SVGs.
-- Home sections alternate paper / cream / blush backgrounds with a hairline between each.
+- Home sections alternate paper / cream / blush backgrounds; the colour change is the break (no divider lines).
 
 - Fonts: **Petit Formal Script** (headlines — formal copperplate, fancy but easy to read) and **Montserrat** (everything else), via `next/font/google`. To try another headline font, change `--headline` in `globals.css`: `var(--fraunces)` = Fraunces, `var(--serif)` = Playfair Display (closest free match to the logo), `var(--script)` = Corinthia — the matching sizes are noted next to `.h1`/`.h2`.
 - Palette, spacing and type scale are CSS variables at the top of `src/app/globals.css`; content sits in a 1320px container with fluid (`clamp`) type and section spacing.
