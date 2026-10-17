@@ -46,7 +46,7 @@ Sections fade in on scroll using pure-CSS scroll-driven animations (no JavaScrip
 
 ## Products
 
-The catalogue is **`src/lib/catalog.json`** — 32 products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
+The catalogue is **`src/lib/catalog.json`** — 33 products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
 
 - `salePrice` puts a product in the sale section and the "On sale" filter.
 - `bestSeller` (1–6) puts it in Best sellers, in that order.
@@ -62,7 +62,7 @@ The catalogue is **`src/lib/catalog.json`** — 32 products (names, prices in Sr
   - Prompt lessons: describe the garment plainly (a "web of straps" or "barely-there" pushes the model to put her in a dress from behind); lingerie and swim prompts add "nothing over it"; when a shot comes out in a different colour, the catalogue colour follows the photo (that's how Mocha joined the palette).
   - All 31 products are photographed.
   - Then `node scripts/import-krea-products.mjs` finishes the new shots into `src/assets/products/` — enhanced 2× with Real-ESRGAN (binary in the git-ignored `.tools/realesrgan/`; download the macOS release from github.com/xinntao/Real-ESRGAN) and watermarked with the Lusted wordmark bottom right, the same gap from the right and bottom edges — and re-syncs `product-images.ts`. `--all` re-finishes everything. The PNG originals live in the git-ignored `refs/`. A product switches to its model shots as soon as its front exists; cards show the back on hover, the product page shows every view.
-  - Real products: `scripts/krea-space-edit.py` dresses an existing model shot in the garment from a product photo (Krea 2 Identity Edit through the Space's API), one call per view — that's how the Fleur Embroidered Satin Slip was shot on the Élodie set.
+  - Real products: `scripts/krea-space-edit.py` dresses an existing model shot in the garment from a product photo (Krea 2 Identity Edit through the Space's API), one call per view — that's how the Fleur Embroidered Satin Slip (Élodie set) and the Lotus Satin Cheongsam (Juliette set) were shot. A second-reference strength of 2 copies an unusual cut (keyholes, open sides) literally instead of turning it into a standard garment.
   - Colourways: shots named `<slug>--<colour>-<view>.png` (e.g. `margot-silk-slip--wine-front.png`, prompts in `COLORWAYS` in `scripts/krea-space-products.py` — same model, set and seed as the main shoot) become `<slug>--<colour>.webp` (+ `-back`/`-side`) and are synced into `colorImages` in `product-images.ts`. All six multi-colour pieces have every colour photographed.
 
 After adding or renaming products, generate the missing photos (this also updates `src/lib/product-images.ts`):

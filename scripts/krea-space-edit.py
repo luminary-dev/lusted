@@ -7,13 +7,14 @@ reference is the product photo to copy the garment from. Use the same seed famil
 Uses the official Krea 2 Turbo weights as a custom base with every LoRA at 0. The browser UI's direct app link runs
 anonymously (free runs limit), so go through this API — it uses the account's quota and credits.
 
-usage: python3 scripts/krea-space-edit.py <primary.png> <reference.png> <prompt.txt> <instruction.txt> <seed> <out.png> [steps]"""
+usage: python3 scripts/krea-space-edit.py <primary.png> <reference.png> <prompt.txt> <instruction.txt> <seed> <out.png> [steps] [reference strength]"""
 import json, mimetypes, pathlib, sys, uuid, urllib.request
 
 SPACE = "https://dhanikaa-krea-2-turbo-v2.hf.space"
 TOKEN = pathlib.Path.home().joinpath(".cache/huggingface/token").read_text().strip()
 primary, ref, ptxt, itxt, seed, out = sys.argv[1:7]
 steps = float(sys.argv[7]) if len(sys.argv) > 7 else 8
+ref_strength = float(sys.argv[8]) if len(sys.argv) > 8 else 1.0  # >1 copies the reference garment more literally
 
 
 def req(url, data=None, ctype="application/json"):
@@ -33,7 +34,7 @@ def upload(path):
 data = [
     "edit", pathlib.Path(ptxt).read_text().strip(), pathlib.Path(itxt).read_text().strip(),
     upload(primary), upload(ref),
-    1024, 1024, 1.4, 768, 1.0, 1.0,
+    1024, 1024, 1.4, 768, 1.0, ref_strength,
     steps, 1.0, "euler", "beta",
     int(seed), False, 0,
     "__custom_huggingface_base_model__", "Comfy-Org/Krea-2", "diffusion_models/krea2_turbo_fp8_scaled.safetensors", "",
