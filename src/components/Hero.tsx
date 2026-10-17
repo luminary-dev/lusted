@@ -13,6 +13,7 @@ import hero10 from "@/assets/images/hero/hero-10.webp";
 import hero11 from "@/assets/images/hero/hero-11.webp";
 import hero12 from "@/assets/images/hero/hero-12.webp";
 import hero13 from "@/assets/images/hero/hero-13.webp";
+import hero14 from "@/assets/images/hero/hero-14.webp";
 import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import HeroSlides, { type HeroSlide } from "./HeroSlides";
@@ -21,7 +22,7 @@ import { ArrowRight, WhatsApp } from "./icons";
 // Krea 2 campaign images (originals in refs/krea/final/hero). pos / posMobile are the crop focal points
 // that keep each face clear of the headline on desktop and centred in frame on phones.
 // Ordered so no two neighbouring slides share a colour story (the loop wraps from the last back to the first):
-// blush → wine → sea → champagne → candlelit black → sea → blush → black → peach → wine → emerald sea → blue dusk → sunlit ivory.
+// blush → wine → sea → champagne → candlelit black → sea → blush → black → peach → wine → emerald sea → blue dusk → wine gown → sunlit ivory.
 const slides: HeroSlide[] = [
   {
     src: hero1,
@@ -94,6 +95,12 @@ const slides: HeroSlide[] = [
     alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk",
     pos: "0% 20%",
     posMobile: "52% 20%",
+  },
+  {
+    src: hero14,
+    alt: "Model in a backless wine silk gown slit to the hip in an empty candlelit lounge",
+    pos: "60% 0%",
+    posMobile: "64% 0%",
   },
   {
     src: hero13,
