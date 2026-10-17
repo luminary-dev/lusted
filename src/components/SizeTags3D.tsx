@@ -824,12 +824,14 @@ export default function SizeTags3D({
         camRange = narrow ? Math.max(0, HALF - (colW / 2) * upp + 0.25) : 0;
         camTarget = THREE.MathUtils.clamp(camTarget, -camRange, camRange);
 
-        // the cord: across the whole stage (plus the swipe range), with a gentle sag
+        // the cord: well past both edges of the stage (plus the swipe range) — the camera looks from the right, so on
+        // wide screens the left edge reaches further than a straight-on view suggests; the canvas clips the excess, so
+        // the cord always runs right up to the gold end cap at the photo
         const visHalfW = (w / 2) * upp;
-        const left = camBase - visHalfW - camRange - 0.6,
-          right = camBase + visHalfW + camRange + 0.6;
+        const left = camBase - visHalfW * 2 - camRange - 2,
+          right = camBase + visHalfW * 2 + camRange + 2;
         span = Math.max(Math.abs(left), Math.abs(right));
-        sag = Math.min(0.14, 0.012 * (right - left));
+        sag = Math.min(0.14, 0.006 * (right - left)); // same sag as before over the now-longer cord
         if (cord) {
           scene.remove(cord);
           cord.geometry.dispose();
