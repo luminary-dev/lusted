@@ -509,7 +509,11 @@ html::-webkit-scrollbar {
 .hearts {
   display: block;
   overflow: visible;
-  color: var(--rose);
+  color: #dc93a2; /* the site's pastel pink, a shade deeper so it holds up on the blush and cream backgrounds */
+}
+
+:root[data-theme="dark"] .hearts {
+  color: var(--blush);
 }
 
 .heart-thread,
@@ -520,21 +524,20 @@ html::-webkit-scrollbar {
 
 .heart-thread {
   stroke-width: 1;
-  opacity: 0.22;
+  opacity: 0.3;
 }
 
-/* blushes down the thread to where you are */
+/* fills pink down the thread to where you are */
 .heart-thread-fill {
-  stroke-width: 1.6;
+  stroke-width: 1.5;
   stroke-dasharray: 1;
   stroke-dashoffset: calc(1 - var(--reach));
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--rose) 70%, transparent));
   transition: stroke-dashoffset 0.35s var(--ease);
 }
 
 .heart-pearl {
-  fill: url(#pearl);
-  opacity: 0.75;
+  fill: currentColor;
+  opacity: 0.7;
 }
 
 .heart {
@@ -547,53 +550,35 @@ html::-webkit-scrollbar {
 }
 
 .heart-body {
-  fill: transparent;
+  fill: var(--paper);
   stroke: currentColor;
   stroke-width: 1.4;
   stroke-linejoin: round;
-  opacity: 0.55;
+  opacity: 0.7;
   transition:
     fill 0.6s var(--ease),
     opacity 0.6s var(--ease);
 }
 
-.heart-shine {
-  fill: #fff;
-  opacity: 0;
-  transition: opacity 0.6s var(--ease);
-}
-
-/* the section you're in: a glossy heart, glowing, with a slow double heartbeat */
+/* the section you're in: a solid pastel heart with a soft glow and a slow heartbeat */
 .heart[data-dist="0"] {
   transform: scale(1.35);
-  filter: drop-shadow(0 0 6px rgba(239, 111, 142, 0.85)) drop-shadow(0 2px 3px rgba(110, 15, 42, 0.35));
+  filter: drop-shadow(0 0 5px color-mix(in srgb, currentColor 80%, transparent));
 }
 
 .heart[data-dist="0"] .heart-body {
-  fill: url(#heart-gloss);
-  stroke: #ffc4cf;
-  stroke-width: 0.6;
+  fill: currentColor;
   opacity: 1;
 }
 
-.heart[data-dist="0"] .heart-shine {
-  opacity: 0.85;
-}
-
-/* the two either side: smaller, softer, still warm */
+/* the two either side: smaller and paler */
 .heart[data-dist="1"] {
   transform: scale(1.02);
-  filter: drop-shadow(0 0 3px rgba(239, 111, 142, 0.45));
 }
 
 .heart[data-dist="1"] .heart-body {
-  fill: url(#heart-gloss);
-  stroke-width: 0.8;
-  opacity: 0.62;
-}
-
-.heart[data-dist="1"] .heart-shine {
-  opacity: 0.45;
+  fill: color-mix(in srgb, currentColor 70%, var(--paper));
+  opacity: 0.95;
 }
 
 .heart[data-dist="2"] {
@@ -601,8 +586,8 @@ html::-webkit-scrollbar {
 }
 
 .heart[data-dist="2"] .heart-body {
-  fill: color-mix(in srgb, var(--rose) 30%, transparent);
-  opacity: 0.75;
+  fill: color-mix(in srgb, currentColor 35%, var(--paper));
+  opacity: 0.85;
 }
 
 @media (prefers-reduced-motion: no-preference) {

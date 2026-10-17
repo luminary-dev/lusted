@@ -4,9 +4,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 // Stands in for the (hidden) browser scrollbar: a thin rose line across the top that fills as you scroll and — on
-// pages made of sections — a string of hearts down the right edge, one per section, with tiny pearls between them.
-// The thread blushes rose down to where you are; the section you're in is a glossy heart with a slow heartbeat and a
-// glow, the two either side are smaller and softer, the rest are faint outlines. Hover a heart for the section's
+// pages made of sections — a string of flat pastel-pink hearts down the right edge, one per section, with tiny dots
+// between them. The thread fills pink down to where you are; the section you're in is a solid heart with a soft glow
+// and a slow heartbeat, the two either side are smaller and paler, the rest are outlines. Hover a heart for the section's
 // name; click to glide there.
 const LABELS: Record<string, string> = {
   top: "Welcome",
@@ -27,7 +27,6 @@ const W = 30;
 const CX = W / 2;
 // a full, slightly plump heart centred on 0,0 (about 16 px wide)
 const HEART = "M0 6.4C-2.6 4.6-8 1.2-8-3.1-8-6-5.9-7.6-3.9-7.6-2.1-7.6-.8-6.5 0-5.1.8-6.5 2.1-7.6 3.9-7.6 5.9-7.6 8-6 8-3.1 8 1.2 2.6 4.6 0 6.4Z";
-const SHINE = "M-5.6-3.6C-5.6-5.3-4.4-6.2-3.2-6.1-2.4-6-1.9-5.6-1.6-5.1-3.1-5-4.6-4.4-5.6-3.6Z";
 
 export default function ScrollRail() {
   const pathname = usePathname();
@@ -97,20 +96,7 @@ export default function ScrollRail() {
       {n > 0 && (
         <nav className="scroll-rail" aria-label="Sections" ref={rail} style={{ width: W, height: H }}>
           <svg className="hearts" viewBox={`0 0 ${W} ${H}`} width={W} height={H} aria-hidden="true">
-            <defs>
-              <radialGradient id="heart-gloss" cx="35%" cy="30%" r="80%">
-                <stop offset="0" stopColor="#ffd9de" />
-                <stop offset="0.35" stopColor="#ef6f8e" />
-                <stop offset="0.75" stopColor="#b3204a" />
-                <stop offset="1" stopColor="#6e0f2a" />
-              </radialGradient>
-              <radialGradient id="pearl" cx="35%" cy="30%" r="75%">
-                <stop offset="0" stopColor="#fff" />
-                <stop offset="0.6" stopColor="#f3dcd4" />
-                <stop offset="1" stopColor="#c9a197" />
-              </radialGradient>
-            </defs>
-            {/* the thread: faint all the way, blushing rose down to where you are */}
+            {/* the thread: faint all the way, pink down to where you are */}
             <line className="heart-thread" x1={CX} x2={CX} y1={0} y2={H} />
             <line className="heart-thread-fill" x1={CX} x2={CX} y1={yAt(0)} y2={yAt(n - 1)} pathLength={1} />
             {sections.slice(1).map((id, i) => (
@@ -121,7 +107,6 @@ export default function ScrollRail() {
                 <g className="heart" data-dist={Math.min(3, Math.abs(i - active))}>
                   <g className="heart-beat">
                     <path className="heart-body" d={HEART} />
-                    <path className="heart-shine" d={SHINE} />
                   </g>
                 </g>
               </g>
