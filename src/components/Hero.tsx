@@ -13,6 +13,10 @@ import hero11 from "@/assets/images/hero/hero-11.webp";
 import hero12 from "@/assets/images/hero/hero-12.webp";
 import hero13 from "@/assets/images/hero/hero-13.webp";
 import hero14 from "@/assets/images/hero/hero-14.webp";
+import hero15 from "@/assets/images/hero/hero-15.webp";
+import hero16 from "@/assets/images/hero/hero-16.webp";
+import hero17 from "@/assets/images/hero/hero-17.webp";
+import hero18 from "@/assets/images/hero/hero-18.webp";
 import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import HeroSlides, { type HeroSlide } from "./HeroSlides";
@@ -21,7 +25,8 @@ import { ArrowRight, WhatsApp } from "./icons";
 // Krea 2 campaign images (originals in refs/krea/final/hero). pos / posMobile are the crop focal points
 // that keep each face clear of the headline on desktop and centred in frame on phones.
 // Ordered so no two neighbouring slides share a colour story (the loop wraps from the last back to the first):
-// blush → wine → sea → champagne → candlelit black → sea → blush → black → peach → wine → emerald sea → blue dusk → wine gown → sunlit ivory.
+// blush → wine → sea → champagne → candlelit black → sea → blush → black → peach → wine → emerald sea → blue dusk → wine gown → sunlit ivory
+// → wine sunset pool → blush bedroom → black sea → wine city night.
 const slides: HeroSlide[] = [
   {
     src: hero1,
@@ -106,6 +111,30 @@ const slides: HeroSlide[] = [
     alt: "Model in a black fishnet bodystocking lying across an ivory silk bed at golden hour",
     pos: "50% 40%",
     posMobile: "58% 50%",
+  },
+  {
+    src: hero15,
+    alt: "Model crouching at the edge of an infinity pool at sunset in a wine patent string bikini",
+    pos: "72% 20%",
+    posMobile: "67% 20%",
+  },
+  {
+    src: hero17,
+    alt: "Model in a blush lace bra, lace skirt and stockings on a velvet chaise in a sunlit bedroom",
+    pos: "72% 20%",
+    posMobile: "78% 20%",
+  },
+  {
+    src: hero18,
+    alt: "Model in a black string bikini on the deck of a yacht at golden hour, looking back over her shoulder",
+    pos: "72% 20%",
+    posMobile: "72% 20%",
+  },
+  {
+    src: hero16,
+    alt: "Model in a wine satin cami and mini skirt leaning on a balcony rail above the city lights at night",
+    pos: "72% 20%",
+    posMobile: "68% 20%",
   },
 ];
 
