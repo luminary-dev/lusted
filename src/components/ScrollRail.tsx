@@ -15,8 +15,7 @@ const LABELS: Record<string, string> = {
   "best-sellers": "Best sellers",
   "size-guide": "Size guide",
   about: "Our story",
-  care: "How it works",
-  ordering: "Ordering",
+  ordering: "How it works",
   contact: "Contact",
 };
 const label = (id: string) => LABELS[id] ?? id.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());

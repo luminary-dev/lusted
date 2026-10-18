@@ -5,7 +5,6 @@ import BestSellers from "@/components/BestSellers";
 import About from "@/components/About";
 import SizeGuide from "@/components/SizeGuide";
 import HowItWorks from "@/components/HowItWorks";
-import Ordering from "@/components/Ordering";
 import Contact from "@/components/Contact";
 
 export default function Home() {
@@ -18,7 +17,6 @@ export default function Home() {
       <SizeGuide />
       <About />
       <HowItWorks />
-      <Ordering />
       <Contact />
     </main>
   );

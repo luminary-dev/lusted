@@ -1188,8 +1188,7 @@ html::-webkit-scrollbar {
   object-position: 74% 50%;
 }
 
-.about-copy .h2,
-.ordering-feature .h2 {
+.about-copy .h2 {
   margin-top: 18px;
 }
 
@@ -1214,16 +1213,14 @@ html::-webkit-scrollbar {
   border-bottom: 1px solid var(--hair);
 }
 
-.value-icon,
-.perk-icon {
+.value-icon {
   display: grid;
   place-items: center;
   border-radius: 50%;
   color: var(--wine);
 }
 
-[data-theme="dark"] .value-icon,
-[data-theme="dark"] .perk-icon {
+[data-theme="dark"] .value-icon {
   color: var(--rose);
 }
 
@@ -1238,20 +1235,54 @@ html::-webkit-scrollbar {
   height: 20px;
 }
 
-.value h3,
-.perk h3 {
+.value h3 {
   font-family: var(--display);
   font-weight: 500;
   font-size: 17px;
   line-height: 1.3;
 }
 
-.value p,
-.perk p {
+.value p {
   margin-top: 4px;
   font-size: 14.5px;
   line-height: 1.6;
   color: var(--muted);
+}
+
+/* the gift-box photo overlaps the corner of the lace still life */
+.about-visual {
+  position: relative;
+  padding: 0 clamp(28px, 6%, 64px) clamp(40px, 8%, 72px) 0;
+}
+
+.about-inset {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 44%;
+  aspect-ratio: 4 / 5;
+  border: 6px solid var(--paper);
+  box-shadow: 0 24px 60px var(--shadow, rgba(46, 20, 24, 0.18));
+}
+
+/* the four promises sit two by two */
+.values-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 28px;
+}
+
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+@media (max-width: 600px) {
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ───────── size guide ───────── */
@@ -2084,50 +2115,6 @@ html::-webkit-scrollbar {
   }
 }
 
-/* ───────── service & packaging (Ordering.tsx) ───────── */
-
-.ordering-feature {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(40px, 6vw, 96px);
-  align-items: center;
-}
-
-.ordering-feature .media {
-  aspect-ratio: 4 / 5;
-}
-
-.ordering-feature .lede {
-  margin-top: 20px;
-}
-
-.perks {
-  display: grid;
-  gap: 28px;
-  margin-top: 36px;
-}
-
-.perk {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 20px;
-}
-
-.perk-icon {
-  width: 52px;
-  height: 52px;
-  background: var(--blush-bg);
-}
-
-.perk-icon svg {
-  width: 22px;
-  height: 22px;
-}
-
-.ordering-feature .btn {
-  margin-top: 40px;
-}
-
 /* ───────── contact ───────── */
 
 .contact.section {
@@ -2578,8 +2565,7 @@ html::-webkit-scrollbar {
     max-height: min(84svh, 720px);
   }
   .about-grid,
-  .size-layout,
-  .ordering-feature {
+  .size-layout {
     grid-template-columns: 1fr;
   }
   .size-visual {
@@ -2595,9 +2581,6 @@ html::-webkit-scrollbar {
   }
   .size-tags-3d {
     --bleed-l: var(--gutter);
-  }
-  .ordering-feature .media {
-    order: 2;
   }
 }
 
@@ -2688,7 +2671,6 @@ html::-webkit-scrollbar {
 /* grid children may shrink below their content (lets the size table scroll instead of widening the page) */
 .about-grid > *,
 .size-layout > *,
-.ordering-feature > *,
 .footer-news > * {
   min-width: 0;
 }
@@ -4823,10 +4805,6 @@ html::-webkit-scrollbar {
 }
 
 .size {
-  background: var(--cream);
-}
-
-.care {
   background: var(--cream);
 }
 
