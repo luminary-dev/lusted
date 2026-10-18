@@ -8,7 +8,7 @@ import wordmark from "@/assets/brand/wordmark-dark.png";
 // candlelit glow with rose-gold dust drifting up through it, a ribbon of satin light sliding across the letters and a
 // thin rose line drawing itself underneath — then light leaks through the seam and the curtains are drawn aside. Shown once per visit (sessionStorage); returning to the site in the same
 // tab skips it (the inline script in layout.tsx hides it before paint). With reduced motion it simply fades.
-const MIN_MS = 2500;
+const MIN_MS = 2000;
 // how long the curtains take to clear (CSS: 0.15 s delay + 1.9 s draw) before the overlay is removed
 const OPEN_MS = 2150;
 
