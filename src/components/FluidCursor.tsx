@@ -8,12 +8,12 @@ import { useEffect, useRef } from "react";
 const SIM_RES = 128;
 const DYE_RES = 768;
 const PRESSURE_ITERATIONS = 20;
-const VELOCITY_DISSIPATION = 3;
-const DENSITY_DISSIPATION = 5;
+const VELOCITY_DISSIPATION = 4;
+const DENSITY_DISSIPATION = 7;
 const PRESSURE = 0.8;
-const CURL = 12;
-const SPLAT_RADIUS = 0.05; // % of the screen — a fine wisp, not a cloud
-const SPLAT_FORCE = 2600;
+const CURL = 8;
+const SPLAT_RADIUS = 0.012; // % of the screen — a thin thread of smoke
+const SPLAT_FORCE = 1400;
 const PALETTE = [
   [0.48, 0.11, 0.2], // wine
   [0.7, 0.33, 0.42], // rose
@@ -92,7 +92,7 @@ const FRAG = {
     uniform sampler2D uTexture;
     void main () {
       vec3 c = texture(uTexture, vUv).rgb;
-      float a = clamp(max(c.r, max(c.g, c.b)) * 1.1, 0.0, 0.6);
+      float a = clamp(max(c.r, max(c.g, c.b)) * 1.2, 0.0, 0.7);
       outColor = vec4(min(c, vec3(a)), a);
     }`,
 };
@@ -304,7 +304,7 @@ export default function FluidCursor() {
         k = hue - i;
       const a = PALETTE[i],
         b = PALETTE[(i + 1) % PALETTE.length];
-      return a.map((v, j) => (v + (b[j] - v) * k) * 0.12);
+      return a.map((v, j) => (v + (b[j] - v) * k) * 0.3);
     };
 
     let raf = 0,
