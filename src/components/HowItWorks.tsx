@@ -24,7 +24,7 @@ export default function HowItWorks() {
           alt="Three models in a blush lace lingerie set, a crimson string bikini and a black sequin mini dress on a villa terrace at sunset"
           fill
           placeholder="blur"
-          sizes="100vw"
+          sizes="(max-width: 600px) 134vw, (max-width: 900px) 100vw, 100vw"
           className="how-img"
         />
       </div>

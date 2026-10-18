@@ -3,6 +3,7 @@ import { Corinthia, Fraunces, Montserrat, Petit_Formal_Script, Playfair_Display 
 import Nav from "@/components/Nav";
 import ScrollRail from "@/components/ScrollRail";
 import FluidCursor from "@/components/FluidCursor";
+import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
 import SearchDialog from "@/components/SearchDialog";
@@ -65,14 +66,18 @@ export const viewport: Viewport = {
 
 // Applies the saved (or system) theme before first paint so there's no flash.
 const themeScript = `try{var t=localStorage.getItem("lusted-theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
+// Skips the loading screen if it has already played in this tab, before paint so it never flashes.
+const introScript = `try{if(sessionStorage.getItem("lusted-intro"))document.documentElement.classList.add("intro-seen")}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${formal.variable} ${fraunces.variable} ${serif.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
       </head>
       <body>
+        <LoadingScreen />
         <Nav />
         <ScrollRail />
         <FluidCursor />

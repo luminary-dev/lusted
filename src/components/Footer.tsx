@@ -47,7 +47,7 @@ const social = [
 export default function Footer() {
   return (
     <footer className="footer">
-      <Image quality={90} src={footerImg} alt="" fill placeholder="blur" sizes="100vw" className="footer-img" />
+      <Image quality={90} src={footerImg} alt="" fill placeholder="blur" sizes="(max-width: 900px) 220vw, 100vw" className="footer-img" />
       <div className="container">
         <div className="footer-main">
           <div className="footer-brand">

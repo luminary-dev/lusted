@@ -652,6 +652,191 @@ html::-webkit-scrollbar {
   pointer-events: none;
 }
 
+/* ───────── loading screen (LoadingScreen.tsx) ─────────
+   Wine velvet curtains closed across the screen; the wordmark surfaces from a candle glow while satin light slides
+   across it and a rose line draws underneath; then the curtains part. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+
+.intro-seen .intro,
+.intro.is-gone {
+  display: none;
+}
+
+.intro-curtain {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  background:
+    /* soft vertical folds of velvet */
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.22) 0 2px, transparent 2px 46px, rgba(255, 190, 200, 0.05) 46px 50px, transparent 50px 92px),
+    radial-gradient(ellipse 120% 80% at 50% 45%, #4a1222 0%, #2a0a13 55%, #12050a 100%);
+  transition: transform 1.25s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.intro-curtain.is-left {
+  left: 0;
+  box-shadow: inset -30px 0 60px -30px rgba(0, 0, 0, 0.6);
+}
+
+.intro-curtain.is-right {
+  right: 0;
+  box-shadow: inset 30px 0 60px -30px rgba(0, 0, 0, 0.6);
+}
+
+.intro.is-leaving {
+  pointer-events: none;
+}
+
+.intro.is-leaving .intro-curtain.is-left {
+  transform: translateX(-102%);
+}
+
+.intro.is-leaving .intro-curtain.is-right {
+  transform: translateX(102%);
+}
+
+.intro-mark {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.9s var(--ease),
+    filter 0.6s var(--ease);
+}
+
+/* a warm candle glow breathing behind the logo */
+.intro-mark::before {
+  content: "";
+  position: absolute;
+  inset: -60% -40%;
+  z-index: -1;
+  background: radial-gradient(ellipse closest-side, rgba(232, 140, 150, 0.22), rgba(232, 140, 150, 0.06) 55%, transparent);
+  animation: intro-glow 2.4s ease-in-out infinite alternate;
+}
+
+.intro.is-leaving .intro-mark {
+  opacity: 0;
+  transform: scale(1.06);
+  filter: blur(6px);
+}
+
+.intro-logo {
+  position: relative;
+  width: min(62vw, 320px);
+  animation: intro-surface 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.intro-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* a ribbon of satin light sliding across the letters (masked to the wordmark's shape) */
+.intro-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 245, 240, 0.95) 48%, rgba(255, 210, 215, 0.6) 52%, transparent 70%);
+  background-size: 250% 100%;
+  -webkit-mask: var(--logo) center / contain no-repeat;
+  mask: var(--logo) center / contain no-repeat;
+  animation: intro-shine 2.2s 0.5s ease-in-out infinite;
+}
+
+.intro-line {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e8a7b2, transparent);
+  animation: intro-line 1.7s 0.3s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+}
+
+.intro-tag {
+  font-family: var(--script);
+  font-size: clamp(18px, 2.4vw, 24px);
+  color: #e8b4aa;
+  opacity: 0;
+  animation: intro-tag 1s 0.8s ease forwards;
+}
+
+@keyframes intro-surface {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes intro-shine {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes intro-line {
+  to {
+    width: min(46vw, 220px);
+  }
+}
+
+@keyframes intro-tag {
+  to {
+    opacity: 0.85;
+  }
+}
+
+@keyframes intro-glow {
+  from {
+    opacity: 0.65;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-curtain {
+    transition: opacity 0.6s ease;
+  }
+  .intro.is-leaving .intro-curtain.is-left,
+  .intro.is-leaving .intro-curtain.is-right {
+    transform: none;
+    opacity: 0;
+  }
+  .intro-logo,
+  .intro-shine,
+  .intro-line,
+  .intro-tag,
+  .intro-mark::before {
+    animation: none;
+  }
+  .intro-line {
+    width: min(46vw, 220px);
+  }
+  .intro-tag {
+    opacity: 0.85;
+  }
+}
+
 /* ───────── nav ───────── */
 
 .nav {

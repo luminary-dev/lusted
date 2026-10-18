@@ -39,7 +39,7 @@ export default function HeroSlides({ slides }: { slides: HeroSlide[] }) {
             style={{ "--pos": s.pos, "--pos-m": s.posMobile } as React.CSSProperties}
             aria-hidden={i !== active}
           >
-            <Image quality={90} src={s.src} alt={s.alt} fill preload={i === 0} loading={i === 0 ? undefined : "eager"} placeholder="blur" sizes="100vw" />
+            <Image quality={90} src={s.src} alt={s.alt} fill preload={i === 0} loading={i === 0 ? undefined : "eager"} placeholder="blur" sizes="(max-aspect-ratio: 1/1) 130vh, 100vw" />
           </div>
         );
       })}
