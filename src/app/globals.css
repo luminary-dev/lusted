@@ -642,7 +642,7 @@ html::-webkit-scrollbar {
   }
 }
 
-/* the silky ribbons that trail the cursor (CursorTrail.tsx) — above everything, never in the way */
+/* the silky smoke that follows the cursor (FluidCursor.tsx) — above everything, never in the way */
 .cursor-trail {
   position: fixed;
   inset: 0;
