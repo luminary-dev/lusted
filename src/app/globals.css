@@ -642,14 +642,41 @@ html::-webkit-scrollbar {
   }
 }
 
-/* the silky smoke that follows the cursor (FluidCursor.tsx) — above everything, never in the way */
-.cursor-trail {
+/* the blush ring that follows the cursor (CursorRing.tsx) — swells over anything clickable */
+.cursor-ring {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   z-index: 90;
-  width: 100vw;
-  height: 100vh;
   pointer-events: none;
+  will-change: transform;
+}
+
+.cursor-ring span {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border: 1.5px solid color-mix(in srgb, var(--rose) 75%, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.3s var(--ease),
+    transform 0.35s var(--ease),
+    background-color 0.35s var(--ease),
+    border-color 0.35s var(--ease);
+}
+
+.cursor-ring.is-on span {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cursor-ring.is-hover span {
+  transform: scale(1.6);
+  background: color-mix(in srgb, var(--blush) 22%, transparent);
+  border-color: color-mix(in srgb, var(--rose) 45%, transparent);
 }
 
 /* ───────── nav ───────── */
@@ -1262,8 +1289,8 @@ html::-webkit-scrollbar {
 /* About as a gallery wall: short copy on the left, framed photos hung salon-style on the right */
 .about-wall-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: clamp(40px, 6vw, 96px);
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(36px, 5vw, 80px);
   align-items: center;
 }
 
@@ -1306,33 +1333,182 @@ html::-webkit-scrollbar {
   margin-top: 32px;
 }
 
-/* the wall itself: frames placed by % so the cluster keeps its shape at every width */
+/* the wall itself: frames placed by % so the cluster keeps its shape at every width. Hung like a real wall: plaster
+   with a faint grain, a soft wash of light from the top left, each photo in a slim mitred moulding (black; antique gold
+   in the dark) round a thin bevelled mat and under glass, hung by a wire from a brass nail, a hair off straight, its
+   shadow falling down and to the right. The pointer tilts the whole wall a degree or two and slides the light across
+   the glass. The frames themselves stay put: nothing happens on hover. */
+@property --px {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --py {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 .photo-wall {
   position: relative;
   aspect-ratio: 100 / 66;
+  container-type: size; /* frames size their hanging wire in cqw / cqh */
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--px) * 1.6deg)) rotateX(calc(var(--py) * -1.6deg));
+  transition:
+    --px 0.9s var(--ease),
+    --py 0.9s var(--ease);
+  --wall-light: rgba(255, 255, 255, 0.6);
+  --wall-vignette: rgba(60, 30, 36, 0.04);
+  --grain-opacity: 0.05;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* the wall: light pooling top left, the corners falling away, plaster grain over it all */
+.photo-wall::before,
+.photo-wall::after {
+  content: "";
+  position: absolute;
+  inset: -14% -12%;
+  pointer-events: none;
+  transform: translateZ(-1px);
+  /* feathered edges, so the lit patch of wall melts into the page rather than sitting on it as a panel */
+  mask-image: radial-gradient(ellipse farthest-side at 50% 50%, #000 45%, transparent 100%);
+}
+
+.photo-wall::before {
+  background:
+    radial-gradient(ellipse closest-side at 36% 32%, var(--wall-light), transparent),
+    radial-gradient(ellipse closest-side at 50% 50%, transparent 55%, var(--wall-vignette));
+}
+
+.photo-wall::after {
+  background: var(--grain);
+  background-size: 200px 200px;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: multiply;
+}
+
+[data-theme="dark"] .photo-wall {
+  --wall-light: rgba(255, 214, 190, 0.07);
+  --wall-vignette: rgba(0, 0, 0, 0.35);
+  --grain-opacity: 0.14;
+}
+
+[data-theme="dark"] .photo-wall::after {
+  mix-blend-mode: screen;
+  filter: invert(1);
 }
 
 .wall-frame {
   position: absolute;
   margin: 0;
-  padding: clamp(7px, 1.1vw, 14px);
-  background: #fbf8f5;
-  /* a thin black frame round a white mat, lifting slightly off the wall */
-  border: clamp(4px, 0.55vw, 7px) solid #171012;
+  --frame: clamp(3px, 0.4vw, 5px); /* a slim moulding */
+  --mat: clamp(3px, 0.42vw, 6px); /* and a sliver of mat */
+  --frame-light: #4e3e42;
+  --frame-mid: #221819;
+  --frame-dark: #0c0708;
+  --mat-bg: #f8f3ee;
+  --cast: 30, 10, 14; /* the shadow's colour on this wall */
+  --W: calc(var(--w) * 1cqw);
+  --H: calc(var(--h) * 1cqh);
+  padding: var(--mat);
+  background: var(--mat-bg);
+  border: var(--frame) solid var(--frame-mid);
+  /* the moulding's profile: its top and left faces catch the light, its bottom and right fall into shadow */
+  border-image: linear-gradient(135deg, var(--frame-light) 0%, var(--frame-mid) 36%, var(--frame-mid) 64%, var(--frame-dark) 100%) 1;
+  outline: 1px solid rgba(255, 255, 255, 0.08);
+  outline-offset: -1px;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 14px 28px -10px rgba(30, 10, 14, 0.45),
-    0 3px 6px rgba(30, 10, 14, 0.18);
-  transition:
-    transform 0.5s var(--ease),
-    box-shadow 0.5s var(--ease);
+    /* the frame's inner lip shading the mat */
+    inset 0 2px 3px rgba(var(--cast), 0.26),
+    inset 2px 0 2px rgba(var(--cast), 0.1),
+    /* the frame on the wall: a tight contact shadow, then a softer one thrown down and to the right */
+    1px 2px 3px rgba(var(--cast), 0.22),
+    3px 7px 10px -3px rgba(var(--cast), 0.3),
+    12px 26px 40px -14px rgba(var(--cast), 0.45);
+  transform: rotate(var(--tilt, 0deg)) translateZ(6px);
+  transform-style: preserve-3d;
+}
+
+/* the mitred corners of the moulding: a hairline across each corner at 45° */
+.wall-frame::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--frame));
+  pointer-events: none;
+  --mitre: linear-gradient(135deg, transparent calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  --mitre-r: linear-gradient(45deg, transparent calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  background:
+    var(--mitre) left top / var(--frame) var(--frame) no-repeat,
+    var(--mitre-r) right top / var(--frame) var(--frame) no-repeat,
+    var(--mitre-r) left bottom / var(--frame) var(--frame) no-repeat,
+    var(--mitre) right bottom / var(--frame) var(--frame) no-repeat;
+}
+
+/* the picture wire: from a brass nail above the frame down behind its top edge, about a fifth of the way in each side */
+.wall-frame .wall-wire,
+.wall-frame .wall-nail {
+  position: absolute;
+  pointer-events: none;
+  transform: translateZ(-3px);
+}
+
+.wall-frame .wall-wire {
+  --rise: clamp(9px, calc(var(--H) * 0.09), 22px);
+  --run: calc(var(--W) * 0.21);
+  left: calc(50% - 0.5px);
+  top: calc(-1 * var(--rise) - var(--frame));
+  width: 1px;
+  height: hypot(var(--run), var(--rise));
+  transform-origin: 50% 0;
+  transform: translateZ(-3px) rotate(calc(-1 * atan2(var(--run), var(--rise))));
+  background: linear-gradient(to bottom, rgba(var(--cast), 0.55), rgba(var(--cast), 0.3));
+  box-shadow: 1px 1px 1px rgba(var(--cast), 0.15);
+}
+
+.wall-frame .wall-wire.is-right {
+  transform: translateZ(-3px) rotate(atan2(var(--run), var(--rise)));
+}
+
+.wall-frame .wall-nail {
+  --rise: clamp(9px, calc(var(--H) * 0.09), 22px);
+  left: calc(50% - 2.5px);
+  top: calc(-1 * var(--rise) - var(--frame) - 2.5px);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f3dfa6, #b58a3c 55%, #6d4d1b);
+  box-shadow:
+    0 1px 2px rgba(var(--cast), 0.45),
+    1px 3px 5px rgba(var(--cast), 0.25);
 }
 
 [data-theme="dark"] .wall-frame {
   /* on the dark wall the frames turn antique gold */
-  border-color: #b08a55;
-  background: #f4ede4;
-  box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.7);
+  --frame-light: #ecd292;
+  --frame-mid: #a9823f;
+  --frame-dark: #543b1a;
+  --mat-bg: #efe6da;
+  --cast: 0, 0, 0;
+  outline-color: rgba(255, 230, 180, 0.14);
+  box-shadow:
+    inset 0 2px 3px rgba(var(--cast), 0.4),
+    inset 2px 0 2px rgba(var(--cast), 0.18),
+    1px 2px 3px rgba(var(--cast), 0.4),
+    3px 7px 10px -3px rgba(var(--cast), 0.5),
+    12px 28px 44px -14px rgba(var(--cast), 0.75);
+}
+
+[data-theme="dark"] .wall-frame::before {
+  --mitre: linear-gradient(135deg, transparent calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  --mitre-r: linear-gradient(45deg, transparent calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+}
+
+[data-theme="dark"] .wall-frame .wall-wire {
+  background: linear-gradient(to bottom, rgba(255, 230, 190, 0.3), rgba(255, 230, 190, 0.12));
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 .wall-photo {
@@ -1340,6 +1516,40 @@ html::-webkit-scrollbar {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  /* paper grain on the mat, and the mat's bevelled cut edge round the window */
+  box-shadow:
+    0 0 0 1px rgba(var(--cast), 0.16),
+    0 0 0 2px rgba(255, 255, 255, 0.6);
+}
+
+.wall-frame > .wall-photo::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--mat));
+  z-index: -1;
+  background: var(--grain);
+  background-size: 120px 120px;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* over the print: the mat window's shadow on it, and a sheet of glass whose reflection slides with the pointer */
+.wall-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--cast), 0.14),
+    inset 0 3px 5px rgba(var(--cast), 0.3),
+    inset 2px 0 3px rgba(var(--cast), 0.12);
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.07) 22%, transparent 38%, transparent 70%, rgba(255, 255, 255, 0.05) 100%);
+  background-size: 200% 200%;
+  background-position: calc(30% - var(--px) * 40%) calc(30% - var(--py) * 40%);
+  transition:
+    --px 0.9s var(--ease),
+    --py 0.9s var(--ease);
 }
 
 /* a frame still waiting for its photo: just the mat with a faint inner shadow */
@@ -1350,20 +1560,12 @@ html::-webkit-scrollbar {
 
 .wall-photo img {
   object-fit: cover;
-  transition: transform 0.8s var(--ease);
 }
 
-.wall-frame:hover {
-  z-index: 2;
-  transform: translateY(-4px) rotate(-0.4deg);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 26px 44px -12px rgba(30, 10, 14, 0.5),
-    0 4px 8px rgba(30, 10, 14, 0.2);
-}
-
-.wall-frame:hover .wall-photo img {
-  transform: scale(1.04);
+@media (prefers-reduced-motion: reduce) {
+  .photo-wall {
+    transform: none;
+  }
 }
 
 @media (max-width: 900px) {
