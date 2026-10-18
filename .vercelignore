@@ -1,0 +1,12 @@
+# what the deploy needs is the app; none of this is
+test-results
+tests
+playwright.config.ts
+.tools
+refs
+brand
+scripts
+README.md
+.claude
+*.log
+.DS_Store
