@@ -12,13 +12,32 @@ const VELOCITY_DISSIPATION = 1.6;
 const DENSITY_DISSIPATION = 2.4;
 const PRESSURE = 0.8;
 const CURL = 22;
-const SPLAT_RADIUS = 0.18; // % of the screen
-const SPLAT_FORCE = 5200;
-const PALETTE = [
-  [0.48, 0.11, 0.2], // wine
-  [0.7, 0.33, 0.42], // rose
-  [0.91, 0.71, 0.67], // blush
-];
+const SPLAT_RADIUS = 0.09; // % of the screen — well under the cursify default (0.2) so the smoke stays close to the cursor
+const SPLAT_FORCE = 3400;
+const MAX_SPLAT = 0.024; // the most one pointer step may push, as a fraction of the screen — a flick doesn't detonate
+const RAMP_MS = 700; // after a pause the smoke eases back in over this long rather than bursting out at full strength
+const PAUSE_MS = 180; // a gap this long between moves counts as a pause
+// two smokes, one per theme: on the dark wall it drifts through wine, rose and blush; on the pale page the deep wine
+// reads far too strong, so it stays in the roses and blushes at about half the strength
+const MODES = {
+  dark: {
+    palette: [
+      [0.48, 0.11, 0.2], // wine
+      [0.7, 0.33, 0.42], // rose
+      [0.91, 0.71, 0.67], // blush
+    ],
+    strength: 0.19,
+  },
+  light: {
+    palette: [
+      [0.7, 0.33, 0.42], // rose
+      [0.86, 0.55, 0.6], // dusty pink
+      [0.91, 0.71, 0.67], // blush
+    ],
+    strength: 0.1,
+  },
+};
+const mode = () => (document.documentElement.dataset.theme === "dark" ? MODES.dark : MODES.light);
 
 const VERT = `#version 300 es
 precision highp float;
@@ -297,26 +316,41 @@ export default function FluidCursor() {
 
     // the pointer, and a colour that drifts round the palette as you move
     const pointer = { x: 0, y: 0, dx: 0, dy: 0, moved: false, seen: false };
-    let hue = Math.random() * PALETTE.length;
+    let current = mode();
+    const themeWatch = new MutationObserver(() => (current = mode()));
+    themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    let hue = Math.random() * 3;
     const colour = () => {
-      hue = (hue + 0.012) % PALETTE.length;
+      const { palette, strength } = current;
+      hue = (hue + 0.012) % palette.length;
       const i = Math.floor(hue),
         k = hue - i;
-      const a = PALETTE[i],
-        b = PALETTE[(i + 1) % PALETTE.length];
-      return a.map((v, j) => (v + (b[j] - v) * k) * 0.22);
+      const a = palette[i],
+        b = palette[(i + 1) % palette.length];
+      return a.map((v, j) => (v + (b[j] - v) * k) * strength);
     };
 
     let raf = 0,
       last = performance.now(),
       lastMove = 0,
+      startedAt = 0, // when the current run of movement began — the ramp counts from here
       running = false;
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.016667);
       last = now;
       if (pointer.moved) {
         pointer.moved = false;
-        splat(pointer.x, pointer.y, pointer.dx * SPLAT_FORCE, pointer.dy * SPLAT_FORCE, colour());
+        const t = Math.min(1, (now - startedAt) / RAMP_MS);
+        const ramp = 0.15 + 0.85 * t * t; // eases in: a wisp at first, full smoke most of a second later
+        const len = Math.hypot(pointer.dx, pointer.dy);
+        const cap = len > MAX_SPLAT ? MAX_SPLAT / len : 1;
+        splat(
+          pointer.x,
+          pointer.y,
+          pointer.dx * cap * SPLAT_FORCE * ramp,
+          pointer.dy * cap * SPLAT_FORCE * ramp,
+          colour().map((v) => v * ramp),
+        );
       }
       step(dt);
       render();
@@ -337,6 +371,12 @@ export default function FluidCursor() {
       if (e.pointerType === "touch") return;
       const x = e.clientX / window.innerWidth,
         y = 1 - e.clientY / window.innerHeight;
+      const now = performance.now();
+      if (now - lastMove > PAUSE_MS) {
+        // a fresh start: don't splat the jump from wherever the pointer last was, and ramp the smoke back in
+        startedAt = now;
+        pointer.seen = false;
+      }
       if (pointer.seen) {
         const aspect = el.width / el.height;
         pointer.dx = (x - pointer.x) * (aspect < 1 ? aspect : 1);
@@ -346,7 +386,7 @@ export default function FluidCursor() {
       pointer.x = x;
       pointer.y = y;
       pointer.seen = true;
-      lastMove = performance.now();
+      lastMove = now;
       wake();
     };
     const onResize = () => {
@@ -358,6 +398,7 @@ export default function FluidCursor() {
     window.addEventListener("resize", onResize);
     return () => {
       cancelAnimationFrame(raf);
+      themeWatch.disconnect();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("resize", onResize);
     };
