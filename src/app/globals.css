@@ -1374,166 +1374,157 @@ html::-webkit-scrollbar {
   filter: invert(1);
 }
 
-.wall-frame {
-  position: absolute;
-  margin: 0;
-  --frame: clamp(3px, 0.4vw, 5px); /* a slim moulding */
-  --mat: clamp(3px, 0.42vw, 6px); /* and a sliver of mat */
-  --frame-light: #4e3e42;
-  --frame-mid: #221819;
-  --frame-dark: #0c0708;
-  --mat-bg: #f8f3ee;
-  --cast: 30, 10, 14; /* the shadow's colour on this wall */
-  --W: calc(var(--w) * 1cqw);
-  --H: calc(var(--h) * 1cqh);
-  padding: var(--mat);
-  background: var(--mat-bg);
-  border: var(--frame) solid var(--frame-mid);
-  /* the moulding's profile: its top and left faces catch the light, its bottom and right fall into shadow */
-  border-image: linear-gradient(135deg, var(--frame-light) 0%, var(--frame-mid) 36%, var(--frame-mid) 64%, var(--frame-dark) 100%) 1;
-  outline: 1px solid rgba(255, 255, 255, 0.08);
-  outline-offset: -1px;
-  box-shadow:
-    /* the frame's inner lip shading the mat */
-    inset 0 2px 3px rgba(var(--cast), 0.26),
-    inset 2px 0 2px rgba(var(--cast), 0.1),
-    /* the frame on the wall: a tight contact shadow, then a softer one thrown down and to the right */
-    1px 2px 3px rgba(var(--cast), 0.22),
-    3px 7px 10px -3px rgba(var(--cast), 0.3),
-    12px 26px 40px -14px rgba(var(--cast), 0.45);
-  transform: rotate(var(--tilt, 0deg)) translateZ(6px);
-  transform-style: preserve-3d;
+/* the prints: real photo prints taped straight onto the wall, always in two rows. Each keeps its photo's own shape and
+   one shared height worked out from the wall's width (row 1's four photos add up to ~4.1 widths), so the rows never
+   wrap. A thin white paper border with a faint sheen, the corners lifting a touch off the wall (curled shadows), soft
+   light from the top left, and strips of translucent paper tape holding them up. */
+.photo-wall {
+  aspect-ratio: auto;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--row-gap);
+  padding: clamp(14px, 2.4vw, 30px) 0;
+  --gap: clamp(12px, 2.2cqw, 26px);
+  --row-gap: clamp(22px, 4cqw, 44px);
+  --pad: clamp(3px, 0.55cqw, 6px);
+  --print-h: calc((100cqw - 3 * var(--gap) - 8 * var(--pad) - 24px) / 4.15);
 }
 
-/* the mitred corners of the moulding: a hairline across each corner at 45° */
-.wall-frame::before {
-  content: "";
-  position: absolute;
-  inset: calc(-1 * var(--frame));
-  pointer-events: none;
-  --mitre: linear-gradient(135deg, transparent calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% + 0.5px), transparent calc(50% + 0.5px));
-  --mitre-r: linear-gradient(45deg, transparent calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% - 0.5px), rgba(0, 0, 0, 0.45) calc(50% + 0.5px), transparent calc(50% + 0.5px));
-  background:
-    var(--mitre) left top / var(--frame) var(--frame) no-repeat,
-    var(--mitre-r) right top / var(--frame) var(--frame) no-repeat,
-    var(--mitre-r) left bottom / var(--frame) var(--frame) no-repeat,
-    var(--mitre) right bottom / var(--frame) var(--frame) no-repeat;
+.print-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap);
 }
 
-/* the picture wire: from a brass nail above the frame down behind its top edge, about a fifth of the way in each side */
-.wall-frame .wall-wire,
-.wall-frame .wall-nail {
-  position: absolute;
-  pointer-events: none;
-  transform: translateZ(-3px);
-}
-
-.wall-frame .wall-wire {
-  --rise: clamp(9px, calc(var(--H) * 0.09), 22px);
-  --run: calc(var(--W) * 0.21);
-  left: calc(50% - 0.5px);
-  top: calc(-1 * var(--rise) - var(--frame));
-  width: 1px;
-  height: hypot(var(--run), var(--rise));
-  transform-origin: 50% 0;
-  transform: translateZ(-3px) rotate(calc(-1 * atan2(var(--run), var(--rise))));
-  background: linear-gradient(to bottom, rgba(var(--cast), 0.55), rgba(var(--cast), 0.3));
-  box-shadow: 1px 1px 1px rgba(var(--cast), 0.15);
-}
-
-.wall-frame .wall-wire.is-right {
-  transform: translateZ(-3px) rotate(atan2(var(--run), var(--rise)));
-}
-
-.wall-frame .wall-nail {
-  --rise: clamp(9px, calc(var(--H) * 0.09), 22px);
-  left: calc(50% - 2.5px);
-  top: calc(-1 * var(--rise) - var(--frame) - 2.5px);
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #f3dfa6, #b58a3c 55%, #6d4d1b);
-  box-shadow:
-    0 1px 2px rgba(var(--cast), 0.45),
-    1px 3px 5px rgba(var(--cast), 0.25);
-}
-
-[data-theme="dark"] .wall-frame {
-  /* on the dark wall the frames turn antique gold */
-  --frame-light: #ecd292;
-  --frame-mid: #a9823f;
-  --frame-dark: #543b1a;
-  --mat-bg: #efe6da;
-  --cast: 0, 0, 0;
-  outline-color: rgba(255, 230, 180, 0.14);
-  box-shadow:
-    inset 0 2px 3px rgba(var(--cast), 0.4),
-    inset 2px 0 2px rgba(var(--cast), 0.18),
-    1px 2px 3px rgba(var(--cast), 0.4),
-    3px 7px 10px -3px rgba(var(--cast), 0.5),
-    12px 28px 44px -14px rgba(var(--cast), 0.75);
-}
-
-[data-theme="dark"] .wall-frame::before {
-  --mitre: linear-gradient(135deg, transparent calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% + 0.5px), transparent calc(50% + 0.5px));
-  --mitre-r: linear-gradient(45deg, transparent calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% - 0.5px), rgba(70, 45, 15, 0.6) calc(50% + 0.5px), transparent calc(50% + 0.5px));
-}
-
-[data-theme="dark"] .wall-frame .wall-wire {
-  background: linear-gradient(to bottom, rgba(255, 230, 190, 0.3), rgba(255, 230, 190, 0.12));
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-}
-
-.wall-photo {
+.polaroid {
   position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  /* paper grain on the mat, and the mat's bevelled cut edge round the window */
-  box-shadow:
-    0 0 0 1px rgba(var(--cast), 0.16),
-    0 0 0 2px rgba(255, 255, 255, 0.6);
+  flex: none;
+  margin: 0;
+  transform: translateY(calc(var(--lift, 0px) * 0.6)) rotate(var(--tilt, 0deg)) translateZ(4px);
 }
 
-.wall-frame > .wall-photo::before {
+/* the corners curling off the wall: soft shadow pooling under the two bottom corners */
+.polaroid::before {
   content: "";
   position: absolute;
-  inset: calc(-1 * var(--mat));
-  z-index: -1;
-  background: var(--grain);
-  background-size: 120px 120px;
-  opacity: 0.08;
+  z-index: 0;
+  left: 2%;
+  right: 2%;
+  bottom: -9px;
+  height: 22px;
+  background:
+    radial-gradient(ellipse 30% 55% at 12% 40%, rgba(46, 20, 24, 0.34), transparent 70%),
+    radial-gradient(ellipse 30% 55% at 88% 40%, rgba(46, 20, 24, 0.34), transparent 70%);
+  filter: blur(4px);
   pointer-events: none;
 }
 
-/* over the print: the mat window's shadow on it, and a sheet of glass whose reflection slides with the pointer */
-.wall-photo::after {
+.print {
+  position: relative;
+  z-index: 1;
+  padding: var(--pad);
+  /* paper: faint grain over an off-white that warms towards the bottom right */
+  background: var(--grain) 0 0 / 120px 120px, linear-gradient(140deg, #fffdfa 0%, #f7f3ec 55%, #efe9e1 100%);
+  background-blend-mode: soft-light, normal;
+  box-shadow:
+    0 0 0 0.5px rgba(46, 20, 24, 0.12),
+    inset 0 -1px 0 rgba(46, 20, 24, 0.06),
+    0 1px 1px rgba(46, 20, 24, 0.16),
+    1px 3px 6px -1px rgba(46, 20, 24, 0.18),
+    3px 10px 18px -8px rgba(46, 20, 24, 0.22);
+}
+
+.polaroid-photo {
+  position: relative;
+  height: var(--print-h);
+  aspect-ratio: var(--ar, 1);
+  overflow: hidden;
+  background: #e9e1d8;
+}
+
+.polaroid-photo img {
+  object-fit: cover;
+}
+
+/* a glossy print: a soft sheen that slides with the pointer, and the faintest darkening round its edge */
+.polaroid-photo::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
   pointer-events: none;
-  box-shadow:
-    inset 0 0 0 1px rgba(var(--cast), 0.14),
-    inset 0 3px 5px rgba(var(--cast), 0.3),
-    inset 2px 0 3px rgba(var(--cast), 0.12);
-  background: linear-gradient(118deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.07) 22%, transparent 38%, transparent 70%, rgba(255, 255, 255, 0.05) 100%);
-  background-size: 200% 200%;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.18), inset 0 0 14px rgba(30, 10, 14, 0.12);
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 26%, transparent 40%, transparent 74%, rgba(255, 255, 255, 0.06) 100%);
+  background-size: 220% 220%;
   background-position: calc(30% - var(--px) * 40%) calc(30% - var(--py) * 40%);
-  transition:
-    --px 0.9s var(--ease),
-    --py 0.9s var(--ease);
 }
 
-/* a frame still waiting for its photo: just the mat with a faint inner shadow */
-.wall-photo.is-empty {
-  background: color-mix(in srgb, var(--cream-2) 70%, #fff);
+.polaroid-photo.is-empty::after {
   box-shadow: inset 0 2px 10px rgba(46, 20, 24, 0.12);
 }
 
-.wall-photo img {
-  object-fit: cover;
+/* paper tape: translucent, a little creased, torn ends */
+.print-tape {
+  position: absolute;
+  z-index: 2;
+  width: clamp(30px, 6cqw, 58px);
+  height: clamp(11px, 1.8cqw, 18px);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 30%, rgba(255, 255, 255, 0.12) 60%, transparent),
+    rgba(238, 226, 208, 0.62);
+  box-shadow: 0 1px 2px rgba(46, 20, 24, 0.12);
+  backdrop-filter: blur(0.5px);
+  clip-path: polygon(0 8%, 6% 0, 12% 10%, 20% 2%, 30% 8%, 40% 0, 52% 9%, 63% 1%, 74% 8%, 86% 0, 94% 9%, 100% 3%, 100% 92%, 94% 100%, 85% 91%, 74% 99%, 62% 92%, 50% 100%, 38% 91%, 26% 99%, 15% 90%, 6% 98%, 0 91%);
+  pointer-events: none;
 }
+
+.tape-top .print-tape {
+  top: calc(-0.55 * clamp(11px, 1.8cqw, 18px));
+  left: 50%;
+  transform: translateX(-50%) rotate(var(--tape, -2deg));
+}
+
+.tape-top .print-tape.is-second {
+  display: none;
+}
+
+.tape-corners .print-tape {
+  top: calc(-0.35 * clamp(11px, 1.8cqw, 18px));
+  left: -12px;
+  transform: rotate(-38deg);
+}
+
+.tape-corners .print-tape.is-second {
+  left: auto;
+  right: -12px;
+  transform: rotate(38deg);
+}
+
+[data-theme="dark"] .print {
+  background: var(--grain) 0 0 / 120px 120px, linear-gradient(140deg, #f6f0e8 0%, #ece4d9 60%, #e1d8cc 100%);
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    1px 4px 8px -1px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .polaroid::before {
+  background:
+    radial-gradient(ellipse 30% 55% at 12% 40%, rgba(0, 0, 0, 0.6), transparent 70%),
+    radial-gradient(ellipse 30% 55% at 88% 40%, rgba(0, 0, 0, 0.6), transparent 70%);
+}
+
+[data-theme="dark"] .print-tape {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12), transparent 30%, rgba(255, 255, 255, 0.08) 60%, transparent),
+    rgba(222, 205, 182, 0.42);
+}
+
+
+
 
 @media (prefers-reduced-motion: reduce) {
   .photo-wall {
@@ -1550,9 +1541,6 @@ html::-webkit-scrollbar {
 @media (max-width: 600px) {
   .about-promises {
     grid-template-columns: 1fr;
-  }
-  .photo-wall {
-    aspect-ratio: 100 / 66;
   }
 }
 
