@@ -46,3 +46,6 @@ next-env.d.ts
 
 # raw generation outputs and originals (hundreds of MB) — kept locally, the site uses src/assets
 /refs/
+
+# playwright
+/test-results/

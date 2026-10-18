@@ -31,6 +31,16 @@ npm run lint
 - `NEWSLETTER_WEBHOOK_URL` — optional. Where the newsletter form posts sign-ups. Until it is set the form says sign-ups open soon.
 - `OPENAI_API_KEY` — only for the image-generation scripts, never at runtime.
 
+## Tests
+
+End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section, the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag and favourites, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1.
+
+```bash
+npm run test:build   # production build, then the whole suite (about 10 minutes)
+npm test             # the suite against an existing `next start` on port 3177
+npm run test:report  # open the last HTML report
+```
+
 ## Deploy
 
 Hosted on Vercel as the `lusted` project.
