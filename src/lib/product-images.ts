@@ -36,6 +36,7 @@ import fleurEmbroideredSatinSlip from "@/assets/products/fleur-embroidered-satin
 import lotusSatinCheongsam from "@/assets/products/lotus-satin-cheongsam.webp";
 import scarletButterflyTeddy from "@/assets/products/scarlet-butterfly-teddy.webp";
 import bloomLaceUpRuffleMini from "@/assets/products/bloom-lace-up-ruffle-mini.webp";
+import jadeDragonCheongsam from "@/assets/products/jade-dragon-cheongsam.webp";
 import roseLaceBalconetteBraBack from "@/assets/products/rose-lace-balconette-bra-back.webp";
 import roseLaceBalconetteBraSide from "@/assets/products/rose-lace-balconette-bra-side.webp";
 import roseLaceHighWaistBriefBack from "@/assets/products/rose-lace-high-waist-brief-back.webp";
@@ -161,6 +162,7 @@ export const productImages = {
   "lotus-satin-cheongsam": lotusSatinCheongsam,
   "scarlet-butterfly-teddy": scarletButterflyTeddy,
   "bloom-lace-up-ruffle-mini": bloomLaceUpRuffleMini,
+  "jade-dragon-cheongsam": jadeDragonCheongsam,
 };
 
 export type ProductView = "back" | "side";
