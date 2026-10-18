@@ -3,7 +3,6 @@ import type { StaticImageData } from "next/image";
 import { colorImages, productImages, productViews } from "./product-images";
 
 // Product data lives in catalog.json (placeholder catalogue — replace with your real range).
-// Photos are generated from each entry's `shot` by scripts/generate-products.mjs.
 
 export type Category = "lingerie" | "swim" | "after-dark";
 export type ColorKey = keyof typeof colors;

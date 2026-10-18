@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import hero1 from "@/assets/images/hero/hero-1.webp";
 import hero2 from "@/assets/images/hero/hero-2.webp";

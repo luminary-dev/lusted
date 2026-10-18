@@ -391,43 +391,6 @@ svg {
   background: #fff;
 }
 
-.btn-ghost-light {
-  border-color: rgba(255, 243, 238, 0.5);
-  color: #fff6f2;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-}
-
-.btn-ghost-light:hover {
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.link-arrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--hair);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: border-color 0.3s var(--ease);
-}
-
-.link-arrow svg {
-  width: 18px;
-  height: 18px;
-  transition: transform 0.35s var(--ease);
-}
-
-.link-arrow:hover {
-  border-color: var(--ink);
-}
-
-.link-arrow:hover svg {
-  transform: translateX(4px);
-}
-
 .media {
   position: relative;
   overflow: hidden;
@@ -1150,18 +1113,6 @@ html::-webkit-scrollbar {
   transform: scaleX(1);
 }
 
-.nav-cta {
-  height: 44px;
-  padding: 0 20px;
-  font-size: 13.5px;
-  gap: 8px;
-}
-
-.nav-cta svg {
-  width: 17px;
-  height: 17px;
-}
-
 .nav-toggle {
   display: none;
 }
@@ -1563,21 +1514,6 @@ html::-webkit-scrollbar {
 
 .about {
   background: var(--paper);
-}
-
-.about-grid {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: clamp(40px, 7vw, 112px);
-  align-items: center;
-}
-
-.about-media {
-  aspect-ratio: 4 / 5;
-}
-
-.about-media img {
-  object-position: 74% 50%;
 }
 
 .about-copy .h2 {
@@ -3082,25 +3018,6 @@ html::-webkit-scrollbar {
   height: 14px;
 }
 
-.trust {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-}
-
-.trust li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 240, 235, 0.78);
-}
-
-.trust svg {
-  width: 15px;
-  height: 15px;
-  color: #f0b9ae;
-}
-
 /* ───────── responsive ───────── */
 
 @media (max-width: 1080px) {
@@ -3118,9 +3035,6 @@ html::-webkit-scrollbar {
   }
   .nav-bar {
     padding: 0 8px 0 22px;
-  }
-  .nav-cta {
-    display: none;
   }
   .nav-actions {
     margin-left: auto;
@@ -3205,7 +3119,6 @@ html::-webkit-scrollbar {
   .col-card {
     max-height: min(84svh, 720px);
   }
-  .about-grid,
   .size-layout {
     grid-template-columns: 1fr;
   }
@@ -3310,16 +3223,13 @@ html::-webkit-scrollbar {
 }
 
 /* grid children may shrink below their content (lets the size table scroll instead of widening the page) */
-.about-grid > *,
 .about-wall-grid > *,
-.size-layout > *,
-.footer-news > * {
+.size-layout > * {
   min-width: 0;
 }
 
-/* ───────── nav: bag button ───────── */
+/* ───────── nav: icon buttons ───────── */
 
-.bag-btn,
 .icon-btn {
   position: relative;
   display: grid;
@@ -3334,12 +3244,10 @@ html::-webkit-scrollbar {
   transition: background 0.3s var(--ease);
 }
 
-.bag-btn:hover,
 .icon-btn:hover {
   background: color-mix(in srgb, currentColor 10%, transparent);
 }
 
-.bag-btn svg,
 .icon-btn svg {
   width: 20px;
   height: 20px;
@@ -5747,10 +5655,6 @@ html::-webkit-scrollbar {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.about-more {
-  margin-top: 28px;
 }
 
 @media (max-width: 900px) {
