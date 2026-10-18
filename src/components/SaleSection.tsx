@@ -11,6 +11,8 @@ const TINT: Record<ColorKey, string> = {
   black: "#241a1c",
   champagne: "#8b6a35",
   mocha: "#5a3d31",
+  lilac: "#6e5a8c",
+  aqua: "#3f7f82",
 };
 
 export default function SaleSection() {

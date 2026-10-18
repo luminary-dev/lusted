@@ -34,9 +34,8 @@ import nightshadeCrossstrapMini from "@/assets/products/nightshade-crossstrap-mi
 import bijouCrystalTwoPiece from "@/assets/products/bijou-crystal-two-piece.webp";
 import fleurEmbroideredSatinSlip from "@/assets/products/fleur-embroidered-satin-slip.webp";
 import lotusSatinCheongsam from "@/assets/products/lotus-satin-cheongsam.webp";
-import scarletButterflyTeddy from "@/assets/products/scarlet-butterfly-teddy.webp";
 import bloomLaceUpRuffleMini from "@/assets/products/bloom-lace-up-ruffle-mini.webp";
-import jadeDragonCheongsam from "@/assets/products/jade-dragon-cheongsam.webp";
+import wisteriaEmbroideredBustierSet from "@/assets/products/wisteria-embroidered-bustier-set.webp";
 import roseLaceBalconetteBraBack from "@/assets/products/rose-lace-balconette-bra-back.webp";
 import roseLaceBalconetteBraSide from "@/assets/products/rose-lace-balconette-bra-side.webp";
 import roseLaceHighWaistBriefBack from "@/assets/products/rose-lace-high-waist-brief-back.webp";
@@ -103,10 +102,10 @@ import fleurEmbroideredSatinSlipBack from "@/assets/products/fleur-embroidered-s
 import fleurEmbroideredSatinSlipSide from "@/assets/products/fleur-embroidered-satin-slip-side.webp";
 import lotusSatinCheongsamBack from "@/assets/products/lotus-satin-cheongsam-back.webp";
 import lotusSatinCheongsamSide from "@/assets/products/lotus-satin-cheongsam-side.webp";
-import scarletButterflyTeddyBack from "@/assets/products/scarlet-butterfly-teddy-back.webp";
-import scarletButterflyTeddySide from "@/assets/products/scarlet-butterfly-teddy-side.webp";
 import bloomLaceUpRuffleMiniBack from "@/assets/products/bloom-lace-up-ruffle-mini-back.webp";
 import bloomLaceUpRuffleMiniSide from "@/assets/products/bloom-lace-up-ruffle-mini-side.webp";
+import wisteriaEmbroideredBustierSetBack from "@/assets/products/wisteria-embroidered-bustier-set-back.webp";
+import wisteriaEmbroideredBustierSetSide from "@/assets/products/wisteria-embroidered-bustier-set-side.webp";
 import roseLaceBalconetteBraWine from "@/assets/products/rose-lace-balconette-bra--wine.webp";
 import roseLaceBalconetteBraWineBack from "@/assets/products/rose-lace-balconette-bra--wine-back.webp";
 import roseLaceBalconetteBraWineSide from "@/assets/products/rose-lace-balconette-bra--wine-side.webp";
@@ -125,6 +124,9 @@ import margotSilkSlipWineSide from "@/assets/products/margot-silk-slip--wine-sid
 import amelieGarterBeltBlush from "@/assets/products/amelie-garter-belt--blush.webp";
 import amelieGarterBeltBlushBack from "@/assets/products/amelie-garter-belt--blush-back.webp";
 import amelieGarterBeltBlushSide from "@/assets/products/amelie-garter-belt--blush-side.webp";
+import wisteriaEmbroideredBustierSetAqua from "@/assets/products/wisteria-embroidered-bustier-set--aqua.webp";
+import wisteriaEmbroideredBustierSetAquaBack from "@/assets/products/wisteria-embroidered-bustier-set--aqua-back.webp";
+import wisteriaEmbroideredBustierSetAquaSide from "@/assets/products/wisteria-embroidered-bustier-set--aqua-side.webp";
 
 export const productImages = {
   "rose-lace-balconette-bra": roseLaceBalconetteBra,
@@ -160,9 +162,8 @@ export const productImages = {
   "bijou-crystal-two-piece": bijouCrystalTwoPiece,
   "fleur-embroidered-satin-slip": fleurEmbroideredSatinSlip,
   "lotus-satin-cheongsam": lotusSatinCheongsam,
-  "scarlet-butterfly-teddy": scarletButterflyTeddy,
   "bloom-lace-up-ruffle-mini": bloomLaceUpRuffleMini,
-  "jade-dragon-cheongsam": jadeDragonCheongsam,
+  "wisteria-embroidered-bustier-set": wisteriaEmbroideredBustierSet,
 };
 
 export type ProductView = "back" | "side";
@@ -200,8 +201,8 @@ export const productViews: Partial<Record<keyof typeof productImages, Partial<Re
   "bijou-crystal-two-piece": { back: bijouCrystalTwoPieceBack, side: bijouCrystalTwoPieceSide },
   "fleur-embroidered-satin-slip": { back: fleurEmbroideredSatinSlipBack, side: fleurEmbroideredSatinSlipSide },
   "lotus-satin-cheongsam": { back: lotusSatinCheongsamBack, side: lotusSatinCheongsamSide },
-  "scarlet-butterfly-teddy": { back: scarletButterflyTeddyBack, side: scarletButterflyTeddySide },
   "bloom-lace-up-ruffle-mini": { back: bloomLaceUpRuffleMiniBack, side: bloomLaceUpRuffleMiniSide },
+  "wisteria-embroidered-bustier-set": { back: wisteriaEmbroideredBustierSetBack, side: wisteriaEmbroideredBustierSetSide },
 };
 
 // other colourways of a piece: { slug: { colour: { front, back?, side? } } }
@@ -212,4 +213,5 @@ export const colorImages: Partial<Record<keyof typeof productImages, Record<stri
   "juliette-lace-bodysuit": { blush: { front: julietteLaceBodysuitBlush, back: julietteLaceBodysuitBlushBack, side: julietteLaceBodysuitBlushSide } },
   "margot-silk-slip": { wine: { front: margotSilkSlipWine, back: margotSilkSlipWineBack, side: margotSilkSlipWineSide } },
   "amelie-garter-belt": { blush: { front: amelieGarterBeltBlush, back: amelieGarterBeltBlushBack, side: amelieGarterBeltBlushSide } },
+  "wisteria-embroidered-bustier-set": { aqua: { front: wisteriaEmbroideredBustierSetAqua, back: wisteriaEmbroideredBustierSetAquaBack, side: wisteriaEmbroideredBustierSetAquaSide } },
 };

@@ -23,6 +23,8 @@ export const colors = {
   ivory: { label: "Ivory", hex: "#f2ebdf" },
   champagne: { label: "Champagne", hex: "#e6ccb2" },
   mocha: { label: "Mocha", hex: "#7a5646" },
+  lilac: { label: "Lilac", hex: "#b9a2d8" },
+  aqua: { label: "Aqua", hex: "#8fd3d6" },
 };
 
 export const sizes = ["XS", "S", "M", "L", "XL"] as const;
@@ -77,9 +79,9 @@ export const products: Product[] = shot.map((p) => ({
   ...(p as Omit<Product, "image" | "isNew" | "backImage" | "views" | "colorViews">),
   image: productImages[p.slug as keyof typeof productImages],
   backImage: productViews[p.slug as keyof typeof productImages]?.back,
-  views: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }, p.mainView),
+  views: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }, (p as { mainView?: string }).mainView),
   colorViews: {
-    [p.colors[0]]: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }, p.mainView),
+    [p.colors[0]]: toViews({ front: productImages[p.slug as keyof typeof productImages], ...productViews[p.slug as keyof typeof productImages] }, (p as { mainView?: string }).mainView),
     ...Object.fromEntries(
       Object.entries(colorImages[p.slug as keyof typeof productImages] ?? {}).map(([c, v]) => [c, toViews(v)]),
     ),

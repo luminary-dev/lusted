@@ -20,10 +20,9 @@ for (const p of catalog) for (const v of VIEWS) if (await exists(path.join(OUT, 
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 // colourways: <slug>--<colour>.webp (+ -back / -side) — the same piece photographed in its other colours
-const COLOURS = ["blush", "wine", "black", "ivory", "champagne", "mocha"];
 const ways = []; // [slug, colour, view | ""]
 for (const p of catalog)
-  for (const c of COLOURS)
+  for (const c of p.colors)
     if (c !== p.colors[0] && (await exists(path.join(OUT, `${p.slug}--${c}.webp`))))
       for (const v of ["", ...VIEWS])
         if (await exists(path.join(OUT, `${p.slug}--${c}${v ? `-${v}` : ""}.webp`))) ways.push([p.slug, c, v]);

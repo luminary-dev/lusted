@@ -46,12 +46,12 @@ Sections fade in on scroll using pure-CSS scroll-driven animations (no JavaScrip
 
 ## Products
 
-The catalogue is **`src/lib/catalog.json`** — 36 products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
+The catalogue is **`src/lib/catalog.json`** — 37 products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
 
 - `salePrice` puts a product in the sale section and the "On sale" filter.
 - `bestSeller` (1–6) puts it in Best sellers, in that order.
 - The 6 most recently `added` products get the "New" badge.
-- The first colour in `colors` is the one in the product's main photos. Other colours can have their own photos (colourways) — see below. Single-colour pieces hide the colour swatches and picker. Colours: blush, wine, black, ivory, champagne, mocha (`colors` in `src/lib/products.ts`; the sale card tint per colour is `TINT` in `SaleSection.tsx`).
+- The first colour in `colors` is the one in the product's main photos. Other colours can have their own photos (colourways) — see below. Single-colour pieces hide the colour swatches and picker. Colours: blush, wine, black, ivory, champagne, mocha, lilac, aqua (`colors` in `src/lib/products.ts`; the sale card tint per colour is `TINT` in `SaleSection.tsx`).
 - `description` is the product page copy and includes every feature and the care note; `details` lists the same points for search.
 - `fit` (-1 runs small · 0 true to size · 1 runs large) and `fitNote` drive the fit line under the size picker; `moments` (three, lower-case) make the "Made for…" line.
 - `shot` describes the product photo for `scripts/generate-products.mjs`.
