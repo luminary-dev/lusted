@@ -5554,22 +5554,48 @@ html::-webkit-scrollbar {
   max-width: 860px;
 }
 
-.about-hero .h1 {
-  margin-top: 18px;
-  font-size: clamp(34px, 4.2vw, 62px);
-}
-
-.about-hero .lede {
-  margin-top: 22px;
-}
-
-.about-page-hero {
-  margin-top: clamp(40px, 5vw, 64px);
+.about-hero-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
   aspect-ratio: 21 / 9;
+  background: var(--cream-2);
+  isolation: isolate;
 }
 
-.about-page-hero img {
+.about-hero-photo img {
+  object-fit: cover;
   object-position: 70% 50%;
+}
+
+.about-hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(46, 20, 24, 0.62) 0%, rgba(46, 20, 24, 0.38) 34%, rgba(46, 20, 24, 0) 62%),
+    linear-gradient(0deg, rgba(46, 20, 24, 0.45) 0%, rgba(46, 20, 24, 0) 45%);
+}
+
+.about-hero-copy {
+  position: absolute;
+  z-index: 1;
+  left: clamp(24px, 4.5vw, 72px);
+  right: clamp(24px, 4.5vw, 72px);
+  bottom: clamp(24px, 4.5vw, 64px);
+  max-width: 580px;
+  color: #fff6f2;
+}
+
+.about-hero-copy .eyebrow {
+  color: #f3c9bd;
+}
+
+.about-hero-copy .h1 {
+  margin-top: 16px;
+  font-size: clamp(34px, 4.2vw, 62px);
+  color: #fff6f2;
+  text-shadow: 0 2px 24px rgba(46, 20, 24, 0.35);
 }
 
 .about-story {
@@ -5590,7 +5616,8 @@ html::-webkit-scrollbar {
   align-content: start;
 }
 
-.about-values-grid {
+/* what we believe: a heading beside a two-by-two of values, divided by hairlines rather than boxed in cards */
+.about-values {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: clamp(14px, 1.6vw, 22px);
@@ -5600,25 +5627,82 @@ html::-webkit-scrollbar {
 
 .about-value {
   display: grid;
+.about-hero-copy .h1 em {
+  color: #f3c9bd;
+}
+
+.about-hero-copy .lede {
+  margin-top: 18px;
+  color: rgba(255, 246, 242, 0.88);
+  max-width: 30em;
+}
+
+/* our story */
   align-content: start;
   gap: 14px;
-  padding: 26px;
-  border-radius: var(--radius);
-  background: var(--paper);
-  border: 1px solid var(--hair);
+  padding: 26px 28px 30px;
+  border-top: 1px solid var(--hair);
+}
+
+/* the hairlines: a column between the two, rows above the second pair */
+.about-value:nth-child(odd) {
+  padding-left: 0;
+  border-right: 1px solid var(--hair);
+}
+
+.about-value:nth-child(even) {
+  padding-right: 0;
+}
+
+.about-value:nth-child(-n + 2) {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.about-value .value-icon {
+  transition:
+    background 0.4s var(--ease),
+    color 0.4s var(--ease);
+}
+
+.about-value:hover .value-icon {
+  background: var(--wine);
+  color: #fff6f2;
+}
+
+.about-value .h3 {
+  margin-top: 4px;
 }
 
 .about-value p {
   font-size: 14.5px;
   line-height: 1.65;
   color: var(--muted);
+.about-quote {
+  margin: 28px 0 0;
+  padding-left: 18px;
+  border-left: 2px solid color-mix(in srgb, var(--rose) 55%, transparent);
+  font-family: var(--script);
+  font-size: clamp(26px, 2.4vw, 34px);
+  line-height: 1.25;
+  color: var(--rose);
+  max-width: 16em;
 }
 
-[data-theme="dark"] .about-value .value-icon {
+}
+
+[data-theme="dark"] .about-value .value-icon,
+[data-theme="dark"] .about-steps .value-icon {
   color: var(--rose);
 }
 
-.about-split {
+[data-theme="dark"] .about-value:hover .value-icon {
+  background: var(--rose);
+  color: #2a0d14;
+}
+
+/* how we work: two prints taped to the page beside the three steps */
+.about-how {
   display: grid;
   grid-template-columns: 0.8fr 0.8fr 1.2fr;
   gap: clamp(14px, 2vw, 28px);
@@ -5627,20 +5711,102 @@ html::-webkit-scrollbar {
   border-bottom: 1px solid var(--hair);
 }
 
-.about-split .media {
-  aspect-ratio: 3 / 4;
-}
-
-.about-split-copy {
-  padding-left: clamp(0px, 3vw, 40px);
-}
-
-.about-split-copy .h2 {
+.about-values-head .h2 {
   margin-top: 16px;
 }
 
-.about-split-copy .lede {
-  margin-top: 18px;
+.about-values-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-prints {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  --print-paper: #fbf7f3;
+}
+
+[data-theme="dark"] .about-prints {
+  --print-paper: #efe6dd;
+}
+
+.about-print {
+  position: absolute;
+  margin: 0;
+  width: 60%;
+  padding: 3% 3% 0;
+  background: var(--print-paper);
+  box-shadow:
+    0 1px 2px rgba(46, 20, 24, 0.18),
+    0 18px 36px -16px rgba(46, 20, 24, 0.45);
+  transform: rotate(var(--tilt));
+}
+
+[data-theme="dark"] .about-print {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 22px 40px -16px rgba(0, 0, 0, 0.75);
+}
+
+.about-print.is-left {
+  left: 0;
+  top: 0;
+  --tilt: -2.6deg;
+}
+
+.about-print.is-right {
+  right: 0;
+  top: 17%;
+  z-index: 1;
+  --tilt: 2.1deg;
+}
+
+.about-print-photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+}
+
+.about-print-photo img {
+  object-fit: cover;
+}
+
+.about-print figcaption {
+  padding: 10px 2px 12px;
+  font-family: var(--script);
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1;
+  color: #5a3a40;
+  text-align: center;
+}
+
+/* a strip of translucent tape across the top edge */
+.about-tape {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 34%;
+  height: 24px;
+  transform: translateX(-50%) rotate(calc(var(--tilt) * -0.6));
+  background: rgba(255, 244, 236, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(46, 20, 24, 0.12);
+  backdrop-filter: blur(1px);
+}
+
+.about-how-copy .h2 {
+  margin-top: 16px;
+}
+
+.about-steps {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 0;
+  list-style: none;
 }
 
 .about-cta {
@@ -5651,7 +5817,19 @@ html::-webkit-scrollbar {
   padding-top: var(--section);
 }
 
-.about-cta > div {
+.about-cta::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10%;
+  z-index: -1;
+  background: radial-gradient(ellipse closest-side at 80% 50%, color-mix(in srgb, var(--rose) 22%, transparent), transparent);
+}
+
+.about-cta .h2 {
+  margin-top: 12px;
+}
+
+.about-cta-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -5675,23 +5853,62 @@ html::-webkit-scrollbar {
     border: 1px solid var(--hair);
     border-radius: 999px;
     font-size: 13px;
+.about-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+}
+
+.about-steps .h3 {
+  margin-top: 10px;
+}
+
+.about-steps p {
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 30em;
+}
+
+/* the closing panel */
   }
-  .about-page-hero {
+  /* on narrow screens the headline moves below the photo, which crops in on her */
+  .about-hero-photo {
     aspect-ratio: 4 / 3;
   }
+  .about-hero-photo::after {
+    background: linear-gradient(0deg, rgba(46, 20, 24, 0.28) 0%, rgba(46, 20, 24, 0) 40%);
+  }
+  .about-hero-copy {
+    position: static;
+    max-width: 640px;
+    margin-top: 28px;
+    color: var(--ink);
+  }
+  .about-hero-copy .eyebrow {
+    color: var(--rose);
+  }
+  .about-hero-copy .h1 {
+    color: var(--ink);
+    text-shadow: none;
+  }
+  .about-hero-copy .h1 em {
+    color: var(--rose);
+  }
+  .about-hero-copy .lede {
+    color: var(--ink-2);
+  }
   .about-story,
-  .about-split {
-    grid-template-columns: 1fr 1fr;
+  .about-how,
+  .about-values {
+    grid-template-columns: 1fr;
   }
-  .about-story > *,
-  .about-split-copy {
-    grid-column: 1 / -1;
-  }
-  .about-split-copy {
-    padding-left: 0;
-  }
-  .about-values-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .about-prints {
+    max-width: 520px;
   }
   .about-cta {
     flex-direction: column;
@@ -5700,7 +5917,8 @@ html::-webkit-scrollbar {
 }
 
 @media (max-width: 600px) {
-  .about-values-grid {
+  /* one column: every value sits under a hairline, none beside another */
+  .about-values-list {
     grid-template-columns: 1fr;
   }
   .footer-credit {
@@ -5741,6 +5959,17 @@ html::-webkit-scrollbar {
 
 /* ───────── header: WhatsApp button ───────── */
 
+  .about-value,
+  .about-value:nth-child(odd),
+  .about-value:nth-child(even) {
+    padding: 22px 0;
+    border-right: 0;
+    border-top: 1px solid var(--hair);
+  }
+  .about-value:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
 .nav-whatsapp {
   height: 42px;
   padding: 0 18px;
