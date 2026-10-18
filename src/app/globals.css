@@ -2691,7 +2691,7 @@ html::-webkit-scrollbar {
     aspect-ratio: 4 / 3;
   }
   .how-img {
-    object-position: 30% 30%;
+    object-position: 33% 30%; /* the three of them centred in the 4:3 crop */
   }
 }
 
