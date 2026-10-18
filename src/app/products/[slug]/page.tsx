@@ -18,27 +18,23 @@ export async function generateMetadata({
   return p ? { title: `${p.name} — Lusted`, description: p.description } : {};
 }
 
-// The shell stays URL-independent; params are read inside Suspense (instant navigation).
-// Every slug is prerendered by generateStaticParams, so the fallback is only a safety net.
-export default function ProductPage({ params }: PageProps<"/products/[slug]">) {
+// Every slug is prerendered by generateStaticParams. The slug is resolved here, before anything streams, so an
+// unknown piece is a real 404 response rather than a 200 carrying a not-found body.
+export default async function ProductPage({ params }: PageProps<"/products/[slug]">) {
+  const product = getProduct((await params).slug);
+  if (!product) notFound();
   return (
     <main className="pdp">
       <div className="container">
         <Suspense fallback={<div className="pdp-skeleton" />}>
-          <ProductDetails params={params} />
+          <ProductDetails product={product} />
         </Suspense>
       </div>
     </main>
   );
 }
 
-async function ProductDetails({
-  params,
-}: {
-  params: PageProps<"/products/[slug]">["params"];
-}) {
-  const product = getProduct((await params).slug);
-  if (!product) notFound();
+function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof getProduct>> }) {
 
   const related = products
     .filter((p) => p.category === product.category && p.slug !== product.slug)

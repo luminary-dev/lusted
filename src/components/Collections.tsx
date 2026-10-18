@@ -76,7 +76,6 @@ export default function Collections() {
               key={c.cat}
               className="col-card"
               href={`/products?cat=${c.cat}`}
-              aria-label={`Shop ${c.name} — ${c.title}`}
               data-reveal
               style={{ "--d": `${i * 0.1}s` } as React.CSSProperties}
             >

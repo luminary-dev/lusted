@@ -35,7 +35,7 @@ export default function BagDrawer() {
   ].join("\n");
 
   return (
-    <div className={`drawer-root ${open ? "is-open" : ""}`} aria-hidden={!open}>
+    <div className={`drawer-root ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open}>
       <div className="drawer-scrim" onClick={() => bag.setOpen(false)} />
       <aside className="drawer" role="dialog" aria-modal="true" aria-label="Your bag">
         <header className="drawer-head">

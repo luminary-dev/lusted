@@ -7,7 +7,8 @@
   --paper: #fffaf7;
   --ink: #2e1418;
   --ink-2: #5e4246;
-  --muted: #8d7175;
+  --muted: #735860;
+  --rose-ink: #a04459; /* rose for small text — the brand rose only passes 4.5:1 on the palest paper */
   --wine: #7a1b33;
   --wine-2: #5c1226;
   --blush: #e8b4aa;
@@ -116,6 +117,7 @@ svg {
   --ink: #f6e9e4;
   --ink-2: #d7c2be;
   --muted: #a88f93;
+  --rose-ink: var(--rose);
   --wine: #8c2340;
   --wine-2: #a32d4d;
   --rose: #eaa99c;
@@ -275,7 +277,7 @@ svg {
   font-weight: 500;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--rose);
+  color: var(--rose-ink);
 }
 
 .eyebrow::before,
@@ -1514,6 +1516,7 @@ html::-webkit-scrollbar {
 
 .about {
   background: var(--paper);
+  overflow-x: clip; /* the tilted prints on the wall may poke past the edge, but never widen the page */
 }
 
 .about-copy .h2 {
@@ -2537,7 +2540,7 @@ html::-webkit-scrollbar {
   align-items: center;
   gap: 6px;
   font-weight: 600;
-  color: var(--rose);
+  color: var(--rose-ink);
 }
 
 .size-note a:hover {
@@ -2983,6 +2986,7 @@ html::-webkit-scrollbar {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  min-height: 24px; /* a 24 px tap target */
   font-size: 14px;
   color: rgba(255, 243, 238, 0.86);
   transition: color 0.25s;
@@ -3069,16 +3073,23 @@ html::-webkit-scrollbar {
     box-shadow: 0 20px 50px rgba(46, 20, 24, 0.12);
     color: var(--ink);
     opacity: 0;
+    visibility: hidden; /* a closed menu is out of the tab order and out of screen readers, not just transparent */
     transform: translateY(-8px);
     pointer-events: none;
     transition:
       opacity 0.35s var(--ease),
-      transform 0.35s var(--ease);
+      transform 0.35s var(--ease),
+      visibility 0s 0.35s;
   }
   .nav.is-open .nav-links {
     opacity: 1;
+    visibility: visible;
     transform: none;
     pointer-events: auto;
+    transition:
+      opacity 0.35s var(--ease),
+      transform 0.35s var(--ease),
+      visibility 0s;
   }
   .nav-links a {
     padding: 16px 0;
@@ -3556,20 +3567,29 @@ html::-webkit-scrollbar {
 }
 
 .product-card .price:has(.price-was) .price-now {
-  color: var(--rose);
+  color: var(--rose-ink);
 }
 
 .swatches {
   display: flex;
-  gap: 6px;
+  gap: 12px; /* each 14 px dot answers to a 24 px area — keep those areas clear of each other */
   padding-inline: 2px;
 }
 
 .swatches .swatch {
+  position: relative;
   padding: 0;
   border: 0;
   cursor: pointer;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* the dot stays 14 px; the tappable area round it is 24 px (WCAG 2.5.8) */
+.swatches .swatch::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
 }
 
 .swatches .swatch:hover {
@@ -4061,7 +4081,7 @@ html::-webkit-scrollbar {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 0;
+  padding: 6px 3px; /* the label is the tap target: 24 px round the box */
   font-size: 14.5px;
   color: var(--ink-2);
   cursor: pointer;
@@ -4315,10 +4335,15 @@ html::-webkit-scrollbar {
 .crumbs {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   margin-bottom: 28px;
   font-size: 13px;
   color: var(--muted);
+}
+
+.crumbs a {
+  padding-block: 3px; /* a 24 px tap target */
 }
 
 .crumbs a:hover {
@@ -4470,7 +4495,7 @@ html::-webkit-scrollbar {
 }
 
 .pdp-price .price:has(.price-was) .price-now {
-  color: var(--rose);
+  color: var(--rose-ink);
 }
 
 .pdp-info > .lede {
@@ -4632,7 +4657,7 @@ html::-webkit-scrollbar {
   font-family: var(--headline);
   font-size: 19px;
   line-height: 1.45;
-  color: var(--rose);
+  color: var(--rose-ink);
 }
 
 /* the fit, one line under the size chips: a three-step meter and the note */
@@ -5214,7 +5239,7 @@ html::-webkit-scrollbar {
   border: 1px solid var(--hair);
   font-family: var(--sans);
   font-size: 11px;
-  color: var(--muted);
+  color: var(--ink-2);
 }
 
 .search-field .icon-btn {
@@ -5418,8 +5443,9 @@ html::-webkit-scrollbar {
 
 .legal,
 .about-page {
-  padding-top: clamp(120px, 12vw, 160px);
-  padding-bottom: var(--section);
+  --gap: clamp(48px, 6vw, 88px); /* the page's own section spacing — tighter than the home page's */
+  padding-top: clamp(104px, 10vw, 136px);
+  padding-bottom: var(--gap);
 }
 
 .legal-head {
@@ -5510,7 +5536,7 @@ html::-webkit-scrollbar {
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.16em;
-  color: var(--rose);
+  color: var(--rose-ink);
 }
 
 .prose p,
@@ -5550,8 +5576,10 @@ html::-webkit-scrollbar {
 
 /* ───────── about page ───────── */
 
+/* the opener: the dressing-room photo fills the width; the headline sits over its quiet left side on a soft scrim */
 .about-hero {
-  max-width: 860px;
+  position: relative; /* the copy is placed against the photo, the header's last block */
+  max-width: none;
 }
 
 .about-hero-photo {
@@ -5598,35 +5626,6 @@ html::-webkit-scrollbar {
   text-shadow: 0 2px 24px rgba(46, 20, 24, 0.35);
 }
 
-.about-story {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: clamp(32px, 6vw, 96px);
-  padding-block: var(--section);
-  border-bottom: 1px solid var(--hair);
-}
-
-.about-story .h2 {
-  margin-top: 16px;
-}
-
-.about-story-copy {
-  display: grid;
-  gap: 16px;
-  align-content: start;
-}
-
-/* what we believe: a heading beside a two-by-two of values, divided by hairlines rather than boxed in cards */
-.about-values {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(14px, 1.6vw, 22px);
-  padding-block: var(--section);
-  border-bottom: 1px solid var(--hair);
-}
-
-.about-value {
-  display: grid;
 .about-hero-copy .h1 em {
   color: #f3c9bd;
 }
@@ -5638,6 +5637,59 @@ html::-webkit-scrollbar {
 }
 
 /* our story */
+.about-story {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(28px, 5vw, 80px);
+  padding-block: var(--gap);
+  border-bottom: 1px solid var(--hair);
+}
+
+.about-story .h2 {
+  margin-top: 16px;
+}
+
+.about-quote {
+  margin: 28px 0 0;
+  padding-left: 18px;
+  border-left: 2px solid color-mix(in srgb, var(--rose) 55%, transparent);
+  font-family: var(--script);
+  font-size: clamp(26px, 2.4vw, 34px);
+  line-height: 1.25;
+  color: var(--rose);
+  max-width: 16em;
+}
+
+.about-story-copy {
+  display: grid;
+  gap: 16px;
+  align-content: center;
+}
+
+/* what we believe: a heading beside a two-by-two of values, divided by hairlines rather than boxed in cards */
+.about-values {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+  padding-block: var(--gap);
+  border-bottom: 1px solid var(--hair);
+}
+
+.about-values-head .h2 {
+  margin-top: 16px;
+}
+
+.about-values-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-value {
+  display: grid;
   align-content: start;
   gap: 14px;
   padding: 26px 28px 30px;
@@ -5678,17 +5730,7 @@ html::-webkit-scrollbar {
   font-size: 14.5px;
   line-height: 1.65;
   color: var(--muted);
-.about-quote {
-  margin: 28px 0 0;
-  padding-left: 18px;
-  border-left: 2px solid color-mix(in srgb, var(--rose) 55%, transparent);
-  font-family: var(--script);
-  font-size: clamp(26px, 2.4vw, 34px);
-  line-height: 1.25;
-  color: var(--rose);
-  max-width: 16em;
-}
-
+  max-width: 28em;
 }
 
 [data-theme="dark"] .about-value .value-icon,
@@ -5704,23 +5746,11 @@ html::-webkit-scrollbar {
 /* how we work: two prints taped to the page beside the three steps */
 .about-how {
   display: grid;
-  grid-template-columns: 0.8fr 0.8fr 1.2fr;
-  gap: clamp(14px, 2vw, 28px);
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(36px, 6vw, 96px);
   align-items: center;
-  padding-block: var(--section);
+  padding-block: var(--gap);
   border-bottom: 1px solid var(--hair);
-}
-
-.about-values-head .h2 {
-  margin-top: 16px;
-}
-
-.about-values-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 .about-prints {
@@ -5767,6 +5797,8 @@ html::-webkit-scrollbar {
 .about-print-photo {
   position: relative;
   aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--cream-2);
 }
 
 .about-print-photo img {
@@ -5809,12 +5841,40 @@ html::-webkit-scrollbar {
   list-style: none;
 }
 
+.about-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+}
+
+.about-steps .h3 {
+  margin-top: 10px;
+}
+
+.about-steps p {
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 30em;
+}
+
+/* the closing panel */
 .about-cta {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  padding-top: var(--section);
+  margin-top: var(--gap);
+  padding: clamp(32px, 4.5vw, 60px) clamp(28px, 5vw, 72px);
+  border-radius: var(--radius);
+  background: var(--blush-bg);
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .about-cta::before {
@@ -5853,28 +5913,6 @@ html::-webkit-scrollbar {
     border: 1px solid var(--hair);
     border-radius: 999px;
     font-size: 13px;
-.about-steps li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  gap: 16px;
-  padding-top: 18px;
-  border-top: 1px solid var(--hair);
-}
-
-.about-steps .h3 {
-  margin-top: 10px;
-}
-
-.about-steps p {
-  margin-top: 6px;
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: var(--muted);
-  max-width: 30em;
-}
-
-/* the closing panel */
   }
   /* on narrow screens the headline moves below the photo, which crops in on her */
   .about-hero-photo {
@@ -5921,6 +5959,17 @@ html::-webkit-scrollbar {
   .about-values-list {
     grid-template-columns: 1fr;
   }
+  .about-value,
+  .about-value:nth-child(odd),
+  .about-value:nth-child(even) {
+    padding: 22px 0;
+    border-right: 0;
+    border-top: 1px solid var(--hair);
+  }
+  .about-value:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
   .footer-credit {
     line-height: 1.6;
   }
@@ -5959,17 +6008,6 @@ html::-webkit-scrollbar {
 
 /* ───────── header: WhatsApp button ───────── */
 
-  .about-value,
-  .about-value:nth-child(odd),
-  .about-value:nth-child(even) {
-    padding: 22px 0;
-    border-right: 0;
-    border-top: 1px solid var(--hair);
-  }
-  .about-value:first-child {
-    padding-top: 0;
-    border-top: 0;
-  }
 .nav-whatsapp {
   height: 42px;
   padding: 0 18px;
@@ -6077,5 +6115,21 @@ html::-webkit-scrollbar {
   .sale-card-cta {
     padding: 11px 12px 11px 14px;
     font-size: 13px;
+  }
+}
+
+/* ───────── print ───────── */
+@media print {
+  .nav,
+  .scroll-progress,
+  .scroll-rail,
+  .cursor-trail,
+  .intro,
+  .drawer-root,
+  .search-root {
+    display: none !important;
+  }
+  body {
+    background: #fff;
   }
 }

@@ -137,7 +137,7 @@ export default function ProductBrowser() {
         </button>
         <label className="sort">
           <span>Sort</span>
-          <select value={sort} onChange={(e) => update({ sort: e.target.value === "featured" ? null : e.target.value })}>
+          <select aria-label="Sort" value={sort} onChange={(e) => update({ sort: e.target.value === "featured" ? null : e.target.value })}>
             {sorts.map((s) => (
               <option key={s.key} value={s.key}>
                 {s.label}

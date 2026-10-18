@@ -66,7 +66,7 @@ export default function SearchDialog() {
   }
 
   return (
-    <div className={`search-root ${isOpen ? "is-open" : ""}`} aria-hidden={!isOpen}>
+    <div className={`search-root ${isOpen ? "is-open" : ""}`} aria-hidden={!isOpen} inert={!isOpen}>
       <div className="drawer-scrim" onClick={close} />
       <div className="search-panel" role="dialog" aria-modal="true" aria-label="Search">
         <form

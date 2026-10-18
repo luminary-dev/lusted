@@ -152,16 +152,16 @@ export default function SizeGuide() {
             ))}
           </div>
 
-          <div className={`size-tags-stage ${has3d ? "has-3d" : ""}`}>
+          <div
+            className={`size-tags-stage ${has3d ? "has-3d" : ""}`}
+            role="tabpanel"
+            aria-label={`${tab} sizes, body measurements in cm`}
+          >
             <SizeTags3D tags={tags3d} onReady={setHas3d} />
             <p className="tags3d-hint" aria-hidden="true">
               ← Swipe along the cord →
             </p>
-            <ul
-              className="size-tags"
-              role="tabpanel"
-              aria-label={`${tab} sizes, body measurements in cm`}
-            >
+            <ul className="size-tags">
               {guides[tab].map((lines, i) => (
                 <li
                   key={`${tab}-${SIZES[i]}`}
@@ -173,7 +173,6 @@ export default function SizeGuide() {
                     role="button"
                     tabIndex={0}
                     aria-pressed={flipped === i}
-                    aria-label={`Size ${SIZES[i]}: ${lines.map(([k, v]) => `${k} ${v}`).join(", ")}`}
                     onClick={() => flip(i)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
