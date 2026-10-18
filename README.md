@@ -46,7 +46,7 @@ Sections fade in on scroll using pure-CSS scroll-driven animations (no JavaScrip
 
 ## Products
 
-The catalogue is **`src/lib/catalog.json`** — 34 products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
+The catalogue is **`src/lib/catalog.json`** — 35 products (names, prices in Sri Lankan rupees — LKR, sale prices, sizes, colours, best-seller ranks, descriptions). Replace it with your real range:
 
 - `salePrice` puts a product in the sale section and the "On sale" filter.
 - `bestSeller` (1–6) puts it in Best sellers, in that order.

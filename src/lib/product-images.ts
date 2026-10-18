@@ -35,6 +35,7 @@ import bijouCrystalTwoPiece from "@/assets/products/bijou-crystal-two-piece.webp
 import fleurEmbroideredSatinSlip from "@/assets/products/fleur-embroidered-satin-slip.webp";
 import lotusSatinCheongsam from "@/assets/products/lotus-satin-cheongsam.webp";
 import scarletButterflyTeddy from "@/assets/products/scarlet-butterfly-teddy.webp";
+import bloomLaceUpRuffleMini from "@/assets/products/bloom-lace-up-ruffle-mini.webp";
 import roseLaceBalconetteBraBack from "@/assets/products/rose-lace-balconette-bra-back.webp";
 import roseLaceBalconetteBraSide from "@/assets/products/rose-lace-balconette-bra-side.webp";
 import roseLaceHighWaistBriefBack from "@/assets/products/rose-lace-high-waist-brief-back.webp";
@@ -102,6 +103,9 @@ import fleurEmbroideredSatinSlipSide from "@/assets/products/fleur-embroidered-s
 import lotusSatinCheongsamBack from "@/assets/products/lotus-satin-cheongsam-back.webp";
 import lotusSatinCheongsamSide from "@/assets/products/lotus-satin-cheongsam-side.webp";
 import scarletButterflyTeddyBack from "@/assets/products/scarlet-butterfly-teddy-back.webp";
+import scarletButterflyTeddySide from "@/assets/products/scarlet-butterfly-teddy-side.webp";
+import bloomLaceUpRuffleMiniBack from "@/assets/products/bloom-lace-up-ruffle-mini-back.webp";
+import bloomLaceUpRuffleMiniSide from "@/assets/products/bloom-lace-up-ruffle-mini-side.webp";
 import roseLaceBalconetteBraWine from "@/assets/products/rose-lace-balconette-bra--wine.webp";
 import roseLaceBalconetteBraWineBack from "@/assets/products/rose-lace-balconette-bra--wine-back.webp";
 import roseLaceBalconetteBraWineSide from "@/assets/products/rose-lace-balconette-bra--wine-side.webp";
@@ -156,6 +160,7 @@ export const productImages = {
   "fleur-embroidered-satin-slip": fleurEmbroideredSatinSlip,
   "lotus-satin-cheongsam": lotusSatinCheongsam,
   "scarlet-butterfly-teddy": scarletButterflyTeddy,
+  "bloom-lace-up-ruffle-mini": bloomLaceUpRuffleMini,
 };
 
 export type ProductView = "back" | "side";
@@ -193,7 +198,8 @@ export const productViews: Partial<Record<keyof typeof productImages, Partial<Re
   "bijou-crystal-two-piece": { back: bijouCrystalTwoPieceBack, side: bijouCrystalTwoPieceSide },
   "fleur-embroidered-satin-slip": { back: fleurEmbroideredSatinSlipBack, side: fleurEmbroideredSatinSlipSide },
   "lotus-satin-cheongsam": { back: lotusSatinCheongsamBack, side: lotusSatinCheongsamSide },
-  "scarlet-butterfly-teddy": { back: scarletButterflyTeddyBack },
+  "scarlet-butterfly-teddy": { back: scarletButterflyTeddyBack, side: scarletButterflyTeddySide },
+  "bloom-lace-up-ruffle-mini": { back: bloomLaceUpRuffleMiniBack, side: bloomLaceUpRuffleMiniSide },
 };
 
 // other colourways of a piece: { slug: { colour: { front, back?, side? } } }

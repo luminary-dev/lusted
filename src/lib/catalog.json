@@ -1103,12 +1103,44 @@
     ],
     "fit": 0,
     "fitNote": "Adjustable straps and choker. Your usual size.",
-    "mainView": "Side",
     "moments": [
       "Valentine's night",
       "a slow reveal",
       "making him forget his own name"
     ],
-    "shot": "Real product, dressed onto the Sabine shoot with Krea 2 Identity Edit; wings and G-string touched up to be lined. Main photo is the side view (front pending a lined touch-up)."
+    "shot": "Real product, dressed onto the Sabine shoot with Krea 2 Identity Edit; wings and G-string touched up to be lined on the back and side views; the front shows the sheer wings."
+  },
+  {
+    "slug": "bloom-lace-up-ruffle-mini",
+    "name": "Bloom Lace-Up Ruffle Mini",
+    "category": "lingerie",
+    "price": 5500,
+    "colors": [
+      "blush"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "added": "2026-10-18",
+    "description": "Sweet print, wicked intentions. Watercolour blossoms on fine stretch mesh, lined cups laced together down the middle with criss-cross ties over your bare cleavage, and soft ruffles cascading all the way down to the opposite hip. One side gathers into a ruched drawstring you can pull as high as you dare, finished with a flirty ruffle hem. Hand wash cold.",
+    "details": [
+      "Printed stretch mesh",
+      "Lined cups with a lace-up centre",
+      "Cascading front ruffles",
+      "Ruched drawstring side",
+      "Ruffled hem",
+      "Hand wash cold"
+    ],
+    "fit": 0,
+    "fitNote": "Stretchy and bodycon, with an adjustable side drawstring. Your usual size.",
+    "moments": [
+      "sunset rooftops",
+      "a long brunch that turns into dinner",
+      "being untied slowly"
+    ],
+    "shot": "Real product, dressed onto the Camille shoot with Krea 2 Identity Edit in the Space UI (front, back, side)."
   }
 ]
