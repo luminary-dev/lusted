@@ -102,6 +102,32 @@ test.describe("sizes, modes and postures", () => {
     await expectNoHorizontalScroll(page, "menu open then widened");
   });
 
+  test("iOS zoom-out: nothing parked off-screen inside an unclipped fixed layer", async ({ prepared: page }) => {
+    // Desktop browsers ignore overflow inside position:fixed layers, but iOS Safari counts it as page width and lets you
+    // pinch out to a blank stripe. Every fixed, full-width layer must clip, or keep its children inside the viewport.
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const path of ["/", "/products", `/products/${CATALOG.hero.slug}`]) {
+      await go(page, path);
+      const leaks = await page.evaluate(() => {
+        const out: string[] = [];
+        for (const el of document.querySelectorAll<HTMLElement>("body *")) {
+          const cs = getComputedStyle(el);
+          if (cs.position !== "fixed" || cs.display === "none") continue;
+          if (/(hidden|clip)/.test(cs.overflow) || /(hidden|clip)/.test(cs.overflowX)) continue;
+          for (const child of el.querySelectorAll<HTMLElement>("*")) {
+            const r = child.getBoundingClientRect();
+            if (r.width > 0 && (r.right > innerWidth + 1 || r.left < -1)) {
+              out.push(`${el.className || el.tagName} ⟶ ${child.className || child.tagName} [${Math.round(r.left)}…${Math.round(r.right)}]`);
+              break;
+            }
+          }
+        }
+        return out;
+      });
+      expect(leaks, `${path}: off-screen content inside an unclipped fixed layer`).toEqual([]);
+    }
+  });
+
   test("short landscape phone (667×375): the header does not eat the screen and the hero copy is reachable", async ({ prepared: page }) => {
     await page.setViewportSize({ width: 667, height: 375 });
     await go(page, "/");
