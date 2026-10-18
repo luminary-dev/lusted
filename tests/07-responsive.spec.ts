@@ -211,7 +211,8 @@ test.describe("sizes, modes and postures", () => {
       const served = await img.evaluate((i: HTMLImageElement) => new URL(i.currentSrc, location.href).searchParams.get("w"));
       const rendered = await img.evaluate((i) => i.getBoundingClientRect().width);
       // the chosen candidate must cover the rendered width × DPR (next/image picks the first size ≥ that), capped at the largest size
-      expect(Number(served), `served width for ${rendered}px × ${dpr}`).toBeGreaterThanOrEqual(Math.min(3840, Math.floor(rendered * dpr) - 1));
+      // phones ask for about 1.9× the screen width (the crop), capped at the largest size
+      expect(Number(served), `served width for ${rendered}px × ${dpr}`).toBeGreaterThanOrEqual(Math.min(3840, Math.floor(390 * 1.9 * dpr) - 1));
       await ctx.close();
     });
   }

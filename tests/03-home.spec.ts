@@ -10,7 +10,9 @@ test("hero: 18 slides, one active, the first preloaded, both calls to action", a
   await expect(slides).toHaveCount(18);
   await expect(page.locator(".hero-slide.is-active")).toHaveCount(1);
   await expect(slides.first()).toHaveClass(/is-active/);
-  for (let i = 0; i < 18; i++) expect(await slides.nth(i).locator("img").getAttribute("alt"), `slide ${i + 1} alt`).toMatch(/Model/);
+  // only the current, previous and next photos are mounted (memory on phones); every mounted one has alt text
+  await expect(page.locator(".hero-slide img")).toHaveCount(2);
+  for (const alt of await page.locator(".hero-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/Model/);
   const first = slides.first().locator("img");
   await expect.poll(() => first.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 1000)).toBe(true);
   await expect(page.locator("#top").getByRole("link", { name: /Find your temptation/ })).toHaveAttribute("href", "/products");

@@ -28,10 +28,14 @@ export default function HeroSlides({ slides }: { slides: HeroSlide[] }) {
     return () => clearInterval(t);
   }, [slides.length]);
 
+  // Only the photo on screen, the one leaving and the one up next are mounted. Every slide at once decodes to
+  // hundreds of megabytes of bitmap on a phone, which is enough for iOS Safari to kill the tab and reload it.
+  const next = (active + 1) % slides.length;
   return (
     <div className="hero-slides">
       {slides.map((s, i) => {
         const state = i === active ? (prev < 0 ? "is-active is-first" : "is-active is-entering") : i === prev ? "is-leaving" : "";
+        const mounted = i === active || i === prev || i === next;
         return (
           <div
             key={i}
@@ -39,7 +43,19 @@ export default function HeroSlides({ slides }: { slides: HeroSlide[] }) {
             style={{ "--pos": s.pos, "--pos-m": s.posMobile } as React.CSSProperties}
             aria-hidden={i !== active}
           >
-            <Image quality={90} src={s.src} alt={s.alt} fill preload={i === 0} loading={i === 0 ? undefined : "eager"} placeholder="blur" sizes="(max-aspect-ratio: 1/1) 130vh, 100vw" />
+            {mounted && (
+              <Image
+                quality={90}
+                src={s.src}
+                alt={s.alt}
+                fill
+                preload={i === 0}
+                loading={i === 0 ? undefined : "eager"}
+                placeholder="blur"
+                // phones: the crop is about 1.8× the screen width, so ask for that, not the full 4K
+                sizes="(max-width: 600px) 190vw, (max-aspect-ratio: 1/1) 130vh, 100vw"
+              />
+            )}
           </div>
         );
       })}
