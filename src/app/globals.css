@@ -642,41 +642,14 @@ html::-webkit-scrollbar {
   }
 }
 
-/* the blush ring that follows the cursor (CursorRing.tsx) — swells over anything clickable */
-.cursor-ring {
+/* the silky smoke that follows the cursor (FluidCursor.tsx) — above everything, never in the way */
+.cursor-trail {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   z-index: 90;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
-  will-change: transform;
-}
-
-.cursor-ring span {
-  display: block;
-  width: 26px;
-  height: 26px;
-  margin: -13px 0 0 -13px;
-  border: 1.5px solid color-mix(in srgb, var(--rose) 75%, transparent);
-  border-radius: 50%;
-  opacity: 0;
-  transform: scale(0.6);
-  transition:
-    opacity 0.3s var(--ease),
-    transform 0.35s var(--ease),
-    background-color 0.35s var(--ease),
-    border-color 0.35s var(--ease);
-}
-
-.cursor-ring.is-on span {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.cursor-ring.is-hover span {
-  transform: scale(1.6);
-  background: color-mix(in srgb, var(--blush) 22%, transparent);
-  border-color: color-mix(in srgb, var(--rose) 45%, transparent);
 }
 
 /* ───────── nav ───────── */
