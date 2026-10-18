@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Corinthia, Fraunces, Montserrat, Petit_Formal_Script, Playfair_Display } from "next/font/google";
 import Nav from "@/components/Nav";
 import ScrollRail from "@/components/ScrollRail";
+import CursorTrail from "@/components/CursorTrail";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
 import SearchDialog from "@/components/SearchDialog";
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <Nav />
         <ScrollRail />
+        <CursorTrail />
         {children}
         <Footer />
         <BagDrawer />

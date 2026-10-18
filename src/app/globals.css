@@ -642,6 +642,16 @@ html::-webkit-scrollbar {
   }
 }
 
+/* the silky ribbons that trail the cursor (CursorTrail.tsx) — above everything, never in the way */
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
 /* ───────── nav ───────── */
 
 .nav {
