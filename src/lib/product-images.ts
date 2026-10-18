@@ -34,6 +34,7 @@ import nightshadeCrossstrapMini from "@/assets/products/nightshade-crossstrap-mi
 import bijouCrystalTwoPiece from "@/assets/products/bijou-crystal-two-piece.webp";
 import fleurEmbroideredSatinSlip from "@/assets/products/fleur-embroidered-satin-slip.webp";
 import lotusSatinCheongsam from "@/assets/products/lotus-satin-cheongsam.webp";
+import scarletButterflyTeddy from "@/assets/products/scarlet-butterfly-teddy.webp";
 import bloomLaceUpRuffleMini from "@/assets/products/bloom-lace-up-ruffle-mini.webp";
 import wisteriaEmbroideredBustierSet from "@/assets/products/wisteria-embroidered-bustier-set.webp";
 import roseLaceBalconetteBraBack from "@/assets/products/rose-lace-balconette-bra-back.webp";
@@ -103,6 +104,8 @@ import fleurEmbroideredSatinSlipSide from "@/assets/products/fleur-embroidered-s
 import lotusSatinCheongsamBack from "@/assets/products/lotus-satin-cheongsam-back.webp";
 import lotusSatinCheongsamSide from "@/assets/products/lotus-satin-cheongsam-side.webp";
 import bloomLaceUpRuffleMiniBack from "@/assets/products/bloom-lace-up-ruffle-mini-back.webp";
+import scarletButterflyTeddyBack from "@/assets/products/scarlet-butterfly-teddy-back.webp";
+import scarletButterflyTeddySide from "@/assets/products/scarlet-butterfly-teddy-side.webp";
 import bloomLaceUpRuffleMiniSide from "@/assets/products/bloom-lace-up-ruffle-mini-side.webp";
 import wisteriaEmbroideredBustierSetBack from "@/assets/products/wisteria-embroidered-bustier-set-back.webp";
 import wisteriaEmbroideredBustierSetSide from "@/assets/products/wisteria-embroidered-bustier-set-side.webp";
@@ -165,6 +168,7 @@ export const productImages = {
   "bloom-lace-up-ruffle-mini": bloomLaceUpRuffleMini,
   "wisteria-embroidered-bustier-set": wisteriaEmbroideredBustierSet,
 };
+  "scarlet-butterfly-teddy": scarletButterflyTeddy,
 
 export type ProductView = "back" | "side";
 export const productViews: Partial<Record<keyof typeof productImages, Partial<Record<ProductView, StaticImageData>>>> = {
@@ -205,6 +209,7 @@ export const productViews: Partial<Record<keyof typeof productImages, Partial<Re
   "wisteria-embroidered-bustier-set": { back: wisteriaEmbroideredBustierSetBack, side: wisteriaEmbroideredBustierSetSide },
 };
 
+  "scarlet-butterfly-teddy": { back: scarletButterflyTeddyBack, side: scarletButterflyTeddySide },
 // other colourways of a piece: { slug: { colour: { front, back?, side? } } }
 export const colorImages: Partial<Record<keyof typeof productImages, Record<string, { front: StaticImageData } & Partial<Record<ProductView, StaticImageData>>>>> = {
   "rose-lace-balconette-bra": { wine: { front: roseLaceBalconetteBraWine, back: roseLaceBalconetteBraWineBack, side: roseLaceBalconetteBraWineSide } },
