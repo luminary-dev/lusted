@@ -6,6 +6,7 @@ import velvetChaise from "@/assets/images/about-wall/velvet-chaise.webp";
 import theBow from "@/assets/images/about-wall/the-bow.webp";
 import windowShot from "@/assets/images/about-wall/window.webp";
 import pearls from "@/assets/images/about-wall/pearls.webp";
+import poolside from "@/assets/images/about-wall/poolside.webp";
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Box, ChatDouble, Bolt, Lock } from "./icons";
 
@@ -20,8 +21,7 @@ const promises = [
 // each frame's place on the wall, in % of the wall (x, y, width, height) — every photo a different shape and size,
 // hung like a salon wall rather than a grid (the wall is 100 × 66, so a frame's height % = its width ÷ aspect × 100/66)
 const frames: { src?: StaticImageData; alt: string; at: [number, number, number, number]; pos?: string }[] = [
-  // an empty frame waiting for the poolside shot (2:1)
-  { alt: "Empty frame", at: [0, 6.8, 22, 16.7] },
+  { src: poolside, alt: "Model in a sheer white string bikini lying along the edge of an infinity pool at sunset", at: [0, 6.8, 22, 16.7] },
   { src: doorway, alt: "Model in wine lace leaning in a doorway, a sheer robe slipping off her shoulders", at: [0, 27, 22, 50], pos: "50% 30%" },
   { src: silkSheets, alt: "Model in black lace and stockings lying on ivory silk sheets", at: [24.5, 6, 28, 52] },
   { src: velvetChaise, alt: "Model in a scarlet string set across a velvet chaise by candlelight", at: [55, 15, 40, 33] },
