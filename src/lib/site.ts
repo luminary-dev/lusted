@@ -8,6 +8,8 @@ export const site = {
   email: "support@lusted.lk",
   hours: "9AM – 7PM",
   responseTime: "We typically reply within 24 hours (Mon – Sun).",
+  // Reveal day. Until this moment every page shows the "Revealing soon" page (src/proxy.ts); ?preview=1 lets you through.
+  revealAt: "2026-11-01T19:00:00+05:30",
 };
 
 export const whatsappLink = (text?: string) =>

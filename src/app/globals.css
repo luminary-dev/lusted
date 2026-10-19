@@ -6139,3 +6139,190 @@ html::-webkit-scrollbar {
     background: #fff;
   }
 }
+
+/* ---------- Revealing soon (src/app/revealing-soon) ---------- */
+/* the page stands alone: no nav, rail, curtain intro or footer while it's up */
+body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer) {
+  display: none;
+}
+
+.reveal {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(32px, 6vh, 72px) 20px;
+  color: #fff6f2;
+  background: #1c0a0d;
+  text-align: center;
+}
+
+.reveal-bg {
+  object-fit: cover;
+  object-position: 62% 50%;
+  z-index: -2;
+}
+
+/* the velvet falls to near-black around the words, candle warmth kept at the left */
+.reveal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 48%, rgba(28, 10, 13, 0.55) 0%, rgba(28, 10, 13, 0.82) 60%, rgba(28, 10, 13, 0.92) 100%),
+    linear-gradient(180deg, rgba(28, 10, 13, 0.5) 0%, rgba(28, 10, 13, 0.2) 30%, rgba(28, 10, 13, 0.65) 100%);
+}
+
+.reveal-inner {
+  width: min(100%, 720px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.reveal-logo {
+  width: min(72vw, 420px);
+  height: auto;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 60px rgba(235, 198, 180, 0.18));
+}
+
+.reveal-eyebrow {
+  margin-top: 10px;
+  color: #f3c9bd;
+}
+
+.reveal-title {
+  margin-top: -6px;
+  color: #fff6f2;
+}
+
+.reveal-title em {
+  color: #f5c2b8;
+}
+
+.reveal-lede {
+  max-width: 54ch;
+  font-size: clamp(15px, 1.2vw, 17px);
+  line-height: 1.65;
+  color: rgba(255, 246, 242, 0.82);
+  text-wrap: balance;
+}
+
+.reveal-count {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 110px));
+  gap: clamp(8px, 2vw, 18px);
+  margin-top: 14px;
+}
+
+.reveal-count li {
+  display: grid;
+  gap: 4px;
+  padding: 14px 6px 12px;
+  border: 1px solid rgba(235, 198, 180, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 246, 242, 0.05);
+  backdrop-filter: blur(6px);
+}
+
+.reveal-num {
+  font-family: var(--display);
+  font-weight: 300;
+  font-size: clamp(30px, 4.6vw, 44px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #fff6f2;
+  min-height: 1em;
+}
+
+.reveal-unit {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(245, 194, 184, 0.9);
+}
+
+.reveal-date {
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 246, 242, 0.62);
+}
+
+.reveal-live {
+  font-family: var(--headline);
+  font-size: clamp(30px, 4vw, 44px);
+  color: #f5c2b8;
+}
+
+.reveal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px 26px;
+  margin-top: 10px;
+}
+
+.reveal-actions .btn svg:first-child {
+  width: 18px;
+  height: 18px;
+}
+
+.reveal-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: #f5c2b8;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(245, 194, 184, 0.5);
+  padding-bottom: 2px;
+}
+
+.reveal-ig svg {
+  width: 18px;
+  height: 18px;
+}
+
+.reveal-ig:hover {
+  color: #fff6f2;
+  border-color: #fff6f2;
+}
+
+.reveal-news {
+  width: min(100%, 520px);
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(235, 198, 180, 0.22);
+}
+
+.reveal-news-title {
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: rgba(255, 246, 242, 0.78);
+}
+
+.reveal-news .news-note {
+  color: rgba(255, 246, 242, 0.62);
+}
+
+@media (max-width: 600px) {
+  .reveal-bg {
+    object-position: 70% 50%;
+  }
+  .reveal-count {
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    max-width: 380px;
+  }
+  .reveal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -184,6 +184,8 @@ export const test = base.extend<{ errors: string[]; prepared: Page }>({
     await provide(errors);
   },
   prepared: async ({ page, errors }, provide) => {
+    // until reveal day the proxy shows /revealing-soon everywhere; the preview cookie is the way through (src/proxy.ts)
+    await page.context().addCookies([{ name: "lusted-preview", value: "1", url: process.env.PW_BASE_URL ?? "http://localhost:3177" }]);
     void errors;
     await page.addInitScript(() => {
       try {

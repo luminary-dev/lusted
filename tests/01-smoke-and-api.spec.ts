@@ -87,3 +87,26 @@ test.describe("newsletter API", () => {
     if (r.status() === 501) expect((await r.json()).error).toMatch(/not configured/i);
   });
 });
+
+// Until reveal day (site.revealAt) every page is replaced by /revealing-soon unless the preview cookie is set; the
+// `prepared` fixture carries the cookie, so this is the one place the gate itself is exercised with a bare page.
+test.describe("revealing soon", () => {
+  test("without the preview cookie the home page is the reveal page, with no site chrome", async ({ page }) => {
+    const res = await page.goto("/", { waitUntil: "domcontentloaded" });
+    expect(res?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Revealing soon/);
+    await expect(page.locator("h1")).toHaveText(/Revealing soon/);
+    await expect(page.locator("header.nav")).toBeHidden();
+    await expect(page.locator("footer.footer")).toBeHidden();
+    await expect(page.locator(".reveal-count li")).toHaveCount(4);
+    await expect(page.locator(".reveal-count .reveal-num").first()).toHaveText(/\d\d/);
+  });
+
+  test("?preview=1 sets the cookie and lets the real site through", async ({ page }) => {
+    await page.goto("/?preview=1", { waitUntil: "domcontentloaded" });
+    expect(new URL(page.url()).searchParams.has("preview")).toBe(false);
+    await expect(page.locator("h1")).toHaveText(/Dressed to tempt/);
+    const cookie = (await page.context().cookies()).find((c) => c.name === "lusted-preview");
+    expect(cookie?.value).toBe("1");
+  });
+});
