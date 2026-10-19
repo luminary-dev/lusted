@@ -5,9 +5,9 @@ test.beforeEach(async ({ prepared: page }) => {
   await revealAll(page);
 });
 
-test("hero: 18 slides, one active, the first preloaded, both calls to action", async ({ prepared: page }) => {
+test("hero: 24 slides, one active, the first preloaded, both calls to action", async ({ prepared: page }) => {
   const slides = page.locator(".hero-slide");
-  await expect(slides).toHaveCount(18);
+  await expect(slides).toHaveCount(24);
   await expect(page.locator(".hero-slide.is-active")).toHaveCount(1);
   await expect(slides.first()).toHaveClass(/is-active/);
   // only the current, previous and next photos are mounted (memory on phones); every mounted one has alt text
@@ -219,7 +219,8 @@ test("scroll rail: one heart per section, labels on hover, click glides there, t
   await expect(hearts.first()).toHaveAccessibleName("Welcome");
   await expect(rail.getByRole("button", { name: "Contact" })).toHaveCount(1);
   await rail.getByRole("button", { name: "Our story" }).click();
-  await expect.poll(async () => page.locator("#about").evaluate((el) => Math.abs(el.getBoundingClientRect().top) < 40)).toBe(true);
+  // sections carry scroll-margin-top: 40px, so the glide lands with the top edge at 40 (give or take a subpixel)
+  await expect.poll(async () => page.locator("#about").evaluate((el) => Math.abs(el.getBoundingClientRect().top - 40) < 2)).toBe(true);
   await expect(rail.getByRole("button", { name: "Our story" })).toHaveAttribute("aria-current", "true");
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await expect.poll(() => page.evaluate(() => Number(getComputedStyle(document.documentElement).getPropertyValue("--scroll-progress")))).toBeGreaterThan(0.95);

@@ -92,6 +92,7 @@ test.describe("newsletter API", () => {
 // `prepared` fixture carries the cookie, so this is the one place the gate itself is exercised with a bare page.
 test.describe("revealing soon", () => {
   test("without the preview cookie the home page is the reveal page, with no site chrome", async ({ page }) => {
+    await page.context().clearCookies();
     const res = await page.goto("/", { waitUntil: "domcontentloaded" });
     expect(res?.status()).toBe(200);
     await expect(page).toHaveTitle(/Revealing soon/);
@@ -103,6 +104,7 @@ test.describe("revealing soon", () => {
   });
 
   test("?preview=1 sets the cookie and lets the real site through", async ({ page }) => {
+    await page.context().clearCookies();
     await page.goto("/?preview=1", { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).searchParams.has("preview")).toBe(false);
     await expect(page.locator("h1")).toHaveText(/Dressed to tempt/);

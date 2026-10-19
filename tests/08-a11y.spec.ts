@@ -114,7 +114,8 @@ test.describe("keyboard and semantics", () => {
         for (const el of document.querySelectorAll<HTMLElement>("button, a[href], input, select, [role=button]")) {
           const r = el.getBoundingClientRect();
           const cs = getComputedStyle(el);
-          if (r.width === 0 || r.height === 0 || cs.visibility === "hidden" || cs.opacity === "0") continue;
+          // a box under 2 px is a screen-reader-only copy (the 1 px clipped size-tag list behind the 3D tags), not a tap target
+          if (r.width < 2 || r.height < 2 || cs.visibility === "hidden" || cs.opacity === "0") continue;
           let p: HTMLElement | null = el, hidden = false;
           while (p) {
             const s = getComputedStyle(p);

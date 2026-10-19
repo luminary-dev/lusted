@@ -4091,22 +4091,36 @@ html::-webkit-scrollbar {
 }
 
 .check input {
+  /* a 24 px tap target (WCAG 2.5.8) drawing an 18 px box inside it */
   appearance: none;
   display: grid;
   place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.check input::before,
+.check input::after {
+  grid-area: 1 / 1;
+}
+
+.check input::before {
+  content: "";
   width: 18px;
   height: 18px;
-  margin: 0;
   border-radius: 5px;
   border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
   background: transparent;
-  cursor: pointer;
   transition:
     background 0.2s,
     border-color 0.2s;
 }
 
-.check input:checked {
+.check input:checked::before {
   background: var(--btn-bg);
   border-color: var(--btn-bg);
 }

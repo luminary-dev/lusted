@@ -168,7 +168,26 @@ export async function expectNoHorizontalScroll(page: Page, label = "") {
 }
 
 /** opens a page with the intro skipped, animations calmed and console errors collected */
+// Until reveal day the proxy shows /revealing-soon everywhere; this cookie is the way through (src/proxy.ts). Every
+// context the suite opens gets it — the default one and any made with browser.newContext() — so the specs see the real
+// site. The gate's own tests clear it first.
+const PREVIEW_COOKIE = { name: "lusted-preview", value: "1", url: process.env.PW_BASE_URL ?? "http://localhost:3177" };
+
 export const test = base.extend<{ errors: string[]; prepared: Page }>({
+  context: async ({ context }, provide) => {
+    await context.addCookies([PREVIEW_COOKIE]);
+    await provide(context);
+  },
+  browser: async ({ browser }, provide) => {
+    const newContext = browser.newContext.bind(browser);
+    browser.newContext = (async (options?: Parameters<typeof newContext>[0]) => {
+      const ctx = await newContext(options);
+      await ctx.addCookies([PREVIEW_COOKIE]);
+      return ctx;
+    }) as typeof browser.newContext;
+    await provide(browser);
+    browser.newContext = newContext;
+  },
   errors: async ({ page }, provide) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
@@ -184,8 +203,6 @@ export const test = base.extend<{ errors: string[]; prepared: Page }>({
     await provide(errors);
   },
   prepared: async ({ page, errors }, provide) => {
-    // until reveal day the proxy shows /revealing-soon everywhere; the preview cookie is the way through (src/proxy.ts)
-    await page.context().addCookies([{ name: "lusted-preview", value: "1", url: process.env.PW_BASE_URL ?? "http://localhost:3177" }]);
     void errors;
     await page.addInitScript(() => {
       try {
