@@ -17,22 +17,37 @@ import hero15 from "@/assets/images/hero/hero-15.webp";
 import hero16 from "@/assets/images/hero/hero-16.webp";
 import hero17 from "@/assets/images/hero/hero-17.webp";
 import hero18 from "@/assets/images/hero/hero-18.webp";
+import hero19 from "@/assets/images/hero/hero-19.webp";
+import hero20 from "@/assets/images/hero/hero-20.webp";
+import hero21 from "@/assets/images/hero/hero-21.webp";
+import hero22 from "@/assets/images/hero/hero-22.webp";
+import hero23 from "@/assets/images/hero/hero-23.webp";
+import hero24 from "@/assets/images/hero/hero-24.webp";
 import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import HeroSlides, { type HeroSlide } from "./HeroSlides";
 import { ArrowRight, WhatsApp } from "./icons";
 
-// Krea 2 campaign images (originals in refs/krea/final/hero). pos / posMobile are the crop focal points
-// that keep each face clear of the headline on desktop and centred in frame on phones.
+// Krea 2 campaign images (originals in refs/krea/final/hero; hero-19…24 from the "unique" hero prompts, enhanced 2× and
+// kept in ../images/hero-enhanced). pos / posMobile are the crop focal points that keep each face clear of the headline
+// on desktop and put the model in the centre of the phone crop (the phone shows ~30% of the width: posMobile ≈ (x − 15%) / 70%,
+// where x is where she stands).
 // Ordered so no two neighbouring slides share a colour story (the loop wraps from the last back to the first):
-// blush → wine → sea → champagne → candlelit black → sea → blush → black → peach → wine → emerald sea → blue dusk → wine gown → sunlit ivory
-// → wine sunset pool → blush bedroom → black sea → wine city night.
+// blush → turquoise cave → wine → sea → champagne → candlelit black → wine latex in cream marble → sea → green glasshouse → blush → black
+// → peach → wine → emerald sea → wine velvet club → blue dusk → black rain → wine gown → sunlit ivory → wine sunset pool → bronze on black sand
+// → blush bedroom → black sea → wine city night.
 const slides: HeroSlide[] = [
   {
     src: hero1,
     alt: "Model reclining on blush satin pillows in a pink lace bra, brief and suspenders",
     pos: "72% 25%",
     posMobile: "80% 25%",
+  },
+  {
+    src: hero20,
+    alt: "Model kneeling in the turquoise water of a sea cave at sunset in an oil-slick chrome bikini with a crystal body chain and a gold net cape",
+    pos: "72% 20%",
+    posMobile: "86% 20%",
   },
   {
     src: hero4,
@@ -59,10 +74,22 @@ const slides: HeroSlide[] = [
     posMobile: "64% 20%",
   },
   {
+    src: hero19,
+    alt: "Model with one foot on the edge of a candlelit marble bath in a glossy wine latex set, pearl harness and stockings",
+    pos: "72% 20%",
+    posMobile: "77% 20%",
+  },
+  {
     src: hero2,
     alt: "Model in an ivory string bikini on the deck of a yacht at golden hour",
     pos: "72% 25%",
     posMobile: "80% 25%",
+  },
+  {
+    src: hero22,
+    alt: "Model in a nude-illusion bodysuit embroidered with wine velvet orchids, in a lantern-lit glasshouse full of orchids",
+    pos: "72% 20%",
+    posMobile: "76% 20%",
   },
   {
     src: hero7,
@@ -95,10 +122,22 @@ const slides: HeroSlide[] = [
     posMobile: "68% 25%",
   },
   {
+    src: hero24,
+    alt: "Model on a brass spiral stair under a mirror ball in a wine mirror-disc chainmail mini dress",
+    pos: "72% 20%",
+    posMobile: "76% 20%",
+  },
+  {
     src: hero10,
     alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk",
     pos: "0% 20%",
     posMobile: "58% 20%",
+  },
+  {
+    src: hero21,
+    alt: "Model in a soaked black draped gown slit to the hip beside a vintage car under a hotel awning in the rain at night",
+    pos: "72% 20%",
+    posMobile: "88% 20%",
   },
   {
     src: hero14,
@@ -117,6 +156,12 @@ const slides: HeroSlide[] = [
     alt: "Model crouching at the edge of an infinity pool at sunset in a wine patent string bikini",
     pos: "72% 20%",
     posMobile: "67% 20%",
+  },
+  {
+    src: hero23,
+    alt: "Model at the water's edge on a black volcanic beach at sunset in a molten-bronze cage monokini",
+    pos: "72% 20%",
+    posMobile: "78% 20%",
   },
   {
     src: hero17,
