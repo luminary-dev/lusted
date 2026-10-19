@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Corinthia, Fraunces, Montserrat, Petit_Formal_Script, Playfair_Display } from "next/font/google";
+import { Corinthia, Fraunces, Montserrat, Parisienne, Petit_Formal_Script, Playfair_Display } from "next/font/google";
 import Nav from "@/components/Nav";
 import ScrollRail from "@/components/ScrollRail";
 import FluidCursor from "@/components/FluidCursor";
@@ -9,13 +9,21 @@ import BagDrawer from "@/components/shop/BagDrawer";
 import SearchDialog from "@/components/SearchDialog";
 import "./globals.css";
 
-// Headlines: Petit Formal Script (formal copperplate — fancy but easy to read).
+// Headlines: Parisienne (a casual connecting script — set ~1.5× the Petit Formal Script sizes, its x-height is small).
 // Alternatives kept unloaded until used — switch --headline in globals.css:
-// Fraunces (soft serif), Playfair Display (closest free match to the logo) or Corinthia (fine script).
+// Petit Formal Script (formal copperplate), Fraunces (soft serif), Playfair Display (closest free match to the logo)
+// or Corinthia (fine script).
+const parisienne = Parisienne({
+  variable: "--font-parisienne",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 const formal = Petit_Formal_Script({
   variable: "--font-formal",
   subsets: ["latin"],
   weight: "400",
+  preload: false,
 });
 
 const fraunces = Fraunces({
@@ -71,7 +79,7 @@ const introScript = `try{if(sessionStorage.getItem("lusted-intro"))document.docu
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${formal.variable} ${fraunces.variable} ${serif.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${parisienne.variable} ${formal.variable} ${fraunces.variable} ${serif.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: introScript }} />

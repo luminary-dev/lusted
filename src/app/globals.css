@@ -30,10 +30,12 @@
   --serif: var(--font-serif), "Playfair Display", Georgia, serif;
   --fraunces: var(--font-fraunces), "Fraunces", Georgia, serif;
   --formal: var(--font-formal), "Petit Formal Script", cursive;
-  /* Headline font: Petit Formal Script. Alternatives: var(--fraunces) = Fraunces, var(--serif) = Playfair Display
-     (logo-style serif) — for those serifs use the serif sizes noted under .h1/.h2 and italic accents —
+  --parisienne: var(--font-parisienne), "Parisienne", cursive;
+  /* Headline font: Parisienne (set ~1.5× the Petit Formal Script sizes — its x-height is small and it runs narrow).
+     Alternatives: var(--formal) = Petit Formal Script (use the sizes noted under .h1/.h2), var(--fraunces) = Fraunces,
+     var(--serif) = Playfair Display (logo-style serif) — for those serifs use the serif sizes and italic accents —
      or var(--script) = Corinthia. */
-  --headline: var(--formal);
+  --headline: var(--parisienne);
   --sans: var(--font-sans), "Montserrat", "Helvetica Neue", Arial, sans-serif;
   --display: var(--sans); /* titles, product names and prices use Montserrat */
 
@@ -297,19 +299,20 @@ svg {
   font-synthesis: none;
   font-variation-settings: "SOFT" 100; /* Fraunces: rounded, softer letter edges */
   letter-spacing: 0;
-  line-height: 1.22;
+  line-height: 1.15;
   text-wrap: balance;
 }
 
-/* Petit Formal Script runs wide, so it's set smaller than the other fonts
-   (serif headline fonts: h1 clamp(44px, 5.8vw, 88px), h2 clamp(36px, 4.2vw, 60px)) */
+/* Parisienne sizes (Petit Formal Script: h1 clamp(36px, 4.6vw, 68px), h2 clamp(30px, 3.4vw, 48px);
+   serif headline fonts: h1 clamp(44px, 5.8vw, 88px), h2 clamp(36px, 4.2vw, 60px)) */
 .h1 {
-  font-size: clamp(36px, 4.6vw, 68px);
-  line-height: 1.2;
+  font-size: clamp(54px, 6.9vw, 102px);
+  line-height: 1.1;
 }
 
 .h2 {
-  font-size: clamp(30px, 3.4vw, 48px);
+  font-size: clamp(45px, 5.1vw, 72px);
+  line-height: 1.12;
 }
 
 /* cursive headline sizes — use these instead when --headline is var(--script):
@@ -1455,8 +1458,8 @@ html::-webkit-scrollbar {
   padding: 0 6px;
   font-family: var(--headline);
   font-weight: 400;
-  font-size: clamp(30px, 2.6vw, 40px);
-  line-height: 1.15;
+  font-size: clamp(45px, 3.9vw, 60px);
+  line-height: 1.1;
 }
 
 .col-text {
@@ -2128,7 +2131,7 @@ html::-webkit-scrollbar {
 .tape-copy span {
   grid-row: span 2;
   font-family: var(--headline);
-  font-size: 18px;
+  font-size: 27px;
   line-height: 1.1;
   color: var(--rose);
 }
@@ -2412,8 +2415,8 @@ html::-webkit-scrollbar {
   display: block;
   font-family: var(--headline);
   font-weight: 400;
-  font-size: clamp(30px, 2.6vw, 40px);
-  line-height: 1.15;
+  font-size: clamp(45px, 3.9vw, 60px);
+  line-height: 1.1;
   color: var(--wine);
 }
 
@@ -2431,8 +2434,8 @@ html::-webkit-scrollbar {
 
 .tag3d-back p {
   font-family: var(--headline);
-  font-size: 15px;
-  line-height: 1.45;
+  font-size: 22px;
+  line-height: 1.3;
   color: #f5c2b8;
 }
 
@@ -2642,7 +2645,7 @@ html::-webkit-scrollbar {
   flex: none;
   min-width: 34px;
   font-family: var(--headline);
-  font-size: 24px;
+  font-size: 36px;
   line-height: 1.05;
   color: #f5c2b8;
 }
@@ -2781,8 +2784,8 @@ html::-webkit-scrollbar {
   display: block;
   margin-bottom: 8px;
   font-family: var(--headline);
-  font-size: clamp(24px, 2.1vw, 30px);
-  line-height: 1.3;
+  font-size: clamp(36px, 3.1vw, 45px);
+  line-height: 1.2;
   white-space: nowrap;
   color: var(--ink);
 }
@@ -3749,7 +3752,7 @@ html::-webkit-scrollbar {
 .sale-card-body h3 {
   margin-top: 12px;
   font-family: var(--headline);
-  font-size: clamp(24px, 2.4vw, 34px);
+  font-size: clamp(28px, 2.7vw, 38px);
   font-weight: 400;
   line-height: 1.15;
 }
@@ -4655,8 +4658,8 @@ html::-webkit-scrollbar {
 .pdp-moments {
   margin-top: 14px;
   font-family: var(--headline);
-  font-size: 19px;
-  line-height: 1.45;
+  font-size: 28px;
+  line-height: 1.3;
   color: var(--rose-ink);
 }
 
@@ -6083,9 +6086,9 @@ html::-webkit-scrollbar {
   font-family: var(--headline);
   font-synthesis: none;
   font-variation-settings: "SOFT" 100;
-  font-size: 18px;
+  font-size: 27px;
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .hero-story svg {
