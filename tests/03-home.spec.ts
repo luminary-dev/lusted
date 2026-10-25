@@ -5,20 +5,91 @@ test.beforeEach(async ({ prepared: page }) => {
   await revealAll(page);
 });
 
-test("hero: 24 slides, one active, the first preloaded, both calls to action", async ({ prepared: page }) => {
-  const slides = page.locator(".hero-slide");
-  await expect(slides).toHaveCount(24);
-  await expect(page.locator(".hero-slide.is-active")).toHaveCount(1);
+test("hero: 27 slides, one active, the first preloaded, both calls to action", async ({ prepared: page }) => {
+  const slides = page.locator("#top .hero-slide");
+  await expect(slides).toHaveCount(27);
+  await expect(page.locator("#top .hero-slide.is-active")).toHaveCount(1);
   await expect(slides.first()).toHaveClass(/is-active/);
   // only the current, previous and next photos are mounted (memory on phones); every mounted one has alt text
-  await expect(page.locator(".hero-slide img")).toHaveCount(2);
-  for (const alt of await page.locator(".hero-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/Model/);
+  await expect(page.locator("#top .hero-slide img")).toHaveCount(2);
+  for (const alt of await page.locator("#top .hero-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/Model/);
   const first = slides.first().locator("img");
   await expect.poll(() => first.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 1000)).toBe(true);
   await expect(page.locator("#top").getByRole("link", { name: /Find your temptation/ })).toHaveAttribute("href", "/products");
   const whisper = page.locator("#top").getByRole("link", { name: /Whisper to us/ });
   expect(await whisper.getAttribute("href")).toContain("wa.me");
   await expect(page.locator("#top h1")).toContainText(/Dressed to tempt/);
+  // the arrowhead in the corner glides to the next section
+  await expect(page.locator("#top .scroll-cue")).toHaveAttribute("href", "/#sale");
+});
+
+test("after dark: the filmstrip band runs two strips of twenty frames, none shared with the hero, all linking into the collection", async ({ prepared: page }) => {
+  const band = page.locator("#after-dark");
+  await band.scrollIntoViewIfNeeded();
+  await expect(band.locator("h2")).toContainText(/The night/);
+  await expect(band.locator(".strip")).toHaveCount(2);
+  await expect(band.locator(".strip-set:not(.is-dup) li")).toHaveCount(40);
+  // the seamless loop is the same eighteen frames again, hidden from assistive tech and out of the tab order
+  await expect(band.locator(".strip-set.is-dup[aria-hidden='true'] li")).toHaveCount(40);
+  await expect(band.locator(".strip-set.is-dup button[tabindex='-1']")).toHaveCount(40);
+  await expect(band.locator(".strip-set:not(.is-dup) button")).toHaveCount(40);
+  // the strips move on their own, in opposite directions, and hold still under the pointer (the fixture asks for
+  // reduced motion, under which they stand still and scroll sideways instead, so motion is checked without it)
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const x = (i: number) => band.locator(".strip").nth(i).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
+  const [a0, b0] = await Promise.all([x(0), x(1)]);
+  await page.waitForTimeout(1200);
+  const [a1, b1] = await Promise.all([x(0), x(1)]);
+  expect(a1).toBeLessThan(a0);
+  expect(b1).toBeGreaterThan(b0);
+  await band.locator(".strip-viewport").first().hover({ position: { x: 200, y: 100 } });
+  const a2 = await x(0);
+  await page.waitForTimeout(600);
+  expect(await x(0)).toBeCloseTo(a2, 0);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(band.getByRole("link", { name: /Steal the night/ })).toHaveAttribute("href", "/products?cat=after-dark");
+  await expect(band.getByRole("link", { name: /See everything/ })).toHaveAttribute("href", "/products");
+  // no photo appears both in the strips and in the top hero
+  const files = (loc: import("@playwright/test").Locator) =>
+    loc.evaluateAll((imgs) => imgs.map((i) => decodeURIComponent(i.getAttribute("src") ?? "").match(/(?:main|after-dark)-\d+/)?.[0] ?? "").filter(Boolean));
+  const top = await files(page.locator("#top .hero-slide img"));
+  const strips = await files(band.locator(".strip-set:not(.is-dup) img"));
+  expect(top.length).toBeGreaterThan(0);
+  expect(strips.length).toBe(40);
+  for (const f of strips) expect(top).not.toContain(f);
+  const img = band.locator(".strip img").first();
+  await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 300)).toBe(true);
+});
+
+test("after dark reel: a tapped frame lifts its row over the blurred page, still gliding, with its line and the way to every piece", async ({ prepared: page }) => {
+  const band = page.locator("#after-dark");
+  await band.scrollIntoViewIfNeeded();
+  await expect(page.locator(".reel")).toHaveCount(0);
+  // open the second row from one of its frames
+  await band.locator(".strip-viewport").nth(1).locator(".strip-set:not(.is-dup) button").nth(2).click({ force: true });
+  const reel = page.locator(".reel");
+  await expect(reel).toBeVisible();
+  await expect(reel).toHaveAttribute("aria-modal", "true");
+  await expect(reel.locator(".reel-backdrop")).toHaveCSS("backdrop-filter", /blur/);
+  await expect(reel.locator(".strip-viewport")).toHaveClass(/is-reverse/);
+  await expect(reel.locator(".strip-set:not(.is-dup) a")).toHaveCount(20); // the row's own twenty frames, now links
+  await expect(reel.locator("#reel-title")).toContainText(/past midnight/);
+  await expect(reel.getByRole("link", { name: /Watch every piece/ })).toHaveAttribute("href", "/products");
+  await expect(reel.getByRole("button", { name: /Close the reel/ })).toBeFocused();
+  await expect(page.locator("html")).toHaveCSS("overflow", "hidden"); // the page behind does not scroll
+  // the reel's frames are larger than the row's
+  const w = (loc: import("@playwright/test").Locator) => loc.evaluate((el) => el.getBoundingClientRect().width);
+  expect(await w(reel.locator(".strip li").first())).toBeGreaterThan((await w(band.locator(".strip li").first())) * 1.3);
+  // Esc closes it, and the page scrolls again
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".reel")).toHaveCount(0);
+  await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
+  // the first row's reel carries its own line
+  await band.locator(".strip-viewport").nth(0).locator(".strip-set:not(.is-dup) button").nth(1).click({ force: true });
+  await expect(page.locator("#reel-title")).toContainText(/Imagine it on/);
+  await expect(page.locator(".reel").getByRole("link", { name: /Undress the whole collection/ })).toHaveAttribute("href", "/products");
+  await page.locator(".reel-backdrop").click({ position: { x: 10, y: 10 }, force: true });
+  await expect(page.locator(".reel")).toHaveCount(0);
 });
 
 test("hero slideshow advances when motion is allowed and holds with reduced motion", async ({ browser }) => {
@@ -27,14 +98,14 @@ test("hero slideshow advances when motion is allowed and holds with reduced moti
   const page = await ctx.newPage();
   await page.addInitScript(() => sessionStorage.setItem("lusted-intro", "1"));
   await page.goto("/");
-  await expect(page.locator(".hero-slide").nth(1)).toHaveClass(/is-active/, { timeout: 12_000 });
+  await expect(page.locator("#top .hero-slide").nth(1)).toHaveClass(/is-active/, { timeout: 12_000 });
   await ctx.close();
   const still = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1280, height: 800 } });
   const p2 = await still.newPage();
   await p2.addInitScript(() => sessionStorage.setItem("lusted-intro", "1"));
   await p2.goto("/");
   await p2.waitForTimeout(9000);
-  await expect(p2.locator(".hero-slide").first()).toHaveClass(/is-active/);
+  await expect(p2.locator("#top .hero-slide").first()).toHaveClass(/is-active/);
   await still.close();
 });
 
@@ -96,6 +167,23 @@ test("how it works: three steps, the ordering anchor and the WhatsApp button", a
   await expect(how.locator("ol li, .how-steps li, .how-step")).toHaveCount(3);
   const link = how.getByRole("link", { name: /order|WhatsApp/i }).first();
   expect(await link.getAttribute("href")).toContain("wa.me");
+  // the photos behind it: nine slides, one active, only the current, previous and next mounted, every mounted one with alt text
+  await expect(how.locator(".how-slide")).toHaveCount(9);
+  await expect(how.locator(".how-slide.is-active")).toHaveCount(1);
+  await expect(how.locator(".how-slide img")).toHaveCount(2);
+  for (const alt of await how.locator(".how-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/models/i);
+  await expect(how.locator(".scroll-cue")).toHaveAttribute("href", "/#contact");
+});
+
+test("how it works: the photos change over on their own when motion is allowed", async ({ browser }) => {
+  test.slow();
+  const ctx = await browser.newContext({ reducedMotion: "no-preference", viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => sessionStorage.setItem("lusted-intro", "1"));
+  await page.goto("/");
+  await page.locator("#ordering").scrollIntoViewIfNeeded();
+  await expect(page.locator("#ordering .how-slide").nth(1)).toHaveClass(/is-active/, { timeout: 14_000 });
+  await ctx.close();
 });
 
 test("size guide: three tabs switch the chart, five tags per tab, tags flip with click, Enter and Space", async ({ prepared: page }) => {
