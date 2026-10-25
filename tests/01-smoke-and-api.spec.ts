@@ -91,7 +91,7 @@ test.describe("newsletter API", () => {
 
 // With site.revealGate on, every page is replaced by /revealing-soon until reveal day (site.revealAt) unless the preview
 // cookie is set; the `prepared` fixture carries the cookie, so this is the one place the gate itself is exercised with a
-// bare page. While the gate is off these are skipped and the reveal page is only checked at its own address.
+// bare page. While the gate is off (or reveal day has passed) these are skipped.
 test.describe("revealing soon", () => {
   test.skip(() => !site.revealGate || Date.now() >= Date.parse(site.revealAt), "the reveal gate is off");
 

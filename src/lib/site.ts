@@ -10,8 +10,10 @@ export const site = {
   responseTime: "We typically reply within 24 hours (Mon – Sun).",
   // Reveal day. Until this moment every page shows the "Revealing soon" page (src/proxy.ts); ?preview=1 lets you through.
   revealAt: "2026-11-01T19:00:00+05:30",
-  // Set to true to put the "Revealing soon" page in front of the site until revealAt. Off for now: the site shows as is.
-  revealGate: false,
+  // Puts the "Revealing soon" page in front of the site until revealAt (src/proxy.ts). Hosts beginning with "dev."
+  // (dev.lusted.vercel.app) and deployments with REVEAL_GATE=off in the environment always show the real site;
+  // anywhere else, open any page with ?preview=1 once to get through.
+  revealGate: true,
 };
 
 export const whatsappLink = (text?: string) =>
