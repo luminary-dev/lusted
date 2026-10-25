@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import velvet from "@/assets/images/reveal/velvet-chair.webp";
+import group from "@/assets/images/reveal/group.webp";
 import wordmark from "@/assets/brand/wordmark-glossy-rosegold.png";
 import Newsletter from "@/components/Newsletter";
 import RevealCountdown from "@/components/RevealCountdown";
@@ -23,12 +23,12 @@ const revealDate = new Date(site.revealAt).toLocaleString("en-GB", {
   timeZone: "Asia/Colombo",
 });
 
-// The page the whole site shows until reveal day (see src/proxy.ts): the glossy wordmark over candlelit velvet, the
-// countdown, and three ways to be first — WhatsApp early access, Instagram and the newsletter.
+// The page the whole site shows until reveal day (see src/proxy.ts): the glossy wordmark over the campaign group on the
+// candlelit velvet chaise, the countdown, and three ways to be first — WhatsApp early access, Instagram and the newsletter.
 export default function RevealingSoon() {
   return (
     <main className="reveal">
-      <Image quality={88} src={velvet} alt="" fill preload placeholder="blur" sizes="100vw" className="reveal-bg" />
+      <Image quality={90} src={group} alt="" fill preload placeholder="blur" sizes="100vw" className="reveal-bg" />
       <div className="reveal-inner">
         <Image src={wordmark} alt="Lusted Lingerie" className="reveal-logo" priority sizes="(max-width: 600px) 72vw, 420px" />
         <p className="eyebrow reveal-eyebrow">Something is being wrapped</p>

@@ -6273,19 +6273,19 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer) {
 
 .reveal-bg {
   object-fit: cover;
-  object-position: 62% 50%;
+  object-position: 50% 60%; /* the five of them sit across the lower two-thirds of the photo */
   z-index: -2;
 }
 
-/* the velvet falls to near-black around the words, candle warmth kept at the left */
+/* the photo falls to deep wine behind the words so they read, and stays brightest at the sides where the models are */
 .reveal::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse 70% 60% at 50% 48%, rgba(28, 10, 13, 0.55) 0%, rgba(28, 10, 13, 0.82) 60%, rgba(28, 10, 13, 0.92) 100%),
-    linear-gradient(180deg, rgba(28, 10, 13, 0.5) 0%, rgba(28, 10, 13, 0.2) 30%, rgba(28, 10, 13, 0.65) 100%);
+    radial-gradient(ellipse 58% 62% at 50% 50%, rgba(28, 10, 13, 0.66) 0%, rgba(28, 10, 13, 0.5) 55%, rgba(28, 10, 13, 0.22) 100%),
+    linear-gradient(180deg, rgba(28, 10, 13, 0.45) 0%, rgba(28, 10, 13, 0.1) 30%, rgba(28, 10, 13, 0.55) 100%);
 }
 
 .reveal-inner {
@@ -6427,7 +6427,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer) {
 
 @media (max-width: 600px) {
   .reveal-bg {
-    object-position: 70% 50%;
+    object-position: 50% 55%; /* the middle of the group */
   }
   .reveal-count {
     grid-template-columns: repeat(4, 1fr);
