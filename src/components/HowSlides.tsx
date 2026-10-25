@@ -1,9 +1,13 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import { getImageProps, type StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
 
-export type HowSlide = { src: StaticImageData; alt: string };
+export type HowSlide = {
+  src: StaticImageData;
+  phone: StaticImageData;
+  alt: string;
+};
 
 // Keep in sync with --how-hold in globals.css (each slide's slow drift lasts exactly one hold).
 const INTERVAL = 10000;
@@ -16,9 +20,17 @@ export default function HowSlides({ slides }: { slides: HowSlide[] }) {
   const [{ active, prev }, setState] = useState({ active: 0, prev: -1 });
 
   useEffect(() => {
-    if (slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (
+      slides.length < 2 ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
     const t = setInterval(() => {
-      if (!document.hidden) setState((s) => ({ active: (s.active + 1) % slides.length, prev: s.active }));
+      if (!document.hidden)
+        setState((s) => ({
+          active: (s.active + 1) % slides.length,
+          prev: s.active,
+        }));
     }, INTERVAL);
     return () => clearInterval(t);
   }, [slides.length]);
@@ -27,25 +39,58 @@ export default function HowSlides({ slides }: { slides: HowSlide[] }) {
   return (
     <div className="how-slides">
       {slides.map((s, i) => {
-        const state = i === active ? (prev < 0 ? "is-active is-first" : "is-active is-entering") : i === prev ? "is-leaving" : "";
+        const state =
+          i === active
+            ? prev < 0
+              ? "is-active is-first"
+              : "is-active is-entering"
+            : i === prev
+              ? "is-leaving"
+              : "";
         const mounted = i === active || i === prev || i === next;
         return (
-          <div key={i} className={`how-slide ${state}`} aria-hidden={i !== active}>
-            {mounted && (
-              <Image
-                quality={90}
-                src={s.src}
-                alt={s.alt}
-                fill
-                placeholder="blur"
-                loading={i === 0 ? "eager" : "lazy"}
-                sizes="(max-width: 600px) 134vw, (max-width: 900px) 100vw, 100vw"
-                className="how-img"
-              />
-            )}
+          <div
+            key={i}
+            className={`how-slide ${state}`}
+            aria-hidden={i !== active}
+          >
+            {mounted && <HowPicture slide={s} />}
           </div>
         );
       })}
     </div>
+  );
+}
+
+// The photo as a <picture>: the 4:3 phone cut below 600px, the wide photo above, both through Next's optimiser with
+// srcset, blur placeholder and lazy loading (the section is far below the fold).
+function HowPicture({ slide }: { slide: HowSlide }) {
+  const common = {
+    alt: slide.alt,
+    fill: true as const,
+    quality: 90,
+    placeholder: "blur" as const,
+    loading: "lazy" as const,
+    className: "how-img",
+  };
+  const { props: phone } = getImageProps({
+    ...common,
+    src: slide.phone,
+    sizes: "134vw",
+  });
+  const { props: wide } = getImageProps({
+    ...common,
+    src: slide.src,
+    sizes: "100vw",
+  });
+  return (
+    <picture>
+      <source
+        media="(max-width: 600px)"
+        srcSet={phone.srcSet}
+        sizes={phone.sizes}
+      />
+      <img {...wide} alt={slide.alt} />
+    </picture>
   );
 }

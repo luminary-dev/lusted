@@ -210,9 +210,11 @@ test.describe("sizes, modes and postures", () => {
       await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
       const served = await img.evaluate((i: HTMLImageElement) => new URL(i.currentSrc, location.href).searchParams.get("w"));
       const rendered = await img.evaluate((i) => i.getBoundingClientRect().width);
-      // the chosen candidate must cover the rendered width × DPR (next/image picks the first size ≥ that), capped at the largest size
-      // phones ask for about 1.9× the screen width (the crop), capped at the largest size
-      expect(Number(served), `served width for ${rendered}px × ${dpr}`).toBeGreaterThanOrEqual(Math.min(3840, Math.floor(390 * 1.9 * dpr) - 1));
+      // phones get the 9:16 cut of the photo (hero/main-phone), shown at 100vw, so the chosen candidate must cover the
+      // screen width × DPR (next/image picks the first size ≥ that), capped at the largest size
+      const portrait = await img.evaluate((i: HTMLImageElement) => i.naturalHeight > i.naturalWidth);
+      expect(portrait, "the phone is served the portrait cut, not the wide photo").toBe(true);
+      expect(Number(served), `served width for ${rendered}px × ${dpr}`).toBeGreaterThanOrEqual(Math.min(3840, Math.floor(390 * dpr) - 1));
       await ctx.close();
     });
   }

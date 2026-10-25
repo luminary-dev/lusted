@@ -26,6 +26,33 @@ import main24 from "@/assets/images/hero/main/main-24.webp";
 import main25 from "@/assets/images/hero/main/main-25.webp";
 import main26 from "@/assets/images/hero/main/main-26.webp";
 import main27 from "@/assets/images/hero/main/main-27.webp";
+import phone01 from "@/assets/images/hero/main-phone/main-01.webp";
+import phone02 from "@/assets/images/hero/main-phone/main-02.webp";
+import phone03 from "@/assets/images/hero/main-phone/main-03.webp";
+import phone04 from "@/assets/images/hero/main-phone/main-04.webp";
+import phone05 from "@/assets/images/hero/main-phone/main-05.webp";
+import phone06 from "@/assets/images/hero/main-phone/main-06.webp";
+import phone07 from "@/assets/images/hero/main-phone/main-07.webp";
+import phone08 from "@/assets/images/hero/main-phone/main-08.webp";
+import phone09 from "@/assets/images/hero/main-phone/main-09.webp";
+import phone10 from "@/assets/images/hero/main-phone/main-10.webp";
+import phone11 from "@/assets/images/hero/main-phone/main-11.webp";
+import phone12 from "@/assets/images/hero/main-phone/main-12.webp";
+import phone13 from "@/assets/images/hero/main-phone/main-13.webp";
+import phone14 from "@/assets/images/hero/main-phone/main-14.webp";
+import phone15 from "@/assets/images/hero/main-phone/main-15.webp";
+import phone16 from "@/assets/images/hero/main-phone/main-16.webp";
+import phone17 from "@/assets/images/hero/main-phone/main-17.webp";
+import phone18 from "@/assets/images/hero/main-phone/main-18.webp";
+import phone19 from "@/assets/images/hero/main-phone/main-19.webp";
+import phone20 from "@/assets/images/hero/main-phone/main-20.webp";
+import phone21 from "@/assets/images/hero/main-phone/main-21.webp";
+import phone22 from "@/assets/images/hero/main-phone/main-22.webp";
+import phone23 from "@/assets/images/hero/main-phone/main-23.webp";
+import phone24 from "@/assets/images/hero/main-phone/main-24.webp";
+import phone25 from "@/assets/images/hero/main-phone/main-25.webp";
+import phone26 from "@/assets/images/hero/main-phone/main-26.webp";
+import phone27 from "@/assets/images/hero/main-phone/main-27.webp";
 import dark01 from "@/assets/images/hero/after-dark/after-dark-01.webp";
 import dark02 from "@/assets/images/hero/after-dark/after-dark-02.webp";
 import dark03 from "@/assets/images/hero/after-dark/after-dark-03.webp";
@@ -71,39 +98,40 @@ import dark40 from "@/assets/images/hero/after-dark/after-dark-40.webp";
 // Each list is in the order it plays, numbered to match its folder, and ordered so no two neighbours share a colour story
 // (each loop wraps from its last photo to its first). The two bands never show the same photo.
 //
-// pos / posMobile are the crop focal points: where the model stands, as object-position. In the top hero they keep her face
-// clear of the headline on desktop and put her in the centre of the phone crop (the phone shows ~30% of the width, so
-// posMobile ≈ (x − 15%) / 70% where x is where she stands). The filmstrip only uses posMobile, to centre its tall crops on her.
+// pos is the crop focal point on desktop: where the model stands, as object-position, keeping her face clear of the headline.
+// Phones get `phone`, a 9:16 cut of the same photo centred on her (hero/main-phone), so they don't download the wide one.
+// posMobile is where she stood in the wide photo ((x − 15%) / 70%); it was used to cut the phone and filmstrip crops and
+// stays as the record of that. The filmstrip's photos are already 4:5 crops centred on her (hero/after-dark).
 
 /** The top of the home page: the close, medium-shot photos (src/assets/images/hero/main). */
 export const heroSlides: HeroSlide[] = [
-  { src: main01, alt: "Model reclining on blush satin pillows in a pink lace bra, brief and suspenders", pos: "72% 25%", posMobile: "80% 25%" },
-  { src: main02, alt: "Model kneeling in the turquoise water of a sea cave at sunset in an oil-slick chrome bikini with a crystal body chain and a gold net cape", pos: "72% 20%", posMobile: "86% 20%" },
-  { src: main03, alt: "Model in an ivory string bikini on the deck of a yacht at golden hour", pos: "72% 25%", posMobile: "80% 25%" },
-  { src: main04, alt: "Model kneeling on a velvet chaise in a wine lace bodysuit with garters", pos: "0% 20%", posMobile: "60% 20%" },
-  { src: main05, alt: "Model kneeling on champagne silk sheets by candlelight in a black string harness", pos: "72% 20%", posMobile: "64% 20%" },
-  { src: main06, alt: "Model by a window in a blush silk robe over a lace bralette", pos: "0% 25%", posMobile: "55% 25%" },
-  { src: main07, alt: "Model in a crimson string bikini kneeling in the surf at golden hour", pos: "0% 20%", posMobile: "65% 20%" },
-  { src: main08, alt: "Model on a brass spiral stair under a mirror ball in a wine mirror-disc chainmail mini dress", pos: "72% 20%", posMobile: "76% 20%" },
-  { src: main09, alt: "Model in a champagne sequin slip dress on a velvet chaise by candlelight", pos: "72% 25%", posMobile: "84% 25%" },
-  { src: main10, alt: "Model in an emerald micro string bikini on sunlit rocks above a turquoise cove", pos: "72% 20%", posMobile: "68% 25%" },
-  { src: main11, alt: "Model in a sheer black lace bodysuit and chiffon robe on the rim of a marble bathtub by candlelight", pos: "72% 20%", posMobile: "68% 20%" },
-  { src: main12, alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk", pos: "0% 20%", posMobile: "58% 20%" },
-  { src: main13, alt: "Model in a blush lace bra, lace skirt and stockings on a velvet chaise in a sunlit bedroom", pos: "72% 20%", posMobile: "85% 20%" },
-  { src: main14, alt: "Model in a plunging gold swimsuit at the edge of an infinity pool at sunset", pos: "0% 20%", posMobile: "66% 20%" },
-  { src: main15, alt: "Model on wine velvet cushions by candlelight in a ruby lace bra", pos: "72% 25%", posMobile: "72% 25%" },
-  { src: main16, alt: "Model lying back across a black-sheeted bed above the city lights in a sheer black mesh teddy and suspenders, her head tipped over the edge", pos: "72% 70%", posMobile: "39% 70%" },
-  { src: main17, alt: "Model crouching low in a backless wine silk gown slit to the hip in an empty candlelit lounge", pos: "60% 20%", posMobile: "50% 20%" },
-  { src: main18, alt: "Model in a black fishnet bodystocking lying across an ivory silk bed at golden hour", pos: "50% 40%", posMobile: "58% 50%" },
-  { src: main19, alt: "Model lying on a white fur rug by a roaring fire in a wine lace bra, G-string and stockings", pos: "72% 25%", posMobile: "86% 25%" },
-  { src: main20, alt: "Model on the edge of a hotel bed at breakfast in a champagne satin slip gown slit to the hip, a strawberry at her lips", pos: "72% 20%", posMobile: "79% 20%" },
-  { src: main21, alt: "Model kneeling on an empty dance floor under blue lasers in an unzipped wet-look micro dress and thigh boots", pos: "72% 20%", posMobile: "76% 20%" },
-  { src: main22, alt: "Model lying in a rope hammock at golden hour in a sheer blush robe fallen open over lace", pos: "72% 30%", posMobile: "93% 30%" },
-  { src: main23, alt: "Model leaning in a hotel suite doorway at 4 am in a wine satin dress laced open from collar to hem", pos: "72% 20%", posMobile: "81% 20%" },
-  { src: main24, alt: "Model under an outdoor shower among the palms in a sea-green string bikini, looking back over her shoulder", pos: "72% 25%", posMobile: "90% 25%" },
-  { src: main25, alt: "Model lying in a wildflower meadow in an unbuttoned white shirt and a white G-string, a flower stem between her lips", pos: "72% 55%", posMobile: "64% 55%" },
-  { src: main26, alt: "Model lying on her stomach on a sheepskin at the foot of the bed in a sheer blush babydoll", pos: "72% 25%", posMobile: "58% 25%" },
-  { src: main27, alt: "Model sitting on a marble staircase under a chandelier in a red dress of nothing but satin straps", pos: "72% 20%", posMobile: "79% 20%" },
+  { src: main01, phone: phone01, alt: "Model reclining on blush satin pillows in a pink lace bra, brief and suspenders", pos: "72% 25%", posMobile: "80% 25%" },
+  { src: main02, phone: phone02, alt: "Model kneeling in the turquoise water of a sea cave at sunset in an oil-slick chrome bikini with a crystal body chain and a gold net cape", pos: "72% 20%", posMobile: "86% 20%" },
+  { src: main03, phone: phone03, alt: "Model in an ivory string bikini on the deck of a yacht at golden hour", pos: "72% 25%", posMobile: "80% 25%" },
+  { src: main04, phone: phone04, alt: "Model kneeling on a velvet chaise in a wine lace bodysuit with garters", pos: "0% 20%", posMobile: "60% 20%" },
+  { src: main05, phone: phone05, alt: "Model kneeling on champagne silk sheets by candlelight in a black string harness", pos: "72% 20%", posMobile: "64% 20%" },
+  { src: main06, phone: phone06, alt: "Model by a window in a blush silk robe over a lace bralette", pos: "0% 25%", posMobile: "55% 25%" },
+  { src: main07, phone: phone07, alt: "Model in a crimson string bikini kneeling in the surf at golden hour", pos: "0% 20%", posMobile: "65% 20%" },
+  { src: main08, phone: phone08, alt: "Model on a brass spiral stair under a mirror ball in a wine mirror-disc chainmail mini dress", pos: "72% 20%", posMobile: "76% 20%" },
+  { src: main09, phone: phone09, alt: "Model in a champagne sequin slip dress on a velvet chaise by candlelight", pos: "72% 25%", posMobile: "84% 25%" },
+  { src: main10, phone: phone10, alt: "Model in an emerald micro string bikini on sunlit rocks above a turquoise cove", pos: "72% 20%", posMobile: "68% 25%" },
+  { src: main11, phone: phone11, alt: "Model in a sheer black lace bodysuit and chiffon robe on the rim of a marble bathtub by candlelight", pos: "72% 20%", posMobile: "68% 20%" },
+  { src: main12, phone: phone12, alt: "Model in an ivory lace bustier, stockings and a flowing chiffon robe on a terrace at dusk", pos: "0% 20%", posMobile: "58% 20%" },
+  { src: main13, phone: phone13, alt: "Model in a blush lace bra, lace skirt and stockings on a velvet chaise in a sunlit bedroom", pos: "72% 20%", posMobile: "85% 20%" },
+  { src: main14, phone: phone14, alt: "Model in a plunging gold swimsuit at the edge of an infinity pool at sunset", pos: "0% 20%", posMobile: "66% 20%" },
+  { src: main15, phone: phone15, alt: "Model on wine velvet cushions by candlelight in a ruby lace bra", pos: "72% 25%", posMobile: "72% 25%" },
+  { src: main16, phone: phone16, alt: "Model lying back across a black-sheeted bed above the city lights in a sheer black mesh teddy and suspenders, her head tipped over the edge", pos: "72% 70%", posMobile: "39% 70%" },
+  { src: main17, phone: phone17, alt: "Model crouching low in a backless wine silk gown slit to the hip in an empty candlelit lounge", pos: "60% 20%", posMobile: "50% 20%" },
+  { src: main18, phone: phone18, alt: "Model in a black fishnet bodystocking lying across an ivory silk bed at golden hour", pos: "50% 40%", posMobile: "58% 50%" },
+  { src: main19, phone: phone19, alt: "Model lying on a white fur rug by a roaring fire in a wine lace bra, G-string and stockings", pos: "72% 25%", posMobile: "86% 25%" },
+  { src: main20, phone: phone20, alt: "Model on the edge of a hotel bed at breakfast in a champagne satin slip gown slit to the hip, a strawberry at her lips", pos: "72% 20%", posMobile: "79% 20%" },
+  { src: main21, phone: phone21, alt: "Model kneeling on an empty dance floor under blue lasers in an unzipped wet-look micro dress and thigh boots", pos: "72% 20%", posMobile: "76% 20%" },
+  { src: main22, phone: phone22, alt: "Model lying in a rope hammock at golden hour in a sheer blush robe fallen open over lace", pos: "72% 30%", posMobile: "93% 30%" },
+  { src: main23, phone: phone23, alt: "Model leaning in a hotel suite doorway at 4 am in a wine satin dress laced open from collar to hem", pos: "72% 20%", posMobile: "81% 20%" },
+  { src: main24, phone: phone24, alt: "Model under an outdoor shower among the palms in a sea-green string bikini, looking back over her shoulder", pos: "72% 25%", posMobile: "90% 25%" },
+  { src: main25, phone: phone25, alt: "Model lying in a wildflower meadow in an unbuttoned white shirt and a white G-string, a flower stem between her lips", pos: "72% 55%", posMobile: "64% 55%" },
+  { src: main26, phone: phone26, alt: "Model lying on her stomach on a sheepskin at the foot of the bed in a sheer blush babydoll", pos: "72% 25%", posMobile: "58% 25%" },
+  { src: main27, phone: phone27, alt: "Model sitting on a marble staircase under a chandelier in a red dress of nothing but satin straps", pos: "72% 20%", posMobile: "79% 20%" },
 ];
 
 /** The After Dark filmstrip in the middle of the home page: the full-length and wider photos (src/assets/images/hero/after-dark). */
