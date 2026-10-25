@@ -66,7 +66,13 @@ export default function HeroSlides({
             key={i}
             className={`hero-slide ${state}`}
             style={
-              { "--pos": s.pos, "--pos-m": s.posMobile } as React.CSSProperties
+              // a phone cut is already centred on the model, so a phone keeps only the vertical focal point
+              {
+                "--pos": s.pos,
+                "--pos-m": s.phone
+                  ? `50% ${s.posMobile.split(" ")[1] ?? "20%"}`
+                  : s.posMobile,
+              } as React.CSSProperties
             }
             aria-hidden={i !== active}
           >
