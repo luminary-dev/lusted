@@ -1,6 +1,6 @@
-import Image from "next/image";
-import group from "@/assets/images/how-it-works.webp";
+import { howSlides } from "@/lib/how-slides";
 import { whatsappLink } from "@/lib/site";
+import HowSlides from "./HowSlides";
 import { ArrowRight } from "./icons";
 
 const steps = [
@@ -12,21 +12,13 @@ const steps = [
   { title: "Discreet delivery", text: "Pay securely, and your order arrives in plain, unbranded packaging." },
 ];
 
-// Full-width 16:9 campaign photo with the three models on the left; the heading, steps and button sit over
-// the open sea on the right.
+// Full-width 16:9 campaign photos (src/lib/how-slides.ts) with the models on the left, slowly changing over
+// (HowSlides.tsx); the heading, steps and button sit over the soft, dark right-hand side.
 export default function HowItWorks() {
   return (
     <section id="ordering" className="section how">
       <div className="how-media">
-        <Image
-          quality={90}
-          src={group}
-          alt="Three models in a blush lace lingerie set, a crimson string bikini and a black sequin mini dress on a villa terrace at sunset"
-          fill
-          placeholder="blur"
-          sizes="(max-width: 600px) 134vw, (max-width: 900px) 100vw, 100vw"
-          className="how-img"
-        />
+        <HowSlides slides={howSlides} />
       </div>
       <div className="container how-inner">
         <div className="how-copy" data-reveal>

@@ -2576,6 +2576,88 @@ html::-webkit-scrollbar {
   object-position: 0% 30%; /* the models sit on the left ~60% of the photo */
 }
 
+/* the slideshow (HowSlides.tsx): each photo arrives under a soft diagonal sweep and drifts while it stays */
+@property --how-sweep {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 160%;
+}
+
+.how-slides {
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* under .how-media's fade */
+  overflow: hidden;
+  --how-hold: 10s; /* matches INTERVAL in HowSlides.tsx */
+  --how-reveal: 3s;
+  --how-drift: cubic-bezier(0.22, 0.61, 0.36, 1);
+  background: #1c0a0d;
+}
+
+.how-slide {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.how-slide.is-leaving {
+  z-index: 1;
+  visibility: visible;
+}
+
+.how-slide.is-active {
+  z-index: 2;
+  visibility: visible;
+}
+
+.how-slide img {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .how-slide.is-first img {
+    animation: how-settle var(--how-hold) var(--how-drift) both;
+  }
+  /* the new photo slides in under a soft diagonal edge, from the models' side outwards */
+  .how-slide.is-entering {
+    -webkit-mask-image: linear-gradient(105deg, #000 calc(var(--how-sweep) - 35%), transparent var(--how-sweep));
+    mask-image: linear-gradient(105deg, #000 calc(var(--how-sweep) - 35%), transparent var(--how-sweep));
+    animation: how-sweep var(--how-reveal) cubic-bezier(0.55, 0, 0.2, 1) both;
+  }
+  .how-slide.is-entering img {
+    animation: how-settle var(--how-hold) var(--how-drift) both;
+  }
+  /* the old one eases away slightly darker as the new one covers it */
+  .how-slide.is-leaving img {
+    animation: how-depart var(--how-reveal) ease-out both;
+  }
+}
+
+@keyframes how-sweep {
+  from {
+    --how-sweep: 0%;
+  }
+  to {
+    --how-sweep: 160%;
+  }
+}
+
+@keyframes how-settle {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes how-depart {
+  to {
+    transform: scale(1);
+    filter: brightness(0.55);
+  }
+}
+
 /* fade the open sea on the right into deep wine so the steps read clearly */
 .how-media::after {
   content: "";
