@@ -3,6 +3,7 @@ import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import { heroSlides } from "@/lib/hero-slides";
 import HeroSlides from "./HeroSlides";
+import ScrollCue from "./ScrollCue";
 import { ArrowRight, WhatsApp } from "./icons";
 
 export default function Hero() {
@@ -50,6 +51,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
+      <ScrollCue href="/#sale" label="Scroll down to the bikini sale" />
     </section>
   );
 }
