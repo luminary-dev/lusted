@@ -18,16 +18,6 @@ export type ReelLine = {
   cta: string;
 };
 
-// Each frame is a tall 4:5 crop of a 16:9 photo, centred on the model. posMobile is where she sits when ~30% of the
-// photo's width shows (x = 0.7·posMobile + 15); a 4:5 crop shows 45% of it, so the focal point is (x − 22.5) / 55.
-const focus = (posMobile: string) => {
-  const x = Math.min(
-    100,
-    Math.max(0, (0.7 * parseFloat(posMobile) + 15 - 22.5) / 0.55),
-  );
-  return `${x.toFixed(0)}% 50%`;
-};
-
 function Frames({
   row,
   dup,
@@ -45,15 +35,15 @@ function Frames({
       aria-hidden={dup || undefined}
     >
       {row.map((s, i) => {
+        // the photos in hero/after-dark are already 4:5 cuts centred on the model, so a frame shows the whole file
         const img = (
           <Image
             src={s.src}
             alt={dup ? "" : s.alt}
             fill
-            sizes="(max-width: 900px) 125vw, 60vw"
+            sizes="(max-width: 900px) 64vw, 29vw"
             placeholder="blur"
             quality={75}
-            style={{ objectPosition: focus(s.posMobile) }}
           />
         );
         return (

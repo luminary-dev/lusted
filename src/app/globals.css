@@ -6612,7 +6612,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer) {
   cursor: pointer;
   font: inherit;
   color: inherit;
-  aspect-ratio: 4 / 5; /* a tall crop of the 16:9 photo, centred on the model (AfterDarkReel.tsx sets the focal point) */
+  aspect-ratio: 4 / 5; /* the photos in hero/after-dark are cut to 4:5 around the model, so the frame shows all of one */
   overflow: hidden;
   border-radius: calc(var(--radius) * 0.7);
   background: #3a1d20;
