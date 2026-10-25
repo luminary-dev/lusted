@@ -1,4 +1,5 @@
 import { test, expect, go, ROUTES, CATALOG } from "./fixtures";
+import { site } from "../src/lib/site";
 
 test.describe("routes", () => {
   for (const path of ROUTES) {
@@ -88,9 +89,12 @@ test.describe("newsletter API", () => {
   });
 });
 
-// Until reveal day (site.revealAt) every page is replaced by /revealing-soon unless the preview cookie is set; the
-// `prepared` fixture carries the cookie, so this is the one place the gate itself is exercised with a bare page.
+// With site.revealGate on, every page is replaced by /revealing-soon until reveal day (site.revealAt) unless the preview
+// cookie is set; the `prepared` fixture carries the cookie, so this is the one place the gate itself is exercised with a
+// bare page. While the gate is off these are skipped and the reveal page is only checked at its own address.
 test.describe("revealing soon", () => {
+  test.skip(() => !site.revealGate || Date.now() >= Date.parse(site.revealAt), "the reveal gate is off");
+
   test("without the preview cookie the home page is the reveal page, with no site chrome", async ({ page }) => {
     await page.context().clearCookies();
     const res = await page.goto("/", { waitUntil: "domcontentloaded" });
