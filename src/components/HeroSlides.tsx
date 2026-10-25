@@ -17,7 +17,9 @@ const INTERVAL = 8000;
 // Full-screen hero backgrounds. Each new photo opens slowly from the model outwards through a soft iris,
 // emerging from a warm champagne haze into focus; the previous photo melts into soft focus beneath it.
 // No visible controls.
-export default function HeroSlides({ slides }: { slides: HeroSlide[] }) {
+// `priority` is for the hero at the top of the page: its first photo is preloaded and the rest fetched eagerly. A band further
+// down would pass false so its photos only load as it scrolls into view.
+export default function HeroSlides({ slides, priority = true }: { slides: HeroSlide[]; priority?: boolean }) {
   const [{ active, prev }, setState] = useState({ active: 0, prev: -1 });
 
   useEffect(() => {
@@ -49,8 +51,8 @@ export default function HeroSlides({ slides }: { slides: HeroSlide[] }) {
                 src={s.src}
                 alt={s.alt}
                 fill
-                preload={i === 0}
-                loading={i === 0 ? undefined : "eager"}
+                preload={priority && i === 0}
+                loading={priority && i === 0 ? undefined : priority ? "eager" : "lazy"}
                 placeholder="blur"
                 // phones: the crop is about 1.8× the screen width, so ask for that, not the full 4K
                 sizes="(max-width: 600px) 190vw, (max-aspect-ratio: 1/1) 130vh, 100vw"
