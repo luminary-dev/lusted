@@ -7,6 +7,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
 import SearchDialog from "@/components/SearchDialog";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 // Headlines: Parisienne (a casual connecting script — set ~1.5× the Petit Formal Script sizes, its x-height is small).
@@ -55,6 +56,9 @@ const sans = Montserrat({
 });
 
 export const metadata: Metadata = {
+  // absolute links for the share image and the product pages' photos (opengraph-image.png in this folder is the
+  // brand card every page shares with, unless it sets its own)
+  metadataBase: siteUrl,
   title: "Lusted — Lingerie for every version of you",
   description:
     "Barely-there lace, sun-kissed strings and midnight silk — lingerie, swimwear and after-dark pieces for the version of you that never asks permission. Discreet packaging, private ordering and personal sizing support.",
@@ -62,7 +66,10 @@ export const metadata: Metadata = {
     title: "Lusted — Lingerie for every version of you",
     description: "Dressed to tempt. Made to be undone.",
     type: "website",
+    siteName: "Lusted",
+    locale: "en_LK",
   },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

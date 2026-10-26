@@ -6,6 +6,7 @@ import { products } from "@/lib/products";
 export const metadata: Metadata = {
   title: "Shop all — Lusted",
   description: "Shop every Lusted piece — lingerie, swim and after dark. Search, filter by size, colour and price, and order discreetly on WhatsApp.",
+  alternates: { canonical: "/products" }, // every filtered, searched or paged view is the same shop
 };
 
 export default function ProductsPage() {

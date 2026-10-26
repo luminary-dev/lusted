@@ -15,7 +15,19 @@ export async function generateMetadata({
   params,
 }: PageProps<"/products/[slug]">): Promise<Metadata> {
   const p = getProduct((await params).slug);
-  return p ? { title: `${p.name} — Lusted`, description: p.description } : {};
+  if (!p) return {};
+  const title = `${p.name} — Lusted`;
+  // a shared link previews the piece itself: its front photo through the image optimiser (a ~60 KB file, well inside
+  // what WhatsApp and the other apps will fetch for a preview), at its own 9:16 shape
+  const w = 828;
+  const image = { url: `/_next/image?url=${encodeURIComponent(p.image.src)}&w=${w}&q=75`, width: w, height: Math.round((w * p.image.height) / p.image.width), alt: p.name };
+  return {
+    title,
+    description: p.description,
+    alternates: { canonical: `/products/${p.slug}` }, // the colour and other query strings are the same page
+    openGraph: { title, description: p.description, type: "website", url: `/products/${p.slug}`, images: [image] },
+    twitter: { card: "summary_large_image", images: [image] },
+  };
 }
 
 // Every slug is prerendered by generateStaticParams. The slug is resolved here, before anything streams, so an
