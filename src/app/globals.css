@@ -7037,9 +7037,12 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   }
 }
 
-/* ───────── scroll cue (ScrollCue.tsx): the arrowhead in a section's bottom-right corner ───────── */
+/* ───────── slide cue (SlideCue.tsx): the arrowhead in a slideshow's bottom-right corner — next photo ───────── */
 
-.scroll-cue {
+.slide-cue {
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
   position: absolute;
   right: clamp(18px, 3vw, 44px);
   bottom: clamp(22px, 4vh, 44px);
@@ -7057,33 +7060,33 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s var(--ease);
 }
 
-.scroll-cue svg {
+.slide-cue svg {
   transform: translateY(1px);
 }
 
-.scroll-cue:hover,
-.scroll-cue:focus-visible {
+.slide-cue:hover,
+.slide-cue:focus-visible {
   background: rgba(255, 246, 242, 0.16);
   border-color: #fff6f2;
   outline: none;
 }
 
-.scroll-cue:focus-visible {
+.slide-cue:focus-visible {
   box-shadow: 0 0 0 3px rgba(245, 194, 184, 0.6);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .scroll-cue {
-    animation: scroll-cue-bob 2.6s ease-in-out infinite;
+  .slide-cue {
+    animation: slide-cue-bob 2.6s ease-in-out infinite;
   }
-  .scroll-cue:hover,
-  .scroll-cue:focus-visible {
+  .slide-cue:hover,
+  .slide-cue:focus-visible {
     animation-play-state: paused;
     transform: translateY(2px);
   }
 }
 
-@keyframes scroll-cue-bob {
+@keyframes slide-cue-bob {
   0%,
   100% {
     transform: translateY(0);
@@ -7096,7 +7099,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 /* the hero's copy sits bottom-left and the how section's steps bottom-right, so on narrow screens the cue tucks in
    under them rather than over the button */
 @media (max-width: 900px) {
-  .scroll-cue {
+  .slide-cue {
     right: 16px;
     bottom: 16px;
     width: 42px;

@@ -1,7 +1,7 @@
 import { howSlides } from "@/lib/how-slides";
 import { whatsappLink } from "@/lib/site";
 import HowSlides from "./HowSlides";
-import ScrollCue from "./ScrollCue";
+import SlideCue from "./SlideCue";
 import { ArrowRight } from "./icons";
 
 // the phone cuts only lend their srcset (the blur placeholder is the wide photo's), so their blur data stays here
@@ -49,7 +49,7 @@ export default function HowItWorks() {
           </a>
         </div>
       </div>
-      <ScrollCue href="/#contact" label="Scroll down to contact" />
+      <SlideCue band="how" label="Next photo" />
     </section>
   );
 }

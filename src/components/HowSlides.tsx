@@ -2,6 +2,7 @@
 
 import { getImageProps, type StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
+import { onNextSlide } from "./SlideCue";
 
 export type HowSlide = {
   src: StaticImageData;
@@ -16,8 +17,18 @@ const INTERVAL = 10000;
 // silk sliding off, from the models' side of the frame outwards, and drifts gently for as long as it stays; no blur,
 // so it costs far less than the hero's transition. Only the photo on screen, the one leaving and the one up next
 // are mounted. No visible controls; stands still with reduced motion.
-export default function HowSlides({ slides }: { slides: HowSlide[] }) {
+export default function HowSlides({ slides, band = "how" }: { slides: HowSlide[]; band?: string }) {
   const [{ active, prev }, setState] = useState({ active: 0, prev: -1 });
+  const [restarts, setRestarts] = useState(0); // bumped by the cue so the timer starts over from the new photo
+
+  const advance = () =>
+    setState((s) => ({
+      active: (s.active + 1) % slides.length,
+      prev: s.active,
+    }));
+
+  // the arrowhead in the corner (SlideCue): next photo, timer from scratch
+  useEffect(() => onNextSlide(band, () => { advance(); setRestarts((n) => n + 1); }), [band, slides.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (
@@ -26,14 +37,10 @@ export default function HowSlides({ slides }: { slides: HowSlide[] }) {
     )
       return;
     const t = setInterval(() => {
-      if (!document.hidden)
-        setState((s) => ({
-          active: (s.active + 1) % slides.length,
-          prev: s.active,
-        }));
+      if (!document.hidden) advance();
     }, INTERVAL);
     return () => clearInterval(t);
-  }, [slides.length]);
+  }, [slides.length, restarts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const next = (active + 1) % slides.length;
   return (

@@ -3,7 +3,7 @@ import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import { heroSlides } from "@/lib/hero-slides";
 import HeroSlides from "./HeroSlides";
-import ScrollCue from "./ScrollCue";
+import SlideCue from "./SlideCue";
 import { ArrowRight, WhatsApp } from "./icons";
 
 // The phone cuts only lend their srcset to the slideshow (the blur placeholder is the wide photo's), so their blur
@@ -55,7 +55,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      <ScrollCue href="/#sale" label="Scroll down to the bikini sale" />
+      <SlideCue band="hero" label="Next photo" />
     </section>
   );
 }
