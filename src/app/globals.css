@@ -7721,7 +7721,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   --card-h: clamp(440px, 60svh, 600px);
 }
 .help-card[data-layout="left-low"] {
-  --card-h: clamp(500px, 68svh, 680px);
+  --card-h: clamp(680px, 96svh, 960px); /* tall, so she is */
 }
 .help-card[data-layout="right-high"] {
   --card-h: clamp(500px, 68svh, 680px);
@@ -7845,24 +7845,24 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   margin-top: 32px;
 }
 
-/* 05 · she stands at the left edge, the questions close beside her in long lines, the number and title underneath them */
+/* 05 · she stands tall at the left, the number, title and questions in one clean column beside her, lines running to
+   the card's edge — the card is made taller so she can be */
 .help-card[data-layout="left-low"] .help-model {
   top: 2%;
-  left: 3%; /* a little in from the edge */
+  left: 3%;
   bottom: 0; /* her feet on the card's bottom edge */
-  width: 36%;
+  width: 40%;
   --anchor: 0% 100%;
 }
-.help-card[data-layout="left-low"] .help-qs {
+.help-card[data-layout="left-low"] .help-card-head {
   grid-row: 1;
+}
+.help-card[data-layout="left-low"] .help-qs {
+  grid-row: 2;
+  margin-top: 32px;
 }
 .help-card[data-layout="left-low"] .help-qa dd p {
   max-width: none; /* the lines run the whole way across to the card's edge */
-}
-.help-card[data-layout="left-low"] .help-card-head {
-  grid-row: 2;
-  align-self: end;
-  margin-top: 32px;
 }
 .help-card[data-layout="left-low"] .help-tease {
   max-width: none;
