@@ -7579,6 +7579,13 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 /* ─ the chapter cards: pale paper, a faint plus-grid, a gold hairline ─ */
 .help-card[data-layout] {
+  /* the card is paper in both themes, so its ink is fixed here (the site's --ink goes light in dark mode) */
+  --ink: #2e1418;
+  --ink-2: #5e4246;
+  --muted: #735860;
+  --rose: #b3546a;
+  --rose-ink: #a04459;
+  --hair: rgba(46, 20, 24, 0.14);
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 0 clamp(20px, 3vw, 48px);
@@ -7704,10 +7711,10 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 /* 01 · she stands at the right, bottom-anchored; number, title and questions down the left */
 .help-card[data-layout="right"] .help-model {
-  top: 6%;
-  right: 2%;
+  top: 2%;
+  right: 1%;
   bottom: 0;
-  width: 42%;
+  width: 48%;
   --anchor: 100% 100%;
 }
 .help-card[data-layout="right"] .help-card-head {
@@ -7721,10 +7728,10 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 /* 02 · she stands at the left, full height; the words on the right, number set right */
 .help-card[data-layout="left"] .help-model {
-  top: 4%;
-  left: 2%;
+  top: 2%;
+  left: 1%;
   bottom: 0;
-  width: 40%;
+  width: 46%;
   --anchor: 0% 100%;
 }
 .help-card[data-layout="left"] .help-card-head {
@@ -7750,9 +7757,9 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 /* 03 · the title across the top, she stands in the middle, the questions either side of her */
 .help-card[data-layout="split"] .help-model {
-  top: 24%;
-  left: 30%;
-  right: 30%;
+  top: 13%;
+  left: 26%;
+  right: 26%;
   bottom: 0;
   --anchor: 50% 100%;
 }
@@ -7789,30 +7796,30 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 /* 04 · the words wide across the top in two columns, she kneels small in the bottom-right corner */
 .help-card[data-layout="corner"] .help-model {
-  right: 3%;
+  right: 2%;
   bottom: 0;
-  width: 36%;
-  height: 66%;
+  width: 42%;
+  height: 80%;
   --anchor: 100% 100%;
 }
 .help-card[data-layout="corner"] .help-card-head {
-  grid-column: 1 / 10;
+  grid-column: 1 / 8;
 }
 .help-card[data-layout="corner"] .help-qs-1 {
-  grid-column: 1 / 6;
+  grid-column: 1 / 5;
   margin-top: 36px;
 }
 .help-card[data-layout="corner"] .help-qs-2 {
-  grid-column: 6 / 10;
+  grid-column: 5 / 8;
   margin-top: 36px;
 }
 
 /* 05 · she stands at the left, the questions high on the right, the number and title underneath them */
 .help-card[data-layout="left-low"] .help-model {
-  top: 5%;
-  left: 4%;
+  top: 2%;
+  left: 2%;
   bottom: 0;
-  width: 38%;
+  width: 46%;
   --anchor: 0% 100%;
 }
 .help-card[data-layout="left-low"] .help-qs {
@@ -7829,9 +7836,9 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 /* 06 · she sits high at the right; the questions first on the left, the number and title low */
 .help-card[data-layout="right-high"] .help-model {
   top: 0;
-  right: 4%;
-  height: 72%;
-  width: 40%;
+  right: 2%;
+  height: 90%;
+  width: 50%;
   --anchor: 100% 0%;
 }
 .help-card[data-layout="right-high"] .help-qs {
@@ -7897,7 +7904,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
     position: relative;
     inset: auto;
     width: auto;
-    height: clamp(300px, 46vh, 420px);
+    height: clamp(360px, 58vh, 560px);
     margin: 18px -22px 0; /* a little air above her head at the card's top edge */
   }
   .help-card[data-layout="right"] .help-model,
@@ -7913,7 +7920,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   }
   .help-card[data-layout="corner"] .help-model {
     --anchor: 90% 100%;
-    height: clamp(260px, 40vh, 360px);
+    height: clamp(320px, 50vh, 480px);
   }
   .help-card[data-layout] .help-card-head {
     display: block;
