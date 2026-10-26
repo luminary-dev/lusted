@@ -5824,6 +5824,15 @@ html::-webkit-scrollbar {
   color: var(--rose-ink);
 }
 
+.status-lede p + p {
+  margin-top: 14px;
+}
+
+.status-lede p:last-child {
+  margin-top: 22px;
+  color: var(--wine);
+}
+
 .status-actions {
   display: flex;
   flex-wrap: wrap;

@@ -52,7 +52,7 @@ test.describe("routes", () => {
     await expect(page.locator(".nav")).toBeVisible();
     await expect(page.locator(".status-actions").getByRole("link", { name: /Show me everything/ })).toHaveAttribute("href", "/products");
     await expect(page.locator(".status-actions").getByRole("link", { name: "Take me back to bed" })).toHaveAttribute("href", "/");
-    await expect(page.locator(".status-links a")).toHaveCount(4); // the three collections and the sale
+    await expect(page.locator(".status-links")).toHaveCount(0); // no onward links on this page — the two buttons are the way out
     expect(await page.title()).toMatch(/nothing on here/i);
   });
 
