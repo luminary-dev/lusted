@@ -5,36 +5,42 @@ import { ArrowRight } from "@/components/icons";
 import { categories } from "@/lib/products";
 
 export const metadata: Metadata = {
-  title: "Page not found — Lusted",
+  title: "Nothing on here — Lusted",
 };
 
-// Any address that isn't a page — and any piece no longer in the catalogue (src/proxy.ts sends those here with a 404)
+// Any address that isn't a page — and any piece no longer in the catalogue (src/proxy.ts sends those here with a 404).
+// The one page where the site is allowed to be as forward as it likes: whoever lands here was looking for something.
 export default function NotFound() {
   return (
     <StatusPage
       code="404"
-      eyebrow="Page not found"
+      eyebrow="Page not found · nothing on underneath"
       title={
         <>
-          This one slipped away, <em>quietly.</em>
+          Caught you looking, <em>you naughty thing.</em>
         </>
       }
-      lede="The page you’re after isn’t here — it may have sold out, moved, or never existed. Everything else is still waiting for you."
+      lede="There’s nothing under this one — we took it all off and left the door open. Whatever you came here wanting, we have something wickeder: lace that doesn’t stay on, strings that barely try, and dresses for nights that end in someone else’s sheets. Come and get undressed."
       actions={
         <>
           <Link href="/products" className="btn btn-wine">
-            Shop the collection <ArrowRight className="arrow" />
+            Show me everything <ArrowRight className="arrow" />
           </Link>
           <Link href="/" className="btn btn-ghost">
-            Back to the home page
+            Take me back to bed
           </Link>
         </>
       }
-      links={categories.map((c) => (
-        <Link key={c.key} href={`/products?cat=${c.key}`}>
-          {c.name}
-        </Link>
-      ))}
+      links={
+        <>
+          {categories.map((c) => (
+            <Link key={c.key} href={`/products?cat=${c.key}`}>
+              {c.name}
+            </Link>
+          ))}
+          <Link href="/products?sale=1">Less fabric, less to pay</Link>
+        </>
+      }
     />
   );
 }
