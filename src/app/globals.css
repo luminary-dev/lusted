@@ -7731,7 +7731,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 .help-card[data-layout="right"] .help-model {
   top: 2%;
   right: 1%;
-  bottom: 0; /* her feet (or the stool) on the card's bottom edge */
+  bottom: -10%; /* the stool sits on the card's bottom edge; the tip of her heel, which hangs below it, dips out of the card */
   width: 48%;
   --anchor: 100% 100%;
 }
