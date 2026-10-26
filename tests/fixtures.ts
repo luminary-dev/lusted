@@ -219,6 +219,13 @@ export { expect };
 export async function go(page: Page, path: string) {
   const res = await page.goto(path, { waitUntil: "load" });
   await page.waitForFunction(() => document.fonts.status === "loaded");
+  // and until React has hydrated every control on the page: before that a click or a key press is simply lost, which
+  // on a slow machine (CI) can take a few seconds after load
+  await page.waitForFunction(
+    () => [...document.querySelectorAll("button, select, input")].every((el) => Object.keys(el).some((k) => k.startsWith("__reactProps$"))),
+    undefined,
+    { timeout: 30_000 },
+  );
   return res;
 }
 

@@ -50,7 +50,7 @@ npm run test:report  # open the last HTML report
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every push to `main` and every pull request: lint, types, a production build, the whole Playwright suite, then Lighthouse (mobile, three runs each) on the home page, the shop, a product, about and `/help`. It fails if accessibility drops below 90, best practices or SEO below 95, total blocking time goes over 600 ms or layout shift over 0.05, and warns if performance drops below 75 — thresholds in `lighthouserc.json`. The test and Lighthouse reports are attached to each run. A run takes about a quarter of an hour; on a private repository that counts against the GitHub Actions minutes in your plan.
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request: lint, types, a production build and the whole Playwright suite (split across two machines), and alongside it Lighthouse (mobile, three runs each) on the home page, the shop, a product, about and `/help`. It fails if accessibility drops below 90, best practices or SEO below 95, total blocking time goes over 600 ms or layout shift over 0.05, and warns if performance drops below 75 — thresholds in `lighthouserc.json`. The test and Lighthouse reports are attached to each run. The three jobs run side by side; GitHub's two-core runners are several times slower than a laptop, so the suite runs two workers per machine and waits for hydration before it interacts (`go()` in `tests/fixtures.ts`). On a private repository every job's minutes count against the GitHub Actions minutes in your plan.
 
 ```bash
 REVEAL_GATE=off npx @lhci/cli@0.15.1 autorun   # the Lighthouse step locally, after npm run build

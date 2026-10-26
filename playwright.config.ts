@@ -10,9 +10,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 4 : 6,
+  workers: process.env.CI ? 2 : 6, // GitHub's runners have two cores
   timeout: 90_000,
-  expect: { timeout: 10_000 },
+  expect: { timeout: process.env.CI ? 20_000 : 10_000 },
   reporter: [["list"], ["html", { open: "never", outputFolder: "test-results/report" }], ["json", { outputFile: "test-results/results.json" }]],
   outputDir: "test-results/artifacts",
   use: {

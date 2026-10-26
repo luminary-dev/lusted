@@ -115,13 +115,16 @@ test.describe("the shop", () => {
     expect(p).toEqual([...p].sort((a, b) => a - b));
     expect(p[0]).toBe(CATALOG.priceRange[0]);
     await select.selectOption("price-desc");
+    await expect(page).toHaveURL(/sort=price-desc/);
     p = await prices();
     expect(p).toEqual([...p].sort((a, b) => b - a));
     expect(p[0]).toBe(CATALOG.priceRange[1]);
     await select.selectOption("new");
+    await expect(page).toHaveURL(/sort=new/);
     expect((await slugs(cards(page))).slice(0, 6).sort()).toEqual([...CATALOG.newest].sort());
     for (let i = 0; i < 6; i++) await expect(cards(page).nth(i).locator(".badge", { hasText: "New" })).toHaveCount(1);
     await select.selectOption("best");
+    await expect(page).toHaveURL(/sort=best/);
     expect((await slugs(cards(page))).slice(0, 6)).toEqual(CATALOG.bestSellers);
     await select.selectOption("featured");
     await expect(page).not.toHaveURL(/sort=/);

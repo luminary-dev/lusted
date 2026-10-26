@@ -38,10 +38,9 @@ test("after dark: the filmstrip band runs two strips of twenty frames, none shar
   await page.emulateMedia({ reducedMotion: "no-preference" });
   const x = (i: number) => band.locator(".strip").nth(i).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
   const [a0, b0] = await Promise.all([x(0), x(1)]);
-  await page.waitForTimeout(1200);
-  const [a1, b1] = await Promise.all([x(0), x(1)]);
-  expect(a1).toBeLessThan(a0);
-  expect(b1).toBeGreaterThan(b0);
+  // polled: a slow machine can take a moment to start the animation once motion is allowed
+  await expect.poll(() => x(0)).toBeLessThan(a0);
+  await expect.poll(() => x(1)).toBeGreaterThan(b0);
   await band.locator(".strip-viewport").first().hover({ position: { x: 200, y: 100 } });
   const a2 = await x(0);
   await page.waitForTimeout(600);
