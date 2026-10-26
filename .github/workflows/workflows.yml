@@ -29,11 +29,27 @@ jobs:
       - name: actionlint
         uses: raven-actions/actionlint@3d39aea434753780c3b3d4a1a31c854b4dbf49d7 # v2
 
+      # zizmor itself, at a pinned version from PyPI (the published action's releases have been unreliable); its
+      # findings go to code scanning, and any finding fails the job
       - name: zizmor
-        uses: zizmorcore/zizmor-action@3aa7e2f1ad15075829ef5158ee06938ae12e1769 # v0.4.0
+        id: zizmor
+        run: |
+          pipx run zizmor==1.31.1 --min-severity low --min-confidence medium --format sarif .github/workflows > zizmor.sarif \
+            && echo "findings=0" >> "$GITHUB_OUTPUT" || echo "findings=1" >> "$GITHUB_OUTPUT"
+          pipx run zizmor==1.31.1 --min-severity low --min-confidence medium --format plain .github/workflows || true
+
+      - name: Upload zizmor's report
+        if: always() && hashFiles('zizmor.sarif') != ''
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
         with:
-          min-severity: low
-          min-confidence: medium
+          sarif_file: zizmor.sarif
+          category: zizmor
+
+      - name: Fail on zizmor findings
+        if: steps.zizmor.outputs.findings == '1'
+        run: |
+          echo "::error::zizmor found weaknesses in the workflows — see the step above and Security → Code scanning."
+          exit 1
 
   secrets:
     name: Secrets scan
