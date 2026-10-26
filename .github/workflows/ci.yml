@@ -1,0 +1,73 @@
+# Every push to main and every pull request: lint, types, a production build, the whole Playwright suite (every
+# route, section and viewport — see README "Tests"), then Lighthouse on the main pages so nothing quietly gets slower,
+# less accessible or worse for search. A newer push to the same branch cancels the run in progress.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, types, build, tests, Lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Types
+        run: npx tsc --noEmit
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install Chromium for the tests
+        run: npx playwright install --with-deps chromium
+
+      # serves the build itself (playwright.config.ts) with the reveal gate as in production; the tests carry the
+      # preview cookie
+      - name: End-to-end tests
+        run: npx playwright test
+        env:
+          CI: "true"
+
+      - name: Keep the test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: test-results/report
+          retention-days: 7
+
+      # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs per page, against the build with the reveal
+      # gate off; the thresholds are in lighthouserc.json
+      - name: Lighthouse
+        run: npx --yes @lhci/cli@0.15.1 autorun
+        env:
+          REVEAL_GATE: "off"
+
+      - name: Keep the Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse
+          path: .lighthouseci
+          retention-days: 14

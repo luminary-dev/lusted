@@ -6,7 +6,7 @@ Live at **https://lusted.vercel.app**.
 
 ## What it is
 
-A Next.js 16 site: a single scrolling home page (hero slideshow, bikini sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop.
+A Next.js 16 site: a single scrolling home page (hero slideshow, bikini sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop.
 
 ## Run it
 
@@ -47,6 +47,18 @@ npm run test:build   # production build, then the whole suite (about 10 minutes)
 npm test             # the suite against an existing `next start` on port 3177
 npm run test:report  # open the last HTML report
 ```
+
+## CI
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull request: lint, types, a production build, the whole Playwright suite, then Lighthouse (mobile, three runs each) on the home page, the shop, a product, about and `/help`. It fails if accessibility drops below 90, best practices or SEO below 95, total blocking time goes over 600 ms or layout shift over 0.05, and warns if performance drops below 75 — thresholds in `lighthouserc.json`. The test and Lighthouse reports are attached to each run. A run takes about a quarter of an hour; on a private repository that counts against the GitHub Actions minutes in your plan.
+
+```bash
+REVEAL_GATE=off npx @lhci/cli@0.15.1 autorun   # the Lighthouse step locally, after npm run build
+```
+
+## Errors and missing pages
+
+`src/app/not-found.tsx` (any unknown address or product, with a real 404 status) and `src/app/error.tsx` (anything that fails while a page renders — try again, or order on WhatsApp) share `components/StatusPage.tsx` and keep the site's nav and footer. `src/app/global-error.tsx` is the last resort when the layout itself fails: a self-contained page with its own few lines of CSS.
 
 ## Deploy
 
