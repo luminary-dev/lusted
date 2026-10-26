@@ -79,7 +79,8 @@ secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel
 
 GitHub's own branch protection isn't available to this private repository on the organisation's free plan, so the
 rules above are enforced by the workflow rather than by GitHub; a direct push to `main` is not blocked, it just
-never deploys. To deploy by hand from a laptop:
+never deploys. The rules GitHub should enforce are kept ready in `.github/rulesets/` (see its README) — when the plan
+allows rulesets, `scripts/apply-rulesets.sh` turns them on. To deploy by hand from a laptop:
 
 ```bash
 vercel deploy --prod   # production
