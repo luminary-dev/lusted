@@ -5719,6 +5719,88 @@ html::-webkit-scrollbar {
   text-underline-offset: 3px;
 }
 
+/* the delivery, returns & FAQ page (src/app/help): each question opens in place — native <details>, gliding open
+   where the browser can animate it */
+.faq {
+  margin-top: 14px;
+}
+
+.faq details {
+  border-bottom: 1px solid var(--hair);
+  interpolate-size: allow-keywords;
+}
+
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 0;
+  font-size: 16.5px;
+  font-weight: 500;
+  color: var(--ink);
+  list-style: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+/* a fine plus that turns into a cross as it opens */
+.faq summary::after {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background:
+    linear-gradient(var(--rose-ink), var(--rose-ink)) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--rose-ink), var(--rose-ink)) center / 1.5px 100% no-repeat;
+  transition: transform 0.35s var(--ease);
+}
+
+.faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq summary:hover {
+  color: var(--rose-ink);
+}
+
+.faq summary:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.faq details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.4s var(--ease),
+    content-visibility 0.4s allow-discrete;
+}
+
+.faq details[open]::details-content {
+  block-size: auto;
+}
+
+.faq-a {
+  padding-bottom: 18px;
+}
+
+.prose .faq-a > p:first-child {
+  margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq details::details-content,
+  .faq summary::after {
+    transition: none;
+  }
+}
+
 /* page not found / something went wrong (not-found.tsx, error.tsx): one centred message under the nav */
 .status-page {
   display: grid;

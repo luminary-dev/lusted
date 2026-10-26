@@ -266,7 +266,7 @@ test("contact: WhatsApp, email and Instagram links, hours, the QR code encodes t
 test("footer: every link resolves, social links open in new tabs, the year is current", async ({ prepared: page, request }) => {
   const footer = page.locator("footer.footer");
   const links = await footer.locator(".footer-cols a").evaluateAll((as) => as.map((a) => [a.textContent!.trim(), (a as HTMLAnchorElement).getAttribute("href")!, (a as HTMLAnchorElement).target]));
-  expect(links.map(([t]) => t)).toEqual(["All products", "Lace Secrets", "Sun Kissed", "Midnight Sins", "Sale", "Size guide", "How ordering works", "Contact", "About us", "Privacy policy", "Terms & conditions", "Instagram", "WhatsApp", "Email"]);
+  expect(links.map(([t]) => t)).toEqual(["All products", "Lace Secrets", "Sun Kissed", "Midnight Sins", "Sale", "Size guide", "How ordering works", "Delivery, returns & FAQ", "Contact", "About us", "Privacy policy", "Terms & conditions", "Instagram", "WhatsApp", "Email"]);
   for (const [label, href, target] of links) {
     if (href.startsWith("/")) {
       const r = await request.get(href.split("#")[0]);

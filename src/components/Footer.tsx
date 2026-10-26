@@ -24,6 +24,7 @@ const columns = [
     links: [
       { label: "Size guide", href: "/#size-guide" },
       { label: "How ordering works", href: "/#ordering" },
+      { label: "Delivery, returns & FAQ", href: "/help" },
       { label: "Contact", href: "/#contact" },
     ],
   },

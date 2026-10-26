@@ -3,8 +3,9 @@ import type { ReactNode } from "react";
 
 export type LegalSection = { id: string; title: string; body: ReactNode };
 
-// Shared layout for the privacy policy and terms: sticky contents list + readable prose column.
-export default function LegalPage({ eyebrow, title, updated, intro, sections }: { eyebrow: string; title: ReactNode; updated: string; intro: ReactNode; sections: LegalSection[] }) {
+// Shared layout for the privacy policy, terms and the delivery/returns FAQ: sticky contents list + readable prose column.
+// `updated` is for the policies; the FAQ has none.
+export default function LegalPage({ eyebrow, title, updated, intro, sections }: { eyebrow: string; title: ReactNode; updated?: string; intro: ReactNode; sections: LegalSection[] }) {
   return (
     <main className="legal">
       <div className="container">
@@ -16,7 +17,7 @@ export default function LegalPage({ eyebrow, title, updated, intro, sections }: 
           </nav>
           <p className="eyebrow">{eyebrow}</p>
           <h1 className="h2">{title}</h1>
-          <p className="legal-updated">Last updated {updated}</p>
+          {updated && <p className="legal-updated">Last updated {updated}</p>}
           <div className="lede">{intro}</div>
         </header>
 

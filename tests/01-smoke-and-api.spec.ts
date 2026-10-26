@@ -45,9 +45,53 @@ test.describe("routes", () => {
     expect(res?.status(), "HTTP status for a missing product").toBe(404);
   });
 
-  test("an unknown route is a 404", async ({ prepared: page }) => {
+  test("an unknown route is a 404, on the site's own page with the way back in", async ({ prepared: page }) => {
     const res = await page.goto("/no-such-page", { waitUntil: "load" });
     expect(res?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("This one slipped away");
+    await expect(page.locator(".nav")).toBeVisible();
+    await expect(page.locator(".status-actions").getByRole("link", { name: /Shop the collection/ })).toHaveAttribute("href", "/products");
+    await expect(page.locator(".status-actions").getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
+    await expect(page.locator(".status-links a")).toHaveCount(3);
+    expect(await page.title()).toMatch(/not found/i);
+  });
+
+  test("delivery, returns & FAQ: every section has questions that open in place, and its links go where they say", async ({ prepared: page }) => {
+    await go(page, "/help");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Everything you’d ask");
+    const ids = ["ordering", "payment", "delivery", "returns", "sizing", "privacy"];
+    for (const id of ids) expect(await page.locator(`#${id} details`).count(), `questions in #${id}`).toBeGreaterThan(1);
+    // the answers restate the terms: 7-day hygiene-safe exchanges, plain packaging
+    const q = page.locator("#returns details").first();
+    await expect(q.locator(".faq-a")).toBeHidden();
+    await q.locator("summary").click();
+    await expect(q).toHaveAttribute("open", "");
+    await expect(q.locator(".faq-a")).toContainText("7 days");
+    await q.locator("summary").press("Enter");
+    await expect(q).not.toHaveAttribute("open", "");
+    await page.locator("#delivery summary", { hasText: "Will anyone know" }).click();
+    await expect(page.locator("#delivery .faq-a", { hasText: "plain, unbranded box" })).toBeVisible();
+    // links (answers are in the DOM even while closed)
+    const hrefs = await page.locator(".prose a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
+    expect(hrefs.filter((h) => h.startsWith("https://wa.me/")).every((h) => h.includes(CATALOG.whatsapp))).toBe(true);
+    for (const h of ["/#size-guide", "/privacy", "/terms"]) expect(hrefs).toContain(h);
+    await expect(page.locator(".legal-toc a")).toHaveCount(ids.length + 1);
+  });
+
+  test("search engines: robots.txt points to a sitemap of every page, and pieces share their own photo", async ({ request, prepared: page }) => {
+    const robots = await (await request.get("/robots.txt")).text();
+    expect(robots).toMatch(/Disallow: \/api\//);
+    expect(robots).toMatch(/Sitemap: https:\/\/[^\s]+\/sitemap\.xml/);
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+    for (const path of ["/", "/products", "/help", "/about", "/privacy", "/terms", `/products/${CATALOG.hero.slug}`]) expect(locs).toContain(path);
+    expect(locs.filter((l) => l.startsWith("/products/"))).toHaveLength(CATALOG.total);
+    expect(locs).not.toContain("/favourites");
+    await go(page, `/products/${CATALOG.hero.slug}`);
+    expect(await page.locator('meta[property="og:image"]').getAttribute("content")).toContain(encodeURIComponent(CATALOG.hero.slug));
+    expect(await page.locator('link[rel="canonical"]').getAttribute("href")).toMatch(new RegExp(`/products/${CATALOG.hero.slug}$`));
+    const card = await request.get("/opengraph-image.png");
+    expect(card.headers()["content-type"]).toBe("image/png");
   });
 
   test("metadata: description, theme-color per scheme, open graph, viewport", async ({ prepared: page }) => {

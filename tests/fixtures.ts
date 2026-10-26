@@ -129,7 +129,7 @@ export const CATALOG = {
   instagram: "lusted.lk",
   hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"] },
 };
-export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/favourites", "/privacy", "/terms"];
+export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/help", "/favourites", "/privacy", "/terms"];
 
 /* ───────── helpers ───────── */
 export const parsePrice = (s: string) => Number((s.match(/LKR\s*([\d,]+)/)?.[1] ?? "0").replace(/,/g, ""));
