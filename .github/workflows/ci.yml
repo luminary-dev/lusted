@@ -1,7 +1,7 @@
 # Every push to dev or main and every pull request: lint, types, a production build and the whole Playwright suite
-# (every route, section and viewport — see README "Tests") split across four machines; on pull requests into main and
-# on main, Lighthouse on the main pages too, so nothing quietly gets slower, less accessible or worse for search. The
-# jobs run side by side; a newer push to the same branch cancels the run in progress.
+# (every route, section and viewport — see README "Tests") split across four machines, and Lighthouse on the main
+# pages so nothing quietly gets slower, less accessible or worse for search. The jobs run side by side; a newer push
+# to the same branch cancels the run in progress.
 #
 # Branches and deploys (README "Deploy"):
 #   dev  — every push that passes deploys a Vercel preview and moves lusted-dev.vercel.app onto it (gate off there)
@@ -110,11 +110,9 @@ jobs:
           path: test-results
           retention-days: 7
 
-  # Lighthouse runs where it decides something: on a pull request into main and on main itself. A push to dev gets
-  # the fast path (lint, types, build, tests, deploy) — run it locally there when you want the numbers.
+  # Lighthouse runs on every push and pull request, alongside the tests, so dev is held to the same numbers as main.
   lighthouse:
     name: Lighthouse
-    if: github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -181,13 +179,10 @@ jobs:
           retention-days: 14
 
   # dev → a preview on Vercel, and lusted-dev.vercel.app moved onto it; main → production, only for a merge of dev.
-  # Deploys never cancel each other and run one at a time per branch, after the tests have passed — and Lighthouse
-  # too on main (on dev it doesn't run, and a skipped job must not hold the deploy back: hence always()).
+  # Deploys never cancel each other and run one at a time per branch, after the tests and Lighthouse have passed.
   deploy:
     name: Deploy (${{ github.ref_name }})
-    if: >-
-      always() && github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-      && needs.tests.result == 'success' && (needs.lighthouse.result == 'success' || needs.lighthouse.result == 'skipped')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
     needs: [tests, lighthouse]
     runs-on: ubuntu-latest
     timeout-minutes: 30
