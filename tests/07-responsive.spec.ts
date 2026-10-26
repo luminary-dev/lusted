@@ -1,5 +1,9 @@
 import { test, expect, go, revealAll, expectNoHorizontalScroll, overflowReport, ALL_DEVICES, BOUNDARIES, MINIMUM_SET, CATALOG, navToggle } from "./fixtures";
 
+// GitHub's GPU-less runners paint the ultrawide, 4K and 5K screens (5-8 million pixels) on the CPU too slowly to
+// finish; those run locally, and CI covers everything up to 2560×1440
+const tooBigForCi = (v: { w: number; h: number }) => !!process.env.CI && v.w * v.h > 4_000_000;
+
 const PAGES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/privacy"];
 
 /** what the layout promises at a given width (the site's own breakpoints) */
@@ -51,9 +55,7 @@ async function expectReadable(page: import("@playwright/test").Page, w: number) 
 test.describe("every device size", () => {
   for (const v of ALL_DEVICES) {
     test(`${v.kind} · ${v.name} (${v.w}×${v.h})`, async ({ prepared: page }) => {
-      // GitHub's GPU-less runners paint a 4K or 5K screen on the CPU too slowly to finish (7-8 million pixels); those
-      // run locally, and CI covers everything up to 3440×1440
-      test.skip(!!process.env.CI && v.w * v.h > 5_000_000, "too large to paint without a GPU in CI");
+      test.skip(tooBigForCi(v), "too large to paint without a GPU in CI");
       test.setTimeout(150_000);
       await page.setViewportSize({ width: v.w, height: v.h });
       for (const path of PAGES) {
@@ -260,6 +262,7 @@ test.describe("sizes, modes and postures", () => {
 test.describe("screenshots for review (practical minimum set)", () => {
   for (const v of MINIMUM_SET) {
     test(`${v.name} ${v.w}×${v.h}`, async ({ prepared: page }, info) => {
+      test.skip(tooBigForCi(v), "too large to paint without a GPU in CI");
       await page.setViewportSize({ width: v.w, height: v.h });
       for (const path of ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about"]) {
         await go(page, path);
