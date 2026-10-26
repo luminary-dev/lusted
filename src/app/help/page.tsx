@@ -25,10 +25,10 @@ export const metadata: Metadata = {
 // where she is in each, the focal point on a laptop and on a phone.
 const photos = {
   opener: img("images/help/pillow-talk.webp"),
-  ordering: img("images/help/ordering.webp"),
+  ordering: img("images/help/how-to-have-us.webp"),
   payment: img("images/help/payment.webp"),
   delivery: img("images/help/delivery.webp"),
-  returns: img("images/help/returns.webp"),
+  returns: img("images/help/second-thoughts.webp"),
   sizing: img("images/help/sizing.webp"),
   privacy: img("images/help/between-us.webp"),
   closing: img("images/help/still-wondering.webp"),
