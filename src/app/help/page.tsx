@@ -201,6 +201,31 @@ const chapters: Chapter[] = [
         q: "Will I know when it’s coming?",
         a: <p>Yes. We tell you on WhatsApp the moment it’s on its way, and you can ask us where it is any time after that.</p>,
       },
+      {
+        q: "Does it come wrapped?",
+        a: (
+          <p>
+            Inside, yes — tissue, a ribbon, every piece folded the way it should be. Outside, nothing at all. That’s rather the point.
+          </p>
+        ),
+      },
+      {
+        q: "Do you deliver outside Sri Lanka?",
+        a: <p>Not yet. For now the plain box only travels within Sri Lanka.</p>,
+      },
+      {
+        q: "Can I collect it instead?",
+        a: <p>Ask us. Tell us when you order that you’d rather collect, and we’ll see what’s possible where you are.</p>,
+      },
+      {
+        q: "What if the box arrives damaged?",
+        a: (
+          <p>
+            Message us with a photo straight away. If anything inside is the worse for it, we replace it or refund you in full — everything under{" "}
+            <a href="#returns">Second thoughts</a>.
+          </p>
+        ),
+      },
     ],
   },
   {
