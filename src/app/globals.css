@@ -7715,7 +7715,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   --card-h: clamp(500px, 68svh, 680px);
 }
 .help-card[data-layout="split"] {
-  --card-h: clamp(520px, 72svh, 720px);
+  --card-h: clamp(680px, 96svh, 960px); /* tall, so she is */
 }
 .help-card[data-layout="corner"] {
   --card-h: clamp(440px, 60svh, 600px);
@@ -7785,44 +7785,38 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   max-width: none; /* the lines run across to the card's edge */
 }
 
-/* 03 · the title across the top, she stands in the middle, the questions either side of her */
+/* 03 · she stands tall in the middle; the number, title and the first questions down the left of her, the rest down
+   the right — two clean columns either side, the card made tall so she is */
 .help-card[data-layout="split"] .help-model {
-  top: 13%;
-  left: 26%;
-  right: 26%;
-  bottom: 0; /* her feet (or the stool) on the card's bottom edge */
+  top: 3%;
+  left: 30%;
+  right: 30%;
+  bottom: 0; /* her feet on the card's bottom edge */
   --anchor: 50% 100%;
 }
+.help-card[data-layout="split"] {
+  grid-template-rows: auto 1fr; /* the right column spans both rows; the slack goes under the left column, not between its head and questions */
+}
 .help-card[data-layout="split"] .help-card-head {
-  grid-column: 1 / 13;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "no title"
-    "no tease";
-  gap: 0 28px;
-  align-items: start;
-}
-.help-card[data-layout="split"] .help-no {
-  grid-area: no;
-}
-.help-card[data-layout="split"] .h2 {
-  grid-area: title;
-  margin-top: 0;
+  grid-column: 1 / 5;
+  grid-row: 1;
 }
 .help-card[data-layout="split"] .help-tease {
-  grid-area: tease;
-  max-width: 20em; /* stops short of her */
+  max-width: none;
 }
 .help-card[data-layout="split"] .help-qs-1 {
   grid-column: 1 / 5;
-  align-self: end;
+  grid-row: 2;
+  align-self: start;
   margin-top: 32px;
 }
 .help-card[data-layout="split"] .help-qs-2 {
   grid-column: 9 / 13;
-  align-self: end;
-  margin-top: 32px;
+  grid-row: 1 / 3;
+  padding-top: 8px;
+}
+.help-card[data-layout="split"] .help-qa dd p {
+  max-width: none;
 }
 
 /* 04 · the words across the left in two columns, she kneels at the right, the full height of the card */
