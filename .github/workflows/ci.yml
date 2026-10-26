@@ -79,7 +79,7 @@ jobs:
       - name: Production build
         run: npm run build || { echo "::warning::Build failed (often a Google Fonts download timing out) — retrying once"; npm run build; }
 
-      # the browser download is the step that varies most from run to run (seconds to minutes); keep it per Playwright version
+      # the browser download varies from run to run (seconds to minutes); keep it per Playwright version
       - name: Restore Playwright's Chromium
         id: pw-cache
         uses: actions/cache@v6
@@ -89,11 +89,15 @@ jobs:
 
       - name: Install Chromium for the tests
         if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
-      - name: Install Chromium's system libraries
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      # the runner image already carries the libraries Chromium needs; `playwright install-deps` would ask apt for
+      # them anyway, and that has taken up to 17 minutes on a slow mirror. So: launch the browser, and only if that
+      # fails install the libraries.
+      - name: Make sure Chromium launches
+        run: |
+          node -e "require('playwright').chromium.launch().then((b) => b.close())" \
+            || { echo "::warning::Chromium would not launch — installing its system libraries"; npx playwright install-deps chromium; }
 
       # serves the build itself (playwright.config.ts) with the reveal gate as in production; the tests carry the
       # preview cookie
@@ -147,11 +151,15 @@ jobs:
 
       - name: Install Chromium for Lighthouse
         if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
-      - name: Install Chromium's system libraries
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+      # the runner image already carries the libraries Chromium needs; `playwright install-deps` would ask apt for
+      # them anyway, and that has taken up to 17 minutes on a slow mirror. So: launch the browser, and only if that
+      # fails install the libraries.
+      - name: Make sure Chromium launches
+        run: |
+          node -e "require('playwright').chromium.launch().then((b) => b.close())" \
+            || { echo "::warning::Chromium would not launch — installing its system libraries"; npx playwright install-deps chromium; }
 
       # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs per page, against the build with the reveal
       # gate off; the thresholds are in lighthouserc.json. Like the tests, it runs the browser without WebGL
