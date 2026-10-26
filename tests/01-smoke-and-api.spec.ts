@@ -50,9 +50,10 @@ test.describe("routes", () => {
     expect(res?.status()).toBe(404);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Caught you looking");
     await expect(page.locator(".nav")).toBeVisible();
-    await expect(page.locator(".status-actions").getByRole("link", { name: /Show me everything/ })).toHaveAttribute("href", "/products");
-    await expect(page.locator(".status-actions").getByRole("link", { name: "Take me back to bed" })).toHaveAttribute("href", "/");
-    await expect(page.locator(".status-links")).toHaveCount(0); // no onward links on this page — the two buttons are the way out
+    await expect(page.locator(".lost-actions").getByRole("link", { name: /Show me everything/ })).toHaveAttribute("href", "/products");
+    await expect(page.locator(".lost-actions").getByRole("link", { name: "Take me back to bed" })).toHaveAttribute("href", "/");
+    // the photo: the wide cut on a laptop, served through the optimiser
+    await expect.poll(() => page.locator(".lost-photo img").evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 1000)).toBe(true);
     expect(await page.title()).toMatch(/nothing on here/i);
   });
 

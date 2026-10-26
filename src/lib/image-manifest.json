@@ -1,5 +1,15 @@
 {
   "images": {
+    "images/404/the-wrong-room-phone.webp": {
+      "w": 1728,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAQCdASoIAAsAAoBCJZACdAD0V0RNNQAA/vGGsfGH7Ii1LPHuGHEnkdw1B2RQ17f7eAPHNRVhWU56MUFiiwJ3nAKjEQ+8AIG5lF+g11mblhY7t2gB/nx8YOQAAA=="
+    },
+    "images/404/the-wrong-room.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAQAAoBCJQBOgCHfZDaAAP74q3Qg/MxrNV0ADYJoHAjzCQ1ZH3jIsEnfvywePBFaH/gAAAA="
+    },
     "images/about-page/dressing-room.webp": {
       "w": 3584,
       "h": 1536,
