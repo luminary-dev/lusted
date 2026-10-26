@@ -2,11 +2,22 @@
   "name": "main — production",
   "target": "branch",
   "enforcement": "active",
-  "conditions": { "ref_name": { "include": ["refs/heads/main"], "exclude": [] } },
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/main"
+      ],
+      "exclude": []
+    }
+  },
   "bypass_actors": [],
   "rules": [
-    { "type": "deletion" },
-    { "type": "non_fast_forward" },
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
     {
       "type": "pull_request",
       "parameters": {
@@ -15,7 +26,9 @@
         "require_code_owner_review": false,
         "require_last_push_approval": false,
         "required_review_thread_resolution": true,
-        "allowed_merge_methods": ["merge"]
+        "allowed_merge_methods": [
+          "merge"
+        ]
       }
     },
     {
@@ -24,12 +37,58 @@
         "strict_required_status_checks_policy": true,
         "do_not_enforce_on_create": false,
         "required_status_checks": [
-          { "context": "Branch rules", "integration_id": 15368 },
-          { "context": "Lint, types, build, tests (1/4)", "integration_id": 15368 },
-          { "context": "Lint, types, build, tests (2/4)", "integration_id": 15368 },
-          { "context": "Lint, types, build, tests (3/4)", "integration_id": 15368 },
-          { "context": "Lint, types, build, tests (4/4)", "integration_id": 15368 },
-          { "context": "Lighthouse", "integration_id": 15368 }
+          {
+            "context": "Branch rules",
+            "integration_id": 15368
+          },
+          {
+            "context": "Lint and types",
+            "integration_id": 15368
+          },
+          {
+            "context": "Tests (1/6)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Tests (2/6)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Tests (3/6)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Tests (4/6)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Tests (5/6)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Tests (6/6)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Lighthouse (home)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Lighthouse (shop)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Lighthouse (product)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Lighthouse (about)",
+            "integration_id": 15368
+          },
+          {
+            "context": "Lighthouse (help)",
+            "integration_id": 15368
+          }
         ]
       }
     }

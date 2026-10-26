@@ -1,7 +1,7 @@
-# Every push to dev or main and every pull request: lint, types, a production build and the whole Playwright suite
-# (every route, section and viewport — see README "Tests") split across four machines, and Lighthouse on the main
-# pages so nothing quietly gets slower, less accessible or worse for search. The jobs run side by side; a newer push
-# to the same branch cancels the run in progress.
+# Every push to dev or main and every pull request: lint and types, a production build and the whole Playwright suite
+# (every route, section and viewport — see README "Tests") split across six machines, and Lighthouse on five pages, one
+# machine each, so nothing quietly gets slower, less accessible or worse for search. The jobs run side by side; a newer
+# push to the same branch cancels the run in progress. Nothing reaches Vercel until all of them have passed.
 #
 # Branches and deploys (README "Deploy"):
 #   dev  — every push that passes deploys a Vercel preview and moves lusted-dev.vercel.app onto it (gate off there)
@@ -39,14 +39,35 @@ jobs:
           fi
           echo "From dev — fine."
 
+  checks:
+    name: Lint and types
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # next-env.d.ts and the route types (PageProps, LayoutProps, image imports) are generated, not committed
+      - name: Types
+        run: npx next typegen && npx tsc --noEmit
+
   tests:
-    name: Lint, types, build, tests (${{ matrix.shard }}/4)
+    name: Tests (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - uses: actions/checkout@v7
 
@@ -66,13 +87,6 @@ jobs:
           key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: |
             next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
-
-      - name: Lint
-        run: npm run lint
-
-      # next-env.d.ts and the route types (PageProps, LayoutProps, image imports) are generated, not committed
-      - name: Types
-        run: npx next typegen && npx tsc --noEmit
 
       # next/font downloads every configured Google font at build time; a download that times out on the runner fails
       # the build, so a failed build gets one more go before the run is called red
@@ -102,7 +116,7 @@ jobs:
       # serves the build itself (playwright.config.ts) with the reveal gate as in production; the tests carry the
       # preview cookie
       - name: End-to-end tests
-        run: npx playwright test --shard=${{ matrix.shard }}/4
+        run: npx playwright test --shard=${{ matrix.shard }}/6
         env:
           CI: "true"
 
@@ -114,11 +128,21 @@ jobs:
           path: test-results
           retention-days: 7
 
-  # Lighthouse runs on every push and pull request, alongside the tests, so dev is held to the same numbers as main.
+  # Lighthouse runs on every push and pull request, alongside the tests, so dev is held to the same numbers as main —
+  # one page per machine, so the five pages take as long as one.
   lighthouse:
-    name: Lighthouse
+    name: Lighthouse (${{ matrix.page.name }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        page:
+          - { name: home, path: / }
+          - { name: shop, path: /products }
+          - { name: product, path: /products/rose-lace-balconette-bra }
+          - { name: about, path: /about }
+          - { name: help, path: /help }
     steps:
       - uses: actions/checkout@v7
 
@@ -161,37 +185,38 @@ jobs:
           node -e "require('playwright').chromium.launch().then((b) => b.close())" \
             || { echo "::warning::Chromium would not launch — installing its system libraries"; npx playwright install-deps chromium; }
 
-      # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs per page, against the build with the reveal
-      # gate off; the thresholds are in lighthouserc.json. Like the tests, it runs the browser without WebGL
-      # (lighthouserc.json chromeFlags): the runner has no GPU, so the cursor smoke and the 3D size tags would be
-      # software-rendered and the numbers would swing from run to run. The server is started here and every page
-      # fetched twice first, so the first measured run isn't also the server's cold start (that alone read 3.9 s of
-      # blocking time once); blocking time and layout shift are then judged by their best of the three runs
-      # (lighthouserc.json "optimistic") — a real regression shows in every run, a runner hiccup in one.
+      # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs of the page, against the build with the reveal
+      # gate off; the thresholds are in lighthouserc.json (whose url list is for local runs — here one page is passed
+      # in). Like the tests, it runs the browser without WebGL (lighthouserc.json chromeFlags): the runner has no GPU,
+      # so the cursor smoke and the 3D size tags would be software-rendered and the numbers would swing from run to
+      # run. The server is started here and the page fetched twice first, so the first measured run isn't also the
+      # server's cold start (that alone read 3.9 s of blocking time once); blocking time and layout shift are then
+      # judged by their best of the three runs (lighthouserc.json "optimistic") — a real regression shows in every
+      # run, a runner hiccup in one.
       - name: Lighthouse
         run: |
           REVEAL_GATE=off npx next start -p 3200 > lighthouse-server.log 2>&1 &
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3200/ && break; sleep 1; done
-          for u in / /products /products/rose-lace-balconette-bra /about /help; do
-            curl -sf -o /dev/null "http://localhost:3200$u" && curl -sf -o /dev/null "http://localhost:3200$u" || { echo "::error::$u did not answer"; exit 1; }
-          done
-          CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun
+          u="${{ matrix.page.path }}"
+          curl -sf -o /dev/null "http://localhost:3200$u" && curl -sf -o /dev/null "http://localhost:3200$u" || { echo "::error::$u did not answer"; exit 1; }
+          CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun --collect.url="http://localhost:3200$u"
 
       - name: Keep the Lighthouse reports
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: lighthouse
+          name: lighthouse-${{ matrix.page.name }}
           path: .lighthouseci
           include-hidden-files: true # the folder's name starts with a dot
           retention-days: 14
 
   # dev → a preview on Vercel, and lusted-dev.vercel.app moved onto it; main → production, only for a merge of dev.
-  # Deploys never cancel each other and run one at a time per branch, after the tests and Lighthouse have passed.
+  # Deploys never cancel each other and run one at a time per branch, and only after lint, types, every test shard
+  # and every Lighthouse page have passed — nothing is built on Vercel before that.
   deploy:
     name: Deploy (${{ github.ref_name }})
     if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-    needs: [tests, lighthouse]
+    needs: [checks, tests, lighthouse]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
