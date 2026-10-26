@@ -7746,9 +7746,9 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 /* 02 · she stands at the left edge; the words close beside her in long lines, number and title set right */
 .help-card[data-layout="left"] .help-model {
   top: 2%;
-  left: 0;
+  left: 3%; /* a little in from the edge */
   bottom: 0; /* her feet on the card's bottom edge */
-  width: 34%;
+  width: 36%;
   --anchor: 0% 100%;
 }
 /* the words start a hand's width from her: her width is her height × the cut-out's aspect (--model-ar), and her height is
@@ -7758,7 +7758,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 .help-card[data-layout="left-low"] .help-card-head,
 .help-card[data-layout="left-low"] .help-qs {
   grid-column: 1 / 13;
-  padding-left: min(calc(var(--h) * var(--model-ar, 0.3) + 28px), 34%);
+  padding-left: min(calc(3% + var(--h) * var(--model-ar, 0.3) + 28px), 36%);
 }
 .help-card[data-layout="left"] .help-card-head {
   text-align: right;
@@ -7845,9 +7845,9 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 /* 05 · she stands at the left edge, the questions close beside her in long lines, the number and title underneath them */
 .help-card[data-layout="left-low"] .help-model {
   top: 2%;
-  left: 0;
+  left: 3%; /* a little in from the edge */
   bottom: 0; /* her feet on the card's bottom edge */
-  width: 34%;
+  width: 36%;
   --anchor: 0% 100%;
 }
 .help-card[data-layout="left-low"] .help-qs {
