@@ -5719,6 +5719,58 @@ html::-webkit-scrollbar {
   text-underline-offset: 3px;
 }
 
+/* page not found / something went wrong (not-found.tsx, error.tsx): one centred message under the nav */
+.status-page {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: clamp(120px, 14vw, 170px) 0 clamp(64px, 8vw, 104px);
+  text-align: center;
+}
+
+.status-inner {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  max-width: 640px;
+}
+
+.status-code {
+  font-family: var(--headline);
+  font-size: clamp(96px, 16vw, 176px);
+  line-height: 0.9;
+  color: var(--rose-ink);
+}
+
+.status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.status-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.status-links a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-color: var(--hair);
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+
+.status-links a:hover {
+  color: var(--rose-ink);
+}
+
 /* ───────── about page ───────── */
 
 /* the opener: the dressing-room photo fills the width; the headline sits over its quiet left side on a soft scrim */
