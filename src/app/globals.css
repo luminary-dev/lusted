@@ -7168,6 +7168,10 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   color: #f3c9bd;
 }
 
+.lost-eyebrow-more {
+  margin-left: 0.5em;
+}
+
 .lost-title {
   margin-top: 14px;
   font-size: clamp(44px, 4.6vw, 72px);

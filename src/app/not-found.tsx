@@ -41,7 +41,7 @@ export default function NotFound() {
             404
           </p>
           <p className="eyebrow lost-eyebrow" data-reveal>
-            Page not found<span className="lost-eyebrow-more"> · nothing on underneath</span>
+            Page not found<span className="lost-eyebrow-more">· nothing on underneath</span>
           </p>
           <h1 className="h1 lost-title" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
             Caught you looking, <em>you naughty thing</em>
