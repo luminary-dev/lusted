@@ -7715,7 +7715,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   --card-h: clamp(500px, 68svh, 680px);
 }
 .help-card[data-layout="split"] {
-  --card-h: clamp(680px, 96svh, 960px); /* tall, so she is */
+  --card-h: clamp(520px, 70svh, 700px); /* the words set the height; she fits whatever it is */
 }
 .help-card[data-layout="corner"] {
   --card-h: clamp(440px, 60svh, 600px);

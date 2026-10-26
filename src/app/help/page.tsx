@@ -212,10 +212,6 @@ const chapters: Chapter[] = [
         ),
       },
       {
-        q: "Do you deliver outside Sri Lanka?",
-        a: <p>Not yet. For now the plain box only travels within Sri Lanka.</p>,
-      },
-      {
         q: "Can I collect it instead?",
         a: <p>Ask us. Tell us when you order that you’d rather collect, and we’ll see what’s possible where you are.</p>,
       },
