@@ -37,8 +37,10 @@ jobs:
       - name: Types
         run: npx next typegen && npx tsc --noEmit
 
+      # next/font downloads every configured Google font at build time; a download that times out on the runner fails
+      # the build, so a failed build gets one more go before the run is called red
       - name: Production build
-        run: npm run build
+        run: npm run build || { echo "::warning::Build failed (often a Google Fonts download timing out) — retrying once"; npm run build; }
 
       - name: Install Chromium for the tests
         run: npx playwright install --with-deps chromium
