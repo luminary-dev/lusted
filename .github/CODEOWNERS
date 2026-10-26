@@ -1,0 +1,6 @@
+# Every change is reviewed by the owner; the workflows, rulesets and security files doubly so.
+*                         @dhanikaa
+/.github/                 @dhanikaa
+/SECURITY.md              @dhanikaa
+/src/app/img/             @dhanikaa
+/src/proxy.ts             @dhanikaa

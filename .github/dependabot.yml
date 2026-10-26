@@ -1,0 +1,33 @@
+# Dependabot — weekly pull requests into dev for npm packages (minor and patch updates grouped into one, majors on
+# their own) and for the actions the workflows use (which are pinned to commits; Dependabot moves the pin and the
+# version comment together). Security updates arrive as soon as an advisory does, regardless of the schedule.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Colombo
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: "deps"
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Asia/Colombo
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "ci"
