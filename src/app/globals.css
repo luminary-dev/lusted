@@ -7387,9 +7387,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   padding-top: clamp(96px, 11vh, 128px);
   padding-bottom: clamp(48px, 7vw, 96px);
   color: #fff6f2;
-  background:
-    radial-gradient(rgba(255, 246, 242, 0.12) 1px, transparent 1.4px) 0 0 / 28px 28px,
-    #1c0a0d;
+  background: #1c0a0d;
   overflow-x: clip;
 }
 
@@ -7592,9 +7590,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   min-height: var(--card-h, clamp(560px, 86svh, 820px)); /* not all the same: each layout sets its own below */
   padding: clamp(28px, 4vw, 56px) clamp(28px, 4.5vw, 64px) calc(clamp(28px, 4vw, 56px) + var(--overlap));
   color: var(--ink);
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 15v10M15 20h10' stroke='%232e1418' stroke-opacity='.11' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 40px 40px,
-    var(--paper);
+  background: var(--paper);
   border: 1px solid rgba(201, 162, 77, 0.35);
 }
 
@@ -7707,33 +7703,33 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   text-decoration-color: var(--rose-ink);
 }
 
-/* dark mode: the cards turn to dark paper — each card's own colour sunk into the wine-black, light ink, the plus-grid in
-   light; she's a cut-out so she simply sits on it (no multiply, which would have sunk her into the dark too) */
+/* dark mode: the same colours as the rest of the site in the dark — the site's dark ground, cards in its dark card
+   colour (each with a breath of its own colour), its ink, rose and hairlines; she's a cut-out so she simply sits on
+   the card (no multiply, which would have sunk her into the dark) */
+:root[data-theme="dark"] .help {
+  background: var(--cream);
+}
+
 :root[data-theme="dark"] .help-card[data-layout] {
-  --ink: #fff6f2;
-  --ink-2: rgba(255, 246, 242, 0.8);
-  --muted: rgba(255, 246, 242, 0.66);
-  --rose: #f5c2b8;
-  --rose-ink: #f3c9bd;
-  --hair: rgba(255, 246, 242, 0.16);
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 15v10M15 20h10' stroke='%23fff6f2' stroke-opacity='.12' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 40px 40px,
-    color-mix(in srgb, var(--paper) 14%, #241216);
-  border-color: rgba(201, 162, 77, 0.45);
+  --ink: #f6e9e4;
+  --ink-2: #d7c2be;
+  --muted: #a88f93;
+  --rose: #eaa99c;
+  --rose-ink: #eaa99c;
+  --hair: rgba(255, 232, 226, 0.12);
+  background: color-mix(in srgb, var(--paper) 8%, #2a171b);
+  border-color: rgba(255, 232, 226, 0.12);
+  box-shadow:
+    0 -1px 0 rgba(255, 232, 226, 0.06),
+    0 -30px 60px -24px rgba(0, 0, 0, 0.8);
 }
 
 :root[data-theme="dark"] .help-card[data-layout] .help-model img {
   mix-blend-mode: normal;
 }
 
-:root[data-theme="dark"] .help-card[data-layout] .help-no {
-  text-shadow: 0 0 36px rgba(245, 194, 184, 0.3);
-}
-
-:root[data-theme="dark"] .help {
-  background:
-    radial-gradient(rgba(255, 246, 242, 0.1) 1px, transparent 1.4px) 0 0 / 28px 28px,
-    #120709;
+:root[data-theme="dark"] .help-tease::before {
+  background: #eaa99c;
 }
 
 /* ─ the six arrangements (desktop) ─ */
