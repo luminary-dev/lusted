@@ -7822,12 +7822,12 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   margin-top: 32px;
 }
 
-/* 04 · the words wide across the top in two columns, she kneels small in the bottom-right corner */
+/* 04 · the words across the left in two columns, she kneels at the right, the full height of the card */
 .help-card[data-layout="corner"] .help-model {
+  top: 2%;
   right: 2%;
-  bottom: 0; /* her feet (or the stool) on the card's bottom edge */
-  width: 42%;
-  height: 80%;
+  bottom: 0; /* she kneels on the card's bottom edge */
+  width: 46%;
   --anchor: 100% 100%;
 }
 .help-card[data-layout="corner"] .help-card-head {
@@ -7958,7 +7958,6 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   }
   .help-card[data-layout="corner"] .help-model {
     --anchor: 90% 100%;
-    height: clamp(320px, 50vh, 480px);
   }
   .help-card[data-layout] .help-card-head,
   .help-card[data-layout] .help-qs {
