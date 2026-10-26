@@ -7481,41 +7481,6 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   text-underline-offset: 3px;
 }
 
-/* the chapter list under the opener: small numbered pills */
-.help-index {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 30px;
-}
-
-.help-index a {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 8px 15px;
-  border: 1px solid rgba(255, 246, 242, 0.32);
-  border-radius: 999px;
-  font-family: var(--script);
-  font-size: 19px;
-  line-height: 1;
-  color: #fff6f2;
-  backdrop-filter: blur(6px);
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.help-index a span {
-  font-family: var(--sans);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  color: #f3c9bd;
-}
-
-.help-index a:hover {
-  background: rgba(255, 246, 242, 0.12);
-  border-color: rgba(255, 246, 242, 0.6);
-}
-
 /* the chapters: photo one side, the number, title, tease and questions the other; the photo stays while they scroll */
 .help-chapter {
   display: grid;
@@ -7548,26 +7513,6 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 .help-photo img {
   object-fit: cover;
-}
-
-.help-photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(28, 10, 13, 0) 60%, rgba(28, 10, 13, 0.7) 100%);
-}
-
-.help-photo figcaption {
-  position: absolute;
-  z-index: 1;
-  left: 22px;
-  right: 22px;
-  bottom: 18px;
-  font-family: var(--script);
-  font-size: clamp(24px, 2.2vw, 34px);
-  line-height: 1;
-  color: #fff6f2;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
 }
 
 .help-no {
@@ -7720,9 +7665,6 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   .help-cta .h1 {
     max-width: none;
   }
-  .help-index {
-    margin-top: 22px;
-  }
   .help-chapter {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -7752,10 +7694,6 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   }
   .help-lede {
     font-size: 15.5px;
-  }
-  .help-index a {
-    padding: 7px 12px;
-    font-size: 17px;
   }
   .help-photo {
     aspect-ratio: 3 / 4;

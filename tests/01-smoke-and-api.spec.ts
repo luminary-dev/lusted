@@ -76,7 +76,6 @@ test.describe("routes", () => {
     const hrefs = await page.locator(".help-chapter a, .help-cta a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
     expect(hrefs.filter((h) => h.startsWith("https://wa.me/")).every((h) => h.includes(CATALOG.whatsapp))).toBe(true);
     for (const h of ["/#size-guide", "/privacy", "/terms"]) expect(hrefs).toContain(h);
-    await expect(page.locator(".help-index a")).toHaveCount(ids.length);
     // every chapter has its photo
     await expect(page.locator(".help-photo img")).toHaveCount(ids.length);
   });

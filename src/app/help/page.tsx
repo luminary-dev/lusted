@@ -35,7 +35,6 @@ type Qa = { q: string; a: ReactNode };
 type Chapter = {
   id: string;
   title: ReactNode;
-  caption: string;
   tease: string;
   photo: { src: ReturnType<typeof img>; alt: string; pos?: string };
   items: Qa[];
@@ -51,7 +50,6 @@ const chapters: Chapter[] = [
         How to <em>have us</em>
       </>
     ),
-    caption: "say the word",
     tease: "No checkout. No forms. Just you, one message, and someone on the other end who wants you to have it.",
     photo: {
       src: photos.ordering,
@@ -104,7 +102,6 @@ const chapters: Chapter[] = [
         Settling <em>up</em>
       </>
     ),
-    caption: "the least sexy minute",
     tease: "The one unsexy moment of the whole affair. We keep it quick, so you can get back to the rest.",
     photo: {
       src: photos.payment,
@@ -137,7 +134,6 @@ const chapters: Chapter[] = [
         The plain <em>box</em>
       </>
     ),
-    caption: "nothing on the outside",
     tease: "It arrives looking like nothing at all. Then you open it.",
     photo: {
       src: photos.delivery,
@@ -180,7 +176,6 @@ const chapters: Chapter[] = [
         Second <em>thoughts</em>
       </>
     ),
-    caption: "this one, or this one?",
     tease: "Changed your mind? Didn’t fit the way you pictured it? Tell us. We don’t sulk.",
     photo: {
       src: photos.returns,
@@ -219,7 +214,6 @@ const chapters: Chapter[] = [
         Fitted <em>to you</em>
       </>
     ),
-    caption: "measure once",
     tease: "Measure once. Then let us worry about where everything goes.",
     photo: {
       src: photos.sizing,
@@ -255,7 +249,6 @@ const chapters: Chapter[] = [
         Between <em>us</em>
       </>
     ),
-    caption: "shh",
     tease: "What you wear, and for whom, is nobody’s business. We’re very good at keeping quiet.",
     photo: {
       src: photos.privacy,
@@ -318,13 +311,6 @@ export default function HelpPage() {
             The questions you’d murmur afterwards — how to have us, how we slip through your door, what happens if it doesn’t fit — answered now, so
             later can be about something else.
           </p>
-          <nav className="help-index" aria-label="On this page" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
-            {chapters.map((c, i) => (
-              <a key={c.id} href={`#${c.id}`}>
-                <span>{String(i + 1).padStart(2, "0")}</span> {c.caption}
-              </a>
-            ))}
-          </nav>
         </div>
       </header>
 
@@ -341,7 +327,6 @@ export default function HelpPage() {
                 sizes="(min-width: 1467px) 540px, (min-width: 901px) 38vw, 100vw"
                 style={{ objectPosition: c.photo.pos }}
               />
-              <figcaption>{c.caption}</figcaption>
             </figure>
             <div className="help-chapter-body">
               <div className="help-chapter-head" data-reveal>
