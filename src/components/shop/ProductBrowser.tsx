@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { Chevron, ChevronNext, Close, Search, Sliders } from "../icons";
@@ -24,14 +24,44 @@ const flags = [
 
 const list = (v: string | null) => (v ? v.split(",").filter(Boolean) : []);
 
+// the query string most recently asked of the router, until the URL catches up (see setUrl); only touched from event
+// handlers, timers and effects
+let pendingQuery: string | null = null;
+// and the search (q) of the last query string asked for, so the box can tell its own updates landing from outside ones
+let askedSearch = "";
+const setPending = (qs: string | null) => {
+  pendingQuery = qs;
+  if (qs !== null) askedSearch = new URLSearchParams(qs).get("q") ?? "";
+};
+const getPending = () => pendingQuery;
+const getAskedSearch = () => askedSearch;
+
 export default function ProductBrowser() {
   const params = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const [drawer, setDrawer] = useState(false);
+  // below 900px the filters are a bottom sheet: while it is closed it is out of reach (no hidden tab stops), and Esc
+  // closes it
+  const sheet = useSyncExternalStore(
+    (onChange) => {
+      const m = window.matchMedia("(max-width: 900px)");
+      m.addEventListener("change", onChange);
+      return () => m.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia("(max-width: 900px)").matches,
+    () => false,
+  );
+  useEffect(() => {
+    if (!drawer) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDrawer(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [drawer]);
 
   // All filter state lives in the URL so filtered views can be shared and survive reloads.
-  const cat = (params.get("cat") ?? "") as Category | "";
+  const rawCat = params.get("cat") ?? "";
+  const cat = (categories.some((c) => c.key === rawCat) ? rawCat : "") as Category | ""; // an unknown ?cat= shows everything
   const selSizes = list(params.get("size"));
   const selColors = list(params.get("color")) as ColorKey[];
   const selPrice = list(params.get("price"));
@@ -39,17 +69,35 @@ export default function ProductBrowser() {
   const sort = (params.get("sort") ?? "featured") as (typeof sorts)[number]["key"];
   const urlQuery = params.get("q") ?? "";
   const [query, setQuery] = useState(urlQuery);
+  // the search in the URL changed under us (the search dialog's "See all", back/forward): show it in the box — but not
+  // when it is one of our own updates landing (that would wipe what has been typed since), nor just what's being typed,
+  // trimmed (a space typed mid-search isn't eaten)
+  const [seenQuery, setSeenQuery] = useState(urlQuery);
+  if (urlQuery !== seenQuery) {
+    setSeenQuery(urlQuery);
+    if (urlQuery !== query.trim() && urlQuery !== getAskedSearch()) setQuery(urlQuery);
+  }
+
+  // router.replace only lands in the URL (and in `params`) once its navigation finishes, so each update builds on the
+  // last one asked for until then — otherwise the debounced search, landing 250ms after typing, would undo a filter
+  // picked in the meantime
+  const setUrl = (qs: string) => {
+    setPending(qs);
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+  useEffect(() => {
+    setPending(null); // the URL has caught up
+  }, [params]);
 
   function update(changes: Record<string, string | string[] | null>) {
-    const next = new URLSearchParams(params.toString());
+    const next = new URLSearchParams(getPending() ?? params.toString());
     if (!("page" in changes)) next.delete("page"); // any filter, search or sort change starts again from page 1
     for (const [k, v] of Object.entries(changes)) {
       const value = Array.isArray(v) ? v.join(",") : v;
       if (value) next.set(k, value);
       else next.delete(k);
     }
-    const qs = next.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    setUrl(next.toString());
   }
 
   const toggle = (key: string, current: string[], value: string) =>
@@ -104,7 +152,7 @@ export default function ProductBrowser() {
   ];
   const clearAll = () => {
     setQuery("");
-    router.replace(cat ? `${pathname}?cat=${cat}` : pathname, { scroll: false });
+    setUrl(cat ? `cat=${cat}` : "");
   };
 
   const filterCount = selSizes.length + selColors.length + selPrice.length + selFlags.length;
@@ -149,7 +197,7 @@ export default function ProductBrowser() {
       </div>
 
       <div className="browser-body">
-        <div className={`filters-root ${drawer ? "is-open" : ""}`}>
+        <div className={`filters-root ${drawer ? "is-open" : ""}`} inert={sheet && !drawer}>
           <div className="filters-scrim" onClick={() => setDrawer(false)} />
           <aside className="filters" aria-label="Filters">
             <div className="filters-head">
