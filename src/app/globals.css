@@ -6267,8 +6267,9 @@ html::-webkit-scrollbar {
 }
 
 /* ---------- Revealing soon (src/app/revealing-soon) ---------- */
-/* the page stands alone: no nav, rail, curtain intro or footer while it's up */
-body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer) {
+/* the page stands alone: no nav, rail, curtain intro or footer while it's up — and no search or bag, which the
+   keyboard shortcuts could otherwise open over it */
+body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-root) {
   display: none;
 }
 

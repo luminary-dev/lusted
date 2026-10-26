@@ -10,8 +10,8 @@ import { ArrowRight, Close, Search } from "./icons";
 
 // Open state lives in a tiny module store so the header button and keyboard shortcut share it.
 let open = false;
-// The result thumbnails are only rendered once search has been opened: the closed dialog is still in the layout (it
-// fades), so its images would otherwise download on every page load, ahead of what's actually on screen.
+// The results are only rendered once search has been opened: the closed dialog is still in the layout (it fades), so
+// its thumbnails would otherwise download on every page load, and every page's HTML would carry the list.
 let opened = false;
 const listeners = new Set<() => void>();
 export function setSearchOpen(next: boolean) {
@@ -50,10 +50,13 @@ export default function SearchDialog() {
   useEffect(() => {
     if (!isOpen) return;
     document.documentElement.style.overflow = "hidden";
+    // focus goes to the search box, and back to whatever opened search when it closes
+    const opener = document.activeElement as HTMLElement | null;
     const t = setTimeout(() => input.current?.focus(), 60);
     return () => {
       clearTimeout(t);
       document.documentElement.style.overflow = "";
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
   }, [isOpen]);
 
@@ -100,13 +103,13 @@ export default function SearchDialog() {
         )}
 
         <p className="search-label">{q ? `${results.length} ${results.length === 1 ? "result" : "results"}` : "Best sellers"}</p>
-        {results.length ? (
+        {!opened ? null : results.length ? (
           <ul className="search-results">
             {results.slice(0, 6).map((p) => (
               <li key={p.slug}>
                 <Link href={`/products/${p.slug}`} onClick={close}>
                   <span className="search-thumb">
-                    {opened && <Image src={p.image} alt="" fill sizes="56px" />}
+                    <Image src={p.image} alt="" fill sizes="56px" />
                   </span>
                   <span className="search-name">
                     <strong>{p.name}</strong>
