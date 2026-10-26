@@ -7531,12 +7531,11 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 }
 
 .help-tease {
-  max-width: 24em;
+  max-width: 30em;
   margin-top: 14px;
-  font-family: var(--script);
-  font-size: clamp(23px, 2.1vw, 31px);
-  line-height: 1.2;
-  color: #f5c2b8;
+  font-size: clamp(16px, 1.2vw, 18.5px);
+  line-height: 1.6;
+  color: rgba(245, 194, 184, 0.92);
   text-wrap: pretty;
 }
 
