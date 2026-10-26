@@ -7751,8 +7751,16 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   width: 34%;
   --anchor: 0% 100%;
 }
+/* the words start a hand's width from her: her width is her height × the cut-out's aspect (--model-ar), and her height is
+   the card's (--h, measured by DeckSizer.tsx) — until that's known the words start a third of the way across */
+.help-card[data-layout="left"] .help-card-head,
+.help-card[data-layout="left"] .help-qs,
+.help-card[data-layout="left-low"] .help-card-head,
+.help-card[data-layout="left-low"] .help-qs {
+  grid-column: 1 / 13;
+  padding-left: min(calc(var(--h) * var(--model-ar, 0.3) + 28px), 34%);
+}
 .help-card[data-layout="left"] .help-card-head {
-  grid-column: 5 / 13;
   text-align: right;
 }
 .help-card[data-layout="left"] .help-tease {
@@ -7768,7 +7776,6 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   margin-right: -0.05em;
 }
 .help-card[data-layout="left"] .help-qs {
-  grid-column: 5 / 13;
   margin-top: 32px;
 }
 .help-card[data-layout="left"] .help-qa dd p {
@@ -7844,14 +7851,12 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   --anchor: 0% 100%;
 }
 .help-card[data-layout="left-low"] .help-qs {
-  grid-column: 5 / 13;
   grid-row: 1;
 }
 .help-card[data-layout="left-low"] .help-qa dd p {
   max-width: none; /* the lines run the whole way across to the card's edge */
 }
 .help-card[data-layout="left-low"] .help-card-head {
-  grid-column: 5 / 13;
   grid-row: 2;
   align-self: end;
   margin-top: 32px;
@@ -7954,6 +7959,10 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   .help-card[data-layout="corner"] .help-model {
     --anchor: 90% 100%;
     height: clamp(320px, 50vh, 480px);
+  }
+  .help-card[data-layout] .help-card-head,
+  .help-card[data-layout] .help-qs {
+    padding-left: 0;
   }
   .help-card[data-layout] .help-card-head {
     display: block;

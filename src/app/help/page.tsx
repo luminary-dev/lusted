@@ -347,7 +347,13 @@ function ChapterCard({ c, i }: { c: Chapter; i: number }) {
   const half = Math.ceil(c.items.length / 2);
   const columns = c.layout === "split" || c.layout === "corner" ? [c.items.slice(0, half), c.items.slice(half)] : [c.items];
   return (
-    <section id={c.id} className="help-card" data-layout={c.layout} data-deck style={{ "--paper": c.paper, "--i": i + 1 } as React.CSSProperties}>
+    <section
+      id={c.id}
+      className="help-card"
+      data-layout={c.layout}
+      data-deck
+      style={{ "--paper": c.paper, "--i": i + 1, "--model-ar": (c.photo.src.width / c.photo.src.height).toFixed(3) } as React.CSSProperties}
+    >
       <div className="help-model">
         <Image quality={90} src={c.photo.src} alt={c.photo.alt} fill sizes="(min-width: 901px) 44vw, 90vw" />
       </div>
