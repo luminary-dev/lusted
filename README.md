@@ -50,7 +50,26 @@ npm run test:report  # open the last HTML report
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every push to `dev` or `main` and every pull request: lint and types, a production build and the whole Playwright suite (split across six machines, with the Next.js build cache and the browser download cached between runs), and alongside it Lighthouse (mobile, three runs each) on the home page, the shop, a product, about and `/help`, one machine per page. Nothing is deployed until every job has passed; a push to `dev` reaches the dev site in about seven minutes. It fails if accessibility drops below 90, best practices or SEO below 95, layout shift goes over 0.05 or total blocking time over 3,000 ms, and warns if performance drops below 45 — thresholds in `lighthouserc.json`. The speed numbers are relative to GitHub's runner, not to real phones: with two cores and no GPU it measures the home page at ~1,500 ms of blocking where a laptop measures ~25 ms, so the limits are set to catch a real regression there (like the 3D tags once building at page load) rather than to match the laptop's scores. Run Lighthouse locally for those. The test and Lighthouse reports are attached to each run. The three jobs run side by side; GitHub's two-core runners are several times slower than a laptop, so the suite runs two workers per machine, waits for hydration before it interacts (`go()` in `tests/fixtures.ts`), runs the browser without WebGL (they have no GPU; Lighthouse does the same, so its blocking-time number holds still) and leaves the screens over 4 million pixels (ultrawide, 4K, 5K) to local runs. On a private repository every job's minutes count against the GitHub Actions minutes in your plan.
+`.github/workflows/ci.yml` runs on every push to `dev` or `main` and every pull request. Jobs, all side by side:
+
+- **Branch rules** (pull requests only) — the branch is up to date with its base, and `main` only takes `dev`.
+- **Lint and types** — eslint, then the generated route types and `tsc`.
+- **Tests (1/6 … 6/6)** — a production build and the whole Playwright suite (every route, section and viewport), split
+  across six machines, with the Next.js build cache and the browser download cached between runs.
+- **Lighthouse (home, shop, product, about, help)** — mobile, three runs of the page, one machine per page. It fails if
+  accessibility drops below 90, best practices or SEO below 95, layout shift goes over 0.05 or total blocking time over
+  3,000 ms, and warns if performance drops below 45 — thresholds in `lighthouserc.json`. The speed numbers are relative to
+  GitHub's runner, not to real phones: with two cores and no GPU it measures the home page at ~1,500 ms of blocking where
+  a laptop measures ~25 ms, so the limits are set to catch a real regression there rather than to match the laptop's
+  scores. The server is warmed before measuring, and blocking time and layout shift are judged by the best of the three
+  runs, so a runner hiccup in one run doesn't fail the job.
+- **Deploy** (pushes to `dev` or `main` only) — after every job above has passed; see "Deploy" below.
+
+GitHub's two-core runners are several times slower than a laptop, so the suite runs two workers per machine, waits for
+hydration before it interacts (`go()` in `tests/fixtures.ts`), runs the browser without WebGL (they have no GPU; Lighthouse
+does the same) and leaves the screens over 4 million pixels (ultrawide, 4K, 5K) to local runs. The test and Lighthouse
+reports are attached to each run. A push reaches the dev site in about seven minutes. On a private repository every job's
+minutes count against the GitHub Actions minutes in your plan.
 
 ```bash
 REVEAL_GATE=off npx next start -p 3200 &   # then, with the server up:
@@ -65,22 +84,26 @@ npx @lhci/cli@0.15.1 autorun               # the Lighthouse step locally, after 
 
 Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed by CI (`.github/workflows/ci.yml`):
 
-- **`dev`** — day-to-day work. Every push that passes lint, types, build, the test suite and Lighthouse is deployed as a
-  Vercel preview and **https://lusted-dev.vercel.app** is moved onto it. Vercel's Preview environment carries
-  `REVEAL_GATE=off`, so the dev site shows the real pages. (Preview deployments ask for a Vercel login unless
-  Deployment Protection is relaxed in the project settings.)
+- **`dev`** — integration. Every merged pull request that passes CI is deployed as a Vercel preview and
+  **https://lusted-dev.vercel.app** is pointed at it. Vercel's Preview environment carries `REVEAL_GATE=off`, so the dev
+  site shows the real pages. (Preview deployments ask for a Vercel login unless Deployment Protection is relaxed in the
+  project settings.)
 - **`main`** — production, **https://lusted.vercel.app**, which shows the "Revealing soon" page until reveal day. Only
-  merges of `dev` reach it: a pull request into `main` from any other branch fails its checks, and the production
-  deploy job refuses a push to `main` that isn't a merge commit whose second parent is on `dev`.
+  merges of `dev` reach it.
 
-The release flow is therefore: work on `dev` → open a pull request `dev → main` → merge. CI needs three repository
-secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account → Tokens; a token scoped to the team is fine),
-`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `.vercel/project.json` after `vercel link`).
+**The flow:** work on a branch → pull request into `dev` → merge → pull request `dev → main` → merge. Pull requests are
+merged as merge commits (the repository allows no other method), must be up to date with their base, and must have every
+check green; `main` takes pull requests from `dev` only. A direct push to either branch runs the checks but is never
+deployed — the deploy job looks for the merge commit.
 
-GitHub's own branch protection isn't available to this private repository on the organisation's free plan, so the
-rules above are enforced by the workflow rather than by GitHub; a direct push to `main` is not blocked, it just
-never deploys. The rules GitHub should enforce are kept ready in `.github/rulesets/` (see its README) — when the plan
-allows rulesets, `scripts/apply-rulesets.sh` turns them on. To deploy by hand from a laptop:
+CI needs three repository secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account →
+Tokens; a token scoped to the team is fine), `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `.vercel/project.json`
+after `vercel link`).
+
+GitHub's own rulesets aren't available to this private repository on the organisation's free plan, so the rules above
+are enforced by the workflow (red checks, no deploy) rather than blocked by GitHub. The rulesets GitHub should enforce
+are kept ready in `.github/rulesets/` (see its README); when the plan allows them, `scripts/apply-rulesets.sh` turns
+them on. To deploy by hand from a laptop:
 
 ```bash
 vercel deploy --prod   # production
