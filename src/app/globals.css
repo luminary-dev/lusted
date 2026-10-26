@@ -7746,7 +7746,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 /* 02 · she stands at the left edge; the words close beside her in long lines, number and title set right */
 .help-card[data-layout="left"] .help-model {
   top: 2%;
-  left: 3%; /* a little in from the edge */
+  left: 7%; /* in from the edge */
   bottom: 0; /* her feet on the card's bottom edge */
   width: 36%;
   --anchor: 0% 100%;
@@ -7758,7 +7758,10 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 .help-card[data-layout="left-low"] .help-card-head,
 .help-card[data-layout="left-low"] .help-qs {
   grid-column: 1 / 13;
-  padding-left: min(calc(3% + var(--h) * var(--model-ar, 0.3) + 28px), 36%);
+  padding-left: min(calc(var(--model-left, 3%) + var(--h) * var(--model-ar, 0.3) + 28px), 40%);
+}
+.help-card[data-layout="left"] {
+  --model-left: 7%;
 }
 .help-card[data-layout="left"] .help-card-head {
   text-align: right;
