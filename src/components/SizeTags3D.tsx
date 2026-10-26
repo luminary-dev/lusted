@@ -373,7 +373,8 @@ export default function SizeTags3D({
       if (gone()) return;
 
       const small = el.clientWidth < 700;
-      const CW = small ? 512 : 704,
+      // the colour map carries the print: on a wide screen a tag draws at ~800 device px, so it gets 1024 texels across
+      const CW = small ? 704 : 1024,
         CH = Math.round(CW * (H / W));
       const DW = small ? 384 : 512,
         DH = Math.round(DW * (H / W));
@@ -434,7 +435,7 @@ export default function SizeTags3D({
           metal: "#000",
         },
         muted: {
-          color: "#8d7175",
+          color: "#5e3b42", // the small labels: dark enough to read at a glance, not just a tint on the paper
           height: "rgb(100,100,100)",
           rough: "rgb(170,170,170)",
           metal: "#000",
@@ -540,10 +541,10 @@ export default function SizeTags3D({
         rule(y);
         tag.lines.forEach(([label, value]) => {
           c.fillStyle = INK.muted[mode];
-          setFont(c, "600", 34, sans, 6);
+          setFont(c, "700", 36, sans, 5);
           c.fillText(label.toUpperCase(), 323, y + row * 0.36);
-          c.fillStyle = mode === "color" ? "#2e1418" : INK.ink[mode];
-          fitFont(c, value, "500", 68, sans, 520);
+          c.fillStyle = mode === "color" ? "#24100f" : INK.ink[mode];
+          fitFont(c, value, "600", 70, sans, 520);
           c.fillText(value, 320, y + row * 0.82);
           y += row;
           rule(y);
@@ -805,7 +806,8 @@ export default function SizeTags3D({
 
       // ── layout: tags centred under the column, cord across the whole stage ──
       const GAP = 1.13;
-      const HALF = 2 * GAP + 0.62;
+      const COUNT = latest.current.length; // XS … XXL
+      const HALF = ((COUNT - 1) / 2) * GAP + 0.62;
       let cord: InstanceType<typeof THREE.Mesh> | null = null;
       let sag = 0.06,
         span = HALF;
@@ -895,7 +897,7 @@ export default function SizeTags3D({
         cord.castShadow = true;
         scene.add(cord);
         items.forEach((it, k) => {
-          const x = (k - 2) * GAP;
+          const x = (k - (COUNT - 1) / 2) * GAP;
           it.pivot.position.set(x, sagAt(x), 0);
         });
         key.position.set(camBase - 5.5, 6.5, 5);

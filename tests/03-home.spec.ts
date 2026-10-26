@@ -190,7 +190,7 @@ test("how it works: the photos change over on their own when motion is allowed",
   await ctx.close();
 });
 
-test("size guide: three tabs switch the chart, five tags per tab, tags flip with click, Enter and Space", async ({ prepared: page }) => {
+test("size guide: three tabs switch the chart, six tags per tab, tags flip with click, Enter and Space", async ({ prepared: page }) => {
   const guide = page.locator("#size-guide");
   const tabs = guide.getByRole("tab");
   await expect(tabs).toHaveText(["Bras & tops", "Bodysuits & dresses", "Bottoms"]);
@@ -198,8 +198,8 @@ test("size guide: three tabs switch the chart, five tags per tab, tags flip with
   const panel = guide.getByRole("tabpanel");
   await expect(panel).toHaveAttribute("aria-label", /Bras & tops sizes/);
   const tags = guide.locator(".size-tags .tag3d");
-  await expect(tags).toHaveCount(5);
-  await expect(tags.locator(".tag3d-front strong")).toHaveText(CATALOG.sizes);
+  await expect(tags).toHaveCount(6);
+  await expect(tags.locator(".tag3d-front strong")).toHaveText([...CATALOG.sizes, "XXL"]); // the guide goes one size past the shop
   // bra chart carries underbust + cup sizes; bottoms carry hips
   await expect(tags.first().locator(".tag3d-front")).toContainText("Underbust");
   await tabs.nth(2).click();

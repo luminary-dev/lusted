@@ -10,14 +10,14 @@ import TapeGuide from "./TapeGuide";
 
 // Body measurements in cm. Bra bands follow the underbust (UK/US/AU 30 = 63–67 cm, then +5 cm per band) and cups
 // the bust-minus-underbust difference. Dress sizes use the usual UK/AU 6–14 ↔ EU 34–42 ↔ US 2–10 conversion.
-// Check them against your makers' own charts.
-const SIZES = ["XS", "S", "M", "L", "XL"];
-const UK = ["6", "8", "10", "12", "14"];
-const EU = ["34", "36", "38", "40", "42"];
-const US = ["2", "4", "6", "8", "10"];
-const BUST = ["78 – 82", "83 – 87", "88 – 92", "93 – 97", "98 – 102"];
-const WAIST = ["60 – 64", "65 – 69", "70 – 74", "75 – 79", "80 – 84"];
-const HIPS = ["84 – 88", "89 – 93", "94 – 98", "99 – 103", "104 – 108"];
+// XXL follows the same steps (UK 16 / EU 44 / US 12). Check them against your makers' own charts.
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+const UK = ["6", "8", "10", "12", "14", "16"];
+const EU = ["34", "36", "38", "40", "42", "44"];
+const US = ["2", "4", "6", "8", "10", "12"];
+const BUST = ["78 – 82", "83 – 87", "88 – 92", "93 – 97", "98 – 102", "103 – 108"];
+const WAIST = ["60 – 64", "65 – 69", "70 – 74", "75 – 79", "80 – 84", "85 – 90"];
+const HIPS = ["84 – 88", "89 – 93", "94 – 98", "99 – 103", "104 – 108", "109 – 114"];
 
 // the line on the back of each swing tag
 const TEASE = [
@@ -26,6 +26,7 @@ const TEASE = [
   "Every curve, perfectly kept.",
   "More to love. More to show.",
   "Every inch, adored.",
+  "Made for more of you.",
 ];
 
 // each size is a swing tag: [label, value] lines
@@ -60,6 +61,12 @@ const guides: Record<string, [string, string][][]> = {
       ["Bust", "99 – 109"],
       ["UK · US", "38C – 38DD"],
       ["EU", "85C – 85E"],
+    ],
+    [
+      ["Underbust", "88 – 92"],
+      ["Bust", "106 – 116"],
+      ["UK · US", "40C – 40DD"],
+      ["EU", "90C – 90E"],
     ],
   ],
   "Bodysuits & dresses": SIZES.map((_, i) => [

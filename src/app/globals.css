@@ -2325,7 +2325,7 @@ html::-webkit-scrollbar {
   --cord: color-mix(in srgb, var(--rose) 70%, transparent);
   position: relative;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 14px;
   margin-top: 62px;
   list-style: none;
