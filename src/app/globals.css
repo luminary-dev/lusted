@@ -7707,6 +7707,35 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   text-decoration-color: var(--rose-ink);
 }
 
+/* dark mode: the cards turn to dark paper — each card's own colour sunk into the wine-black, light ink, the plus-grid in
+   light; she's a cut-out so she simply sits on it (no multiply, which would have sunk her into the dark too) */
+:root[data-theme="dark"] .help-card[data-layout] {
+  --ink: #fff6f2;
+  --ink-2: rgba(255, 246, 242, 0.8);
+  --muted: rgba(255, 246, 242, 0.66);
+  --rose: #f5c2b8;
+  --rose-ink: #f3c9bd;
+  --hair: rgba(255, 246, 242, 0.16);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 15v10M15 20h10' stroke='%23fff6f2' stroke-opacity='.12' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 40px 40px,
+    color-mix(in srgb, var(--paper) 14%, #241216);
+  border-color: rgba(201, 162, 77, 0.45);
+}
+
+:root[data-theme="dark"] .help-card[data-layout] .help-model img {
+  mix-blend-mode: normal;
+}
+
+:root[data-theme="dark"] .help-card[data-layout] .help-no {
+  text-shadow: 0 0 36px rgba(245, 194, 184, 0.3);
+}
+
+:root[data-theme="dark"] .help {
+  background:
+    radial-gradient(rgba(255, 246, 242, 0.1) 1px, transparent 1.4px) 0 0 / 28px 28px,
+    #120709;
+}
+
 /* ─ the six arrangements (desktop) ─ */
 .help-card[data-layout="right"] {
   --card-h: clamp(520px, 72svh, 720px);
