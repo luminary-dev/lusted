@@ -1,14 +1,74 @@
 {
   "images": {
-    "images/404/the-wrong-room-phone.webp": {
-      "w": 1728,
-      "h": 2304,
-      "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAQCdASoIAAsAAoBCJZACdAD0V0RNNQAA/vGGsfGH7Ii1LPHuGHEnkdw1B2RQ17f7eAPHNRVhWU56MUFiiwJ3nAKjEQ+8AIG5lF+g11mblhY7t2gB/nx8YOQAAA=="
+    "images/404/the-cellar-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRlwAAABXRUJQVlA4IFAAAAAQAgCdASoIAAsAAoBCJQBOja/gWIJMThHAAP7sg5MwMkU41YN6b8uPtX7j/uorYDJN8pu8TotHQGJhk2D0PDSNdXNYdKb3/NUF3GQHf4TAAA=="
     },
-    "images/404/the-wrong-room.webp": {
-      "w": 4096,
-      "h": 2304,
-      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAQAAoBCJQBOgCHfZDaAAP74q3Qg/MxrNV0ADYJoHAjzCQ1ZH3jIsEnfvywePBFaH/gAAAA="
+    "images/404/the-cellar.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAACwAQCdASoIAAUAAoBCJYwCdADze7hYAP74gsvku5vGOKERGPEpiM3YfM2Re5X5ZLos4eGAAAA="
+    },
+    "images/404/the-kitchen-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAADwAQCdASoIAAsAAoBCJZgCdAD0lwoJ/HAA/kRJfh1HbVCdPrpEb7/iJYYIcIlq4juAd+bByBdyfSw+Ew1iEyDavMF6RMuBw6OHJ3LrrZf9fUx8OAAAAA=="
+    },
+    "images/404/the-kitchen.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAADQAQCdASoIAAUAAoBCJQBOgCPtytxKYAD+9MdjfPqT/UzbGth3GwamiyV+W2ap4/imAGapKKyhs9So3dQAAA=="
+    },
+    "images/404/the-library-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAQAgCdASoIAAsAAoBCJYgCdAD0QWcvj8oAAP731/FVrZauX6teIvXYfYrBASOOLb0+pDxBhsSyoWRtGS45qoDk5HGwx4LMd9E+6rjNd6jqAAAA"
+    },
+    "images/404/the-library.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkYAAABXRUJQVlA4IDoAAACwAQCdASoIAAUAAoBCJQBOgCHfGKfgAP77m1xVRSW45fMEEl6jTiQCYO5u9xqJjUI3+2VS2HgoAAAA"
+    },
+    "images/404/the-lift-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAAAQAgCdASoIAAsAAoBCJYgCdAEPAl4tTSyAAP70n+aRvKDiQpXYflGV6FHkUwH6zlebCWUrsvNLMSgObteL59STrZJybazXes8km0l04he4ckY098yw/gAA"
+    },
+    "images/404/the-lift.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJQBOgCHgGACwAP78DL0q7vIeeMaTMSA/4dU1XOUjfbmxPq71BUmZLZhMzw7gAAA="
+    },
+    "images/404/the-lobby-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADQAQCdASoIAAsAAoBCJYgCdAD0QOfNgAD+8bfIWBb0eaQZ5BuNfiuF2poF0z8N/vtA1iWK10/jSF8MDkngnV0NQhyF/luxTuIpmYS0u4NK9PgFs9yDsgAA"
+    },
+    "images/404/the-lobby.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJQBOgB5vdwsAAP734W/3UACnWLALQ2oj1WT14+Fo9ku1E4PGyHS5dJaIDV4AAAA="
+    },
+    "images/404/the-pool-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRmwAAABXRUJQVlA4IGAAAABQAgCdASoIAAsAAoBCJbACdAYst2wnFF5BlYAA/uo/ynL7ErOk/xUTz3fo2sp9eRQ87+tpI4V51dwngiyLpYnVlxAqK9Ugw4GUHh9Kx3W4aivIVJq4pQ4wbXRH+XQAAAA="
+    },
+    "images/404/the-pool.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJZgCdADx+IRAAP734IKrCX7l2GW/uiEor18nnD/z4ACUF9RydTmYfASRLypAAAA="
+    },
+    "images/404/the-suite-phone.webp": {
+      "w": 1440,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAADwAQCdASoIAAsAAoBCJZACdAYtLkQkCAAA/vfc8yC3jrpPLip77ibmQ6dajqRii6ZKH4Q/BLYOjc2SXB6NXtV/l06rUcCSs067W717Ec13d1LAl5HiHYJmOdtAAA=="
+    },
+    "images/404/the-suite.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJQBOgB8xKY6AAP72/uQZpN0Sm4isUwvSgGdnP5j+JGSAINoDp5+cd03hpoEgwAA="
     },
     "images/about-page/dressing-room.webp": {
       "w": 3584,

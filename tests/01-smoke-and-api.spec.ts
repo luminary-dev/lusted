@@ -52,8 +52,12 @@ test.describe("routes", () => {
     await expect(page.locator(".nav")).toBeVisible();
     await expect(page.locator(".lost-actions").getByRole("link", { name: /Show me everything/ })).toHaveAttribute("href", "/products");
     await expect(page.locator(".lost-actions").getByRole("link", { name: "Take me back to bed" })).toHaveAttribute("href", "/");
-    // the photo: the wide cut on a laptop, served through the optimiser
-    await expect.poll(() => page.locator(".lost-photo img").evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 1000)).toBe(true);
+    // the photos are a slideshow: the first is a real (large) photo and the arrowhead moves on to the next
+    const first = page.locator(".lost-photo .hero-slide").first();
+    await expect(first).toHaveClass(/is-active/);
+    await expect.poll(() => first.locator("img").evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 1000)).toBe(true);
+    await page.locator(".slide-cue").click();
+    await expect(page.locator(".lost-photo .hero-slide").nth(1)).toHaveClass(/is-active/);
     expect(await page.title()).toMatch(/nothing on here/i);
   });
 
