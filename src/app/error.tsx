@@ -21,7 +21,12 @@ export default function Error({ error, retry }: { error: unknown; retry: () => v
           Something came undone, <em>just for a moment.</em>
         </>
       }
-      lede="This page didn’t load as it should. Try again — and if it keeps happening, message us and we’ll take your order by hand."
+      lede={
+        <>
+          <p>This page didn’t load as it should.</p>
+          <p>Try again — and if it keeps happening, message us and we’ll take your order by hand.</p>
+        </>
+      }
       actions={
         <>
           <button type="button" className="btn btn-wine" onClick={() => retry()}>

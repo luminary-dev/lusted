@@ -5824,6 +5824,15 @@ html::-webkit-scrollbar {
   color: var(--rose-ink);
 }
 
+.status-lede p + p {
+  margin-top: 14px;
+}
+
+.status-lede p:last-child {
+  margin-top: 22px;
+  color: var(--wine);
+}
+
 .status-actions {
   display: flex;
   flex-wrap: wrap;
@@ -7093,4 +7102,296 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
     width: 42px;
     height: 42px;
   }
+}
+
+/* ---------- 404 (src/app/not-found.tsx): the wrong door, opened ---------- */
+.lost {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #fff6f2;
+  background: #1c0a0d;
+}
+
+.lost-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.lost-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 92% 50%; /* the models hold the right of the wide photo */
+}
+
+/* the dark wall on the left is where the words live: deepen it, and keep the photo's right side clear */
+.lost::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(28, 10, 13, 0.92) 0%, rgba(28, 10, 13, 0.82) 30%, rgba(28, 10, 13, 0.45) 48%, rgba(28, 10, 13, 0) 64%),
+    linear-gradient(180deg, rgba(28, 10, 13, 0.55) 0%, rgba(28, 10, 13, 0) 22%, rgba(28, 10, 13, 0) 78%, rgba(28, 10, 13, 0.5) 100%);
+}
+
+.lost-inner {
+  width: 100%;
+  padding-top: clamp(96px, 12vh, 140px);
+  padding-bottom: clamp(48px, 7vh, 80px);
+}
+
+.lost-copy {
+  max-width: min(520px, 46%);
+}
+
+.lost-code {
+  font-family: var(--headline);
+  font-size: clamp(120px, 15vw, 220px);
+  line-height: 0.78;
+  margin-left: -0.06em;
+  color: #f5c2b8;
+  text-shadow:
+    0 0 40px rgba(245, 194, 184, 0.35),
+    0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+.lost-eyebrow {
+  margin-top: 28px;
+  color: #f3c9bd;
+}
+
+.lost-eyebrow-more {
+  margin-left: 0.5em;
+}
+
+.lost-title {
+  margin-top: 14px;
+  font-size: clamp(44px, 4.6vw, 72px);
+  line-height: 1.05;
+  color: #fff6f2;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.lost-title em {
+  color: #f5c2b8;
+}
+
+.lost-lede {
+  margin-top: 22px;
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 1.65;
+  color: rgba(255, 246, 242, 0.82);
+  text-wrap: pretty;
+}
+
+.lost-lede p + p {
+  margin-top: 12px;
+}
+
+.lost-invite {
+  margin-top: 20px !important;
+  font-family: var(--headline);
+  font-size: clamp(28px, 2.4vw, 38px);
+  line-height: 1.1;
+  color: #f5c2b8;
+}
+
+.lost-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 26px;
+  margin-top: 30px;
+}
+
+.lost-home {
+  font-family: var(--headline);
+  font-size: clamp(22px, 1.7vw, 27px);
+  color: #f5c2b8;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(245, 194, 184, 0.5);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.lost-home:hover {
+  color: #fff6f2;
+  border-color: #fff6f2;
+}
+
+/* a slow, barely-there push in on the photo */
+@media (prefers-reduced-motion: no-preference) {
+  .lost-photo img {
+    animation: lost-drift 24s var(--hero-drift, ease-out) both;
+  }
+  @keyframes lost-drift {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+}
+
+/* tablets and small laptops: the photo is cropped to the models and the words take the lower left */
+@media (max-width: 1100px) {
+  .lost-photo img {
+    object-position: 74% 50%;
+  }
+  .lost::before {
+    background:
+      linear-gradient(90deg, rgba(28, 10, 13, 0.88) 0%, rgba(28, 10, 13, 0.6) 40%, rgba(28, 10, 13, 0.15) 70%, rgba(28, 10, 13, 0) 100%),
+      linear-gradient(180deg, rgba(28, 10, 13, 0.5) 0%, rgba(28, 10, 13, 0) 25%, rgba(28, 10, 13, 0.3) 60%, rgba(28, 10, 13, 0.88) 100%);
+  }
+  .lost-copy {
+    max-width: min(520px, 60%);
+  }
+}
+
+/* phones and portrait tablets: the 3:4 cut, the models above, the words over the dark bottom */
+@media (max-width: 900px) {
+  .lost {
+    align-items: flex-end;
+  }
+  .lost-photo img {
+    object-position: 50% 0%;
+  }
+  .lost::before {
+    background: linear-gradient(180deg, rgba(28, 10, 13, 0.35) 0%, rgba(28, 10, 13, 0) 18%, rgba(28, 10, 13, 0.15) 36%, rgba(28, 10, 13, 0.86) 58%, rgba(28, 10, 13, 0.97) 100%);
+  }
+  .lost-inner {
+    padding-top: 40vh;
+    padding-bottom: 28px;
+  }
+  .lost-copy {
+    max-width: 560px;
+  }
+  .lost-code {
+    font-size: clamp(76px, 20vw, 110px);
+    margin-left: -0.04em;
+  }
+  .lost-eyebrow {
+    margin-top: 14px;
+  }
+  .lost-eyebrow-more {
+    display: none;
+  }
+  .lost-title {
+    margin-top: 10px;
+    font-size: clamp(36px, 9.5vw, 52px);
+  }
+  .lost-lede {
+    margin-top: 12px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .lost-lede p + p {
+    margin-top: 8px;
+  }
+  .lost-invite {
+    margin-top: 12px !important;
+    font-size: 28px;
+  }
+  .lost-actions {
+    margin-top: 18px;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .lost-inner {
+    padding-top: 37vh;
+  }
+  .lost-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* short phones (an iPhone SE): everything still inside the fold */
+@media (max-width: 600px) and (max-height: 720px) {
+  .lost-inner {
+    padding-top: 30vh;
+    padding-bottom: 20px;
+  }
+  .lost-code {
+    font-size: 64px;
+  }
+  .lost-title {
+    font-size: 32px;
+  }
+  .lost-lede {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .lost-invite {
+    font-size: 24px;
+  }
+  .lost-actions {
+    margin-top: 14px;
+  }
+}
+
+/* short, wide screens (a mini laptop at 1366×768, a phone on its side): keep everything inside the fold */
+@media (max-height: 820px) and (min-width: 601px) {
+  .lost-inner {
+    padding-top: 88px;
+    padding-bottom: 32px;
+  }
+  .lost-code {
+    font-size: clamp(96px, 12vh, 160px);
+  }
+  .lost-eyebrow {
+    margin-top: 18px;
+  }
+  .lost-title {
+    font-size: clamp(36px, 5.2vh, 56px);
+  }
+  .lost-lede {
+    margin-top: 14px;
+  }
+  .lost-invite {
+    margin-top: 12px !important;
+  }
+  .lost-actions {
+    margin-top: 20px;
+  }
+}
+
+/* The 404 sits over a photo like the home hero, so until the bar scrolls (or the menu opens) it goes transparent there
+   too — the champagne mark, light links, the cream WhatsApp button — exactly as over the hero. Done in CSS off the
+   page's own marker so the first paint is already right (Nav.tsx can't know the page at render time). */
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) {
+  padding-top: 24px;
+}
+
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .nav-bar {
+  background: transparent;
+  backdrop-filter: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: #fff6f2;
+}
+
+:root:not([data-theme="dark"]) body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .logo-wine {
+  opacity: 0;
+}
+
+:root:not([data-theme="dark"]) body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .logo-champagne {
+  opacity: 1;
+}
+
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .bag-count,
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .nav-whatsapp {
+  background: #fff6f2;
+  color: #7a1b33;
 }
