@@ -6,8 +6,8 @@ the same rule, applied to `main` and to `dev`:
 - changes arrive only by pull request, merged as a merge commit (never squashed or rebased — the deploy job tells a
   merged pull request from a direct push by the merge commit);
 - the pull request's branch must be up to date with its base, and every check must pass on it: Branch rules, Lint and
-  types, Tests (1/6 … 6/6), Lighthouse (home, shop, product, about, help), CodeQL (javascript-typescript, actions) and
-  Dependency review;
+  types, Tests (1/6 … 6/6), Lighthouse (home, shop, product, about, help), CodeQL (javascript-typescript, actions), Dependency
+  review, Workflow lint and Secrets scan;
 - code scanning merge protection: a merge may not add a high-severity CodeQL finding or an analysis error;
 - review threads resolved; no force-pushes; the branch can't be deleted.
 

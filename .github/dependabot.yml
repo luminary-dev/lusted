@@ -12,6 +12,9 @@ updates:
       time: "06:00"
       timezone: Asia/Colombo
     open-pull-requests-limit: 5
+    # a version has to be a week old before it's proposed — most compromised releases are pulled within days
+    cooldown:
+      default-days: 7
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -26,6 +29,8 @@ updates:
       day: monday
       time: "06:00"
       timezone: Asia/Colombo
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ["*"]

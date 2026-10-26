@@ -100,6 +100,14 @@
           {
             "context": "Dependency review",
             "integration_id": 15368
+          },
+          {
+            "context": "Workflow lint",
+            "integration_id": 15368
+          },
+          {
+            "context": "Secrets scan",
+            "integration_id": 15368
           }
         ]
       }
