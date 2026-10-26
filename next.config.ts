@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
-import manifest from "./src/lib/image-manifest.json";
 
-// the photos come from Cloudflare R2 (scripts/images.mjs); the manifest carries the bucket's address, the env var overrides it
-const imageCdn = new URL(process.env.NEXT_PUBLIC_IMAGE_CDN || manifest.cdn);
+// The photos are served from the site's own origin (/img, read from a private R2 bucket — src/app/img). Only when
+// NEXT_PUBLIC_IMAGE_CDN names a public address instead does next/image need that host allowed.
+const imageCdn = process.env.NEXT_PUBLIC_IMAGE_CDN ? new URL(process.env.NEXT_PUBLIC_IMAGE_CDN) : null;
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -10,10 +10,7 @@ const nextConfig: NextConfig = {
   // lets a phone on the laptop's iPhone hotspot (172.20.10.x) load the dev server's scripts and live reload
   allowedDevOrigins: ["172.20.10.3", "172.20.10.*"],
   images: {
-    remotePatterns: [{ protocol: imageCdn.protocol.replace(":", "") as "http" | "https", hostname: imageCdn.hostname, port: imageCdn.port }],
-    // only for a local stand-in for the bucket (NEXT_PUBLIC_IMAGE_CDN=http://127.0.0.1:…, e.g. the tests on a laptop):
-    // Next refuses loopback addresses otherwise
-    dangerouslyAllowLocalIP: ["localhost", "127.0.0.1"].includes(imageCdn.hostname),
+    remotePatterns: imageCdn ? [{ protocol: imageCdn.protocol.replace(":", "") as "http" | "https", hostname: imageCdn.hostname, port: imageCdn.port }] : [],
     // AVIF first (about a third smaller than WebP for these soft, diffused photos at the same look; Next lowers the
     // AVIF quality by 20 under the hood, so q90 is AVIF 70), WebP where a browser can't take it.
     formats: ["image/avif", "image/webp"],

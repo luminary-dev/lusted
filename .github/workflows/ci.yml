@@ -15,9 +15,10 @@
 # request from dev. Pull requests are merged as merge commits, so the deploy job can tell a merged pull request from a
 # direct push and refuses to deploy the latter. GitHub's own rulesets for the same rules are in .github/rulesets.
 #
-# A newer push to the same branch cancels the run in progress. The deploy jobs need VERCEL_TOKEN (any scope — a
-# team-scoped token is fine, the commands avoid the CLI's identity call), VERCEL_ORG_ID (the team id) and
-# VERCEL_PROJECT_ID in the repository's secrets.
+# A newer push to the same branch cancels the run in progress. Secrets: the test and Lighthouse servers read the photos
+# from the private R2 bucket with R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY; the deploy jobs
+# need VERCEL_TOKEN (any scope — a team-scoped token is fine, the commands avoid the CLI's identity call),
+# VERCEL_ORG_ID (the team id) and VERCEL_PROJECT_ID.
 name: CI
 
 on:
@@ -151,6 +152,11 @@ jobs:
         run: npx playwright test --shard=${{ matrix.shard }}/6
         env:
           CI: "true"
+          # the served build reads the photos from the private bucket (src/app/img)
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
 
       - name: Upload the test report
         if: failure()
@@ -224,6 +230,11 @@ jobs:
       # judged by their best of the three runs (lighthouserc.json "optimistic") — a real regression shows in every
       # run, a runner hiccup in one.
       - name: Run Lighthouse
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           REVEAL_GATE=off npx next start -p 3200 > lighthouse-server.log 2>&1 &
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3200/ && break; sleep 1; done
