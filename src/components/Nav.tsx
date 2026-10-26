@@ -44,11 +44,12 @@ export default function Nav() {
   }, [home]);
 
   const isActive = (href: string) => (href.startsWith("/#") ? home && spy === href.slice(2) : pathname.startsWith(href));
-  // Transparent only while sitting over the home hero.
+  // Transparent only while sitting over the home hero. (The 404 sits over a photo too: globals.css lifts the solid look
+  // there with body:has(main.lost) until the bar scrolls or opens — hence the separate is-scrolled class.)
   const solid = scrolled || open || !home;
 
   return (
-    <header className={`nav ${solid ? "is-solid" : ""} ${open ? "is-open" : ""}`}>
+    <header className={`nav ${solid ? "is-solid" : ""} ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""}`}>
       <div className="container">
         <div className="nav-bar">
           <Link href="/" className="nav-logo" aria-label="Lusted — home" onClick={() => setOpen(false)}>

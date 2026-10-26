@@ -7362,3 +7362,32 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
     margin-top: 20px;
   }
 }
+
+/* The 404 sits over a photo like the home hero, so until the bar scrolls (or the menu opens) it goes transparent there
+   too — the champagne mark, light links, the cream WhatsApp button — exactly as over the hero. Done in CSS off the
+   page's own marker so the first paint is already right (Nav.tsx can't know the page at render time). */
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) {
+  padding-top: 24px;
+}
+
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .nav-bar {
+  background: transparent;
+  backdrop-filter: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: #fff6f2;
+}
+
+:root:not([data-theme="dark"]) body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .logo-wine {
+  opacity: 0;
+}
+
+:root:not([data-theme="dark"]) body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .logo-champagne {
+  opacity: 1;
+}
+
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .bag-count,
+body:has(main.lost) .nav.is-solid:not(.is-scrolled):not(.is-open) .nav-whatsapp {
+  background: #fff6f2;
+  color: #7a1b33;
+}
