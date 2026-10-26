@@ -59,7 +59,7 @@ test.describe("routes", () => {
 
   test("delivery, returns & FAQ: every section has questions that open in place, and its links go where they say", async ({ prepared: page }) => {
     await go(page, "/help");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Everything you’d ask");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Ask us anything");
     const ids = ["ordering", "payment", "delivery", "returns", "sizing", "privacy"];
     for (const id of ids) expect(await page.locator(`#${id} details`).count(), `questions in #${id}`).toBeGreaterThan(1);
     // the answers restate the terms: 7-day hygiene-safe exchanges, plain packaging
@@ -73,10 +73,12 @@ test.describe("routes", () => {
     await page.locator("#delivery summary", { hasText: "Will anyone know" }).click();
     await expect(page.locator("#delivery .faq-a", { hasText: "plain, unbranded box" })).toBeVisible();
     // links (answers are in the DOM even while closed)
-    const hrefs = await page.locator(".prose a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
+    const hrefs = await page.locator(".help-chapter a, .help-cta a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
     expect(hrefs.filter((h) => h.startsWith("https://wa.me/")).every((h) => h.includes(CATALOG.whatsapp))).toBe(true);
     for (const h of ["/#size-guide", "/privacy", "/terms"]) expect(hrefs).toContain(h);
-    await expect(page.locator(".legal-toc a")).toHaveCount(ids.length + 1);
+    await expect(page.locator(".help-index a")).toHaveCount(ids.length);
+    // every chapter has its photo
+    await expect(page.locator(".help-photo img")).toHaveCount(ids.length);
   });
 
   test("search engines: robots.txt points to a sitemap of every page, and pieces share their own photo", async ({ request, prepared: page }) => {
