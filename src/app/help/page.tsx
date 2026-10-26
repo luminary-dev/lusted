@@ -30,7 +30,7 @@ const photos = {
   delivery: img("images/help/delivery.webp"),
   returns: img("images/help/returns.webp"),
   sizing: img("images/help/sizing.webp"),
-  privacy: img("images/help/privacy.webp"),
+  privacy: img("images/help/between-us.webp"),
   closing: img("images/help/still-wondering.webp"),
 };
 

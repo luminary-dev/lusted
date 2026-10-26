@@ -140,6 +140,11 @@
       "h": 2160,
       "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADQAQCdASoIAAQAAoBCJYgCdAEQFAUlwAD++J6neAqyZQ/CuVDZLXc4XGE0k6O7PYjI0sAA"
     },
+    "images/help/between-us.webp": {
+      "w": 1371,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRtQAAABXRUJQVlA4WAoAAAAQAAAABwAACwAAQUxQSF0AAAAJgFvbtqpq4e7WAYPYiS1yOnD31HrQyELaoA6Hb6G7/zoiIkAyuxkAONINDUAEXQKwhMEBdAKQB+4AmxRO8PduB9UG0ds9yJdgmer43AOptcJfgeW/07e6fb4wDbsAVlA4IFAAAABQAgCdASoIAAwAAoBCJYwCdAYrT2WORZhsV6AA/uxZBD94XEedN98CJfD5AGm/eCqvzcZ7/CePRm417/5UvPXB+eeAopUQjn8Jzd/LyAAAAA=="
+    },
     "images/help/delivery.webp": {
       "w": 629,
       "h": 1969,
@@ -159,11 +164,6 @@
       "w": 2560,
       "h": 1680,
       "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJQBOgB5vdqIAAP75U2g/CL05o4AisKnEzFI0g+3Pmr4T9VaPWmNNSvqDkdUGAAA="
-    },
-    "images/help/privacy.webp": {
-      "w": 1347,
-      "h": 1968,
-      "blur": "data:image/webp;base64,UklGRtIAAABXRUJQVlA4WAoAAAAQAAAABwAACwAAQUxQSFkAAAAJcFvbtqKcccW9gVkU4KSTDmVYCiXQgRPRACkplbjG7hDSREQEyINDCyBdadj/MkEPiLrgAE0X6sARSKmwAnDAmMHvDMYIlGGA9wzwplquBpApjW/H/aTdAQBWUDggUgAAABACAJ0BKggADAACgEIljAJ0BioNs1j0+agA/uxYkvSM/Fxz8aM9ysvrKHvIxu1hTH6X/PCK7/Nxr3/sS+XzVztdnf0K8yjQnnDaBsIJFF4AAAA="
     },
     "images/help/returns.webp": {
       "w": 1025,
