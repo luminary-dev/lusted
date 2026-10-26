@@ -7743,19 +7743,20 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   margin-top: 32px;
 }
 
-/* 02 · she stands at the left, full height; the words on the right, number set right */
+/* 02 · she stands at the left edge; the words close beside her in long lines, number and title set right */
 .help-card[data-layout="left"] .help-model {
   top: 2%;
-  left: 1%;
-  bottom: 0; /* her feet (or the stool) on the card's bottom edge */
-  width: 46%;
+  left: 0;
+  bottom: 0; /* her feet on the card's bottom edge */
+  width: 34%;
   --anchor: 0% 100%;
 }
 .help-card[data-layout="left"] .help-card-head {
-  grid-column: 6 / 13;
+  grid-column: 5 / 13;
   text-align: right;
 }
 .help-card[data-layout="left"] .help-tease {
+  max-width: none;
   margin-left: auto;
 }
 .help-card[data-layout="left"] .help-tease::before {
@@ -7767,8 +7768,11 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   margin-right: -0.05em;
 }
 .help-card[data-layout="left"] .help-qs {
-  grid-column: 6 / 13;
+  grid-column: 5 / 13;
   margin-top: 32px;
+}
+.help-card[data-layout="left"] .help-qa dd p {
+  max-width: none; /* the lines run across to the card's edge */
 }
 
 /* 03 · the title across the top, she stands in the middle, the questions either side of her */
