@@ -45,6 +45,7 @@ type Chapter = {
   tease: string;
   layout: Layout;
   paper: string; // the card's colour
+  splitAt?: number; // on a two-column card, how many questions go in the first column (half by default)
   photo: { src: ReturnType<typeof img>; alt: string };
   items: Qa[];
 };
@@ -148,6 +149,7 @@ const chapters: Chapter[] = [
     tease: "It arrives looking like nothing at all. Then you open it.",
     layout: "split",
     paper: "#f3e1da",
+    splitAt: 4,
     photo: {
       src: photos.delivery,
       alt: "Model standing in a champagne silk robe fallen open over lavender lace, a plain brown box in her arms with its lid lifted an inch",
@@ -391,7 +393,7 @@ function Qas({ items }: { items: Qa[] }) {
 
 function ChapterCard({ c, i }: { c: Chapter; i: number }) {
   // the "split" and "corner" cards set the questions in two columns
-  const half = Math.ceil(c.items.length / 2);
+  const half = c.splitAt ?? Math.ceil(c.items.length / 2);
   const columns = c.layout === "split" || c.layout === "corner" ? [c.items.slice(0, half), c.items.slice(half)] : [c.items];
   return (
     <section
