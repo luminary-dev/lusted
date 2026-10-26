@@ -1,12 +1,18 @@
-# Every push to main and every pull request: lint, types, a production build, the whole Playwright suite (every
+# Every push to dev or main and every pull request: lint, types, a production build, the whole Playwright suite (every
 # route, section and viewport — see README "Tests") split across two machines, and Lighthouse on the main pages so
 # nothing quietly gets slower, less accessible or worse for search. The three jobs run side by side; a newer push to
 # the same branch cancels the run in progress.
+#
+# Branches and deploys (README "Deploy"):
+#   dev  — every push that passes deploys a Vercel preview and moves lusted-dev.vercel.app onto it (gate off there)
+#   main — production, lusted.vercel.app; deploys only when the push is a merge of dev, and a pull request into main
+#          from any branch other than dev fails its checks
+# The deploy jobs need VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID in the repository's secrets.
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
 
 concurrency:
@@ -17,6 +23,21 @@ permissions:
   contents: read
 
 jobs:
+  # main only takes merges from dev: a pull request into main from anywhere else goes red here
+  branch-rules:
+    name: Branch rules
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Only dev may be merged into main
+        run: |
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "::error::Pull requests into main must come from dev (this one is from '${{ github.head_ref }}')."
+            exit 1
+          fi
+          echo "From dev — fine."
+
   tests:
     name: Lint, types, build, tests (${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
@@ -102,3 +123,64 @@ jobs:
           path: .lighthouseci
           include-hidden-files: true # the folder's name starts with a dot
           retention-days: 14
+
+  # dev → a preview on Vercel, and lusted-dev.vercel.app moved onto it; main → production, only for a merge of dev.
+  # Deploys never cancel each other and run one at a time per branch, after the tests and Lighthouse have passed.
+  deploy:
+    name: Deploy (${{ github.ref_name }})
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+    needs: [tests, lighthouse]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: false
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the merge check below reads the commit's parents
+
+      - name: Check the Vercel secrets are there
+        run: |
+          for v in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!v}" ]; then echo "::error::Repository secret $v is not set (Settings → Secrets → Actions)."; exit 1; fi
+          done
+
+      # production only ever comes from dev: the commit on main must be a merge whose second parent is on dev
+      - name: Production deploys only from a merge of dev
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git fetch origin dev --quiet || { echo "::error::There is no dev branch to merge from."; exit 1; }
+          if [ "$(git rev-list --parents -n 1 HEAD | wc -w)" -lt 3 ]; then
+            echo "::error::This push to main is not a merge commit. Merge dev into main instead of pushing to main directly."
+            exit 1
+          fi
+          second="$(git rev-list --parents -n 1 HEAD | cut -d' ' -f3)"
+          if ! git merge-base --is-ancestor "$second" origin/dev; then
+            echo "::error::This merge did not come from dev (its second parent is not on dev). Only dev is merged into main."
+            exit 1
+          fi
+          echo "A merge of dev — deploying to production."
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Vercel builds the deployment itself from the source (so its build cache and image optimiser settings apply)
+      - name: Deploy a preview and move lusted-dev.vercel.app onto it
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          url="$(npx --yes vercel@latest deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -o 'https://[a-z0-9.-]*\.vercel\.app' | tail -1)"
+          [ -n "$url" ] || { echo "::error::Could not read the preview URL from the Vercel CLI."; exit 1; }
+          npx --yes vercel@latest alias set "$url" lusted-dev.vercel.app --token "$VERCEL_TOKEN"
+          echo "lusted-dev.vercel.app → $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
+          echo "lusted.vercel.app ← $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"

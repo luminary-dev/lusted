@@ -62,8 +62,25 @@ REVEAL_GATE=off npx @lhci/cli@0.15.1 autorun   # the Lighthouse step locally, af
 
 ## Deploy
 
-Hosted on Vercel as the `lusted` project.
+Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed by CI (`.github/workflows/ci.yml`):
+
+- **`dev`** — day-to-day work. Every push that passes lint, types, build, the test suite and Lighthouse is deployed as a
+  Vercel preview and **https://lusted-dev.vercel.app** is moved onto it. Vercel's Preview environment carries
+  `REVEAL_GATE=off`, so the dev site shows the real pages. (Preview deployments ask for a Vercel login unless
+  Deployment Protection is relaxed in the project settings.)
+- **`main`** — production, **https://lusted.vercel.app**, which shows the "Revealing soon" page until reveal day. Only
+  merges of `dev` reach it: a pull request into `main` from any other branch fails its checks, and the production
+  deploy job refuses a push to `main` that isn't a merge commit whose second parent is on `dev`.
+
+The release flow is therefore: work on `dev` → open a pull request `dev → main` → merge. CI needs three repository
+secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account → Tokens),
+`VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `.vercel/project.json` after `vercel link`).
+
+GitHub's own branch protection isn't available to this private repository on the organisation's free plan, so the
+rules above are enforced by the workflow rather than by GitHub; a direct push to `main` is not blocked, it just
+never deploys. To deploy by hand from a laptop:
 
 ```bash
-vercel deploy --prod
+vercel deploy --prod   # production
+vercel                 # a preview; then: vercel alias set <its url> lusted-dev.vercel.app
 ```
