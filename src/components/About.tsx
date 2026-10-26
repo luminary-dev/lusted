@@ -1,15 +1,16 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import silkSheets from "@/assets/images/about-wall/silk-sheets.webp";
-import doorway from "@/assets/images/about-wall/doorway.webp";
-import velvetChaise from "@/assets/images/about-wall/velvet-chaise.webp";
-import theBow from "@/assets/images/about-wall/the-bow.webp";
-import windowShot from "@/assets/images/about-wall/window.webp";
-import pearls from "@/assets/images/about-wall/pearls.webp";
-import poolside from "@/assets/images/about-wall/poolside.webp";
+const silkSheets = img("images/about-wall/silk-sheets.webp");
+const doorway = img("images/about-wall/doorway.webp");
+const velvetChaise = img("images/about-wall/velvet-chaise.webp");
+const theBow = img("images/about-wall/the-bow.webp");
+const windowShot = img("images/about-wall/window.webp");
+const pearls = img("images/about-wall/pearls.webp");
+const poolside = img("images/about-wall/poolside.webp");
 import { whatsappLink } from "@/lib/site";
 import PhotoWall from "./PhotoWall";
 import { ArrowRight, Box, ChatDouble, Bolt, Lock } from "./icons";
+import { img } from "@/lib/cdn";
 
 // About us as a photo wall: real prints taped to the wall, in two rows, beside a short story and the four promises.
 const promises = [

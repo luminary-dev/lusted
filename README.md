@@ -19,13 +19,14 @@ npm run lint
 
 ## Where things live
 
-- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description. Photos are `src/assets/products/<slug>.webp` with optional `-back` and `-side` views.
+- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos").
 - **Contact details** — `src/lib/site.ts`: WhatsApp number, Instagram, email, hours. Every button and link reads from here.
 - **Collection names and taglines** — `categories` in `src/lib/products.ts`.
 - **Colours, type and spacing** — CSS variables at the top of `src/app/globals.css`; dark mode is the `[data-theme="dark"]` block.
 - **Brand assets** — `brand/` (logo pack, icons, social images).
 - **Link previews and search engines** — `src/app/opengraph-image.png` is the brand card every shared link shows (product pages share their own front photo instead); `src/app/sitemap.ts` and `src/app/robots.ts` build `/sitemap.xml` and `/robots.txt`. Absolute URLs come from Vercel's production domain (`src/lib/site-url.ts`), so a custom domain is picked up without a code change. The reveal page is `noindex`.
-- **Adding product photos** — put the shots in `refs/krea/products/` as `<slug>-front|back|side.png` and run `node scripts/import-krea-products.mjs`: it enhances them (Real-ESRGAN, when the binary is in `.tools/realesrgan/`), crops to 9:16, watermarks them and refreshes the image map. Neither folder is in git.
+- **Photos** — every photo (products, hero, sections) lives outside git: in `assets/` on a laptop (git-ignored) and in the private Cloudflare R2 bucket `luminary-lusted`. The site serves them from its own origin, `/img/<path>` (`src/app/img/[...path]/route.ts` reads the bucket with a signed request and answers with a year-long immutable cache header, so Vercel's edge serves repeats), and `next/image` optimises them from there. The repository keeps `src/lib/image-manifest.json` — each photo's path, size and blur placeholder — and `img("images/hero/main/main-01.webp")` from `src/lib/cdn.ts` turns a path into what `next/image` needs; a path not in the manifest is never fetched. The bucket's keys are the four `R2_*` variables (`.env.local` locally; the Vercel project and the repository's Actions secrets hold the same). After adding or changing a photo: `node scripts/images.mjs manifest`, then `node scripts/images.mjs upload` (new and changed photos only) and `node scripts/images.mjs check`. On a fresh clone, `node scripts/images.mjs pull` fetches them all. Setting `NEXT_PUBLIC_IMAGE_CDN` to a public address serves them from there instead.
+- **Adding product photos** — put the shots in `refs/krea/products/` as `<slug>-front|back|side.png` and run `node scripts/import-krea-products.mjs`: it enhances them (Real-ESRGAN, when the binary is in `.tools/realesrgan/`), crops to 9:16, watermarks them into `assets/products/` and refreshes `product-images.ts`; then the manifest and upload steps above. Neither folder is in git.
 
 ## Performance
 

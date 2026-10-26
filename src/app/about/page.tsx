@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import dressingRoom from "@/assets/images/about-page/dressing-room.webp";
-import theParcel from "@/assets/images/about-page/the-parcel.webp";
-import theFitting from "@/assets/images/about-page/the-fitting.webp";
+const dressingRoom = img("images/about-page/dressing-room.webp");
+const theParcel = img("images/about-page/the-parcel.webp");
+const theFitting = img("images/about-page/the-fitting.webp");
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Box, Butterfly, ChatDouble, Heart, Lock, Sparkle } from "@/components/icons";
+import { img } from "@/lib/cdn";
 
 export const metadata: Metadata = {
   title: "About us — Lusted",

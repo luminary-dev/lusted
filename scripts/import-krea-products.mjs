@@ -1,5 +1,5 @@
 // Brings the Krea model shots into the shop: refs/krea/products/<slug>-<view>.png and refs/krea/bikini/<slug>-<view>.png
-// become src/assets/products/<slug>.webp (front) and <slug>-back|side.webp, then product-images.ts is re-synced.
+// become assets/products/<slug>.webp (front) and <slug>-back|side.webp, then product-images.ts is re-synced.
 // A product switches to model photography as soon as its front shot exists.
 //
 // Each photo is finished on the way in:
@@ -18,7 +18,7 @@ import path from "node:path";
 import sharp from "sharp";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const OUT = path.join(ROOT, "src/assets/products");
+const OUT = path.join(ROOT, "assets/products");
 const ALL = process.argv.includes("--all");
 const ESRGAN_WEIGHT = 0.75;
 

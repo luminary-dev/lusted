@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import footerImg from "@/assets/images/footer.webp";
+const footerImg = img("images/footer.webp");
 import wordmark from "@/assets/brand/wordmark-dark.png";
 import { collectionName } from "@/lib/products";
 import { emailLink, instagramLink, whatsappLink } from "@/lib/site";
 import Newsletter from "./Newsletter";
 import Year from "./Year";
 import { ArrowUpRight, Instagram, Mail, WhatsApp } from "./icons";
+import { img } from "@/lib/cdn";
 
 const columns = [
   {
