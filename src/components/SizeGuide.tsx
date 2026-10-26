@@ -113,7 +113,7 @@ export default function SizeGuide() {
               alt="Model in pearl-strand lingerie pulling a blush measuring tape around her waist"
               fill
               placeholder="blur"
-              sizes="(min-width: 900px) 30vw, 100vw"
+              sizes="(min-width: 901px) 900px, (min-width: 601px) 520px, 90vw"
             />
           </div>
         </div>

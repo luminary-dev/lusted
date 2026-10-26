@@ -31,7 +31,7 @@ export default function PdpGallery({ product }: { product: Product }) {
             fill
             preload={i === 0}
             placeholder="blur"
-            sizes="(min-width: 900px) 40vw, 100vw"
+            sizes="(min-width: 901px) and (max-height: 834px) 300px, (min-width: 901px) calc(56.25vh - 169px), (min-width: 521px) 460px, 90vw"
             className={`pdp-main-img ${i === active ? "is-active" : ""}`}
             aria-hidden={i !== active}
           />
@@ -49,7 +49,7 @@ export default function PdpGallery({ product }: { product: Product }) {
           {views.map((v, i) =>
             i === active ? null : (
               <button key={v.label} type="button" className="pdp-thumb" onClick={() => setActive(i)} aria-label={`Show the ${v.label.toLowerCase()} view`}>
-                <Image quality={80} src={v.src} alt="" fill placeholder="blur" sizes="120px" />
+                <Image quality={80} src={v.src} alt="" fill placeholder="blur" sizes="80px" />
                 <span>{v.label}</span>
               </button>
             ),

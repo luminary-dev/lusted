@@ -75,8 +75,9 @@ function HowPicture({ slide }: { slide: HowSlide }) {
   };
   const { props: phone } = getImageProps({
     ...common,
+    placeholder: "empty", // only its srcset is used; the blur under the <picture> is the wide photo's
     src: slide.phone,
-    sizes: "134vw",
+    sizes: "100vw",
   });
   const { props: wide } = getImageProps({
     ...common,

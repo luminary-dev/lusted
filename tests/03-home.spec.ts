@@ -58,7 +58,12 @@ test("after dark: the filmstrip band runs two strips of twenty frames, none shar
   expect(strips.length).toBe(40);
   for (const f of strips) expect(top).not.toContain(f);
   const img = band.locator(".strip img").first();
-  await expect.poll(() => img.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 300)).toBe(true);
+  // loaded, and the file picked from the srcset covers the frame at this screen's pixel density
+  await expect
+    .poll(() =>
+      img.evaluate((i: HTMLImageElement) => i.complete && Number(new URL(i.currentSrc).searchParams.get("w")) >= i.getBoundingClientRect().width * devicePixelRatio),
+    )
+    .toBe(true);
 });
 
 test("after dark reel: a tapped frame lifts its row over the blurred page, still gliding, with its line and the way to every piece", async ({ prepared: page }) => {

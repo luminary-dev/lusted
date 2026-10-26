@@ -41,8 +41,15 @@ function Frames({
             src={s.src}
             alt={dup ? "" : s.alt}
             fill
-            sizes="(max-width: 900px) 64vw, 29vw"
-            placeholder="blur"
+            // the frame widths in globals.css: --card on .strip, larger on .reel-stage .strip
+            sizes={
+              as === "button"
+                ? "(max-width: 1111px) 200px, (min-width: 1611px) 290px, 18vw"
+                : "(max-width: 862px) 250px, (min-width: 1586px) 460px, 29vw"
+            }
+            // a copy only comes into view after its original has already loaded and been on screen, so its blur
+            // placeholder would never show — leaving it out keeps 40 of them out of the page
+            placeholder={dup ? "empty" : "blur"}
             quality={75}
           />
         );

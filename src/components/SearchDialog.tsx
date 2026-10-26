@@ -10,9 +10,13 @@ import { ArrowRight, Close, Search } from "./icons";
 
 // Open state lives in a tiny module store so the header button and keyboard shortcut share it.
 let open = false;
+// The result thumbnails are only rendered once search has been opened: the closed dialog is still in the layout (it
+// fades), so its images would otherwise download on every page load, ahead of what's actually on screen.
+let opened = false;
 const listeners = new Set<() => void>();
 export function setSearchOpen(next: boolean) {
   open = next;
+  if (next) opened = true;
   listeners.forEach((l) => l());
 }
 const useSearchOpen = () =>
@@ -102,7 +106,7 @@ export default function SearchDialog() {
               <li key={p.slug}>
                 <Link href={`/products/${p.slug}`} onClick={close}>
                   <span className="search-thumb">
-                    <Image src={p.image} alt="" fill sizes="56px" />
+                    {opened && <Image src={p.image} alt="" fill sizes="56px" />}
                   </span>
                   <span className="search-name">
                     <strong>{p.name}</strong>

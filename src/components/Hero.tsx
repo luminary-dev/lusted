@@ -6,10 +6,14 @@ import HeroSlides from "./HeroSlides";
 import ScrollCue from "./ScrollCue";
 import { ArrowRight, WhatsApp } from "./icons";
 
+// The phone cuts only lend their srcset to the slideshow (the blur placeholder is the wide photo's), so their blur
+// data isn't sent to the browser — 27 of them would be ~12 KB of page for nothing.
+const slides = heroSlides.map((s) => (s.phone ? { ...s, phone: { ...s.phone, blurDataURL: undefined } } : s));
+
 export default function Hero() {
   return (
     <section id="top" className="hero">
-      <HeroSlides slides={heroSlides} />
+      <HeroSlides slides={slides} />
       <div className="container hero-inner">
         <div className="hero-copy">
           <p className="eyebrow" data-reveal>

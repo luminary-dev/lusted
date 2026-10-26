@@ -25,7 +25,7 @@ export default function BestSellers() {
         <div className="product-grid best-grid">
           {bestSellers.slice(0, 6).map((p, i) => (
             <div key={p.slug} data-reveal style={{ "--d": `${(i % 3) * 0.08}s` } as React.CSSProperties}>
-              <ProductCard product={p} sizes="(min-width: 900px) 30vw, 50vw" />
+              <ProductCard product={p} sizes="(min-width: 1460px) 430px, (min-width: 901px) 30vw, 44vw" />
             </div>
           ))}
         </div>

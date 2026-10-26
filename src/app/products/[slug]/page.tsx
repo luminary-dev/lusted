@@ -82,7 +82,7 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
           </header>
           <div className="product-grid related-grid">
             {related.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+              <ProductCard key={p.slug} product={p} sizes="(min-width: 1460px) 320px, (min-width: 1081px) 22vw, 44vw" />
             ))}
           </div>
         </section>

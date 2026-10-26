@@ -4,6 +4,9 @@ import HowSlides from "./HowSlides";
 import ScrollCue from "./ScrollCue";
 import { ArrowRight } from "./icons";
 
+// the phone cuts only lend their srcset (the blur placeholder is the wide photo's), so their blur data stays here
+const slides = howSlides.map((s) => ({ ...s, phone: { ...s.phone, blurDataURL: undefined } }));
+
 const steps = [
   { title: "Choose your pieces", text: "Browse lingerie, swim and after dark, and save everything that makes your pulse race." },
   {
@@ -19,7 +22,7 @@ export default function HowItWorks() {
   return (
     <section id="ordering" className="section how">
       <div className="how-media">
-        <HowSlides slides={howSlides} />
+        <HowSlides slides={slides} />
       </div>
       <div className="container how-inner">
         <div className="how-copy" data-reveal>

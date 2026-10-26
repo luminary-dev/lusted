@@ -99,7 +99,8 @@ export default function HeroSlides({
                         : "lazy"
                   }
                   placeholder="blur"
-                  sizes="(max-width: 600px) 190vw, (max-aspect-ratio: 1/1) 130vh, 100vw"
+                  fetchPriority={priority && i === 0 ? undefined : "low"}
+                  sizes="(max-aspect-ratio: 16/9) 190vh, 100vw"
                 />
               ))}
           </div>
@@ -126,6 +127,8 @@ function HeroPicture({
     quality: 90,
     placeholder: "blur" as const,
     preload: priority,
+    // the slides after the first are fetched straight away (they must be ready in time) but behind everything on screen
+    fetchPriority: priority ? undefined : ("low" as const),
     loading: priority
       ? undefined
       : eager
@@ -134,13 +137,14 @@ function HeroPicture({
   };
   const { props: phone } = getImageProps({
     ...common,
+    placeholder: "empty", // only its srcset is used; the blur under the <picture> is the wide photo's
     src: slide.phone!,
-    sizes: "100vw",
+    sizes: "(max-aspect-ratio: 9/16) 60vh, 107vw",
   });
   const { props: wide } = getImageProps({
     ...common,
     src: slide.src,
-    sizes: "(max-aspect-ratio: 1/1) 130vh, 100vw",
+    sizes: "(max-aspect-ratio: 16/9) 190vh, 100vw",
   });
   return (
     <picture>

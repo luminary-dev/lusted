@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import { useEffect, useRef } from "react";
 import wordmark from "@/assets/brand/wordmark-dark.png";
 
@@ -11,6 +11,10 @@ import wordmark from "@/assets/brand/wordmark-dark.png";
 const MIN_MS = 2000;
 // how long the curtains take to clear (CSS: 0.15 s delay + 1.9 s draw) before the overlay is removed
 const OPEN_MS = 2150;
+
+// The satin shine is masked to the wordmark's shape. The mask is the optimised logo — the same 640px file a retina
+// screen already loads for the logo itself — rather than the 220 KB source PNG.
+const logoMask = getImageProps({ src: wordmark, alt: "", width: 320 }).props.src;
 
 // rose-gold dust motes — fixed values (no Math.random) so the server and the browser render the same thing
 const motes = Array.from({ length: 14 }, (_, i) => ({
@@ -53,7 +57,7 @@ export default function LoadingScreen() {
   }, []);
 
   return (
-    <div ref={ref} className="intro" aria-hidden="true" style={{ "--logo": `url(${wordmark.src})` } as React.CSSProperties}>
+    <div ref={ref} className="intro" aria-hidden="true" style={{ "--logo": `url(${logoMask})` } as React.CSSProperties}>
       <div className="intro-curtain is-left" />
       <div className="intro-curtain is-right" />
       <span className="intro-seam" />

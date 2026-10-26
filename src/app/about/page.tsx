@@ -45,7 +45,7 @@ export default function AboutPage() {
               fill
               preload
               placeholder="blur"
-              sizes="(min-width: 1400px) 1320px, 100vw"
+              sizes="(min-width: 1467px) 1320px, (min-width: 901px) 90vw, 158vw"
             />
           </div>
           <div className="about-hero-copy">
@@ -112,7 +112,7 @@ export default function AboutPage() {
                   alt="Model kneeling on silk sheets in a blush satin robe, lifting a lace bra from the tissue in a plain box"
                   fill
                   placeholder="blur"
-                  sizes="(min-width: 900px) 30vw, 60vw"
+                  sizes="(min-width: 1450px) 335px, (min-width: 901px) 23vw, (min-width: 601px) 300px, 51vw"
                   style={{ objectPosition: "50% 40%" }}
                 />
               </div>
@@ -127,7 +127,7 @@ export default function AboutPage() {
                   alt="Model at a candlelit vanity mirror in a wine lace set with garters, a tailor's measuring tape round her neck, looking back over her shoulder"
                   fill
                   placeholder="blur"
-                  sizes="(min-width: 900px) 30vw, 60vw"
+                  sizes="(min-width: 1450px) 335px, (min-width: 901px) 23vw, (min-width: 601px) 300px, 51vw"
                   style={{ objectPosition: "50% 30%" }}
                 />
               </div>

@@ -85,7 +85,7 @@ export default function Collections() {
                 alt={c.alt}
                 fill
                 placeholder="blur"
-                sizes="(min-width: 900px) 30vw, 100vw"
+                sizes="(min-width: 1460px) 425px, (min-width: 901px) 30vw, (min-width: 601px) 440px, 90vw"
                 className="col-card-img"
               />
               <span className="col-badge">

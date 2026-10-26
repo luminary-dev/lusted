@@ -72,7 +72,7 @@ function QuickAdd({ product, color }: { product: Product; color: ColorKey }) {
 export default function ProductCard({
   product,
   color: initialColor,
-  sizes = "(min-width: 1080px) 24vw, (min-width: 700px) 32vw, 50vw",
+  sizes = "(min-width: 1500px) 340px, (min-width: 901px) 23vw, 44vw",
 }: {
   product: Product;
   color?: ColorKey; // start on this colourway (e.g. the colour the shop is filtered by)

@@ -41,8 +41,8 @@ export default function SaleCard({ product: p, tint, index }: { product: Product
       style={{ "--d": `${index * 0.08}s`, "--tint": tint } as React.CSSProperties}
     >
       <span className="sale-card-media">
-        <Image quality={90} src={p.image} alt={p.name} fill placeholder="blur" sizes="(min-width: 900px) 30vw, 66vw" className="sale-card-img" />
-        {p.backImage && <Image quality={90} src={p.backImage} alt="" fill sizes="(min-width: 900px) 30vw, 66vw" className="sale-card-img sale-card-back" />}
+        <Image quality={90} src={p.image} alt={p.name} fill placeholder="blur" sizes="(min-width: 1460px) 440px, (min-width: 761px) 30vw, 61vw" className="sale-card-img" />
+        {p.backImage && <Image quality={90} src={p.backImage} alt="" fill sizes="(min-width: 1460px) 440px, (min-width: 761px) 30vw, 61vw" className="sale-card-img sale-card-back" />}
       </span>
       <span className="sale-card-sheen" aria-hidden="true" />
       <div className="sale-card-body">
