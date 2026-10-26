@@ -100,4 +100,5 @@ jobs:
         with:
           name: lighthouse
           path: .lighthouseci
+          include-hidden-files: true # the folder's name starts with a dot
           retention-days: 14
