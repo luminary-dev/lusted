@@ -140,40 +140,40 @@
       "h": 2160,
       "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADQAQCdASoIAAQAAoBCJYgCdAEQFAUlwAD++J6neAqyZQ/CuVDZLXc4XGE0k6O7PYjI0sAA"
     },
+    "images/help/delivery.webp": {
+      "w": 629,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRngBAABXRUJQVlA4WAoAAAAQAAAABwAAGAAAQUxQSKsAAAABgGNt2zHnmZnY5gLSpbJtO6mSyurMyraxBPV2Ktu2U42e4ttEREwAIMnNgJhJ+gir5CQA6SXZBsCd5G0k0EWSKkv7G4HOIST5vRQXIMjVVQkC2aw1JSjdMC30A1fCLDSUJJ9WYPdFsnkbjlsnPAs+RuDCKFuSbpC+VMKprHcULRfxt/QPdWuJ/K9XyXr2gpTPw7TQcDCZe8+aMARQoDbRlQBoYCIASIvbnQAAVlA4IKYAAABQBACdASoIABkAPrVKn0onJCKhsAgA4BaJYgCdMoRwAc/g7CLELkRyTC14AP7s6cUmul6iiQ66PJJ8j00ltWK6UjalprTHJfcHZkTig2ye1JA9yl/kv8WCWdXnoYb2UsO8fMvtGKE1zyJ+Im/4C1Q2mnv5neENxvMvu9vIhkjhc2kgGeu4FpXgSffzEl0P1gY9HNM121KwSfimj21SVrEnUKwHQAAA"
+    },
+    "images/help/ordering.webp": {
+      "w": 1018,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRgIBAABXRUJQVlA4WAoAAAAQAAAABwAADwAAQUxQSHsAAAABgFtt27LmxqV0d++odAAOFVQcFoAZNEnpyQY5qXSElO5p3d1q1zc2RERMANDbw1+PfDgBVf1MhgF2RaQNrIpIBdiSj8MIEHh4H1OBrySyDqMiIveQHpi5klktaLPjrzVAna/OTf/JlYubSVCmC8XUkhXMNpOxMcK/xjoAVlA4IGAAAADwAQCdASoIABAAAoBCJQBOgMWCx3Bvs9AA/tJexMP7iq58f4y8BJs8ZaY1oUJjr4BW+enfAx/ipKfgK3sbSrgvXlsdYXxVaQLOh0UcocAXEKRJQ63GToaQ6temyKrgAAA="
+    },
+    "images/help/payment.webp": {
+      "w": 590,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRmwBAABXRUJQVlA4WAoAAAAQAAAABwAAGgAAQUxQSJ8AAAABgKpt//nn/aW/bbb/P2rmGWzVOwDbW7Larn8fmtISku24xGQv8Q2f30FExAQA9oliyHF+mcQyWSQWyXoA5mvyskFBB2USayoVOBebfY4/khctKWWb5HCqVzkhOXWgKyTJNx+6xRxQLYaByD/JAgBn5AoATPAvJqq4ClnIJZVMMls4ftkusMdJlaHnWZWMu8+o0Pz8lAjP922rsA/0hwEAVlA4IKYAAABwBACdASoIABsAPrVKn0onJCKhsAgA4BaJYwCdMoMxg0bR2axrB6AH2NjOgAD+wPUm/CMQ+a5Hcy4C044QkfgV7WYdg02LOA58mA+tRg+Xbh8hBa2ETNaIAZT5FKngp55wTKOtBi4C6WRs6nf/7bkql6lRbzb3vMjBFR85LjTl4J4eE3fqqWchj8NzDhpyAWWVfC2OAwfc7gjEWdnHLu4KUq+LqAAA"
+    },
     "images/help/pillow-talk.webp": {
       "w": 2560,
       "h": 1680,
       "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJQBOgB5vdqIAAP75U2g/CL05o4AisKnEzFI0g+3Pmr4T9VaPWmNNSvqDkdUGAAA="
     },
-    "images/help/standin-delivery.webp": {
-      "w": 620,
-      "h": 1406,
-      "blur": "data:image/webp;base64,UklGRhQBAABXRUJQVlA4WAoAAAAQAAAABwAAEQAAQUxQSIkAAAABgKpt+/rk2X/J3T25+5asUrlIHMQiF43mkNyhs7iLg6A6zUnu9v9OIyICNJNdAOzqfVAh0pv++B+3aEafL+5kN6KQ+JLfyzEF+5EsZ6+jsCAHa0NAV2SgBUKqSBHoiyoeSKsne6KHhfvIiOhgbwLbQwP6PVichv0aDG/DIArJFdhzQ/MQAGItAABWUDggZAAAAHADAJ0BKggAEgA+tUieSackIqEwCADgFolAE6XrkD2rlARmAAD+zeYsN0E66+305xM9E54TmTfOgtBWeXcapj6ysci5gEvizqTBwx9nA+835htn9MP6W2X130ERrSAryE4AAAA="
+    "images/help/privacy.webp": {
+      "w": 1347,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRtYAAABXRUJQVlA4WAoAAAAQAAAABwAACwAAQUxQSFsAAAABgGJb27LqwUk0d48sZmLNdQAsqjtMgkyn08g2BjqLrgfunURETIBk3oz1P83d8a8HRUn+A8wkrYGbQeoC2KXsB8hI9SM8fFK7A1yCqhYArqnt6R8x53C/mzWbAFZQOCBUAAAAMAIAnQEqCAAMAAKAQiWMAnQBHwfrPIFEYYAA/uxa5C2DJ9dsiqOjSaa5UNJYGt2H2Fb/+nvO33/4Ad/aCberOHl7il/9Cx6nHjE84bQNhBIovAAA"
     },
-    "images/help/standin-ordering.webp": {
-      "w": 895,
-      "h": 1460,
-      "blur": "data:image/webp;base64,UklGRswAAABXRUJQVlA4WAoAAAAQAAAABwAADAAAQUxQSFwAAAABcFpt27K8SIMhPDKBa6WSnM4KbODNvXlzS2RfwB2qfzpERAQASAsyAGpHQS6AQpz1P+Mk8yRnmqa5+GEhZFWEXGyNrgMqfqHNhKoReiaEAE6E/hWNIdzqt/0OLVZQOCBKAAAA8AEAnQEqCAANAAKAQiWwAnQBA/rfAS4AAP7w6INKW44hQ2VGkAmVRarqO5vt6DyDv8ws4wqwZKl01Rzri6JIjS9tvqTXjPUAAAA="
+    "images/help/returns.webp": {
+      "w": 1025,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRvoAAABXRUJQVlA4WAoAAAAQAAAABwAADwAAQUxQSHQAAAABcCJb27I8uGRYAkOyTiQ6JOZvONnd3VZAIzIsgKGzBbpDIjsPtoiImAAAynEdv3bSCGjVbjICjOJmcilgcFmQ9CLG3xySfwJInsj7TYDesuZmawUw5asMABPyZgD8Z5IxFPhr8/FvZE5yFWJbV54JMrFOA1ZQOCBgAAAAEAIAnQEqCAAQAAKAQiWIAnQGKtZFGzZsAAD+8bsVLQeFtix/g5qP85uOvIYb2B+ZaYkqkLvK02oCzl5LX9xvV8JqxrqsqerCnrIBGn/EbuRAxsyyGwaamuwL0P5CQYAA"
     },
-    "images/help/standin-payment.webp": {
-      "w": 718,
-      "h": 1452,
-      "blur": "data:image/webp;base64,UklGRvYAAABXRUJQVlA4WAoAAAAQAAAABwAADwAAQUxQSHIAAAABcFNt27LcuLs7JCCAVyCCF9AAjBw2nZjdApCBzUdIwGq/lYiICQAMwxLKjPBUKWaCEFb0BaEEONeCEAFyR+HjBZqtqbBXAzQEIQ3Ufv9HAuK/Qe8EqBqv8hlAnTq8rSjNj5TCZJ2DSmdQcfartRoodi1WUDggXgAAADACAJ0BKggAEAACgEIloAJ0Bi8NsvUO3qsgAP7u4x2+u7Q2J+VjCt/GOmv3cvrUAjVUUKTIbBWfaMc20ehte/ut9RjT9VbLO2b9usKVbPw/+OaRDPcXi4EmY+iVAAA="
-    },
-    "images/help/standin-privacy.webp": {
-      "w": 1368,
-      "h": 1463,
-      "blur": "data:image/webp;base64,UklGRrgAAABXRUJQVlA4WAoAAAAQAAAABwAACAAAQUxQSEkAAAAAAAB/SQYAAAAAD8PKEAAAAACR//kcAAAAhv///+1eDQAt0//////7vACg1v/////zAIA2/v//+VAAZy3y/7syAABsDniDAAAAAFZQOCBIAAAAMAIAnQEqCAAJAAKAQiWoAnRH/4F5nVNDf2AA+8vTNSGsRzcjL+9P4m+nwEQP0EmB2VWI5iRh7UIokXP7fCxHeqWbjcEVoAAA"
-    },
-    "images/help/standin-returns.webp": {
-      "w": 1147,
-      "h": 1433,
-      "blur": "data:image/webp;base64,UklGRq4AAABXRUJQVlA4WAoAAAAQAAAABwAACQAAQUxQSEoAAAAJcFNt27Lcv/v/zzraKoShAJtVIIFLBTIwu45sVKAA61siIgKIZ8MfQNE/ZrKijkRj+pGcO4Dl0UqhH2Jp2DlSc32Dfx/895NvD1ZQOCA+AAAA0AEAnQEqCAAKAAKAQiWIAnQAt+9olIAA+64PFCdaiu2hW2rtifsjRfADR9U77aqTGZ62MK6F8jt+h1QYAAA="
-    },
-    "images/help/standin-sizing.webp": {
-      "w": 944,
-      "h": 1426,
-      "blur": "data:image/webp;base64,UklGRs4AAABXRUJQVlA4WAoAAAAQAAAABwAACwAAQUxQSFoAAAABcFtr25o8SaosYHhL6VJJ6W4dh4WoHCZwGIGWnkHS4fotEREB5KqAGpg93qdsgPXnfZllUujB1PPQA3A7XYCm8zmGACqfvCnpp4osz4oYg4UmQ6sZkRiePgBWUDggTgAAAPABAJ0BKggADAACgEIloAJ0ugACso3AAAD+X20GiqX/srY29NUy/2BBS97SqSxGo4/pTmLunYTzWWZLAKB+vxFvPoUbGSTfFyH1CAAAAA=="
+    "images/help/sizing.webp": {
+      "w": 587,
+      "h": 2000,
+      "blur": "data:image/webp;base64,UklGRooBAABXRUJQVlA4WAoAAAAQAAAABwAAGgAAQUxQSLIAAAABkGtr27FHV5xUdmc7qW3b6VWnY2encw7BKq3KtlNp7LkHJxEREwC2TRn8P6xvtv+t6nceEPxdl15Ajj642QDV0oIRsClp0giXn8/SN0cqbtKlaeh7N/pbY2CV0i+pDRzOpO08aJRUC9RJ2gYsv0gKAa4ljQD3OtBnGziV67yq4eKaMtVg/rWbrScLIpTqoyaIV2T5FxfwkP/AAGD8rfAtDuB2TJaA0ee7RwvAIC+4KgwAVlA4ILIAAACwBACdASoIABsAPrVKn0onJCKhsAgA4BaJQBOj+EfMDxlPKxYKSeGXDv89PKgAAP7mO/+zyjSmvLuMbY+9rD4ZQdQvMEXZikxJL5tZaX3p7ouEjJHNHGOlrETiBwA57n6PLqkuk3CLrrYFV3yQzXe1CHAfVBX95K/7lzo3/HXGA5c+musCMy+t79JQC/mAh8N0x1vEk2A/YOQpEJEOnMTdv+IG+44k7924ohtzhhBxtAAA"
     },
     "images/help/still-wondering.webp": {
       "w": 2560,

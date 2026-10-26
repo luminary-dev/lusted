@@ -19,19 +19,18 @@ export const metadata: Metadata = {
 // decided there (delivery times, fees, payment methods) is confirmed with the customer on WhatsApp, and the answers say
 // so rather than promise it.
 //
-// PHOTOS: the chapter models are shot on a pure white seamless backdrop and multiplied onto the card (mix-blend-mode),
-// so the white disappears into the paper and nothing has to be cut out; where she stands is CSS. Until the "Pillow
-// talk" renders are made (about-wall/help-prompt.txt, HELP-1…6) these are stand-ins cut from the hero photos; the alt
-// texts describe the photos to come. The opener and the closing card have their real photos (HELP-0 and HELP-7); --pos
-// and --pos-m are where she is in each, the focal point on a laptop and on a phone.
+// PHOTOS: the chapter models are cut-outs (transparent webp, trimmed to her outline) from the "Pillow talk" renders
+// (about-wall/help-prompt.txt, HELP-1…6, shot on a plain backdrop and cut out with rembg), so the card colour and where
+// she stands are CSS. The opener and the closing card are the wide photos (HELP-0 and HELP-7); --pos and --pos-m are
+// where she is in each, the focal point on a laptop and on a phone.
 const photos = {
   opener: img("images/help/pillow-talk.webp"),
-  ordering: img("images/help/standin-ordering.webp"),
-  payment: img("images/help/standin-payment.webp"),
-  delivery: img("images/help/standin-delivery.webp"),
-  returns: img("images/help/standin-returns.webp"),
-  sizing: img("images/help/standin-sizing.webp"),
-  privacy: img("images/help/standin-privacy.webp"),
+  ordering: img("images/help/ordering.webp"),
+  payment: img("images/help/payment.webp"),
+  delivery: img("images/help/delivery.webp"),
+  returns: img("images/help/returns.webp"),
+  sizing: img("images/help/sizing.webp"),
+  privacy: img("images/help/privacy.webp"),
   closing: img("images/help/still-wondering.webp"),
 };
 
