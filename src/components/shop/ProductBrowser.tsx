@@ -238,6 +238,8 @@ export default function ProductBrowser() {
 
           {results.length ? (
             <>
+              {/* the cards' names are h3s; this keeps the outline h1 → h2 → h3 (the Filters h2 is hidden on desktop) */}
+              <h2 className="sr-only">Pieces</h2>
               <div className="product-grid">
                 {shown.map((p) => {
                   const color = p.colors.find((c) => selColors.includes(c)); // filtered by colour → show that colourway

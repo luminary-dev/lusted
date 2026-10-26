@@ -55,8 +55,14 @@ test.describe("product page", () => {
     await page.getByRole("button", { name: /Add to bag/ }).click();
     await expect(page.locator(".buy-warn")).toHaveText("Please choose a size");
     await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
+    // the WhatsApp button is always a real link (crawlable, reachable by keyboard), but without a size a click only
+    // asks for one — nothing opens
     const wa = page.locator(".buy-whatsapp");
-    expect(await wa.getAttribute("href")).toBeNull();
+    expect(await wa.getAttribute("href")).toContain(`wa.me/${CATALOG.whatsapp}`);
+    const popup = page.context().waitForEvent("page", { timeout: 1500 }).catch(() => null);
+    await wa.click();
+    expect(await popup).toBeNull();
+    await expect(page.locator(".buy-warn")).toHaveText("Please choose a size");
     await page.locator(".pdp-info .size-chips").getByRole("button", { name: "M", exact: true }).click();
     await expect(page.locator(".buy-warn")).toHaveCount(0);
     const href = (await wa.getAttribute("href"))!;
