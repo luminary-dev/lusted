@@ -8,12 +8,12 @@ import { ArrowRight } from "./icons";
 const slides = howSlides.map((s) => ({ ...s, phone: { ...s.phone, blurDataURL: undefined } }));
 
 const steps = [
-  { title: "Choose your pieces", text: "Browse lingerie, swim and after dark, and save everything that makes your pulse race." },
+  { title: "Pick what you’ll be caught in", text: "Lingerie, swim, after dark — save everything that makes you want to be seen in it, and seen out of it." },
   {
-    title: "Message us your picks",
-    text: "Send them to us on WhatsApp — we’ll help you find your perfect fit and confirm price and availability, personally.",
+    title: "Whisper us your picks",
+    text: "Send them on WhatsApp. A real person confirms your size, the price and that it’s here — and never asks who it’s for.",
   },
-  { title: "Discreet delivery", text: "Pay securely, and your order arrives in plain, unbranded packaging." },
+  { title: "Arrives looking innocent", text: "Pay securely, and it turns up in a plain box with nothing on the outside. What’s inside is nobody’s business but yours." },
 ];
 
 // Full-width 16:9 campaign photos (src/lib/how-slides.ts) with the models on the left, slowly changing over
@@ -26,11 +26,11 @@ export default function HowItWorks() {
       </div>
       <div className="container how-inner">
         <div className="how-copy" data-reveal>
-          <p className="eyebrow">How it works</p>
+          <p className="eyebrow">How it happens</p>
           <h2 className="h2">
-            From desire <em>to your door</em>
+            From wanting it <em>to wearing it</em>
           </h2>
-          <p className="how-lede">Three easy, private steps — no accounts, no checkout forms, just us.</p>
+          <p className="how-lede">Three private steps — no accounts, no forms, no one watching. Except us.</p>
 
           <ol className="how-steps">
             {steps.map((s, i) => (

@@ -10,8 +10,8 @@ import { img } from "@/lib/cdn";
 
 export const metadata: Metadata = {
   title: "Lusted — Revealing soon",
-  description: "Something is being wrapped. Lingerie, swim and after dark — made to tempt, sent to be our secret. Revealing 1 November.",
-  openGraph: { title: "Lusted — Revealing soon", description: "Something is being wrapped. Revealing 1 November." },
+  description: "Something is being unwrapped. Lingerie, swim and after dark — made to tempt, cut to come off, sent so no one knows. Revealing 1 November.",
+  openGraph: { title: "Lusted — Revealing soon", description: "Something is being unwrapped. Revealing 1 November." },
   // a teaser, not a page to be found by: until reveal day it stands in for every URL, and those shouldn't be indexed
   // as copies of it; afterwards /revealing-soon itself stays out of search results
   robots: { index: false, follow: true },
@@ -35,11 +35,11 @@ export default function RevealingSoon() {
       <Image quality={90} src={group} alt="" fill preload placeholder="blur" sizes="100vw" className="reveal-bg" />
       <div className="reveal-inner">
         <Image src={wordmark} alt="Lusted Lingerie" className="reveal-logo" priority sizes="(max-width: 600px) 72vw, 420px" />
-        <p className="eyebrow reveal-eyebrow">Something is being wrapped</p>
+        <p className="eyebrow reveal-eyebrow">Something is being unwrapped</p>
         <h1 className="h1 reveal-title">
           Revealing <em>soon.</em>
         </h1>
-        <p className="reveal-lede">Lingerie, swim and after dark — made to tempt, sent to be our secret. Plain box, private ordering, a real person on the other end.</p>
+        <p className="reveal-lede">Lingerie, swim and after dark — made to tempt, cut to come off, sent so no one knows. Plain box, private ordering, a real person on the other end who won’t blush.</p>
 
         <RevealCountdown at={site.revealAt} />
         <p className="reveal-date">{revealDate}</p>
@@ -54,7 +54,7 @@ export default function RevealingSoon() {
         </div>
 
         <div className="reveal-news">
-          <p className="reveal-news-title">Or leave your email — we’ll whisper when it’s time.</p>
+          <p className="reveal-news-title">Or leave your email — we’ll whisper when it’s time to come in.</p>
           <Newsletter />
         </div>
       </div>

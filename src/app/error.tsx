@@ -15,7 +15,7 @@ export default function Error({ error, retry }: { error: unknown; retry: () => v
   return (
     <StatusPage
       code="Oh…"
-      eyebrow="Something went wrong"
+      eyebrow="Well, that was awkward"
       title={
         <>
           Something came undone, <em>just for a moment.</em>
@@ -23,8 +23,8 @@ export default function Error({ error, retry }: { error: unknown; retry: () => v
       }
       lede={
         <>
-          <p>This page didn’t load as it should.</p>
-          <p>Try again — and if it keeps happening, message us and we’ll take your order by hand.</p>
+          <p>This page lost its nerve halfway through.</p>
+          <p>Try again — and if it keeps misbehaving, message us and we’ll take your order by hand. We’re good with our hands.</p>
         </>
       }
       actions={

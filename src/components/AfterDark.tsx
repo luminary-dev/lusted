@@ -14,15 +14,15 @@ const ROWS = [afterDarkSlides.slice(0, HALF), afterDarkSlides.slice(HALF)];
 // What the reel says under each row once it is opened (AfterDarkReel.tsx)
 const LINES: ReelLine[] = [
   {
-    eyebrow: "You've looked long enough",
+    eyebrow: "You’ve been staring. Good.",
     title: "Imagine it on. Now imagine it coming off.",
-    lead: "Every piece in this reel was cut to be taken off slowly — by someone who was told to wait. Tonight you decide how long.",
+    lead: "Every piece in this reel was cut to be peeled off slowly, by someone who was told to wait and didn’t. Tonight you decide who kneels first.",
     cta: "Undress the whole collection",
   },
   {
-    eyebrow: "Pick your poison",
+    eyebrow: "Pick what you’ll be stripped out of",
     title: "Nothing here stays on past midnight.",
-    lead: "Sheer, slit and tied with a single bow. Choose the one you want to be unwrapped in, and let the rest of the night follow.",
+    lead: "Sheer, slit and held on by a single bow that’s begging to be pulled. Choose what you want to be unwrapped from, and let the rest of the night do what it likes with you.",
     cta: "Watch every piece",
   },
 ];

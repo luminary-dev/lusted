@@ -11,11 +11,11 @@ export default function BestSellers() {
           <div data-reveal>
             <p className="eyebrow">Best sellers</p>
             <h2 className="h2">
-              Most loved, <em>most worn.</em>
+              Most wanted, <em>most taken off.</em>
             </h2>
           </div>
           <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            <p>The six pieces our customers come back for again and again.</p>
+            <p>The six pieces that get ordered twice — once for you, once for whoever tore the first one off.</p>
             <Link className="btn btn-wine" href="/products?best=1&sort=best">
               Shop all best sellers <ArrowRight className="arrow" />
             </Link>

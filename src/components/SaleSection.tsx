@@ -30,8 +30,8 @@ export default function SaleSection() {
           </div>
           <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
             <p>
-              Less fabric, and now less to pay. Consider it permission to show a little more — but only while your
-              size lasts.
+              Less fabric, less to pay, nothing left to hide behind. Consider it permission to show them everything —
+              while your size lasts.
             </p>
             <Link className="btn btn-wine" href="/products?sale=1">
               Shop the bikini sale <ArrowRight className="arrow" />

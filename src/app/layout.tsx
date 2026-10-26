@@ -59,12 +59,12 @@ export const metadata: Metadata = {
   // absolute links for the share image and the product pages' photos (opengraph-image.png in this folder is the
   // brand card every page shares with, unless it sets its own)
   metadataBase: siteUrl,
-  title: "Lusted — Lingerie for every version of you",
+  title: "Lusted — Lingerie that doesn’t stay on",
   description:
-    "Barely-there lace, sun-kissed strings and midnight silk — lingerie, swimwear and after-dark pieces for the version of you that never asks permission. Discreet packaging, private ordering and personal sizing support.",
+    "Lace that comes off with one tug, strings that barely try and silk that slides away the second a hand finds it — lingerie, swimwear and after-dark pieces for the version of you that wants to be watched, and worse. Plain box, private ordering, a real person who won’t blush.",
   openGraph: {
-    title: "Lusted — Lingerie for every version of you",
-    description: "Dressed to tempt. Made to be undone.",
+    title: "Lusted — Lingerie that doesn’t stay on",
+    description: "Dressed to tempt. Undressed by midnight.",
     type: "website",
     siteName: "Lusted",
     locale: "en_LK",

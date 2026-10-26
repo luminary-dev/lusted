@@ -75,7 +75,7 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
           </div>
           <p className="lede">{product.description}</p>
           <p className="pdp-moments">
-            Made for {product.moments.slice(0, -1).join(", ")} &amp; {product.moments.at(-1)}.
+            Wear it for {product.moments.slice(0, -1).join(", ")} &amp; {product.moments.at(-1)}. Then don’t.
           </p>
 
           <ProductBuy slug={product.slug} />
@@ -88,7 +88,7 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
             <div>
               <p className="eyebrow">More from {collectionName(product.category)}</p>
               <h2 className="h2">
-                If the <em>{product.name}</em> tempted you…
+                If the <em>{product.name}</em> got under your skin…
               </h2>
             </div>
           </header>
