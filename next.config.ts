@@ -10,7 +10,10 @@ const nextConfig: NextConfig = {
   // lets a phone on the laptop's iPhone hotspot (172.20.10.x) load the dev server's scripts and live reload
   allowedDevOrigins: ["172.20.10.3", "172.20.10.*"],
   images: {
-    remotePatterns: [{ protocol: "https", hostname: imageCdn.hostname }],
+    remotePatterns: [{ protocol: imageCdn.protocol.replace(":", "") as "http" | "https", hostname: imageCdn.hostname, port: imageCdn.port }],
+    // only for a local stand-in for the bucket (NEXT_PUBLIC_IMAGE_CDN=http://127.0.0.1:…, e.g. the tests on a laptop):
+    // Next refuses loopback addresses otherwise
+    dangerouslyAllowLocalIP: ["localhost", "127.0.0.1"].includes(imageCdn.hostname),
     // AVIF first (about a third smaller than WebP for these soft, diffused photos at the same look; Next lowers the
     // AVIF quality by 20 under the hood, so q90 is AVIF 70), WebP where a browser can't take it.
     formats: ["image/avif", "image/webp"],
