@@ -48,12 +48,13 @@ test.describe("routes", () => {
   test("an unknown route is a 404, on the site's own page with the way back in", async ({ prepared: page }) => {
     const res = await page.goto("/no-such-page", { waitUntil: "load" });
     expect(res?.status()).toBe(404);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("This one slipped away");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Caught you looking");
     await expect(page.locator(".nav")).toBeVisible();
-    await expect(page.locator(".status-actions").getByRole("link", { name: /Shop the collection/ })).toHaveAttribute("href", "/products");
-    await expect(page.locator(".status-actions").getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
-    await expect(page.locator(".status-links a")).toHaveCount(3);
-    expect(await page.title()).toMatch(/not found/i);
+    await expect(page.locator(".lost-actions").getByRole("link", { name: /Show me everything/ })).toHaveAttribute("href", "/products");
+    await expect(page.locator(".lost-actions").getByRole("link", { name: "Take me back to bed" })).toHaveAttribute("href", "/");
+    // the photo: the wide cut on a laptop, served through the optimiser
+    await expect.poll(() => page.locator(".lost-photo img").evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 1000)).toBe(true);
+    expect(await page.title()).toMatch(/nothing on here/i);
   });
 
   test("delivery, returns & FAQ: every section has questions that open in place, and its links go where they say", async ({ prepared: page }) => {
