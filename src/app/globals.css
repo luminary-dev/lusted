@@ -7703,33 +7703,17 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   text-decoration-color: var(--rose-ink);
 }
 
-/* dark mode: the same colours as the rest of the site in the dark — the site's dark ground, cards in its dark card
-   colour (each with a breath of its own colour), its ink, rose and hairlines; she's a cut-out so she simply sits on
-   the card (no multiply, which would have sunk her into the dark) */
+/* dark mode: a minimal change — the cards keep their pale paper and dark ink, only turned down a touch, on the site's
+   own dark ground */
 :root[data-theme="dark"] .help {
   background: var(--cream);
 }
 
 :root[data-theme="dark"] .help-card[data-layout] {
-  --ink: #f6e9e4;
-  --ink-2: #d7c2be;
-  --muted: #a88f93;
-  --rose: #eaa99c;
-  --rose-ink: #eaa99c;
-  --hair: rgba(255, 232, 226, 0.12);
-  background: color-mix(in srgb, var(--paper) 8%, #2a171b);
-  border-color: rgba(255, 232, 226, 0.12);
+  background: color-mix(in srgb, var(--paper) 90%, #1b0e11);
   box-shadow:
     0 -1px 0 rgba(255, 232, 226, 0.06),
-    0 -30px 60px -24px rgba(0, 0, 0, 0.8);
-}
-
-:root[data-theme="dark"] .help-card[data-layout] .help-model img {
-  mix-blend-mode: normal;
-}
-
-:root[data-theme="dark"] .help-tease::before {
-  background: #eaa99c;
+    0 -30px 60px -24px rgba(0, 0, 0, 0.85);
 }
 
 /* ─ the six arrangements (desktop) ─ */
