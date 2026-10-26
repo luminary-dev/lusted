@@ -29,7 +29,7 @@ const sections: LegalSection[] = [
         <p>We only collect what we need to help you shop and to deliver your order:</p>
         <ul>
           <li>
-            <strong>Contact details</strong> — your name, email address and WhatsApp number when you message us or use the enquiry form.
+            <strong>Contact details</strong> — your name, email address and WhatsApp number when you message us or sign up for our newsletter.
           </li>
           <li>
             <strong>Order details</strong> — the pieces, sizes and colours you choose, your delivery address and any notes you send us.
