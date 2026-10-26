@@ -77,6 +77,26 @@ REVEAL_GATE=off npx next start -p 3200 &   # then, with the server up:
 npx @lhci/cli@0.15.1 autorun               # the Lighthouse step locally, after npm run build
 ```
 
+## Security
+
+The repository is public, so GitHub's protections are all on: secret scanning with push protection (a commit carrying a
+known secret format is rejected at push), the dependency graph with Dependabot alerts and security updates, private
+vulnerability reporting (`SECURITY.md` and `/.well-known/security.txt` say how to report), and rulesets on `dev` and
+`main` (`.github/rulesets/`). Five workflows watch the code: **CodeQL** (`codeql.yml`, every push and pull request and
+weekly, TypeScript and the workflows themselves — a merge may not add a high-severity finding), **Dependency review**
+(`dependency-review.yml`, a pull request adding a vulnerable or badly licensed package goes red), **Workflows**
+(`workflows.yml`: actionlint for mistakes in the workflow files, zizmor for their security, gitleaks for secrets in the
+commits), **Scorecard** (`scorecard.yml`, OpenSSF's weekly supply-chain score, under Security → Code scanning) and the
+CI itself. `dependabot.yml` opens weekly pull requests into `dev` for npm packages and for the actions, which are
+pinned to commits, after a week's cooldown on new versions. Workflows get a read-only token by default and widen it
+per job; `CODEOWNERS` routes every review to the owner.
+
+The site sends security headers on every response (`next.config.ts`): a content security policy that allows only the
+site itself (inline scripts and styles are allowed because Next's hydration scripts and the theme script in
+`layout.tsx` are inline), no framing, `nosniff`, a strict referrer policy, a permissions policy that switches off
+camera, microphone, location and payment, and cross-origin isolation headers. HSTS comes from Vercel. The source is
+published to be read, not reused — see `LICENSE`.
+
 ## Errors and missing pages
 
 `src/app/not-found.tsx` (any unknown address or product, with a real 404 status) and `src/app/error.tsx` (anything that fails while a page renders — try again, or order on WhatsApp) share `components/StatusPage.tsx` and keep the site's nav and footer. `src/app/global-error.tsx` is the last resort when the layout itself fails: a self-contained page with its own few lines of CSS.
