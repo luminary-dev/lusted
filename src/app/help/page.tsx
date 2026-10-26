@@ -179,6 +179,28 @@ const chapters: Chapter[] = [
           </p>
         ),
       },
+      {
+        q: "Can it go to someone else?",
+        a: (
+          <p>
+            Of course — a gift, or to work, or wherever you’d rather it turned up. Give us their address and a number they’ll answer. The box gives
+            nothing away either way.
+          </p>
+        ),
+      },
+      {
+        q: "What if I’m not in?",
+        a: (
+          <p>
+            The courier calls the number you gave us. If you’d rather it went to a neighbour, your office or a different day, tell us when you
+            order and we’ll arrange what we can.
+          </p>
+        ),
+      },
+      {
+        q: "Will I know when it’s coming?",
+        a: <p>Yes. We tell you on WhatsApp the moment it’s on its way, and you can ask us where it is any time after that.</p>,
+      },
     ],
   },
   {
