@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import lingerie from "@/assets/images/cat-lingerie.webp";
-import swim from "@/assets/images/cat-swim.webp";
-import afterDark from "@/assets/images/cat-after-dark.webp";
+const lingerie = img("images/cat-lingerie.webp");
+const swim = img("images/cat-swim.webp");
+const afterDark = img("images/cat-after-dark.webp");
 import { categories, type Category } from "@/lib/products";
 import { ArrowRight, Heart, Moon, Sun } from "./icons";
+import { img } from "@/lib/cdn";
 
 // Card art and wording; each collection's name, tagline and category label come from `categories`
 // in src/lib/products.ts (shared with the footer).

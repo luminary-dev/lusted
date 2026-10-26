@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import sizeImg from "@/assets/images/size-guide.webp";
+const sizeImg = img("images/size-guide.webp");
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight } from "./icons";
 import SizeTags3D from "./SizeTags3D";
 import TapeGuide from "./TapeGuide";
+import { img } from "@/lib/cdn";
 
 // Body measurements in cm. Bra bands follow the underbust (UK/US/AU 30 = 63–67 cm, then +5 cm per band) and cups
 // the bust-minus-underbust difference. Dress sizes use the usual UK/AU 6–14 ↔ EU 34–42 ↔ US 2–10 conversion.

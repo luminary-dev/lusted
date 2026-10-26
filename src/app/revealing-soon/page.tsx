@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import group from "@/assets/images/reveal/group.webp";
+const group = img("images/reveal/group.webp");
 import wordmark from "@/assets/brand/wordmark-glossy-rosegold.png";
 import Newsletter from "@/components/Newsletter";
 import RevealCountdown from "@/components/RevealCountdown";
 import { ArrowRight, Instagram, WhatsApp } from "@/components/icons";
 import { instagramLink, site, whatsappLink } from "@/lib/site";
+import { img } from "@/lib/cdn";
 
 export const metadata: Metadata = {
   title: "Lusted — Revealing soon",

@@ -19,13 +19,14 @@ npm run lint
 
 ## Where things live
 
-- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description. Photos are `src/assets/products/<slug>.webp` with optional `-back` and `-side` views.
+- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos").
 - **Contact details** — `src/lib/site.ts`: WhatsApp number, Instagram, email, hours. Every button and link reads from here.
 - **Collection names and taglines** — `categories` in `src/lib/products.ts`.
 - **Colours, type and spacing** — CSS variables at the top of `src/app/globals.css`; dark mode is the `[data-theme="dark"]` block.
 - **Brand assets** — `brand/` (logo pack, icons, social images).
 - **Link previews and search engines** — `src/app/opengraph-image.png` is the brand card every shared link shows (product pages share their own front photo instead); `src/app/sitemap.ts` and `src/app/robots.ts` build `/sitemap.xml` and `/robots.txt`. Absolute URLs come from Vercel's production domain (`src/lib/site-url.ts`), so a custom domain is picked up without a code change. The reveal page is `noindex`.
-- **Adding product photos** — put the shots in `refs/krea/products/` as `<slug>-front|back|side.png` and run `node scripts/import-krea-products.mjs`: it enhances them (Real-ESRGAN, when the binary is in `.tools/realesrgan/`), crops to 9:16, watermarks them and refreshes the image map. Neither folder is in git.
+- **Photos** — every photo (products, hero, sections) lives outside git: in `assets/` on a laptop (git-ignored) and in the Cloudflare R2 bucket `luminary-lusted` the site serves them from. The repository keeps `src/lib/image-manifest.json` — each photo's path, size and blur placeholder — and `img("images/hero/main/main-01.webp")` from `src/lib/cdn.ts` turns a path into what `next/image` needs. After adding or changing a photo: `node scripts/images.mjs manifest` (rewrites the manifest), then `CLOUDFLARE_API_TOKEN=… node scripts/images.mjs upload` (new and changed photos only) and `node scripts/images.mjs check`. On a fresh clone, `node scripts/images.mjs pull` fetches them all from the bucket. The bucket's public address is in `scripts/images.mjs` (`NEXT_PUBLIC_IMAGE_CDN` overrides it); `next.config.ts` allows that host for `next/image`.
+- **Adding product photos** — put the shots in `refs/krea/products/` as `<slug>-front|back|side.png` and run `node scripts/import-krea-products.mjs`: it enhances them (Real-ESRGAN, when the binary is in `.tools/realesrgan/`), crops to 9:16, watermarks them into `assets/products/` and refreshes `product-images.ts`; then the manifest and upload steps above. Neither folder is in git.
 
 ## Performance
 

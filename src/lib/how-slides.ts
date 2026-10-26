@@ -1,22 +1,23 @@
 import type { HowSlide } from "@/components/HowSlides";
-import how01 from "@/assets/images/how/how-01.webp";
-import how02 from "@/assets/images/how/how-02.webp";
-import how03 from "@/assets/images/how/how-03.webp";
-import how04 from "@/assets/images/how/how-04.webp";
-import how05 from "@/assets/images/how/how-05.webp";
-import how06 from "@/assets/images/how/how-06.webp";
-import how07 from "@/assets/images/how/how-07.webp";
-import how08 from "@/assets/images/how/how-08.webp";
-import how09 from "@/assets/images/how/how-09.webp";
-import howPhone01 from "@/assets/images/how-phone/how-01.webp";
-import howPhone02 from "@/assets/images/how-phone/how-02.webp";
-import howPhone03 from "@/assets/images/how-phone/how-03.webp";
-import howPhone04 from "@/assets/images/how-phone/how-04.webp";
-import howPhone05 from "@/assets/images/how-phone/how-05.webp";
-import howPhone06 from "@/assets/images/how-phone/how-06.webp";
-import howPhone07 from "@/assets/images/how-phone/how-07.webp";
-import howPhone08 from "@/assets/images/how-phone/how-08.webp";
-import howPhone09 from "@/assets/images/how-phone/how-09.webp";
+import { img } from "@/lib/cdn";
+const how01 = img("images/how/how-01.webp");
+const how02 = img("images/how/how-02.webp");
+const how03 = img("images/how/how-03.webp");
+const how04 = img("images/how/how-04.webp");
+const how05 = img("images/how/how-05.webp");
+const how06 = img("images/how/how-06.webp");
+const how07 = img("images/how/how-07.webp");
+const how08 = img("images/how/how-08.webp");
+const how09 = img("images/how/how-09.webp");
+const howPhone01 = img("images/how-phone/how-01.webp");
+const howPhone02 = img("images/how-phone/how-02.webp");
+const howPhone03 = img("images/how-phone/how-03.webp");
+const howPhone04 = img("images/how-phone/how-04.webp");
+const howPhone05 = img("images/how-phone/how-05.webp");
+const howPhone06 = img("images/how-phone/how-06.webp");
+const howPhone07 = img("images/how-phone/how-07.webp");
+const howPhone08 = img("images/how-phone/how-08.webp");
+const howPhone09 = img("images/how-phone/how-09.webp");
 
 // The photos behind "How it works" (src/assets/images/how), in the order they play, numbered to match the folder and
 // ordered so no two neighbours share a colour story (the loop wraps). All are 16:9 with the models in the left ~60%,
