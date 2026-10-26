@@ -23,6 +23,10 @@ export default defineConfig({
     colorScheme: "light",
     locale: "en-GB",
     viewport: { width: 1440, height: 900 },
+    // GitHub's runners have no GPU: WebGL there is emulated on the CPU, and the cursor smoke and the 3D size tags then
+    // starve the page (seconds per frame on a 4K or 5K viewport). In CI the browser runs without WebGL, so the site
+    // falls back as it does on any device without it — the suite tests the HTML tags, never the 3D scene.
+    launchOptions: process.env.CI ? { args: ["--disable-3d-apis"] } : undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } }],
   webServer: process.env.PW_BASE_URL

@@ -82,10 +82,15 @@ jobs:
       - name: Production build
         run: npm run build || { echo "::warning::Build failed (often a Google Fonts download timing out) — retrying once"; npm run build; }
 
+      # Lighthouse drives the same Chromium build as the tests: the runner's own, newest Chrome times out on its
+      # DevTools calls
+      - name: Install Chromium for Lighthouse
+        run: npx playwright install --with-deps chromium
+
       # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs per page, against the build with the reveal
       # gate off; the thresholds are in lighthouserc.json
       - name: Lighthouse
-        run: npx --yes @lhci/cli@0.15.1 autorun
+        run: CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun
         env:
           REVEAL_GATE: "off"
 
