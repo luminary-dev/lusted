@@ -7831,23 +7831,29 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   margin-top: 32px;
 }
 
-/* 05 · she stands at the left, the questions high on the right, the number and title underneath them */
+/* 05 · she stands at the left edge, the questions close beside her in long lines, the number and title underneath them */
 .help-card[data-layout="left-low"] .help-model {
   top: 2%;
-  left: 2%;
-  bottom: 0; /* her feet (or the stool) on the card's bottom edge */
-  width: 46%;
+  left: 0;
+  bottom: 0; /* her feet on the card's bottom edge */
+  width: 34%;
   --anchor: 0% 100%;
 }
 .help-card[data-layout="left-low"] .help-qs {
-  grid-column: 7 / 13;
+  grid-column: 5 / 13;
   grid-row: 1;
 }
+.help-card[data-layout="left-low"] .help-qa dd p {
+  max-width: none; /* the lines run the whole way across to the card's edge */
+}
 .help-card[data-layout="left-low"] .help-card-head {
-  grid-column: 7 / 13;
+  grid-column: 5 / 13;
   grid-row: 2;
   align-self: end;
-  margin-top: 36px;
+  margin-top: 32px;
+}
+.help-card[data-layout="left-low"] .help-tease {
+  max-width: none;
 }
 
 /* 06 · she sits high at the right; the questions first on the left, the number and title low */
