@@ -20,7 +20,10 @@ test("hero: 27 slides, one active, the first preloaded, both calls to action", a
   expect(await whisper.getAttribute("href")).toContain("wa.me");
   await expect(page.locator("#top h1")).toContainText(/Dressed to tempt/);
   // the arrowhead in the corner glides to the next section
-  await expect(page.locator("#top .scroll-cue")).toHaveAttribute("href", "/#sale");
+  // the arrowhead in the corner moves the slideshow on
+  await page.locator("#top .slide-cue").click();
+  await expect(slides.nth(1)).toHaveClass(/is-active/);
+  await expect(slides.first()).not.toHaveClass(/is-active/);
 });
 
 test("after dark: the filmstrip band runs two strips of twenty frames, none shared with the hero, all linking into the collection", async ({ prepared: page }) => {
@@ -176,7 +179,9 @@ test("how it works: three steps, the ordering anchor and the WhatsApp button", a
   await expect(how.locator(".how-slide.is-active")).toHaveCount(1);
   await expect(how.locator(".how-slide img")).toHaveCount(2);
   for (const alt of await how.locator(".how-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/models/i);
-  await expect(how.locator(".scroll-cue")).toHaveAttribute("href", "/#contact");
+  // the arrowhead in the corner moves the slideshow on
+  await how.locator(".slide-cue").click();
+  await expect(how.locator(".how-slide").nth(1)).toHaveClass(/is-active/);
 });
 
 test("how it works: the photos change over on their own when motion is allowed", async ({ browser }) => {
