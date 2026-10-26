@@ -76,7 +76,7 @@ export default function About() {
                   >
                     <div className="print">
                       <div className={`polaroid-photo ${src ? "" : "is-empty"}`} aria-hidden={!src || undefined}>
-                        {src && <Image quality={85} src={src} alt={alt} fill placeholder="blur" sizes="(min-width: 901px) 23vw, 40vw" style={{ objectPosition: pos ?? "50% 50%" }} />}
+                        {src && <Image quality={90} src={src} alt={alt} fill placeholder="blur" sizes="(min-width: 901px) 23vw, 40vw" style={{ objectPosition: pos ?? "50% 50%" }} />}
                       </div>
                     </div>
                     {/* strips of paper tape holding it to the wall */}

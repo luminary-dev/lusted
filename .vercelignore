@@ -10,3 +10,5 @@
 /.claude
 *.log
 .DS_Store
+# local secrets never ride along with a CLI deploy (set them in the Vercel project instead)
+.env*

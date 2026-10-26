@@ -16,6 +16,8 @@ const TINT: Record<ColorKey, string> = {
 };
 
 export default function SaleSection() {
+  // nothing on sale: no band (rather than "Now -Infinity% off")
+  if (!onSale.length) return null;
   return (
     <section id="sale" className="section sale">
       <div className="container">
