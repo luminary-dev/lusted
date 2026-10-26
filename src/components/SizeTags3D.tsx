@@ -50,6 +50,24 @@ export default function SizeTags3D({
     let cleanup = () => {};
 
     (async () => {
+      // Nothing is loaded or built until the size guide is within about a screen and a half: three.js, the studio light
+      // and five printed tags are seconds of work on a phone, which would otherwise land on top of the page load.
+      await new Promise<void>((resolve) => {
+        const near = new IntersectionObserver(
+          ([entry]) => {
+            if (!entry.isIntersecting) return;
+            near.disconnect();
+            resolve();
+          },
+          { rootMargin: "150% 0px" },
+        );
+        near.observe(host.current!);
+        cleanup = () => near.disconnect();
+      });
+      if (disposed) return;
+      // hands the main thread back between the heavy steps, so building the scene never holds up a tap or a frame
+      const breathe = () => new Promise<void>((r) => setTimeout(r, 0));
+
       const THREE = await import("three");
       const { RoomEnvironment } =
         await import("three/examples/jsm/environments/RoomEnvironment.js");
@@ -142,6 +160,15 @@ export default function SizeTags3D({
         attributes: true,
         attributeFilter: ["data-theme"],
       });
+      // unmounted while still building (the build awaits fonts and yields between steps): tear down what exists so far
+      const gone = () => {
+        if (!disposed) return false;
+        themeWatch.disconnect();
+        disposables.forEach((d) => d.dispose());
+        renderer.dispose();
+        renderer.domElement.remove();
+        return true;
+      };
       wall.receiveShadow = true;
       scene.add(wall);
 
@@ -343,10 +370,7 @@ export default function SizeTags3D({
         document.fonts.load(`500 40px ${sans}`),
         document.fonts.load(`600 40px ${sans}`),
       ]).catch(() => {});
-      if (disposed) {
-        renderer.dispose();
-        return;
-      }
+      if (gone()) return;
 
       const small = el.clientWidth < 700;
       const CW = small ? 512 : 704,
@@ -376,6 +400,8 @@ export default function SizeTags3D({
           f.stroke();
         }
       }
+      await breathe();
+      if (gone()) return;
 
       type Mode = "color" | "height" | "rough" | "metal";
       type Ink =
@@ -634,15 +660,27 @@ export default function SizeTags3D({
         color: ReturnType<typeof canvasTex>;
         data: ReturnType<typeof canvasTex>;
       };
-      const printTag = (front: Face, back: Face, tag: TagData) => {
+      // printed in three slices with a breath between them; the textures are only uploaded once the whole tag is done,
+      // so a tag never shows half its new print. `live` turns false when a newer print has started, which stops this one.
+      const printTag = async (
+        front: Face,
+        back: Face,
+        tag: TagData,
+        live = () => true,
+      ) => {
         paintFront(front.color.ctx, tag, "color", CW, CH);
         paintBack(back.color.ctx, tag, "color", CW, CH);
+        await breathe();
+        if (!live() || disposed) return false;
         paintData(front.data.ctx, paintFront, tag);
+        await breathe();
+        if (!live() || disposed) return false;
         paintData(back.data.ctx, paintBack, tag);
         for (const f of [front, back]) {
           f.color.tex.needsUpdate = true;
           f.data.tex.needsUpdate = true;
         }
+        return true;
       };
 
       // ── five tags: pivot (swing) → twister (turn on the string) → card ──
@@ -657,7 +695,7 @@ export default function SizeTags3D({
       };
       const REST = [0.16, 0.12, -0.05, 0.12, -0.08]; // resting angle on the string, radians — small, so every tag reads; XS (far left, seen most side-on) turns towards the camera
       const LEN = [0.4, 0.5, 0.36, 0.46, 0.42]; // string lengths — each tag hangs a little differently
-      const items = latest.current.map((tag, i) => {
+      const items = latest.current.map((_, i) => {
         const pivot = new THREE.Group();
         const twister = new THREE.Group();
         pivot.add(twister);
@@ -686,7 +724,6 @@ export default function SizeTags3D({
           color: canvasTex(CW, CH, true),
           data: canvasTex(DW, DH, false),
         };
-        printTag(front, back, tag);
         const frontMat = keep(
           new THREE.MeshPhysicalMaterial({
             map: front.color.tex,
@@ -759,6 +796,12 @@ export default function SizeTags3D({
           rest: REST[i % REST.length],
         };
       });
+      // print each tag's faces (whatever category is showing by now), a slice at a time
+      const printed = latest.current;
+      for (const [i, it] of items.entries()) {
+        await printTag(it.front, it.back, printed[i]);
+        if (gone()) return;
+      }
 
       // ── layout: tags centred under the column, cord across the whole stage ──
       const GAP = 1.13;
@@ -873,6 +916,10 @@ export default function SizeTags3D({
       resize();
       camTarget = camX = -camRange; // narrow screens start at XS
       placeCamera();
+      // compile every shader before the first frame — in the background where the browser supports it
+      // (KHR_parallel_shader_compile) — instead of stalling the page on the first render
+      await renderer.compileAsync(scene, camera);
+      if (gone()) return;
       const ro = new ResizeObserver(resize);
       ro.observe(el);
 
@@ -986,17 +1033,21 @@ export default function SizeTags3D({
       window.addEventListener("pointercancel", onUp);
       window.addEventListener("scroll", onScroll, { passive: true });
 
+      let printing = 0;
       api.current = {
-        setTags: (next) => {
-          next.forEach((tag, i) => {
+        setTags: async (next) => {
+          // one tag at a time, so switching category never blocks a tap; a newer switch takes over from this one
+          const run = ++printing;
+          const live = () => run === printing;
+          for (const [i, tag] of next.entries()) {
             const it = items[i];
-            if (!it) return;
-            printTag(it.front, it.back, tag);
+            if (!it) continue;
+            if (!(await printTag(it.front, it.back, tag, live))) return;
             // new category: back to the fronts, with a swing
             it.state.turn = it.rest;
             it.state.vz += (i % 2 ? 1 : -1) * 0.35;
             it.state.vy += (i % 2 ? -1 : 1) * 0.8;
-          });
+          }
         },
       };
 
@@ -1061,6 +1112,9 @@ export default function SizeTags3D({
       io.observe(el);
       const onVis = () => (document.hidden ? stop() : start());
       document.addEventListener("visibilitychange", onVis);
+
+      // the category was switched while the scene was still being built: print the one now showing
+      if (latest.current !== printed) api.current.setTags(latest.current);
 
       renderer.render(scene, camera);
       ready.current(true);
