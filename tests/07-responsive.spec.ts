@@ -171,7 +171,7 @@ test.describe("sizes, modes and postures", () => {
       await page.addStyleTag({ content: `html{font-size:${pct}%!important}` });
       await page.waitForTimeout(100);
       await expectNoHorizontalScroll(page, `font ${pct}%`);
-      const cta = page.locator(".about-cta").getByRole("link", { name: /Shop the collection/ });
+      const cta = page.locator(".about-cta").getByRole("link", { name: /Show me everything/ });
       await cta.scrollIntoViewIfNeeded();
       const b = await cta.boundingBox();
       expect(b!.x + b!.width, `button fits at ${pct}%`).toBeLessThanOrEqual(391);

@@ -128,11 +128,11 @@ export default function PrivacyPage() {
       eyebrow="Privacy policy"
       title={
         <>
-          Your privacy, <em>always first.</em>
+          What’s in the box <em>stays in the box.</em>
         </>
       }
       updated="16 October 2026"
-      intro={<p>We know lingerie is personal. Here’s exactly how we look after your information — in plain language.</p>}
+      intro={<p>Lingerie is personal. So is what we know about you. Here’s exactly how we keep it quiet — in plain language.</p>}
       sections={sections}
     />
   );

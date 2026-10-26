@@ -64,7 +64,7 @@ export default function Collections() {
             data-reveal
             style={{ "--d": "0.1s" } as React.CSSProperties}
           >
-            <p>Lace for when you want to be unwrapped, strings for when you want to be stared at, and silk for when you’re not going home alone.</p>
+            <p>Lace for when you want to be undone slowly, strings for when you want to be stared at and soaked through, and silk for when you’re not going home alone — or going home at all.</p>
             <Link className="btn btn-wine" href="/products">
               Tempt me with everything <ArrowRight className="arrow" />
             </Link>

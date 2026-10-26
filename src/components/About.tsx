@@ -14,10 +14,10 @@ import { img } from "@/lib/cdn";
 
 // About us as a photo wall: real prints taped to the wall, in two rows, beside a short story and the four promises.
 const promises = [
-  { icon: Box, title: "A plain box — no one has to know" },
-  { icon: ChatDouble, title: "We’ll help it fit just right" },
+  { icon: Box, title: "A plain box — nobody has to know" },
+  { icon: ChatDouble, title: "We’ll make it fit like it was made on you" },
   { icon: Bolt, title: "A real person, never keeps you waiting" },
-  { icon: Lock, title: "Our little secret, start to finish" },
+  { icon: Lock, title: "Our dirty little secret, start to finish" },
 ];
 
 // the prints stuck to the wall: each keeps its photo's own shape, a hair off straight (`tilt`, degrees) and a touch
@@ -39,10 +39,10 @@ export default function About() {
         <div className="about-copy" data-reveal>
           <p className="eyebrow">About us</p>
           <h2 className="h2">
-            Made to be seen, <em>sent to be our secret.</em>
+            Made to be taken off. <em>Sent so no one knows.</em>
           </h2>
           <p className="lede">
-            Lingerie for the nights you plan and the ones you don’t — lace that lingers, silk that slips, strings that barely try. Picked to make you feel wicked, and delivered so quietly no one knows but you (and whoever gets to see it).
+            Lingerie for the nights you plan and the ones that happen anyway — lace that lingers, silk that slips, strings that give up at the first tug. Picked to make you feel filthy in the best way, and delivered so quietly the only one who’ll know is whoever’s undoing it.
           </p>
           <ul className="about-promises">
             {promises.map(({ icon: Icon, title }) => (

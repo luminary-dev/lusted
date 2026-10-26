@@ -24,15 +24,16 @@ export default function Hero() {
             data-reveal
             style={{ "--d": "0.1s" } as React.CSSProperties}
           >
-            Dressed to tempt. <em>Made to be undone.</em>
+            Dressed to tempt. <em>Undressed by midnight.</em>
           </h1>
           <p
             className="lede"
             data-reveal
             style={{ "--d": "0.2s" } as React.CSSProperties}
           >
-            Barely-there lace, sun-kissed strings and midnight silk — for the
-            version of you that never asks permission.
+            Lace that begs to come off, strings that untie with one tug, silk
+            that slides away the second a hand finds it — for the version of
+            you that wants to be watched, and worse.
           </p>
           <div
             className="hero-actions"

@@ -10,9 +10,9 @@ export type ColorKey = keyof typeof colors;
 // `label` is the plain category (kept searchable, so "swim" still finds the bikinis); `name` is the collection name shown
 // to shoppers everywhere (product pages, shop tabs, search, footer) and `tagline` its line on the home-page cards.
 export const categories: { key: Category; label: string; name: string; tagline: string }[] = [
-  { key: "lingerie", label: "Lingerie", name: "Lace Secrets", tagline: "Delicate lace that clings like a secret, made to be slowly undone." },
-  { key: "swim", label: "Swim", name: "Sun Kissed", tagline: "Barely-there cuts, sun-warmed skin and every eye on you." },
-  { key: "after-dark", label: "After Dark", name: "Midnight Sins", tagline: "Plunging lines and daring slits for nights that end at sunrise." },
+  { key: "lingerie", label: "Lingerie", name: "Lace Secrets", tagline: "Lace that clings like a secret and comes off like a confession." },
+  { key: "swim", label: "Swim", name: "Sun Kissed", tagline: "Barely-there strings, wet skin, and every eye on what’s barely covered." },
+  { key: "after-dark", label: "After Dark", name: "Midnight Sins", tagline: "Plunges, slits and hems that give up long before the night does." },
 ];
 
 export const colors = {

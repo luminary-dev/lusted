@@ -288,11 +288,11 @@ test("footer: every link resolves, social links open in new tabs, the year is cu
 test("newsletter: the browser blocks a bad address, a good one reports the sign-up state", async ({ prepared: page }) => {
   const form = page.locator("form.news-form");
   const input = form.getByRole("textbox", { name: "Email address" });
-  await expect(form.locator(".news-note")).toHaveText("No spam. Just beautiful things.");
+  await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
   await input.fill("not-an-email");
   await form.getByRole("button", { name: /Subscribe/ }).click();
   expect(await input.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false); // native validation stops the submit
-  await expect(form.locator(".news-note")).toHaveText("No spam. Just beautiful things.");
+  await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
   await input.fill("someone@example.com");
   const [res] = await Promise.all([page.waitForResponse((r) => r.url().includes("/api/subscribe")), form.getByRole("button", { name: /Subscribe/ }).click()]);
   expect([200, 501, 502]).toContain(res.status());
@@ -300,7 +300,7 @@ test("newsletter: the browser blocks a bad address, a good one reports the sign-
   await expect(note).toHaveAttribute("role", "status");
   if (res.status() === 501) await expect(note).toContainText("Sign-ups open soon");
   else if (res.status() === 200) {
-    await expect(note).toContainText("inner circle");
+    await expect(note).toContainText("whisper");
     await expect(input).toHaveValue("");
   }
 });

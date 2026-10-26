@@ -54,7 +54,7 @@ export default function Footer() {
         <div className="footer-main">
           <div className="footer-brand">
             <Image src={wordmark} alt="Lusted Lingerie" className="footer-logo" sizes="160px" />
-            <p>Lingerie for every version of you. Join the inner circle for new drops and private offers.</p>
+            <p>Lingerie that doesn’t stay on. Join the inner circle for new drops, private offers and the things we don’t post.</p>
             <Newsletter />
           </div>
           <div className="footer-cols">

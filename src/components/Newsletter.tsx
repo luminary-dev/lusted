@@ -6,9 +6,9 @@ import { ArrowRight } from "./icons";
 type Status = "idle" | "loading" | "done" | "unavailable" | "error";
 
 const messages: Record<Status, string> = {
-  idle: "No spam. Just beautiful things.",
+  idle: "No spam. Just the pretty, filthy things — first.",
   loading: "Joining…",
-  done: "You’re on the list — welcome to the inner circle.",
+  done: "You’re in. We’ll whisper to you before anyone else hears.",
   unavailable: "Sign-ups open soon — message us on WhatsApp in the meantime.",
   error: "Something went wrong — please try again.",
 };

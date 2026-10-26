@@ -131,7 +131,7 @@ test.describe("search dialog", () => {
     await page.keyboard.press("/");
     const box = page.getByRole("searchbox", { name: "Search products" });
     await box.fill("qzxv");
-    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nothing matches");
+    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nothing’s wearing");
     await expect(searchDialog(page).getByRole("button", { name: /See all/ })).toHaveCount(0);
     await box.fill("sale");
     await expect(searchDialog(page).locator(".search-label")).toHaveText(`${CATALOG.sale.length} results`);
