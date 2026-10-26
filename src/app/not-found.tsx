@@ -16,13 +16,13 @@ export default function NotFound() {
       eyebrow="Page not found · nothing on underneath"
       title={
         <>
-          Caught you looking, <em>you naughty thing.</em>
+          Caught you looking, <em>you naughty thing</em>
         </>
       }
       lede={
         <>
-          <p>There’s nothing under this one. We took it all off and left the door open.</p>
-          <p>Whatever you came here wanting, we have something wickeder — lace that doesn’t stay on, strings that barely try, and dresses for nights that end in someone else’s sheets.</p>
+          <p>There’s nothing under this one. We took it all off.</p>
+          <p>Whatever you came for, we have something wickeder — lace that doesn’t stay on, strings that barely try.</p>
           <p>Come and get undressed.</p>
         </>
       }
