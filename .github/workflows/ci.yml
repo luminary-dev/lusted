@@ -47,24 +47,33 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0 # the checks below compare branches
+          persist-credentials: false
 
+      # branch names and shas reach the scripts through the environment, never inline — a branch named with a
+      # shell metacharacter must not be able to run anything here
       - name: Check that main only takes dev
         if: github.base_ref == 'main'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [ "${{ github.head_ref }}" != "dev" ]; then
-            echo "::error::Pull requests into main must come from dev (this one is from '${{ github.head_ref }}')."
+          if [ "$HEAD_REF" != "dev" ]; then
+            echo "::error::Pull requests into main must come from dev (this one is from '$HEAD_REF')."
             exit 1
           fi
           echo "From dev — fine."
 
-      - name: Check that the branch is up to date with ${{ github.base_ref }}
+      - name: Check that the branch is up to date with its base
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          git fetch origin "${{ github.base_ref }}" --quiet
-          if ! git merge-base --is-ancestor "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}"; then
-            echo "::error::'${{ github.head_ref }}' is behind '${{ github.base_ref }}'. Merge ${{ github.base_ref }} into it (or rebase) and push again."
+          git fetch origin "$BASE_REF" --quiet
+          if ! git merge-base --is-ancestor "origin/$BASE_REF" "$HEAD_SHA"; then
+            echo "::error::'$HEAD_REF' is behind '$BASE_REF'. Merge $BASE_REF into it (or rebase) and push again."
             exit 1
           fi
-          echo "Up to date with ${{ github.base_ref }}."
+          echo "Up to date with $BASE_REF."
 
   checks:
     name: Lint and types
@@ -73,6 +82,8 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
@@ -101,6 +112,8 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
@@ -149,9 +162,10 @@ jobs:
       # serves the build itself (playwright.config.ts) with the reveal gate as in production; the tests carry the
       # preview cookie
       - name: Run the tests
-        run: npx playwright test --shard=${{ matrix.shard }}/6
+        run: npx playwright test --shard="$SHARD/6"
         env:
           CI: "true"
+          SHARD: ${{ matrix.shard }}
           # the served build reads the photos from the private bucket (src/app/img)
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -182,6 +196,8 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
@@ -231,16 +247,17 @@ jobs:
       # run, a runner hiccup in one.
       - name: Run Lighthouse
         env:
+          PAGE: ${{ matrix.page.path }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           REVEAL_GATE=off npx next start -p 3200 > lighthouse-server.log 2>&1 &
-          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3200/ && break; sleep 1; done
-          u="${{ matrix.page.path }}"
-          curl -sf -o /dev/null "http://localhost:3200$u" && curl -sf -o /dev/null "http://localhost:3200$u" || { echo "::error::$u did not answer"; exit 1; }
-          CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun --collect.url="http://localhost:3200$u"
+          for _ in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3200/ && break; sleep 1; done
+          url="http://localhost:3200$PAGE"
+          if ! curl -sf -o /dev/null "$url" || ! curl -sf -o /dev/null "$url"; then echo "::error::$PAGE did not answer"; exit 1; fi
+          CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun --collect.url="$url"
 
       - name: Upload the Lighthouse report
         if: always()
@@ -271,6 +288,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0 # the checks below read the commit's parents
+          persist-credentials: false
 
       - name: Check the Vercel secrets
         run: |
@@ -281,9 +299,11 @@ jobs:
       # both branches take changes only through pull requests, merged as merge commits: a push whose head has a
       # single parent was pushed straight to the branch, and is not deployed
       - name: Check that the push is a merged pull request
+        env:
+          BRANCH: ${{ github.ref_name }}
         run: |
           if [ "$(git rev-list --parents -n 1 HEAD | wc -w)" -lt 3 ]; then
-            echo "::error::This push to ${{ github.ref_name }} is not a merge commit — it was pushed directly. Open a pull request into ${{ github.ref_name }} instead; direct pushes are never deployed."
+            echo "::error::This push to $BRANCH is not a merge commit — it was pushed directly. Open a pull request into $BRANCH instead; direct pushes are never deployed."
             exit 1
           fi
           echo "A merged pull request."
