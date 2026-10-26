@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { bag, useBag, useBagOpen } from "@/lib/bag";
 import { colors, formatPrice, getProduct, priceOf } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
@@ -12,14 +12,21 @@ export default function BagDrawer() {
   const open = useBagOpen();
   const { items, count, subtotal } = useBag();
 
+  const closeBtn = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && bag.setOpen(false);
     document.addEventListener("keydown", onKey);
     document.documentElement.style.overflow = "hidden";
+    // focus moves into the bag as it opens and back to whatever opened it when it closes
+    const opener = document.activeElement as HTMLElement | null;
+    const t = setTimeout(() => closeBtn.current?.focus(), 60);
     return () => {
+      clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = "";
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -40,7 +47,7 @@ export default function BagDrawer() {
       <aside className="drawer" role="dialog" aria-modal="true" aria-label="Your bag">
         <header className="drawer-head">
           <h2 className="h3">Your bag {count > 0 && <span>({count})</span>}</h2>
-          <button className="icon-btn" aria-label="Close bag" onClick={() => bag.setOpen(false)}>
+          <button ref={closeBtn} className="icon-btn" aria-label="Close bag" onClick={() => bag.setOpen(false)}>
             <Close />
           </button>
         </header>
