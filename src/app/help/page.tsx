@@ -218,6 +218,15 @@ const chapters: Chapter[] = [
         q: "And sale pieces?",
         a: <p>Sale pieces can be exchanged for another size, but aren’t refundable unless they’re faulty.</p>,
       },
+      {
+        q: "How do I get it back to you?",
+        a: (
+          <p>
+            Message us and we’ll arrange the return with you — how, and where to, depends on where you are. Once it’s back with us and checked,
+            the exchange or the refund is on its way.
+          </p>
+        ),
+      },
     ],
   },
   {
@@ -246,11 +255,29 @@ const chapters: Chapter[] = [
         ),
       },
       {
+        q: "Can you help me choose a style for my shape?",
+        a: (
+          <p>
+            Yes. Tell us what you’d like a piece to do — lift, hold, show, hide, all four — and we’ll point you to the ones that do it, and the sizes
+            that do it best.
+          </p>
+        ),
+      },
+      {
         q: "Will it look like the photos?",
         a: (
           <p>
             We do our best to show every colour and detail as it really is, but every screen is a little different. Want a closer look at something?
             Ask, and we’ll send you one.
+          </p>
+        ),
+      },
+      {
+        q: "And if it still doesn’t fit?",
+        a: (
+          <p>
+            Then it goes back for the right size: within 7 days of delivery, unworn, tags on — everything under <a href="#returns">Second thoughts</a>.
+            No lecture.
           </p>
         ),
       },
@@ -283,6 +310,19 @@ const chapters: Chapter[] = [
       {
         q: "Where are my bag and favourites kept?",
         a: <p>Only in your own browser, on your own device. We don’t see a thing until you send us your order.</p>,
+      },
+      {
+        q: "Will you message me afterwards?",
+        a: (
+          <p>
+            Only about your order — unless you’ve asked for our newsletter, and you can stop that whenever you like. Your WhatsApp chat with us can
+            be deleted on request once your order is done.
+          </p>
+        ),
+      },
+      {
+        q: "What does the courier see?",
+        a: <p>Your name, your address and a phone number. Not a word about what’s in the box, and nothing on the box to tell them.</p>,
       },
     ],
   },
