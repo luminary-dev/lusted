@@ -13,30 +13,38 @@ export const metadata: Metadata = {
   alternates: { canonical: "/help" },
 };
 
-// The delivery, returns & FAQ page, after dark: the practical questions asked and answered as pillow talk. Every answer
-// restates the terms (/terms) — keep the two in step. Anything not decided there (delivery times, fees, payment methods)
-// is confirmed with the customer on WhatsApp, and the answers say so rather than promise it.
+// The delivery, returns & FAQ page as a deck of cards: pale, big-radius cards piled on a dark ground, one chapter per card, each with one model cut out on the card and the words wherever she leaves room — a
+// different arrangement on every card. Every answer restates the terms (/terms) — keep the two in step. Anything not
+// decided there (delivery times, fees, payment methods) is confirmed with the customer on WhatsApp, and the answers say
+// so rather than promise it.
 //
-// PHOTOS: stand-ins until the eight "Pillow talk" renders are made (about-wall/help-prompt.txt, HELP-0…7). The alt texts
-// already describe the photos to come; when the renders land in assets/images/help/, swap the paths below and nothing else.
+// PHOTOS: the chapter models are cut-outs (transparent webp, trimmed to her outline) so the card colour and her place on
+// it are CSS. Until the "Pillow talk" renders are made (about-wall/help-prompt.txt, HELP-1…6, shot on a plain backdrop
+// and cut out the same way) these are stand-ins cut from the hero photos; the alt texts describe the photos to come.
+// The opener and the closing card keep their wide photos (HELP-0 and HELP-7).
 const photos = {
   opener: img("images/about-page/dressing-room.webp"),
-  ordering: img("images/hero/main-phone/main-01.webp"),
-  payment: img("images/hero/main-phone/main-02.webp"),
-  delivery: img("images/about-page/the-parcel.webp"),
-  returns: img("images/hero/main-phone/main-03.webp"),
-  sizing: img("images/about-page/the-fitting.webp"),
-  privacy: img("images/hero/main-phone/main-04.webp"),
+  ordering: img("images/help/standin-ordering.webp"),
+  payment: img("images/help/standin-payment.webp"),
+  delivery: img("images/help/standin-delivery.webp"),
+  returns: img("images/help/standin-returns.webp"),
+  sizing: img("images/help/standin-sizing.webp"),
+  privacy: img("images/help/standin-privacy.webp"),
   closing: img("images/hero/main/main-01.webp"),
 };
 
 type Qa = { q: string; a: ReactNode };
 
+// where she stands and where the words go — see .help-card[data-layout] in globals.css
+type Layout = "right" | "left" | "split" | "corner" | "left-low" | "right-high";
+
 type Chapter = {
   id: string;
   title: ReactNode;
   tease: string;
-  photo: { src: ReturnType<typeof img>; alt: string; pos?: string };
+  layout: Layout;
+  paper: string; // the card's colour
+  photo: { src: ReturnType<typeof img>; alt: string };
   items: Qa[];
 };
 
@@ -51,10 +59,11 @@ const chapters: Chapter[] = [
       </>
     ),
     tease: "No checkout. No forms. Just you, one message, and someone on the other end who wants you to have it.",
+    layout: "right",
+    paper: "#f8f1ec",
     photo: {
       src: photos.ordering,
-      alt: "Model sitting up against a wine velvet headboard in a cherry-red satin teddy, typing her order on her phone and glancing up over it",
-      pos: "50% 20%",
+      alt: "Model in a cherry-red satin teddy and stockings, sitting with one knee up, typing her order on her phone and glancing up over it",
     },
     items: [
       {
@@ -103,10 +112,11 @@ const chapters: Chapter[] = [
       </>
     ),
     tease: "The one unsexy moment of the whole affair. We keep it quick, so you can get back to the rest.",
+    layout: "left",
+    paper: "#f5ead9",
     photo: {
       src: photos.payment,
-      alt: "Model perched on the arm of a velvet chair in a liquid-gold chain-strap slip, a black card held to her lips",
-      pos: "50% 20%",
+      alt: "Model standing in a liquid-gold chain-strap slip and gold stilettos, a black card held between two fingers to her lips",
     },
     items: [
       {
@@ -135,10 +145,11 @@ const chapters: Chapter[] = [
       </>
     ),
     tease: "It arrives looking like nothing at all. Then you open it.",
+    layout: "split",
+    paper: "#f3e1da",
     photo: {
       src: photos.delivery,
-      alt: "Model with her back against her front door in a champagne silk robe fallen open over lavender lace, lifting the lid of a plain brown box",
-      pos: "50% 30%",
+      alt: "Model standing in a champagne silk robe fallen open over lavender lace, a plain brown box in her arms with its lid lifted an inch",
     },
     items: [
       {
@@ -177,10 +188,11 @@ const chapters: Chapter[] = [
       </>
     ),
     tease: "Changed your mind? Didn’t fit the way you pictured it? Tell us. We don’t sulk.",
+    layout: "corner",
+    paper: "#efe6e0",
     photo: {
       src: photos.returns,
-      alt: "Model kneeling on silk sheets in an ivory satin corset-bodysuit among three lingerie sets, holding a wine lace bra up by its straps",
-      pos: "50% 20%",
+      alt: "Model kneeling in an ivory satin corset-bodysuit and stockings, holding a wine lace bra up by its straps as if asking which one",
     },
     items: [
       {
@@ -215,10 +227,11 @@ const chapters: Chapter[] = [
       </>
     ),
     tease: "Measure once. Then let us worry about where everything goes.",
+    layout: "left-low",
+    paper: "#f6e4e4",
     photo: {
       src: photos.sizing,
-      alt: "Model side-on at a dawn window in white strappy lace, a tailor's tape around her hips, looking back over her shoulder",
-      pos: "50% 25%",
+      alt: "Model standing side-on in white strappy lace and stockings, a tailor's tape around her hips, looking back over her shoulder",
     },
     items: [
       {
@@ -250,10 +263,11 @@ const chapters: Chapter[] = [
       </>
     ),
     tease: "What you wear, and for whom, is nobody’s business. We’re very good at keeping quiet.",
+    layout: "right-high",
+    paper: "#f2e9df",
     photo: {
       src: photos.privacy,
-      alt: "Model lying back on black satin pillows in black satin and lace, a sleep mask pushed up into her hair and a finger across her lips",
-      pos: "50% 20%",
+      alt: "Model sitting in black satin and lace with a sleep mask pushed up into her hair, a finger laid across her lips",
     },
     items: [
       {
@@ -287,89 +301,90 @@ function Faq({ items }: { items: Qa[] }) {
   );
 }
 
+function ChapterCard({ c, i }: { c: Chapter; i: number }) {
+  // the "split" card puts her in the middle with the questions either side of her
+  const half = Math.ceil(c.items.length / 2);
+  const columns = c.layout === "split" || c.layout === "corner" ? [c.items.slice(0, half), c.items.slice(half)] : [c.items];
+  return (
+    <section id={c.id} className="help-card" data-layout={c.layout} data-reveal style={{ "--paper": c.paper, "--i": i + 1 } as React.CSSProperties}>
+      <div className="help-model">
+        <Image quality={90} src={c.photo.src} alt={c.photo.alt} fill sizes="(min-width: 901px) 44vw, 90vw" />
+      </div>
+      <div className="help-card-head">
+        <p className="help-no" aria-hidden="true">
+          {String(i + 1).padStart(2, "0")}
+        </p>
+        <h2 className="h2">{c.title}</h2>
+        <p className="help-tease">{c.tease}</p>
+      </div>
+      {columns.map((items, k) => (
+        <div key={k} className={`help-qs help-qs-${k + 1}`}>
+          <Faq items={items} />
+        </div>
+      ))}
+    </section>
+  );
+}
+
 export default function HelpPage() {
   return (
     <main className="help">
-      {/* the opener: she fills the right of the photo, the words sit on the dark left */}
-      <header className="help-hero">
-        <div className="help-hero-photo" aria-hidden="true">
-          <Image quality={90} src={photos.opener} alt="" fill preload placeholder="blur" sizes="100vw" />
-        </div>
-        <div className="container help-hero-inner">
-          <nav className="crumbs" aria-label="Breadcrumb">
-            <Link href="/">Home</Link>
-            <span>/</span>
-            <span>Delivery, returns &amp; FAQ</span>
-          </nav>
-          <p className="eyebrow" data-reveal>
-            Pillow talk · delivery, returns &amp; FAQ
-          </p>
-          <h1 className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            Ask us anything. <em>We don’t blush.</em>
-          </h1>
-          <p className="help-lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
-            The questions you’d murmur afterwards — how to have us, how we slip through your door, what happens if it doesn’t fit — answered now, so
-            later can be about something else.
-          </p>
-        </div>
-      </header>
-
-      <div className="container">
-        {chapters.map((c, i) => (
-          <section key={c.id} id={c.id} className={`help-chapter${i % 2 ? " is-flipped" : ""}`}>
-            <figure className="help-photo" data-reveal>
-              <Image
-                quality={90}
-                src={c.photo.src}
-                alt={c.photo.alt}
-                fill
-                placeholder="blur"
-                sizes="(min-width: 1467px) 540px, (min-width: 901px) 38vw, 100vw"
-                style={{ objectPosition: c.photo.pos }}
-              />
-            </figure>
-            <div className="help-chapter-body">
-              <div className="help-chapter-head" data-reveal>
-                <p className="help-no" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <h2 className="h2">{c.title}</h2>
-                <p className="help-tease">{c.tease}</p>
-              </div>
-              <div data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-                <Faq items={c.items} />
-              </div>
-            </div>
-          </section>
-        ))}
-      </div>
-
-      {/* the closing band: still wondering — a real person on the other end */}
-      <section className="help-cta" aria-labelledby="help-cta-title">
-        <div className="help-cta-photo" aria-hidden="true">
-          <Image quality={90} src={photos.closing} alt="" fill placeholder="blur" sizes="100vw" />
-        </div>
-        <div className="container help-cta-inner">
-          <p className="eyebrow" data-reveal>
-            Still wondering?
-          </p>
-          <h2 id="help-cta-title" className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            Say it <em>however you like.</em>
-          </h2>
-          <p className="help-lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
-            A real person answers on WhatsApp or by email — about a size, a piece, a delivery, or the thing you’re not sure you should ask. The fine
-            print behind every answer is in our <Link href="/terms">terms</Link>.
-          </p>
-          <div className="help-cta-actions" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
-            <a className="btn btn-light" href={ask("I have a question.")} target="_blank" rel="noopener noreferrer">
-              Message us on WhatsApp <ArrowRight className="arrow" />
-            </a>
-            <a className="help-email" href={emailLink}>
-              {site.email}
-            </a>
+      <div className="container help-deck">
+        {/* the opener card: the wide photo, the words on its dark left */}
+        <header className="help-card is-photo is-opener" style={{ "--i": 0 } as React.CSSProperties}>
+          <div className="help-card-photo" aria-hidden="true">
+            <Image quality={90} src={photos.opener} alt="" fill preload placeholder="blur" sizes="(min-width: 1467px) 1320px, 94vw" />
           </div>
-        </div>
-      </section>
+          <div className="help-card-copy">
+            <nav className="crumbs" aria-label="Breadcrumb">
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <span>Delivery, returns &amp; FAQ</span>
+            </nav>
+            <p className="eyebrow" data-reveal>
+              Pillow talk · delivery, returns &amp; FAQ
+            </p>
+            <h1 className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
+              Ask us anything. <em>We don’t blush.</em>
+            </h1>
+            <p className="help-lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
+              The questions you’d murmur afterwards — how to have us, how we slip through your door, what happens if it doesn’t fit — answered now,
+              so later can be about something else.
+            </p>
+          </div>
+        </header>
+
+        {chapters.map((c, i) => (
+          <ChapterCard key={c.id} c={c} i={i} />
+        ))}
+
+        {/* the closing card: still wondering — a real person on the other end */}
+        <section className="help-card is-photo is-closing" aria-labelledby="help-cta-title" style={{ "--i": chapters.length + 1 } as React.CSSProperties}>
+          <div className="help-card-photo" aria-hidden="true">
+            <Image quality={90} src={photos.closing} alt="" fill placeholder="blur" sizes="(min-width: 1467px) 1320px, 94vw" />
+          </div>
+          <div className="help-card-copy">
+            <p className="eyebrow" data-reveal>
+              Still wondering?
+            </p>
+            <h2 id="help-cta-title" className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
+              Say it <em>however you like.</em>
+            </h2>
+            <p className="help-lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
+              A real person answers on WhatsApp or by email — about a size, a piece, a delivery, or the thing you’re not sure you should ask. The
+              fine print behind every answer is in our <Link href="/terms">terms</Link>.
+            </p>
+            <div className="help-cta-actions" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
+              <a className="btn btn-light" href={ask("I have a question.")} target="_blank" rel="noopener noreferrer">
+                Message us on WhatsApp <ArrowRight className="arrow" />
+              </a>
+              <a className="help-email" href={emailLink}>
+                {site.email}
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

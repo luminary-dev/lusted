@@ -140,6 +140,36 @@
       "h": 2160,
       "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADQAQCdASoIAAQAAoBCJYgCdAEQFAUlwAD++J6neAqyZQ/CuVDZLXc4XGE0k6O7PYjI0sAA"
     },
+    "images/help/standin-delivery.webp": {
+      "w": 620,
+      "h": 1406,
+      "blur": "data:image/webp;base64,UklGRhQBAABXRUJQVlA4WAoAAAAQAAAABwAAEQAAQUxQSIkAAAABgKpt+/rk2X/J3T25+5asUrlIHMQiF43mkNyhs7iLg6A6zUnu9v9OIyICNJNdAOzqfVAh0pv++B+3aEafL+5kN6KQ+JLfyzEF+5EsZ6+jsCAHa0NAV2SgBUKqSBHoiyoeSKsne6KHhfvIiOhgbwLbQwP6PVichv0aDG/DIArJFdhzQ/MQAGItAABWUDggZAAAAHADAJ0BKggAEgA+tUieSackIqEwCADgFolAE6XrkD2rlARmAAD+zeYsN0E66+305xM9E54TmTfOgtBWeXcapj6ysci5gEvizqTBwx9nA+835htn9MP6W2X130ERrSAryE4AAAA="
+    },
+    "images/help/standin-ordering.webp": {
+      "w": 895,
+      "h": 1460,
+      "blur": "data:image/webp;base64,UklGRswAAABXRUJQVlA4WAoAAAAQAAAABwAADAAAQUxQSFwAAAABcFpt27K8SIMhPDKBa6WSnM4KbODNvXlzS2RfwB2qfzpERAQASAsyAGpHQS6AQpz1P+Mk8yRnmqa5+GEhZFWEXGyNrgMqfqHNhKoReiaEAE6E/hWNIdzqt/0OLVZQOCBKAAAA8AEAnQEqCAANAAKAQiWwAnQBA/rfAS4AAP7w6INKW44hQ2VGkAmVRarqO5vt6DyDv8ws4wqwZKl01Rzri6JIjS9tvqTXjPUAAAA="
+    },
+    "images/help/standin-payment.webp": {
+      "w": 718,
+      "h": 1452,
+      "blur": "data:image/webp;base64,UklGRvYAAABXRUJQVlA4WAoAAAAQAAAABwAADwAAQUxQSHIAAAABcFNt27LcuLs7JCCAVyCCF9AAjBw2nZjdApCBzUdIwGq/lYiICQAMwxLKjPBUKWaCEFb0BaEEONeCEAFyR+HjBZqtqbBXAzQEIQ3Ufv9HAuK/Qe8EqBqv8hlAnTq8rSjNj5TCZJ2DSmdQcfartRoodi1WUDggXgAAADACAJ0BKggAEAACgEIloAJ0Bi8NsvUO3qsgAP7u4x2+u7Q2J+VjCt/GOmv3cvrUAjVUUKTIbBWfaMc20ehte/ut9RjT9VbLO2b9usKVbPw/+OaRDPcXi4EmY+iVAAA="
+    },
+    "images/help/standin-privacy.webp": {
+      "w": 1368,
+      "h": 1463,
+      "blur": "data:image/webp;base64,UklGRrgAAABXRUJQVlA4WAoAAAAQAAAABwAACAAAQUxQSEkAAAAAAAB/SQYAAAAAD8PKEAAAAACR//kcAAAAhv///+1eDQAt0//////7vACg1v/////zAIA2/v//+VAAZy3y/7syAABsDniDAAAAAFZQOCBIAAAAMAIAnQEqCAAJAAKAQiWoAnRH/4F5nVNDf2AA+8vTNSGsRzcjL+9P4m+nwEQP0EmB2VWI5iRh7UIokXP7fCxHeqWbjcEVoAAA"
+    },
+    "images/help/standin-returns.webp": {
+      "w": 1147,
+      "h": 1433,
+      "blur": "data:image/webp;base64,UklGRq4AAABXRUJQVlA4WAoAAAAQAAAABwAACQAAQUxQSEoAAAAJcFNt27Lcv/v/zzraKoShAJtVIIFLBTIwu45sVKAA61siIgKIZ8MfQNE/ZrKijkRj+pGcO4Dl0UqhH2Jp2DlSc32Dfx/895NvD1ZQOCA+AAAA0AEAnQEqCAAKAAKAQiWIAnQAt+9olIAA+64PFCdaiu2hW2rtifsjRfADR9U77aqTGZ62MK6F8jt+h1QYAAA="
+    },
+    "images/help/standin-sizing.webp": {
+      "w": 944,
+      "h": 1426,
+      "blur": "data:image/webp;base64,UklGRs4AAABXRUJQVlA4WAoAAAAQAAAABwAACwAAQUxQSFoAAAABcFtr25o8SaosYHhL6VJJ6W4dh4WoHCZwGIGWnkHS4fotEREB5KqAGpg93qdsgPXnfZllUujB1PPQA3A7XYCm8zmGACqfvCnpp4osz4oYg4UmQ6sZkRiePgBWUDggTgAAAPABAJ0BKggADAACgEIloAJ0ugACso3AAAD+X20GiqX/srY29NUy/2BBS97SqSxGo4/pTmLunYTzWWZLAKB+vxFvPoUbGSTfFyH1CAAAAA=="
+    },
     "images/hero/after-dark/after-dark-01.webp": {
       "w": 1843,
       "h": 2304,
