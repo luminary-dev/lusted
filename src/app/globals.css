@@ -7372,14 +7372,17 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 }
 
 /* ───────── delivery, returns & FAQ — "pillow talk" (src/app/help) ─────────
-   A deck of cards on a dark ground: pale, big-radius cards piled on each other (each one laid a little over the one
-   before, nudged left or right in turn), one chapter per card, one model cut out on each card and the words wherever
-   she leaves room — a different arrangement on every card (data-layout). Not sticky: a card has to scroll normally so
-   an answer that opens below the fold can be read. The opener and the closing card are photo cards. The nav goes
-   transparent over the opener as over the 404 (the body:has() rules below). */
+   A deck of cards on a dark ground: pale, big-radius cards, each tilted a touch one way or the other, one chapter per
+   card, one model on each card and the words wherever she leaves room — a different arrangement on every card
+   (data-layout). Under the opener the rest of the deck waits at the bottom of the screen, each card showing a strip of
+   its top (position: sticky with a negative bottom — how far a card may hang below the screen is its height, measured
+   by DeckSizer.tsx into --h, less the strip), and scrolls up into place in turn; once a card is up it scrolls like
+   anything else, so an answer that opens below the fold can be read. The opener and the closing card are photo cards.
+   The nav goes transparent over the opener as over the 404 and solid over the rest (the body:has() rules below). */
 .help {
   --card-radius: clamp(26px, 3vw, 40px);
   --overlap: clamp(22px, 2.6vw, 36px); /* how far each card lies over the one before */
+  --strip: 14px; /* the sliver of each waiting card that shows at the bottom of the screen */
   position: relative;
   padding-top: clamp(96px, 11vh, 128px);
   padding-bottom: clamp(48px, 7vw, 96px);
@@ -7403,19 +7406,68 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   box-shadow:
     0 -1px 0 rgba(255, 246, 242, 0.08),
     0 -30px 60px -24px rgba(0, 0, 0, 0.75);
+  transform: rotate(var(--tilt, 0deg));
 }
 
 .help-card + .help-card {
   margin-top: calc(var(--overlap) * -1);
 }
 
-/* the pile isn't squared up: every other card sits a touch to the right, the rest a touch to the left */
-.help-card:nth-child(odd) {
+/* the cards after the opener wait at the bottom of the screen, fanned: the second card's strip highest, the last
+   card's lowest, each one over the one before. --h is the card's measured height (DeckSizer.tsx); until it's known the
+   card can't stick, and simply follows in flow. */
+.help-card[data-deck] {
+  --h: 99999px;
+  position: sticky;
+  bottom: calc(var(--strip) * (var(--n) - var(--i)) - var(--h));
+}
+
+/* the pile isn't squared up: each card is nudged a touch and tilted a touch, this way and that */
+.help-card:nth-child(8n + 1) {
+  --tilt: -0.55deg;
   margin-right: clamp(10px, 1.6vw, 24px);
 }
 
-.help-card:nth-child(even) {
+.help-card:nth-child(8n + 2) {
+  --tilt: 0.5deg;
   margin-left: clamp(10px, 1.6vw, 24px);
+}
+
+.help-card:nth-child(8n + 3) {
+  --tilt: -0.3deg;
+  margin-left: clamp(6px, 1vw, 14px);
+}
+
+.help-card:nth-child(8n + 4) {
+  --tilt: 0.7deg;
+  margin-right: clamp(10px, 1.6vw, 24px);
+}
+
+.help-card:nth-child(8n + 5) {
+  --tilt: -0.45deg;
+  margin-left: clamp(10px, 1.6vw, 24px);
+}
+
+.help-card:nth-child(8n + 6) {
+  --tilt: 0.35deg;
+  margin-right: clamp(6px, 1vw, 14px);
+}
+
+.help-card:nth-child(8n + 7) {
+  --tilt: -0.65deg;
+  margin-left: clamp(10px, 1.6vw, 24px);
+}
+
+.help-card:nth-child(8n + 8) {
+  --tilt: 0.4deg;
+  margin-right: clamp(10px, 1.6vw, 24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .help-card[data-deck] {
+    position: relative; /* no cards sliding up from the bottom */
+    bottom: auto;
+  }
 }
 
 /* ─ the photo cards (opener and closing) ─ */
@@ -7530,7 +7582,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 0 clamp(20px, 3vw, 48px);
-  min-height: clamp(560px, 86svh, 820px);
+  min-height: var(--card-h, clamp(560px, 86svh, 820px)); /* not all the same: each layout sets its own below */
   padding: clamp(28px, 4vw, 56px) clamp(28px, 4.5vw, 64px) calc(clamp(28px, 4vw, 56px) + var(--overlap));
   color: var(--ink);
   background:
@@ -7549,7 +7601,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 .help-model img {
   object-fit: contain;
   object-position: var(--anchor, 50% 100%);
-  filter: drop-shadow(0 24px 30px rgba(46, 20, 24, 0.28));
+  mix-blend-mode: multiply; /* shot on pure white: the white becomes the paper, her shadow on the floor stays */
 }
 
 .help-card-head,
@@ -7631,6 +7683,25 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 }
 
 /* ─ the six arrangements (desktop) ─ */
+.help-card[data-layout="right"] {
+  --card-h: clamp(560px, 84svh, 800px);
+}
+.help-card[data-layout="left"] {
+  --card-h: clamp(520px, 76svh, 720px);
+}
+.help-card[data-layout="split"] {
+  --card-h: clamp(560px, 82svh, 780px);
+}
+.help-card[data-layout="corner"] {
+  --card-h: clamp(460px, 66svh, 640px);
+}
+.help-card[data-layout="left-low"] {
+  --card-h: clamp(500px, 72svh, 700px);
+}
+.help-card[data-layout="right-high"] {
+  --card-h: clamp(520px, 78svh, 740px);
+}
+
 /* 01 · she stands at the right, bottom-anchored; number, title and questions down the left */
 .help-card[data-layout="right"] .help-model {
   top: 6%;
@@ -7784,6 +7855,11 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 @media (max-width: 900px) {
   .help {
     --overlap: 18px;
+    --strip: 12px;
+  }
+  .help-card:nth-child(n) {
+    margin-left: 0;
+    margin-right: 0;
   }
   .help-card:nth-child(odd) {
     margin-right: 6px;
@@ -7888,6 +7964,12 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Over the help page's deck the scrolled bar is solid paper rather than frosted glass: the cards shouldn't show through it. */
+body:has(main.help) .nav.is-scrolled:not(.is-open) .nav-bar {
+  background: var(--cream);
+  backdrop-filter: none;
 }
 
 /* The 404 and the help page sit over a photo like the home hero, so until the bar scrolls (or the menu opens) it goes transparent there
