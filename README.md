@@ -73,7 +73,7 @@ Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed 
   deploy job refuses a push to `main` that isn't a merge commit whose second parent is on `dev`.
 
 The release flow is therefore: work on `dev` → open a pull request `dev → main` → merge. CI needs three repository
-secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account → Tokens),
+secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account → Tokens, scope: the team that owns the project),
 `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `.vercel/project.json` after `vercel link`).
 
 GitHub's own branch protection isn't available to this private repository on the organisation's free plan, so the
