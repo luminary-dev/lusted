@@ -18,7 +18,9 @@ function r2() {
 }
 
 async function serve(request: Request, params: Promise<{ path: string[] }>, method: "GET" | "HEAD") {
-  const key = (await params).path.join("/");
+  const segments = (await params).path;
+  if (/^v\d+$/.test(segments[0] ?? "")) segments.shift(); // the cache-busting version (src/lib/cdn.ts) isn't part of the key
+  const key = segments.join("/");
   if (!paths.has(key)) return new Response("Not found", { status: 404 });
   const bucket = r2();
   if (!bucket) return new Response("The photo store is not configured (R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY).", { status: 503 });

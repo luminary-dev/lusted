@@ -8,8 +8,13 @@ import manifest from "./image-manifest.json";
 export type ImagePath = keyof typeof manifest.images;
 
 const base = (process.env.NEXT_PUBLIC_IMAGE_CDN || "/img").replace(/\/$/, "");
+// Bumped whenever the photos themselves change under the same paths (they're served immutable for a year, and the
+// image optimiser and browsers keep them that long): the version is a path segment the /img route ignores, so every
+// address changes and every cache refetches. 2: the wordmark on every photo.
+const IMAGE_VERSION = 2;
 
 export function img(path: ImagePath): StaticImageData {
   const m = manifest.images[path];
-  return { src: `${base}/${path}`, width: m.w, height: m.h, blurDataURL: m.blur };
+  const src = base === "/img" ? `/img/v${IMAGE_VERSION}/${path}` : `${base}/${path}`;
+  return { src, width: m.w, height: m.h, blurDataURL: m.blur };
 }
