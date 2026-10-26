@@ -2225,7 +2225,17 @@ html::-webkit-scrollbar {
 
 /* ── WebGL swing tags (SizeTags3D.tsx): measured in the background, then faded in once ready ── */
 .size-tags-stage {
+  --tags-h: clamp(340px, 27vw, 420px); /* the 3D stage's height in the flow (plus 22px above) */
   position: relative;
+}
+
+/* the 3D tags' room, held from the first paint wherever WebGL can run (they build as the section nears) so nothing
+   below them moves. As its own formatting context the stage keeps the 3D canvas's negative margins (and the HTML
+   tags' cord margin) inside, so its height is exactly this before and after the tags arrive; on phones it also holds
+   the swipe hint's line. */
+.webgl .size-tags-stage:not(.no-3d) {
+  display: flow-root;
+  min-height: calc(var(--tags-h) + 22px + var(--hint-h, 0px));
 }
 
 /* everything else in the column sits above the 3D stage's invisible headroom, so it stays clickable */
@@ -2243,7 +2253,7 @@ html::-webkit-scrollbar {
   top: 0;
   left: calc(-1 * var(--bleed-l));
   right: calc(-1 * var(--bleed-r));
-  height: calc(clamp(340px, 27vw, 420px) + var(--pad) * 2);
+  height: calc(var(--tags-h) + var(--pad) * 2);
   visibility: hidden;
   pointer-events: none;
 }
@@ -2272,8 +2282,8 @@ html::-webkit-scrollbar {
   }
 }
 
-/* with 3D up, the HTML tags stay only for screen readers */
-.has-3d .size-tags {
+/* with 3D on its way or up, the HTML tags stay only for screen readers */
+.webgl .size-tags-stage:not(.no-3d) .size-tags {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -2290,9 +2300,13 @@ html::-webkit-scrollbar {
 }
 
 @media (max-width: 600px) {
+  .size-tags-stage {
+    --hint-h: 22px; /* the hint's line below the 3D tags: 4px + 18px */
+  }
   .has-3d .tags3d-hint {
     display: block;
     margin-top: 4px;
+    line-height: 18px;
     text-align: center;
     font-size: 11px;
     letter-spacing: 0.18em;
@@ -3286,9 +3300,11 @@ html::-webkit-scrollbar {
     font-size: 12.5px;
     line-height: 1.25;
   }
+  .size-tags-stage {
+    --tags-h: calc(100vw - var(--gutter) * 2);
+  }
   .size-tags-3d {
     --pad: 36px;
-    height: calc(100vw - var(--gutter) * 2 + var(--pad) * 2);
   }
   .tape-guide {
     grid-template-columns: 1fr;

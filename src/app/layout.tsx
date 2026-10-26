@@ -83,6 +83,9 @@ export const viewport: Viewport = {
 const themeScript = `try{var t=localStorage.getItem("lusted-theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
 // Skips the loading screen if it has already played in this tab, before paint so it never flashes.
 const introScript = `try{if(sessionStorage.getItem("lusted-intro"))document.documentElement.classList.add("intro-seen")}catch(e){}`;
+// Marks browsers that can draw the 3D size tags, before first paint, so the size guide holds their room from the start
+// (SizeGuide.tsx / .webgl in globals.css) and never changes height when they arrive.
+const webglScript = `if(window.WebGLRenderingContext)document.documentElement.classList.add("webgl")`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -90,6 +93,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
+        <script dangerouslySetInnerHTML={{ __html: webglScript }} />
       </head>
       <body>
         <LoadingScreen />

@@ -82,7 +82,12 @@ export default function SizeGuide() {
   const [tab, setTab] = useState<Tab>("Bras & tops");
   const [flipped, setFlipped] = useState(-1); // the tag turned over by a tap / click / key
   const flip = (i: number) => setFlipped((f) => (f === i ? -1 : i));
-  const [has3d, setHas3d] = useState(false); // true once the WebGL tags are up; the HTML tags then stay for screen readers only
+  // null until the WebGL tags report in; true once they're up (the HTML tags then stay for screen readers only). The tags
+  // only build as the section nears, but wherever WebGL can run their room is held from the first paint (the `webgl`
+  // class, layout.tsx), so the section never changes height under someone scrolling — or jumping to an anchor — past it.
+  // If they then can't start, `no-3d` gives the room back to the HTML tags.
+  const [ready3d, setReady3d] = useState<boolean | null>(null);
+  const has3d = ready3d === true;
   const tags3d = useMemo(
     () =>
       guides[tab].map((lines, i) => ({
@@ -153,11 +158,11 @@ export default function SizeGuide() {
           </div>
 
           <div
-            className={`size-tags-stage ${has3d ? "has-3d" : ""}`}
+            className={`size-tags-stage ${ready3d === false ? "no-3d" : ""} ${has3d ? "has-3d" : ""}`}
             role="tabpanel"
             aria-label={`${tab} sizes, body measurements in cm`}
           >
-            <SizeTags3D tags={tags3d} onReady={setHas3d} />
+            <SizeTags3D tags={tags3d} onReady={setReady3d} />
             <p className="tags3d-hint" aria-hidden="true">
               ← Swipe along the cord →
             </p>
