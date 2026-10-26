@@ -191,7 +191,16 @@ export default function FluidCursor() {
     };
 
     let velocity: DoubleFbo, dye: DoubleFbo, pressure: DoubleFbo, divergence: Fbo, curl: Fbo;
+    const free = (f?: Fbo) => {
+      if (!f) return;
+      gl.deleteFramebuffer(f.fbo);
+      gl.deleteTexture(f.tex);
+    };
     const resize = () => {
+      // the buffers are rebuilt at the new size: free the old ones first, or every resize event (a window being
+      // dragged fires dozens) leaves eight textures behind on the GPU
+      for (const d of [velocity, dye, pressure]) if (d) [d.read, d.write].forEach(free);
+      [divergence, curl].forEach(free);
       const dpr = Math.min(1.5, window.devicePixelRatio || 1);
       el.width = Math.round(window.innerWidth * dpr);
       el.height = Math.round(window.innerHeight * dpr);
