@@ -61,27 +61,20 @@ test.describe("routes", () => {
     expect(await page.title()).toMatch(/nothing on here/i);
   });
 
-  test("delivery, returns & FAQ: every section has questions that open in place, and its links go where they say", async ({ prepared: page }) => {
+  test("delivery, returns & FAQ: every chapter answers its questions in the open, and its links go where they say", async ({ prepared: page }) => {
     await go(page, "/help");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Ask us anything");
     const ids = ["ordering", "payment", "delivery", "returns", "sizing", "privacy"];
-    for (const id of ids) expect(await page.locator(`#${id} details`).count(), `questions in #${id}`).toBeGreaterThan(1);
-    // the answers restate the terms: 7-day hygiene-safe exchanges, plain packaging
-    const q = page.locator("#returns details").first();
-    await expect(q.locator(".faq-a")).toBeHidden();
-    await q.locator("summary").click();
-    await expect(q).toHaveAttribute("open", "");
-    await expect(q.locator(".faq-a")).toContainText("7 days");
-    await q.locator("summary").press("Enter");
-    await expect(q).not.toHaveAttribute("open", "");
-    await page.locator("#delivery summary", { hasText: "Will anyone know" }).click();
-    await expect(page.locator("#delivery .faq-a", { hasText: "plain, unbranded box" })).toBeVisible();
-    // links (answers are in the DOM even while closed)
+    for (const id of ids) expect(await page.locator(`#${id} .help-qa dt`).count(), `questions in #${id}`).toBeGreaterThan(1);
+    // the answers restate the terms: 7-day hygiene-safe exchanges, plain packaging — and they're readable without a click
+    await expect(page.locator("#returns .help-qa dd").first()).toContainText("7 days");
+    await expect(page.locator("#delivery .help-qa dd", { hasText: "plain, unbranded box" })).toBeVisible();
+    // every chapter card has its model
+    await expect(page.locator(".help-card .help-model img")).toHaveCount(ids.length);
+    // links
     const hrefs = await page.locator(".help-card a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
     expect(hrefs.filter((h) => h.startsWith("https://wa.me/")).every((h) => h.includes(CATALOG.whatsapp))).toBe(true);
     for (const h of ["/#size-guide", "/privacy", "/terms"]) expect(hrefs).toContain(h);
-    // every chapter card has its model
-    await expect(page.locator(".help-card .help-model img")).toHaveCount(ids.length);
   });
 
   test("search engines: robots.txt points to a sitemap of every page, and pieces share their own photo", async ({ request, prepared: page }) => {

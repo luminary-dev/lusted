@@ -288,22 +288,22 @@ const chapters: Chapter[] = [
   },
 ];
 
-// one question per <details>: native open/close, keyboard and screen-reader friendly, no script
-function Faq({ items }: { items: Qa[] }) {
+// the questions and their answers, all open: the words fill the card
+function Qas({ items }: { items: Qa[] }) {
   return (
-    <div className="faq">
+    <dl className="help-qa">
       {items.map(({ q, a }) => (
-        <details key={q}>
-          <summary>{q}</summary>
-          <div className="faq-a">{a}</div>
-        </details>
+        <div key={q}>
+          <dt>{q}</dt>
+          <dd>{a}</dd>
+        </div>
       ))}
-    </div>
+    </dl>
   );
 }
 
 function ChapterCard({ c, i }: { c: Chapter; i: number }) {
-  // the "split" card puts her in the middle with the questions either side of her
+  // the "split" and "corner" cards set the questions in two columns
   const half = Math.ceil(c.items.length / 2);
   const columns = c.layout === "split" || c.layout === "corner" ? [c.items.slice(0, half), c.items.slice(half)] : [c.items];
   return (
@@ -320,7 +320,7 @@ function ChapterCard({ c, i }: { c: Chapter; i: number }) {
       </div>
       {columns.map((items, k) => (
         <div key={k} className={`help-qs help-qs-${k + 1}`}>
-          <Faq items={items} />
+          <Qas items={items} />
         </div>
       ))}
     </section>
