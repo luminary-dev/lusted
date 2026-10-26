@@ -7490,7 +7490,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 .help-card-photo img {
   object-fit: cover;
-  object-position: 80% 30%; /* she holds the right of the wide photos */
+  object-position: var(--pos, 80% 30%); /* she holds the right of the wide photos; each card says where exactly */
 }
 
 .help-card.is-photo::before {
@@ -7847,7 +7847,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 @media (max-width: 1100px) {
   .help-card-photo img {
-    object-position: 72% 30%;
+    object-position: var(--pos, 72% 30%);
   }
 }
 
@@ -7874,7 +7874,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
     min-height: clamp(420px, 70svh, 600px);
   }
   .help-card-photo img {
-    object-position: 62% 20%;
+    object-position: var(--pos-m, 62% 20%);
   }
   .help-card.is-photo::before {
     background: linear-gradient(180deg, rgba(28, 10, 13, 0.45) 0%, rgba(28, 10, 13, 0.05) 22%, rgba(28, 10, 13, 0.3) 42%, rgba(28, 10, 13, 0.9) 62%, rgba(28, 10, 13, 0.98) 100%);

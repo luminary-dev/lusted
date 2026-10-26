@@ -22,16 +22,17 @@ export const metadata: Metadata = {
 // PHOTOS: the chapter models are shot on a pure white seamless backdrop and multiplied onto the card (mix-blend-mode),
 // so the white disappears into the paper and nothing has to be cut out; where she stands is CSS. Until the "Pillow
 // talk" renders are made (about-wall/help-prompt.txt, HELP-1…6) these are stand-ins cut from the hero photos; the alt
-// texts describe the photos to come. The opener and the closing card keep their wide photos (HELP-0 and HELP-7).
+// texts describe the photos to come. The opener and the closing card have their real photos (HELP-0 and HELP-7); --pos
+// and --pos-m are where she is in each, the focal point on a laptop and on a phone.
 const photos = {
-  opener: img("images/about-page/dressing-room.webp"),
+  opener: img("images/help/pillow-talk.webp"),
   ordering: img("images/help/standin-ordering.webp"),
   payment: img("images/help/standin-payment.webp"),
   delivery: img("images/help/standin-delivery.webp"),
   returns: img("images/help/standin-returns.webp"),
   sizing: img("images/help/standin-sizing.webp"),
   privacy: img("images/help/standin-privacy.webp"),
-  closing: img("images/hero/main/main-01.webp"),
+  closing: img("images/help/still-wondering.webp"),
 };
 
 type Qa = { q: string; a: ReactNode };
@@ -334,7 +335,7 @@ export default function HelpPage() {
       <div className="container help-deck" style={{ "--n": chapters.length + 2 } as React.CSSProperties}>
         {/* the opener card: the wide photo, the words on its dark left */}
         <header className="help-card is-photo is-opener" style={{ "--i": 0 } as React.CSSProperties}>
-          <div className="help-card-photo" aria-hidden="true">
+          <div className="help-card-photo" aria-hidden="true" style={{ "--pos": "70% 40%", "--pos-m": "56% 30%" } as React.CSSProperties}>
             <Image quality={90} src={photos.opener} alt="" fill preload placeholder="blur" sizes="(min-width: 1467px) 1320px, 94vw" />
           </div>
           <div className="help-card-copy">
@@ -362,7 +363,7 @@ export default function HelpPage() {
 
         {/* the closing card: still wondering — a real person on the other end */}
         <section className="help-card is-photo is-closing" aria-labelledby="help-cta-title" data-deck style={{ "--i": chapters.length + 1 } as React.CSSProperties}>
-          <div className="help-card-photo" aria-hidden="true">
+          <div className="help-card-photo" aria-hidden="true" style={{ "--pos": "75% 35%", "--pos-m": "70% 25%" } as React.CSSProperties}>
             <Image quality={90} src={photos.closing} alt="" fill placeholder="blur" sizes="(min-width: 1467px) 1320px, 94vw" />
           </div>
           <div className="help-card-copy">

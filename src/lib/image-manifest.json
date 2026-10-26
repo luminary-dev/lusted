@@ -140,6 +140,11 @@
       "h": 2160,
       "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADQAQCdASoIAAQAAoBCJYgCdAEQFAUlwAD++J6neAqyZQ/CuVDZLXc4XGE0k6O7PYjI0sAA"
     },
+    "images/help/pillow-talk.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoIAAUAAoBCJQBOgB5vdqIAAP75U2g/CL05o4AisKnEzFI0g+3Pmr4T9VaPWmNNSvqDkdUGAAA="
+    },
     "images/help/standin-delivery.webp": {
       "w": 620,
       "h": 1406,
@@ -169,6 +174,11 @@
       "w": 944,
       "h": 1426,
       "blur": "data:image/webp;base64,UklGRs4AAABXRUJQVlA4WAoAAAAQAAAABwAACwAAQUxQSFoAAAABcFtr25o8SaosYHhL6VJJ6W4dh4WoHCZwGIGWnkHS4fotEREB5KqAGpg93qdsgPXnfZllUujB1PPQA3A7XYCm8zmGACqfvCnpp4osz4oYg4UmQ6sZkRiePgBWUDggTgAAAPABAJ0BKggADAACgEIloAJ0ugACso3AAAD+X20GiqX/srY29NUy/2BBS97SqSxGo4/pTmLunYTzWWZLAKB+vxFvPoUbGSTfFyH1CAAAAA=="
+    },
+    "images/help/still-wondering.webp": {
+      "w": 2560,
+      "h": 1680,
+      "blur": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAADQAQCdASoIAAUAAoBCJYwCdAD0lcG0AAD+9+EliJPmibkd2gTeR9gDf02psFJNbZcYhjtDal+yx6wAAAA="
     },
     "images/hero/after-dark/after-dark-01.webp": {
       "w": 1843,
