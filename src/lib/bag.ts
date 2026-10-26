@@ -14,17 +14,33 @@ let loaded = false;
 let open = false;
 const listeners = new Set<() => void>();
 
+// A saved line is only kept if it still makes sense against today's catalogue: the piece exists and still comes in
+// that size and colour, with a whole quantity of 1–10. Anything else (a renamed colour, a stale or hand-edited entry)
+// would otherwise break the bag drawer — which is on every page.
+const valid = (i: unknown): i is BagItem => {
+  if (!i || typeof i !== "object") return false;
+  const { slug, size, color, qty } = i as Record<string, unknown>;
+  const p = typeof slug === "string" ? getProduct(slug) : undefined;
+  return !!p && p.sizes.includes(size as string) && p.colors.includes(color as ColorKey) && Number.isInteger(qty) && (qty as number) >= 1 && (qty as number) <= 10;
+};
+
+function read() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) ?? "[]");
+    items = Array.isArray(saved) ? saved.filter(valid) : EMPTY;
+  } catch {
+    items = EMPTY;
+  }
+}
+
 function load() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
-  try {
-    const saved = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    if (Array.isArray(saved)) items = saved.filter((i) => getProduct(i.slug));
-  } catch {}
+  read();
+  // another tab changed the bag: pick it up (registered once — load() only ever runs its body once)
   window.addEventListener("storage", (e) => {
     if (e.key !== KEY) return;
-    loaded = false;
-    load();
+    read();
     emit();
   });
 }

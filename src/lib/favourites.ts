@@ -12,17 +12,23 @@ let loaded = false;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
+function read() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY) ?? "[]");
+    slugs = Array.isArray(saved) ? saved.filter((s) => typeof s === "string" && getProduct(s)) : EMPTY;
+  } catch {
+    slugs = EMPTY;
+  }
+}
+
 function load() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
-  try {
-    const saved = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    if (Array.isArray(saved)) slugs = saved.filter((s) => typeof s === "string" && getProduct(s));
-  } catch {}
+  read();
+  // another tab changed the favourites: pick them up (registered once — load() only ever runs its body once)
   window.addEventListener("storage", (e) => {
     if (e.key !== KEY) return;
-    loaded = false;
-    load();
+    read();
     emit();
   });
 }
