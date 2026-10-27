@@ -131,7 +131,9 @@ token for this repository with Contents read/write and Pull requests read (it fi
 secret, `CONSOLE_TOKEN` — a fine-grained token with Contents and Pull requests read/write, used by the workflow to push
 the branch and open and merge the pull request (the workflow's own token could push, but nothing it pushes runs CI).
 The bucket must allow the browser's uploads: `node --env-file=.env.local scripts/admin/bucket-cors.mjs` once sets
-its CORS rules for the site's addresses. Sessions are a signed cookie for seven days; eight wrong passwords in ten
+its CORS rules for the site's addresses — through Cloudflare's API with `CLOUDFLARE_API_TOKEN` in `.env.local` (an API
+token with "Workers R2 Storage: Edit"), since the site's own R2 keys can't change bucket settings; without it the script
+prints the rules to paste into the dashboard. Sessions are a signed cookie for seven days; eight wrong passwords in ten
 minutes lock an address out for ten.
 
 ```bash
