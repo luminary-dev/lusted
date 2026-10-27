@@ -10,9 +10,27 @@ const MAX_FAILURES = 8; // per address per window, then 429
 type Bucket = { count: number; reset: number };
 const buckets = new Map<string, Bucket>();
 
+// The caller's address. x-real-ip is set by the platform (Vercel overwrites it); failing that, the right-most
+// X-Forwarded-For hop is the one the nearest proxy appended. The left-most hop is whatever the client sent, so keying
+// on it let anyone dodge the throttle by sending a fresh X-Forwarded-For with every guess.
 export function clientKey(request: Request): string {
-  const fwd = request.headers.get("x-forwarded-for");
-  return (fwd ? fwd.split(",")[0].trim() : "") || request.headers.get("x-real-ip") || "unknown";
+  const real = request.headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  const hops = (request.headers.get("x-forwarded-for") ?? "").split(",").map((h) => h.trim()).filter(Boolean);
+  return hops[hops.length - 1] || "unknown";
+}
+
+// A general fixed-window counter for unauthenticated routes (the newsletter sign-up): true once `key` has made more
+// than `max` calls in the window. Same caveat as above — per instance, a speed bump.
+const hits = new Map<string, Bucket>();
+export function overLimit(key: string, max: number, windowMs: number): boolean {
+  const now = Date.now();
+  const bucket = hits.get(key);
+  if (!bucket || bucket.reset <= now) hits.set(key, { count: 1, reset: now + windowMs });
+  else bucket.count += 1;
+  if (hits.size > 5000) for (const [k, v] of hits) if (v.reset <= now) hits.delete(k); // never unbounded
+  const current = hits.get(key);
+  return !!current && current.count > max;
 }
 
 export function isRateLimited(key: string): boolean {
