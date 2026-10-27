@@ -48,34 +48,33 @@ test.describe("routes", () => {
   test("an unknown route is a 404, on the site's own page with the way back in", async ({ prepared: page }) => {
     const res = await page.goto("/no-such-page", { waitUntil: "load" });
     expect(res?.status()).toBe(404);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("This one slipped away");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Caught you looking");
     await expect(page.locator(".nav")).toBeVisible();
-    await expect(page.locator(".status-actions").getByRole("link", { name: /Shop the collection/ })).toHaveAttribute("href", "/products");
-    await expect(page.locator(".status-actions").getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
-    await expect(page.locator(".status-links a")).toHaveCount(3);
-    expect(await page.title()).toMatch(/not found/i);
+    await expect(page.locator(".lost-actions").getByRole("link", { name: /Show me everything/ })).toHaveAttribute("href", "/products");
+    await expect(page.locator(".lost-actions").getByRole("link", { name: "Take me back to bed" })).toHaveAttribute("href", "/");
+    // the photos are a slideshow: the first is a real (large) photo and the arrowhead moves on to the next
+    const first = page.locator(".lost-photo .hero-slide").first();
+    await expect(first).toHaveClass(/is-active/);
+    await expect.poll(() => first.locator("img").evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 1000)).toBe(true);
+    await page.locator(".slide-cue").click();
+    await expect(page.locator(".lost-photo .hero-slide").nth(1)).toHaveClass(/is-active/);
+    expect(await page.title()).toMatch(/nothing on here/i);
   });
 
-  test("delivery, returns & FAQ: every section has questions that open in place, and its links go where they say", async ({ prepared: page }) => {
+  test("delivery, returns & FAQ: every chapter answers its questions in the open, and its links go where they say", async ({ prepared: page }) => {
     await go(page, "/help");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Everything you’d ask");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Ask us anything");
     const ids = ["ordering", "payment", "delivery", "returns", "sizing", "privacy"];
-    for (const id of ids) expect(await page.locator(`#${id} details`).count(), `questions in #${id}`).toBeGreaterThan(1);
-    // the answers restate the terms: 7-day hygiene-safe exchanges, plain packaging
-    const q = page.locator("#returns details").first();
-    await expect(q.locator(".faq-a")).toBeHidden();
-    await q.locator("summary").click();
-    await expect(q).toHaveAttribute("open", "");
-    await expect(q.locator(".faq-a")).toContainText("7 days");
-    await q.locator("summary").press("Enter");
-    await expect(q).not.toHaveAttribute("open", "");
-    await page.locator("#delivery summary", { hasText: "Will anyone know" }).click();
-    await expect(page.locator("#delivery .faq-a", { hasText: "plain, unbranded box" })).toBeVisible();
-    // links (answers are in the DOM even while closed)
-    const hrefs = await page.locator(".prose a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
+    for (const id of ids) expect(await page.locator(`#${id} .help-qa dt`).count(), `questions in #${id}`).toBeGreaterThan(1);
+    // the answers restate the terms: 7-day hygiene-safe exchanges, plain packaging — and they're readable without a click
+    await expect(page.locator("#returns .help-qa dd").first()).toContainText("7 days");
+    await expect(page.locator("#delivery .help-qa dd", { hasText: "plain, unbranded box" })).toBeVisible();
+    // every chapter card has its model
+    await expect(page.locator(".help-card .help-model img")).toHaveCount(ids.length);
+    // links
+    const hrefs = await page.locator(".help-card a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
     expect(hrefs.filter((h) => h.startsWith("https://wa.me/")).every((h) => h.includes(CATALOG.whatsapp))).toBe(true);
     for (const h of ["/#size-guide", "/privacy", "/terms"]) expect(hrefs).toContain(h);
-    await expect(page.locator(".legal-toc a")).toHaveCount(ids.length + 1);
   });
 
   test("search engines: robots.txt points to a sitemap of every page, and pieces share their own photo", async ({ request, prepared: page }) => {

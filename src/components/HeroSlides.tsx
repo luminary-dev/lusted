@@ -2,6 +2,7 @@
 
 import Image, { getImageProps, type StaticImageData } from "next/image";
 import { useEffect, useState } from "react";
+import { onNextSlide } from "./SlideCue";
 
 export type HeroSlide = {
   src: StaticImageData;
@@ -24,11 +25,27 @@ const INTERVAL = 8000;
 export default function HeroSlides({
   slides,
   priority = true,
+  band = "hero",
+  phoneUpTo = 600,
 }: {
   slides: HeroSlide[];
   priority?: boolean;
+  /** the name the SlideCue in this section dispatches to */
+  band?: string;
+  /** the widest screen (px) that gets the phone cut; the 404 keeps its 3:4 cut up to portrait tablets */
+  phoneUpTo?: number;
 }) {
   const [{ active, prev }, setState] = useState({ active: 0, prev: -1 });
+  const [restarts, setRestarts] = useState(0); // bumped by the cue so the timer starts over from the new photo
+
+  const advance = () =>
+    setState((s) => ({
+      active: (s.active + 1) % slides.length,
+      prev: s.active,
+    }));
+
+  // the arrowhead in the corner (SlideCue): next photo, timer from scratch
+  useEffect(() => onNextSlide(band, () => { advance(); setRestarts((n) => n + 1); }), [band, slides.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (
@@ -37,14 +54,10 @@ export default function HeroSlides({
     )
       return;
     const t = setInterval(() => {
-      if (!document.hidden)
-        setState((s) => ({
-          active: (s.active + 1) % slides.length,
-          prev: s.active,
-        }));
+      if (!document.hidden) advance();
     }, INTERVAL);
     return () => clearInterval(t);
-  }, [slides.length]);
+  }, [slides.length, restarts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Only the photo on screen, the one leaving and the one up next are mounted. Every slide at once decodes to
   // hundreds of megabytes of bitmap on a phone, which is enough for iOS Safari to kill the tab and reload it.
@@ -83,6 +96,7 @@ export default function HeroSlides({
                   slide={s}
                   priority={priority && i === 0}
                   eager={priority}
+                  phoneUpTo={phoneUpTo}
                 />
               ) : (
                 <Image
@@ -110,16 +124,18 @@ export default function HeroSlides({
   );
 }
 
-// The hero photo as a <picture>: the phone cut below 600px, the wide photo above. Built from Next's own image props so
+// The hero photo as a <picture>: the phone cut up to `phoneUpTo` (600px for the hero), the wide photo above. Built from Next's own image props so
 // both sources go through the optimiser with srcset, blur placeholder and lazy loading like a plain <Image>.
 function HeroPicture({
   slide,
   priority,
   eager,
+  phoneUpTo,
 }: {
   slide: HeroSlide;
   priority: boolean;
   eager: boolean;
+  phoneUpTo: number;
 }) {
   const common = {
     alt: slide.alt,
@@ -149,7 +165,7 @@ function HeroPicture({
   return (
     <picture>
       <source
-        media="(max-width: 600px)"
+        media={`(max-width: ${phoneUpTo}px)`}
         srcSet={phone.srcSet}
         sizes={phone.sizes}
       />

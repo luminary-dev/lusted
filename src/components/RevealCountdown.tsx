@@ -23,7 +23,7 @@ export default function RevealCountdown({ at }: { at: string }) {
   }, [at]);
 
   const done = left && left.days + left.hours + left.minutes + left.seconds === 0;
-  if (done) return <p className="reveal-live">It’s time. Refresh, and come in.</p>;
+  if (done) return <p className="reveal-live">It’s time. Refresh, and come and get it.</p>;
 
   return (
     <ol className="reveal-count" aria-label="Time until the reveal">

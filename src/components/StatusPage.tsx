@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 
-// The page-not-found and something-went-wrong pages (app/not-found.tsx, app/error.tsx): a big script word, a line or
-// two, the way back in, and a few links onward — inside the site's own nav and footer. No hooks, so the error page (a
-// client component) can use it too; it takes its links as props so it never pulls the catalogue into the client.
+// The page-not-found and something-went-wrong pages (app/not-found.tsx, app/error.tsx): a big script word, a few short
+// lines (one <p> each, so the rhythm is the copy's own), the way back in, and — when there are any — a few links
+// onward, inside the site's own nav and footer. No hooks, so the error page (a client component) can use it too; it
+// takes its links as props so it never pulls the catalogue into the client.
 export default function StatusPage({
   code,
   eyebrow,
@@ -16,7 +17,7 @@ export default function StatusPage({
   title: ReactNode;
   lede: ReactNode;
   actions: ReactNode;
-  links: ReactNode;
+  links?: ReactNode;
 }) {
   return (
     <main className="status-page">
@@ -26,11 +27,13 @@ export default function StatusPage({
         </p>
         <p className="eyebrow">{eyebrow}</p>
         <h1 className="h2">{title}</h1>
-        <p className="lede">{lede}</p>
+        <div className="lede status-lede">{lede}</div>
         <div className="status-actions">{actions}</div>
-        <nav className="status-links" aria-label="Elsewhere on Lusted">
-          {links}
-        </nav>
+        {links && (
+          <nav className="status-links" aria-label="Elsewhere on Lusted">
+            {links}
+          </nav>
+        )}
       </div>
     </main>
   );

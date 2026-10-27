@@ -20,7 +20,10 @@ test("hero: 27 slides, one active, the first preloaded, both calls to action", a
   expect(await whisper.getAttribute("href")).toContain("wa.me");
   await expect(page.locator("#top h1")).toContainText(/Dressed to tempt/);
   // the arrowhead in the corner glides to the next section
-  await expect(page.locator("#top .scroll-cue")).toHaveAttribute("href", "/#sale");
+  // the arrowhead in the corner moves the slideshow on
+  await page.locator("#top .slide-cue").click();
+  await expect(slides.nth(1)).toHaveClass(/is-active/);
+  await expect(slides.first()).not.toHaveClass(/is-active/);
 });
 
 test("after dark: the filmstrip band runs two strips of twenty frames, none shared with the hero, all linking into the collection", async ({ prepared: page }) => {
@@ -176,7 +179,9 @@ test("how it works: three steps, the ordering anchor and the WhatsApp button", a
   await expect(how.locator(".how-slide.is-active")).toHaveCount(1);
   await expect(how.locator(".how-slide img")).toHaveCount(2);
   for (const alt of await how.locator(".how-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/models/i);
-  await expect(how.locator(".scroll-cue")).toHaveAttribute("href", "/#contact");
+  // the arrowhead in the corner moves the slideshow on
+  await how.locator(".slide-cue").click();
+  await expect(how.locator(".how-slide").nth(1)).toHaveClass(/is-active/);
 });
 
 test("how it works: the photos change over on their own when motion is allowed", async ({ browser }) => {
@@ -283,11 +288,11 @@ test("footer: every link resolves, social links open in new tabs, the year is cu
 test("newsletter: the browser blocks a bad address, a good one reports the sign-up state", async ({ prepared: page }) => {
   const form = page.locator("form.news-form");
   const input = form.getByRole("textbox", { name: "Email address" });
-  await expect(form.locator(".news-note")).toHaveText("No spam. Just beautiful things.");
+  await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
   await input.fill("not-an-email");
   await form.getByRole("button", { name: /Subscribe/ }).click();
   expect(await input.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false); // native validation stops the submit
-  await expect(form.locator(".news-note")).toHaveText("No spam. Just beautiful things.");
+  await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
   await input.fill("someone@example.com");
   const [res] = await Promise.all([page.waitForResponse((r) => r.url().includes("/api/subscribe")), form.getByRole("button", { name: /Subscribe/ }).click()]);
   expect([200, 501, 502]).toContain(res.status());
@@ -295,7 +300,7 @@ test("newsletter: the browser blocks a bad address, a good one reports the sign-
   await expect(note).toHaveAttribute("role", "status");
   if (res.status() === 501) await expect(note).toContainText("Sign-ups open soon");
   else if (res.status() === 200) {
-    await expect(note).toContainText("inner circle");
+    await expect(note).toContainText("whisper");
     await expect(input).toHaveValue("");
   }
 });

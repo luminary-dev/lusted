@@ -52,3 +52,6 @@ next-env.d.ts
 
 # lighthouse ci reports
 /.lighthouseci/
+
+# Photos live outside git and are served from Cloudflare R2 (scripts/images.mjs); the manifest in src/lib is what the site builds from
+/assets/

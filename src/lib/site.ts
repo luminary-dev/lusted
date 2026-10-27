@@ -1,7 +1,7 @@
 // Shop contact details — edit these to update every link on the site.
 export const site = {
   name: "Lusted",
-  tagline: "Lingerie for every version of you.",
+  tagline: "Lingerie that doesn’t stay on.",
   whatsappDisplay: "+65 8123 4567",
   whatsappNumber: "6581234567", // digits only, used for wa.me links
   instagramHandle: "lusted.lk",

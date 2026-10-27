@@ -25,7 +25,7 @@ test.describe("header", () => {
     const nav = page.getByRole("navigation", { name: "Main" });
     for (const [label, href] of NAV.filter(([, h]) => h.startsWith("/#"))) {
       await nav.getByRole("link", { name: label, exact: true }).click();
-      await expect(page).toHaveURL(new RegExp(href.replace("/", "").replace("#", "#") + "$"));
+      await expect(page).toHaveURL(new RegExp(`${href.slice(1)}$`)); // "/#collections" → ends in "#collections"
       const id = href.slice(2);
       await expect.poll(async () => page.locator(`#${id}`).evaluate((el) => Math.abs(el.getBoundingClientRect().top) < window.innerHeight * 0.6), { timeout: 8000 }).toBe(true);
     }
@@ -131,7 +131,7 @@ test.describe("search dialog", () => {
     await page.keyboard.press("/");
     const box = page.getByRole("searchbox", { name: "Search products" });
     await box.fill("qzxv");
-    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nothing matches");
+    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nothing’s wearing");
     await expect(searchDialog(page).getByRole("button", { name: /See all/ })).toHaveCount(0);
     await box.fill("sale");
     await expect(searchDialog(page).locator(".search-label")).toHaveText(`${CATALOG.sale.length} results`);

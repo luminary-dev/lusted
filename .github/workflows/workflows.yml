@@ -1,0 +1,76 @@
+# The workflows themselves, and the history: actionlint checks every workflow file for mistakes (bad expressions,
+# unknown runners, shell errors), zizmor for security weaknesses (template injection, credential persistence,
+# over-broad permissions, unpinned actions, cache poisoning), and gitleaks checks the pushed commits for secrets that
+# GitHub's own scanning might not have a pattern for. Required by the rulesets.
+name: Workflows
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Workflow lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # zizmor's findings go to code scanning too
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: actionlint
+        uses: raven-actions/actionlint@3d39aea434753780c3b3d4a1a31c854b4dbf49d7 # v2
+
+      # zizmor itself, at a pinned version from PyPI (the published action's releases have been unreliable); its
+      # findings go to code scanning, and any finding fails the job
+      - name: zizmor
+        id: zizmor
+        run: |
+          pipx run zizmor==1.31.1 --min-severity low --min-confidence medium --format sarif .github/workflows > zizmor.sarif \
+            && echo "findings=0" >> "$GITHUB_OUTPUT" || echo "findings=1" >> "$GITHUB_OUTPUT"
+          pipx run zizmor==1.31.1 --min-severity low --min-confidence medium --format plain .github/workflows || true
+
+      - name: Upload zizmor's report
+        if: always() && hashFiles('zizmor.sarif') != ''
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor
+
+      - name: Fail on zizmor findings
+        if: steps.zizmor.outputs.findings == '1'
+        run: |
+          echo "::error::zizmor found weaknesses in the workflows — see the step above and Security → Code scanning."
+          exit 1
+
+  secrets:
+    name: Secrets scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0 # gitleaks reads the commits, not just the tree
+          persist-credentials: false
+
+      # on a pull request only its commits are scanned; on a push, the whole history
+      - name: gitleaks
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact --no-banner --exit-code 1 "--log-opts=$BASE_SHA..$HEAD_SHA"
+          else
+            docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 git /repo --redact --no-banner --exit-code 1
+          fi

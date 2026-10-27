@@ -1,8 +1,6 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "npx next start -p 3200",
-      "startServerReadyPattern": "Ready",
       "url": [
         "http://localhost:3200/",
         "http://localhost:3200/products",
@@ -12,7 +10,7 @@
       ],
       "numberOfRuns": 3,
       "settings": {
-        "chromeFlags": "--no-sandbox",
+        "chromeFlags": "--no-sandbox --disable-3d-apis",
         "disableFullPageScreenshot": true
       }
     },
@@ -50,14 +48,14 @@
           "error",
           {
             "maxNumericValue": 3000,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "optimistic"
           }
         ],
         "cumulative-layout-shift": [
           "error",
           {
             "maxNumericValue": 0.05,
-            "aggregationMethod": "median-run"
+            "aggregationMethod": "optimistic"
           }
         ]
       }

@@ -115,11 +115,11 @@ export default function TermsPage() {
       eyebrow="Terms & conditions"
       title={
         <>
-          The fine print, <em>made simple.</em>
+          The fine print, <em>with the lights on.</em>
         </>
       }
       updated="16 October 2026"
-      intro={<p>Everything you need to know about ordering, payment, delivery and exchanges at Lusted.</p>}
+      intro={<p>Ordering, paying, delivery and exchanges — the one part of Lusted that keeps its clothes on.</p>}
       sections={sections}
     />
   );

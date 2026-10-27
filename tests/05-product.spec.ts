@@ -15,7 +15,7 @@ test.describe("product page", () => {
     await expect(page.locator("h1")).toHaveText(name);
     await expect(page.locator(".pdp-price .price-now")).toHaveText(fmt(price));
     await expect(page.locator(".pdp-info .lede")).toContainText(/Hand wash|wash/i);
-    await expect(page.locator(".pdp-moments")).toContainText(/^Made for .+ & .+\.$/);
+    await expect(page.locator(".pdp-moments")).toContainText(/^Wear it for .+ & .+\. Then don’t\.$/);
     await expect(page.locator(".pdp-info .eyebrow")).toHaveText("Lace Secrets");
   });
 

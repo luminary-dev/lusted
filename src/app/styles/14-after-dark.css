@@ -1,0 +1,423 @@
+/* ───────── after dark: the filmstrip band in the middle of the home page ───────── */
+
+.after-dark {
+  /* The size guide's tape (.tape, the next section's top edge) is a 58px ribbon rotated -1.4deg, so its top edge runs
+     from 6px + 1.27vw below the section top at the left to 6px - 1.27vw at the right. The band runs on under it by
+     --tape-overlap and its bottom edge is cut at the same angle, 10px below the ribbon's top edge all the way across:
+     the band's own dark ground shows above the tape with no gap, and nothing of it shows beneath. */
+  --tape-overlap: calc(16px + 1.27vw);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: var(--section) calc(var(--section) * 0.8 + var(--tape-overlap));
+  margin-bottom: calc(-1 * var(--tape-overlap));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 2.54vw), 0 100%);
+  color: #fff6f2;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(122, 27, 51, 0.55), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 15% 100%, rgba(179, 84, 106, 0.25), transparent 70%),
+    #1c0a0d;
+}
+
+/* a faint grain so the dark ground reads as paper, not flat pixels */
+.after-dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.35;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 220, 196, 0.08) 0, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(255, 220, 196, 0.06) 0, transparent 2px),
+    radial-gradient(circle at 45% 85%, rgba(255, 220, 196, 0.07) 0, transparent 2px);
+  background-size: 180px 180px, 240px 240px, 300px 300px;
+  pointer-events: none;
+}
+
+.after-dark-head {
+  text-align: center;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.after-dark .eyebrow {
+  color: #f6cfc6;
+}
+
+.after-dark .h2 {
+  margin-top: 18px;
+  color: #fff6f2;
+}
+
+.after-dark .h2 em {
+  color: #f5c2b8;
+}
+
+.after-dark .lede {
+  margin: 18px auto 0;
+  color: rgba(255, 244, 240, 0.82);
+  max-width: 32em;
+}
+
+.after-dark-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 24px;
+  margin-top: 30px;
+}
+
+.after-dark-all {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* a comfortable tap target; the text itself is one line */
+  padding-inline: 4px;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff6f2;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-color: rgba(255, 246, 242, 0.45);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.after-dark-all:hover {
+  text-decoration-color: #fff6f2;
+}
+
+/* two rows of photo cards laid out like strips of film, wider than the screen and cut off at both edges. Each strip
+   holds its twenty frames twice and glides by half its width for ever, so it joins up without a seam and every frame
+   comes round: the top strip leftwards, the bottom one rightwards. Hovering a strip pauses it so a frame can be
+   clicked. With reduced motion the strips stand still and can be swiped instead (one set only). */
+.strips {
+  display: grid;
+  gap: clamp(14px, 1.6vw, 24px);
+  margin-top: clamp(44px, 5vw, 72px);
+}
+
+.strip-viewport {
+  overflow: hidden;
+}
+
+.strip {
+  --card: clamp(200px, 18vw, 290px);
+  --gap: clamp(14px, 1.6vw, 24px);
+  display: flex;
+  width: max-content;
+  animation: strip-glide 240s linear infinite;
+}
+
+.is-reverse .strip {
+  animation-direction: reverse;
+  animation-delay: -81s; /* so the two strips' frames never line up */
+}
+
+.strip-viewport:hover .strip,
+.strip-viewport:focus-within .strip {
+  animation-play-state: paused;
+}
+
+.strip-set {
+  display: flex;
+  gap: var(--gap);
+  padding: 0 var(--gap) 0 0; /* the trailing gap, so two sets are exactly twice one and the loop is seamless */
+  margin: 0;
+  list-style: none;
+}
+
+@keyframes strip-glide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip {
+    animation: none;
+  }
+  .strip-set.is-dup {
+    display: none;
+  }
+  .strip-viewport {
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding-inline: var(--gutter);
+  }
+  .strip-set li {
+    scroll-snap-align: center;
+  }
+}
+
+.strip li {
+  flex: none;
+  width: var(--card);
+}
+
+.strip a,
+.strip button {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  aspect-ratio: 4 / 5; /* the photos in hero/after-dark are cut to 4:5 around the model, so the frame shows all of one */
+  overflow: hidden;
+  border-radius: calc(var(--radius) * 0.7);
+  background: #3a1d20;
+  box-shadow:
+    0 1px 0 rgba(255, 246, 242, 0.12) inset,
+    0 18px 40px rgba(0, 0, 0, 0.45);
+  outline: 1px solid rgba(255, 220, 196, 0.14);
+  outline-offset: -1px;
+}
+
+.strip img {
+  object-fit: cover;
+  transition: transform 0.9s var(--ease), filter 0.6s ease;
+  filter: saturate(0.92);
+}
+
+.strip a:hover img,
+.strip a:focus-visible img,
+.strip button:hover img,
+.strip button:focus-visible img {
+  transform: scale(1.05);
+  filter: saturate(1.05);
+}
+
+.strip a:focus-visible,
+.strip button:focus-visible {
+  outline: 2px solid #f5c2b8;
+  outline-offset: 2px;
+}
+
+/* ── the reel: a tapped row lifted over the blurred page, still gliding, larger, with its line and the way to every piece ── */
+
+.reel {
+  position: fixed;
+  inset: 0;
+  z-index: 95; /* over the nav, the rail and the drawers; under the loading curtain */
+  display: grid;
+  align-content: center;
+  overflow: hidden;
+  color: #fff6f2;
+}
+
+.reel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(28, 10, 13, 0.62);
+  backdrop-filter: blur(22px) saturate(1.15); /* no -webkit- twin: the CSS compiler drops the pair when both are written */
+  animation: reel-fade 0.45s ease both;
+}
+
+.reel-close {
+  position: absolute;
+  top: clamp(14px, 2.5vw, 28px);
+  right: clamp(14px, 2.5vw, 28px);
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 246, 242, 0.35);
+  border-radius: 999px;
+  background: rgba(28, 10, 13, 0.45);
+  color: #fff6f2;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.reel-close:hover,
+.reel-close:focus-visible {
+  background: rgba(255, 246, 242, 0.16);
+  transform: rotate(90deg);
+  outline: none;
+}
+
+.reel-stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(22px, 3.2vh, 40px);
+  animation: reel-zoom 0.75s var(--ease) both;
+  pointer-events: none;
+}
+
+.reel-stage .strip-viewport {
+  pointer-events: auto;
+}
+
+/* the reel's frames are about 1.6× the row's, and glide at the same pace */
+.reel-stage .strip {
+  --card: min(clamp(250px, 29vw, 460px), 42vh); /* leaves room for the line beneath on short screens */
+  --gap: clamp(18px, 2vw, 30px);
+}
+
+.reel-stage .strip a {
+  box-shadow:
+    0 1px 0 rgba(255, 246, 242, 0.18) inset,
+    0 30px 70px rgba(0, 0, 0, 0.6);
+}
+
+.reel-copy {
+  pointer-events: auto;
+  text-align: center;
+  max-width: 760px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.reel-copy .eyebrow {
+  color: #f6cfc6;
+}
+
+.reel-title {
+  margin-top: 14px;
+  font-family: var(--headline);
+  font-weight: 400;
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: 1.1;
+  text-wrap: balance;
+  color: #fff6f2;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.45);
+}
+
+.reel-lead {
+  margin: 14px auto 0;
+  max-width: 34em;
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 1.7;
+  color: rgba(255, 244, 240, 0.86);
+  text-wrap: pretty;
+}
+
+/* the way in: large script, a slow champagne shimmer across the words, the line beneath drawing itself */
+.reel-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 26px;
+  padding: 6px 2px 10px;
+  font-family: var(--headline);
+  font-size: clamp(26px, 2.6vw, 40px);
+  line-height: 1.1;
+  color: #f5c2b8;
+  text-decoration: none;
+}
+
+.reel-cta span {
+  background: linear-gradient(100deg, #f5c2b8 0%, #fff6f2 45%, #f5c2b8 60%, #f5c2b8 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: reel-shimmer 3.2s ease-in-out infinite;
+}
+
+.reel-cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f5c2b8 20%, #fff6f2 50%, #f5c2b8 80%, transparent);
+  transform: scaleX(0.35);
+  opacity: 0.6;
+  transition: transform 0.6s var(--ease), opacity 0.3s ease;
+}
+
+.reel-cta:hover::after,
+.reel-cta:focus-visible::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.reel-cta .arrow {
+  width: 0.7em;
+  height: 0.7em;
+  color: #fff6f2;
+  transition: transform 0.4s var(--ease);
+}
+
+.reel-cta:hover .arrow,
+.reel-cta:focus-visible .arrow {
+  transform: translateX(8px);
+}
+
+.reel-cta:focus-visible {
+  outline: 2px solid #f5c2b8;
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+@keyframes reel-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes reel-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.82) translateY(24px);
+  }
+}
+
+@keyframes reel-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-backdrop,
+  .reel-stage {
+    animation: none;
+  }
+  .reel-cta span {
+    animation: none;
+    color: #f5c2b8;
+    background: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .reel-stage .strip {
+    --card: 64vw;
+  }
+  .reel-title {
+    font-size: clamp(30px, 8.5vw, 40px);
+  }
+  .reel-cta {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+}
+
+@media (max-width: 900px) {
+  .after-dark {
+    padding-block: calc(var(--section) * 0.9) calc(var(--section) * 0.7 + var(--tape-overlap));
+  }
+  .strip {
+    --card: 54vw;
+    animation-duration: 155s;
+  }
+  .after-dark-actions .btn {
+    flex: 1 1 180px;
+  }
+}

@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import sizeImg from "@/assets/images/size-guide.webp";
+const sizeImg = img("images/size-guide.webp");
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight } from "./icons";
 import SizeTags3D from "./SizeTags3D";
 import TapeGuide from "./TapeGuide";
+import { img } from "@/lib/cdn";
 
 // Body measurements in cm. Bra bands follow the underbust (UK/US/AU 30 = 63–67 cm, then +5 cm per band) and cups
 // the bust-minus-underbust difference. Dress sizes use the usual UK/AU 6–14 ↔ EU 34–42 ↔ US 2–10 conversion.
@@ -21,12 +22,12 @@ const HIPS = ["84 – 88", "89 – 93", "94 – 98", "99 – 103", "104 – 108"
 
 // the line on the back of each swing tag
 const TEASE = [
-  "Petite. Precise. Dangerous.",
-  "Made to be noticed.",
-  "Every curve, perfectly kept.",
-  "More to love. More to show.",
-  "Every inch, adored.",
-  "Made for more of you.",
+  "Small. Precise. Trouble.",
+  "Made to be noticed, then handled.",
+  "Every curve, held exactly right.",
+  "More to love. More to take off.",
+  "Every inch, worshipped.",
+  "Made for all of you — slowly.",
 ];
 
 // each size is a swing tag: [label, value] lines
@@ -134,11 +135,12 @@ export default function SizeGuide() {
           <div data-reveal>
             <p className="eyebrow">Size guide</p>
             <h2 className="h2">
-              Fitted to <em>every curve</em>
+              Fitted to <em>every inch of you</em>
             </h2>
             <p className="size-lede">
-              Wrap a soft tape around every curve, then find the tag that’s been
-              waiting for you. Touch one to turn it over.
+              Wrap a soft tape around every curve, slowly, and find the tag
+              that’s been waiting to be pulled off you. Touch one to turn it
+              over.
             </p>
           </div>
 

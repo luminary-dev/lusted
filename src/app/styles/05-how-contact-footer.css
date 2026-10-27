@@ -1,0 +1,556 @@
+/* ───────── how it works (HowItWorks.tsx) ───────── */
+
+.how.section {
+  position: relative;
+  isolation: isolate;
+  scroll-margin-top: 0; /* "Ordering" lands on the photo's top edge, not a strip of the section above */
+  display: flex;
+  align-items: center;
+  min-height: calc(100vw * 9 / 16); /* the photo's natural 16:9 shape, so nothing is cropped */
+  padding-block: clamp(56px, 5vw, 88px);
+  overflow: hidden;
+  background: #1c0a0d;
+  color: #fff6f2;
+}
+
+.how-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.how-img {
+  object-fit: cover;
+  object-position: 0% 30%; /* the models sit on the left ~60% of the photo */
+}
+
+/* the slideshow (HowSlides.tsx): each photo arrives under a soft diagonal sweep and drifts while it stays */
+@property --how-sweep {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 160%;
+}
+
+.how-slides {
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* under .how-media's fade */
+  overflow: hidden;
+  --how-hold: 10s; /* matches INTERVAL in HowSlides.tsx */
+  --how-reveal: 3s;
+  --how-drift: cubic-bezier(0.22, 0.61, 0.36, 1);
+  background: #1c0a0d;
+}
+
+.how-slide {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.how-slide.is-leaving {
+  z-index: 1;
+  visibility: visible;
+}
+
+.how-slide.is-active {
+  z-index: 2;
+  visibility: visible;
+}
+
+.how-slide img {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .how-slide.is-first img {
+    animation: how-settle var(--how-hold) var(--how-drift) both;
+  }
+  /* the new photo slides in under a soft diagonal edge, from the models' side outwards */
+  .how-slide.is-entering {
+    -webkit-mask-image: linear-gradient(105deg, #000 calc(var(--how-sweep) - 35%), transparent var(--how-sweep));
+    mask-image: linear-gradient(105deg, #000 calc(var(--how-sweep) - 35%), transparent var(--how-sweep));
+    animation: how-sweep var(--how-reveal) cubic-bezier(0.55, 0, 0.2, 1) both;
+  }
+  .how-slide.is-entering img {
+    animation: how-settle var(--how-hold) var(--how-drift) both;
+  }
+  /* the old one eases away slightly darker as the new one covers it */
+  .how-slide.is-leaving img {
+    animation: how-depart var(--how-reveal) ease-out both;
+  }
+}
+
+@keyframes how-sweep {
+  from {
+    --how-sweep: 0%;
+  }
+  to {
+    --how-sweep: 160%;
+  }
+}
+
+@keyframes how-settle {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes how-depart {
+  to {
+    transform: scale(1);
+    filter: brightness(0.55);
+  }
+}
+
+/* fade the open sea on the right into deep wine so the steps read clearly */
+.how-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* long eased fade (no visible edge): deep behind the text, melting gradually into the photo */
+    linear-gradient(
+      270deg,
+      rgba(28, 10, 13, 0.9) 0%,
+      rgba(28, 10, 13, 0.84) 18%,
+      rgba(28, 10, 13, 0.72) 28%,
+      rgba(28, 10, 13, 0.55) 35%,
+      rgba(28, 10, 13, 0.36) 42%,
+      rgba(28, 10, 13, 0.19) 49%,
+      rgba(28, 10, 13, 0.07) 56%,
+      rgba(28, 10, 13, 0) 63%
+    ),
+    linear-gradient(0deg, rgba(28, 10, 13, 0.45) 0%, rgba(28, 10, 13, 0) 30%);
+}
+
+.how-inner {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.how-copy {
+  width: min(440px, 32%);
+  text-shadow: 0 1px 16px rgba(28, 10, 13, 0.7);
+}
+
+.how .eyebrow {
+  color: #f6cfc6;
+}
+
+.how .h2 {
+  margin-top: 16px;
+  color: #fff6f2;
+}
+
+.how .h2 em {
+  color: #f5c2b8;
+}
+
+.how-lede {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255, 244, 240, 0.92);
+}
+
+.how-steps {
+  list-style: none;
+  margin: 28px 0 32px;
+  border-top: 1px solid rgba(255, 240, 235, 0.26);
+}
+
+.how-steps li {
+  display: flex;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255, 240, 235, 0.26);
+}
+
+.how-num {
+  flex: none;
+  min-width: 34px;
+  font-family: var(--headline);
+  font-size: 36px;
+  line-height: 1.05;
+  color: #f5c2b8;
+}
+
+.how-steps h3 {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+.how-steps p {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 244, 240, 0.88);
+}
+
+/* below ~1100px there isn't room beside the models: photo on top, steps underneath */
+@media (max-width: 1100px) {
+  .how.section {
+    display: block;
+    min-height: 0;
+    padding-top: 0;
+  }
+  .how-media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 8px;
+  }
+  .how-media::after {
+    background: linear-gradient(0deg, #1c0a0d 0%, rgba(28, 10, 13, 0) 35%);
+  }
+  .how-inner {
+    display: block;
+  }
+  .how-copy {
+    width: auto;
+    max-width: 560px;
+  }
+}
+
+/* phones: a taller crop on the three models */
+@media (max-width: 600px) {
+  .how-media {
+    aspect-ratio: 4 / 3;
+  }
+  .how-img {
+    object-position: 33% 30%; /* the three of them centred in the 4:3 crop */
+  }
+}
+
+/* ───────── contact ───────── */
+
+.contact.section {
+  padding-block: clamp(64px, 7vw, 108px);
+}
+
+.contact-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(48px, 8vw, 140px);
+  align-items: center;
+}
+
+.contact-title {
+  margin-top: 22px;
+}
+
+.contact-lede {
+  margin-top: 28px;
+  max-width: 30em;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 52px;
+  margin-top: 48px;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--hair);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition:
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+.text-link.accent {
+  color: var(--rose);
+  border-bottom-color: color-mix(in srgb, var(--rose) 55%, transparent);
+}
+
+.text-link svg {
+  font-size: 16px;
+  transition: transform 0.4s var(--ease);
+}
+
+.text-link:hover {
+  color: var(--ink);
+  border-bottom-color: currentColor;
+}
+
+.text-link.accent:hover {
+  color: var(--wine);
+}
+
+.text-link:hover svg {
+  transform: translateX(5px);
+}
+
+.contact-qr {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 60px;
+}
+
+.contact-qr p {
+  max-width: 17em;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.contact-qr-tease {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--headline);
+  font-size: clamp(36px, 3.1vw, 45px);
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.contact-qr-tease em {
+  font-style: normal;
+  color: var(--rose);
+}
+
+.contact-qr svg {
+  flex: none;
+  width: 132px;
+  height: 132px;
+  padding: 4px;
+  color: var(--ink); /* no tile — the code sits straight on the section background */
+}
+
+.contact-list {
+  list-style: none;
+  border-top: 1px solid var(--hair);
+}
+
+.contact-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--hair);
+  font-size: 16px;
+}
+
+.contact-list li > svg {
+  flex: none;
+  margin-right: 4px;
+  font-size: 22px;
+  color: var(--rose);
+}
+
+.contact-key {
+  color: var(--muted);
+}
+
+.contact-list a,
+.contact-value {
+  padding-bottom: 3px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  transition:
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+.contact-value {
+  border-bottom-color: transparent;
+}
+
+.contact-list a:hover {
+  color: var(--rose);
+  border-bottom-color: currentColor;
+}
+
+.contact-note {
+  margin-top: 28px;
+  max-width: 40em;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .contact-wrap {
+    grid-template-columns: 1fr;
+    gap: 56px;
+  }
+}
+
+/* scanning a code on the phone you're holding doesn't work — phones get the links */
+@media (max-width: 700px) {
+  .contact-qr {
+    display: none;
+  }
+  .contact-list li {
+    padding: 22px 0;
+    font-size: 15px;
+  }
+}
+
+/* ───────── footer ───────── */
+
+.footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #2d1316;
+  color: #fff3ee;
+}
+
+.footer-img {
+  object-fit: cover;
+  z-index: -2;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(38, 14, 17, 0.9), rgba(38, 14, 17, 0.78));
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 2fr;
+  gap: clamp(40px, 6vw, 96px);
+  padding-block: clamp(40px, 4vw, 56px) clamp(20px, 2vw, 28px);
+}
+
+.footer-logo {
+  width: 148px;
+  height: auto;
+}
+
+.footer-brand p {
+  max-width: 330px;
+  margin: 14px 0 18px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: rgba(255, 240, 235, 0.7);
+}
+
+.news-form {
+  display: grid;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.news-row {
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(255, 246, 242, 0.08);
+  border: 1px solid var(--hair-light);
+  transition: border-color 0.3s;
+}
+
+.news-row:focus-within {
+  border-color: rgba(255, 240, 235, 0.55);
+}
+
+.news-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 16px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14.5px;
+}
+
+.news-row input::placeholder {
+  color: rgba(255, 240, 235, 0.5);
+}
+
+.news-row .btn {
+  height: 42px;
+  padding: 0 20px;
+  font-size: 13.5px;
+}
+
+.news-note {
+  padding-left: 18px;
+  font-size: 12px;
+  color: rgba(255, 240, 235, 0.58);
+}
+
+.footer-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.footer-col h3 {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 240, 235, 0.55);
+}
+
+.footer-col ul {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.footer-col a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 24px; /* a 24 px tap target */
+  font-size: 14px;
+  color: rgba(255, 243, 238, 0.86);
+  transition: color 0.25s;
+}
+
+.footer-col a:hover {
+  color: #fff;
+}
+
+.footer-col a svg {
+  width: 16px;
+  height: 16px;
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 4px 22px;
+  font-size: 12.5px;
+  color: rgba(255, 240, 235, 0.6);
+}
+
+.footer-bottom > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-bottom > span svg {
+  width: 14px;
+  height: 14px;
+}

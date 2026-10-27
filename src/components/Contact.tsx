@@ -29,12 +29,12 @@ export default function Contact() {
     <section id="contact" className="section contact">
       <div className="container contact-wrap">
         <div className="contact-copy" data-reveal>
-          <p className="eyebrow">Get in touch</p>
+          <p className="eyebrow">Say it out loud</p>
           <h2 className="h1 contact-title">
-            Tell us what <em>you desire</em>
+            Tell us what <em>you want taken off</em>
           </h2>
           <p className="lede contact-lede">
-            Send us the name of the piece you love — or a screenshot of it — and we’ll confirm your size, availability, price and discreet delivery.
+            Send us the name of the piece that’s been keeping you up — or a screenshot of it, we won’t ask where you found it — and we’ll confirm the size, the price, and how quietly it gets to your door.
           </p>
 
           <div className="contact-actions">
@@ -52,7 +52,7 @@ export default function Contact() {
               <span className="contact-qr-tease">
                 Go on, <em>scan me.</em>
               </span>
-              Our chat opens in a heartbeat — and your secrets stay between us.
+              Our chat opens in a heartbeat — and whatever you tell us in it stays between the sheets.
             </p>
           </div>
         </div>

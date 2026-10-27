@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import footerImg from "@/assets/images/footer.webp";
+const footerImg = img("images/footer.webp");
 import wordmark from "@/assets/brand/wordmark-dark.png";
 import { collectionName } from "@/lib/products";
 import { emailLink, instagramLink, whatsappLink } from "@/lib/site";
 import Newsletter from "./Newsletter";
 import Year from "./Year";
 import { ArrowUpRight, Instagram, Mail, WhatsApp } from "./icons";
+import { img } from "@/lib/cdn";
 
 const columns = [
   {
@@ -53,7 +54,7 @@ export default function Footer() {
         <div className="footer-main">
           <div className="footer-brand">
             <Image src={wordmark} alt="Lusted Lingerie" className="footer-logo" sizes="160px" />
-            <p>Lingerie for every version of you. Join the inner circle for new drops and private offers.</p>
+            <p>Lingerie that doesn’t stay on. Join the inner circle for new drops, private offers and the things we don’t post.</p>
             <Newsletter />
           </div>
           <div className="footer-cols">

@@ -3,7 +3,7 @@ import { categories } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import { heroSlides } from "@/lib/hero-slides";
 import HeroSlides from "./HeroSlides";
-import ScrollCue from "./ScrollCue";
+import SlideCue from "./SlideCue";
 import { ArrowRight, WhatsApp } from "./icons";
 
 // The phone cuts only lend their srcset to the slideshow (the blur placeholder is the wide photo's), so their blur
@@ -24,15 +24,16 @@ export default function Hero() {
             data-reveal
             style={{ "--d": "0.1s" } as React.CSSProperties}
           >
-            Dressed to tempt. <em>Made to be undone.</em>
+            Dressed to tempt. <em>Undressed by midnight.</em>
           </h1>
           <p
             className="lede"
             data-reveal
             style={{ "--d": "0.2s" } as React.CSSProperties}
           >
-            Barely-there lace, sun-kissed strings and midnight silk — for the
-            version of you that never asks permission.
+            Lace that begs to come off, strings that untie with one tug, silk
+            that slides away the second a hand finds it — for the version of
+            you that wants to be watched, and worse.
           </p>
           <div
             className="hero-actions"
@@ -55,7 +56,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      <ScrollCue href="/#sale" label="Scroll down to the bikini sale" />
+      <SlideCue band="hero" label="Next photo" />
     </section>
   );
 }

@@ -1,0 +1,387 @@
+/* ───────── bag drawer ───────── */
+
+.drawer-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden; /* the panel parks off-screen inside; iOS would otherwise let you zoom out to it */
+  z-index: 80;
+  pointer-events: none;
+}
+
+.drawer-root.is-open {
+  pointer-events: auto;
+}
+
+.drawer-scrim,
+.filters-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 8, 10, 0.45);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+.drawer-root.is-open .drawer-scrim {
+  opacity: 1;
+}
+
+.drawer {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  width: min(440px, calc(100vw - 24px));
+  border-radius: 24px;
+  background: var(--paper);
+  box-shadow: 0 30px 80px rgba(20, 8, 10, 0.3);
+  transform: translateX(calc(100% + 24px));
+  transition: transform 0.5s var(--ease);
+}
+
+.drawer-root.is-open .drawer {
+  transform: none;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 22px 18px 28px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.drawer-head span {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.drawer-empty {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  padding: 32px 28px;
+  color: var(--muted);
+}
+
+.bag-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 28px;
+}
+
+.bag-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.bag-thumb {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--cream-2);
+}
+
+.bag-thumb img {
+  object-fit: cover;
+}
+
+.bag-body {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding-right: 28px;
+}
+
+.bag-body > a {
+  font-family: var(--display);
+  font-size: 15.5px;
+  line-height: 1.3;
+}
+
+.bag-body > span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.bag-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.bag-row .stepper {
+  height: 36px;
+}
+
+.bag-row .stepper button {
+  width: 32px;
+  font-size: 16px;
+}
+
+.bag-row strong {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.bag-remove {
+  position: absolute;
+  top: 16px;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.bag-remove:hover {
+  background: var(--cream-2);
+  color: var(--ink);
+}
+
+.bag-remove svg {
+  width: 15px;
+  height: 15px;
+}
+
+.drawer-foot {
+  display: grid;
+  gap: 14px;
+  padding: 22px 28px 26px;
+  border-top: 1px solid var(--hair);
+}
+
+.drawer-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.drawer-total strong {
+  font-weight: 600;
+}
+
+.drawer-foot p {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.drawer-clear {
+  justify-self: center;
+  border: 0;
+  background: transparent;
+  font-size: 12.5px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ───────── shop responsive ───────── */
+
+@media (max-width: 1080px) {
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .sale-products,
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .browser-body {
+    grid-template-columns: 1fr;
+  }
+  .filters-btn {
+    display: inline-flex;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+  }
+  .search {
+    flex-basis: 100%;
+    max-width: none;
+  }
+  .sort {
+    margin-left: auto;
+  }
+  .sort > span {
+    display: none;
+  }
+
+  /* filters become a bottom sheet */
+  .filters-root {
+    position: fixed;
+    inset: 0;
+    overflow: hidden; /* the sheet parks off-screen inside; iOS would otherwise let you zoom out to it */
+    z-index: 80;
+    pointer-events: none;
+  }
+  .filters-root.is-open {
+    pointer-events: auto;
+  }
+  .filters-scrim {
+    display: block;
+  }
+  .filters-root.is-open .filters-scrim {
+    opacity: 1;
+  }
+  .filters {
+    position: absolute;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 86svh;
+    overflow-y: auto;
+    padding: 0 22px;
+    border-radius: 24px 24px 0 0;
+    background: var(--paper);
+    transform: translateY(100%);
+    transition: transform 0.5s var(--ease);
+  }
+  .filters-root.is-open .filters {
+    transform: none;
+  }
+  .filters-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 -22px 8px;
+    padding: 18px 22px 14px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--hair);
+  }
+  .filters fieldset:first-of-type {
+    padding-top: 12px;
+  }
+  .filters-foot {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: 10px;
+    margin: 0 -22px;
+    padding: 14px 22px 22px;
+    background: var(--paper);
+    border-top: 1px solid var(--hair);
+  }
+  .filters-foot .btn {
+    flex: 1;
+  }
+  .pdp-grid {
+    grid-template-columns: 1fr;
+  }
+  .pdp-gallery {
+    position: relative;
+    top: 0;
+    width: min(100%, 460px);
+  }
+}
+
+@media (max-width: 600px) {
+  .product-grid {
+    gap: 28px 12px;
+  }
+  .product-info h3 {
+    font-size: 16px;
+  }
+  .buy-actions {
+    flex-direction: column;
+  }
+  .buy-actions .stepper {
+    align-self: flex-start;
+  }
+}
+
+.pdp-skeleton {
+  min-height: 80vh;
+}
+
+/* ───────── header controls ───────── */
+
+.nav-actions {
+  gap: 8px;
+}
+
+.nav-actions .icon-btn {
+  border-color: transparent;
+}
+
+.nav-actions .icon-btn:hover,
+.nav-actions .icon-btn.is-active {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.nav-theme {
+  display: flex;
+  margin-left: 6px;
+}
+
+.nav-menu-theme {
+  display: none;
+}
+
+@media (max-width: 1240px) and (min-width: 901px) {
+  .nav-links {
+    gap: 22px;
+  }
+  .nav-links a {
+    font-size: 13.5px;
+  }
+  .nav-actions .icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-actions {
+    gap: 4px;
+  }
+  .nav-actions .icon-btn,
+  .nav-toggle {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .nav-toggle {
+    margin-left: 4px;
+  }
+}
+
+/* very small phones: the theme switch moves into the menu panel */
+@media (max-width: 479px) {
+  .nav-logo {
+    width: 92px;
+  }
+  .nav-bar {
+    padding: 0 6px 0 16px;
+  }
+  .nav-theme {
+    display: none;
+  }
+  .nav-menu-theme {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0 8px;
+    font-size: 16px;
+  }
+}

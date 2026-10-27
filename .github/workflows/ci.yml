@@ -1,13 +1,24 @@
-# Every push to dev or main and every pull request: lint, types, a production build, the whole Playwright suite (every
-# route, section and viewport — see README "Tests") split across two machines, and Lighthouse on the main pages so
-# nothing quietly gets slower, less accessible or worse for search. The three jobs run side by side; a newer push to
-# the same branch cancels the run in progress.
+# CI — every push to dev or main and every pull request.
 #
-# Branches and deploys (README "Deploy"):
-#   dev  — every push that passes deploys a Vercel preview and moves lusted-dev.vercel.app onto it (gate off there)
-#   main — production, lusted.vercel.app; deploys only when the push is a merge of dev, and a pull request into main
-#          from any branch other than dev fails its checks
-# The deploy jobs need VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID in the repository's secrets.
+# Jobs, all side by side:
+#   Branch rules     pull requests only: the head is up to date with its base, and main only takes dev
+#   Lint and types   eslint, then the generated route types and tsc
+#   Tests (n/6)      a production build and the whole Playwright suite (every route, section and viewport — README
+#                    "Tests") split across six machines
+#   Lighthouse (…)   the home page, the shop, a product, about and /help, one machine each, so nothing quietly gets
+#                    slower, less accessible or worse for search
+#   Deploy (branch)  pushes only, after every job above has passed — nothing reaches Vercel before that:
+#                    dev → a Vercel preview, and lusted-dev.vercel.app is pointed at it (reveal gate off there)
+#                    main → production, lusted.vercel.app
+#
+# Branches (README "Deploy"): work happens on a branch, reaches dev by pull request, and reaches main by a pull
+# request from dev. Pull requests are merged as merge commits, so the deploy job can tell a merged pull request from a
+# direct push and refuses to deploy the latter. GitHub's own rulesets for the same rules are in .github/rulesets.
+#
+# A newer push to the same branch cancels the run in progress. Secrets: the test and Lighthouse servers read the photos
+# from the private R2 bucket with R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY; the deploy jobs
+# need VERCEL_TOKEN (any scope — a team-scoped token is fine, the commands avoid the CLI's identity call),
+# VERCEL_ORG_ID (the team id) and VERCEL_PROJECT_ID.
 name: CI
 
 on:
@@ -22,114 +33,247 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  NODE_VERSION: 22
+
 jobs:
-  # main only takes merges from dev: a pull request into main from anywhere else goes red here
   branch-rules:
     name: Branch rules
-    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Only dev may be merged into main
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0 # the checks below compare branches
+          persist-credentials: false
+
+      # branch names and shas reach the scripts through the environment, never inline — a branch named with a
+      # shell metacharacter must not be able to run anything here
+      - name: Check that main only takes dev
+        if: github.base_ref == 'main'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [ "${{ github.head_ref }}" != "dev" ]; then
-            echo "::error::Pull requests into main must come from dev (this one is from '${{ github.head_ref }}')."
+          if [ "$HEAD_REF" != "dev" ]; then
+            echo "::error::Pull requests into main must come from dev (this one is from '$HEAD_REF')."
             exit 1
           fi
           echo "From dev — fine."
 
-  tests:
-    name: Lint, types, build, tests (${{ matrix.shard }}/2)
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2]
-    steps:
-      - uses: actions/checkout@v7
+      - name: Check that the branch is up to date with its base
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch origin "$BASE_REF" --quiet
+          if ! git merge-base --is-ancestor "origin/$BASE_REF" "$HEAD_SHA"; then
+            echo "::error::'$HEAD_REF' is behind '$BASE_REF'. Merge $BASE_REF into it (or rebase) and push again."
+            exit 1
+          fi
+          echo "Up to date with $BASE_REF."
 
-      - uses: actions/setup-node@v7
+  checks:
+    name: Lint and types
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          node-version: 22
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
       - name: Lint
         run: npm run lint
 
       # next-env.d.ts and the route types (PageProps, LayoutProps, image imports) are generated, not committed
-      - name: Types
+      - name: Check types
         run: npx next typegen && npx tsc --noEmit
+
+  tests:
+    name: Tests (${{ matrix.shard }}/6)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Next.js keeps its compiler and image cache in .next/cache; restored from the last run on this lockfile,
+      # topped up by any older one, the build takes seconds instead of a minute
+      - name: Restore the Next.js build cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
       # next/font downloads every configured Google font at build time; a download that times out on the runner fails
       # the build, so a failed build gets one more go before the run is called red
-      - name: Production build
+      - name: Build
         run: npm run build || { echo "::warning::Build failed (often a Google Fonts download timing out) — retrying once"; npm run build; }
 
-      - name: Install Chromium for the tests
-        run: npx playwright install --with-deps chromium
+      # the browser download varies from run to run (seconds to minutes); keep it per Playwright version
+      - name: Restore Chromium
+        id: chromium-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        if: steps.chromium-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      # the runner image already carries the libraries Chromium needs; `playwright install-deps` would ask apt for
+      # them anyway, and that has taken up to 17 minutes on a slow mirror. So: launch the browser, and only if that
+      # fails install the libraries.
+      - name: Make sure Chromium launches
+        run: |
+          node -e "require('playwright').chromium.launch().then((b) => b.close())" \
+            || { echo "::warning::Chromium would not launch — installing its system libraries"; npx playwright install-deps chromium; }
 
       # serves the build itself (playwright.config.ts) with the reveal gate as in production; the tests carry the
       # preview cookie
-      - name: End-to-end tests
-        run: npx playwright test --shard=${{ matrix.shard }}/2
+      - name: Run the tests
+        run: npx playwright test --shard="$SHARD/6"
         env:
           CI: "true"
+          SHARD: ${{ matrix.shard }}
+          # the served build reads the photos from the private bucket (src/app/img)
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
 
-      - name: Keep the test report, traces and screenshots
+      - name: Upload the test report
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: playwright-report-${{ matrix.shard }}
           path: test-results
           retention-days: 7
 
   lighthouse:
-    name: Lighthouse
+    name: Lighthouse (${{ matrix.page.name }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        page:
+          - { name: home, path: / }
+          - { name: shop, path: /products }
+          - { name: product, path: /products/rose-lace-balconette-bra }
+          - { name: about, path: /about }
+          - { name: help, path: /help }
     steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          node-version: 22
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Production build
+      - name: Restore the Next.js build cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - name: Build
         run: npm run build || { echo "::warning::Build failed (often a Google Fonts download timing out) — retrying once"; npm run build; }
 
       # Lighthouse drives the same Chromium build as the tests: the runner's own, newest Chrome times out on its
       # DevTools calls
-      - name: Install Chromium for Lighthouse
-        run: npx playwright install --with-deps chromium
-
-      # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs per page, against the build with the reveal
-      # gate off; the thresholds are in lighthouserc.json
-      - name: Lighthouse
-        run: CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun
-        env:
-          REVEAL_GATE: "off"
-
-      - name: Keep the Lighthouse reports
-        if: always()
-        uses: actions/upload-artifact@v7
+      - name: Restore Chromium
+        id: chromium-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
-          name: lighthouse
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        if: steps.chromium-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+
+      - name: Make sure Chromium launches
+        run: |
+          node -e "require('playwright').chromium.launch().then((b) => b.close())" \
+            || { echo "::warning::Chromium would not launch — installing its system libraries"; npx playwright install-deps chromium; }
+
+      # mobile Lighthouse (simulated slow 4G, 4x slower CPU), three runs of the page, against the build with the reveal
+      # gate off; the thresholds are in lighthouserc.json (whose url list is for local runs — here one page is passed
+      # in). Like the tests, it runs the browser without WebGL (lighthouserc.json chromeFlags): the runner has no GPU,
+      # so the cursor smoke and the 3D size tags would be software-rendered and the numbers would swing from run to
+      # run. The server is started here and the page fetched twice first, so the first measured run isn't also the
+      # server's cold start (that alone read 3.9 s of blocking time once); blocking time and layout shift are then
+      # judged by their best of the three runs (lighthouserc.json "optimistic") — a real regression shows in every
+      # run, a runner hiccup in one.
+      - name: Run Lighthouse
+        env:
+          PAGE: ${{ matrix.page.path }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          REVEAL_GATE=off npx next start -p 3200 > lighthouse-server.log 2>&1 &
+          for _ in $(seq 1 60); do curl -sf -o /dev/null http://localhost:3200/ && break; sleep 1; done
+          url="http://localhost:3200$PAGE"
+          if ! curl -sf -o /dev/null "$url" || ! curl -sf -o /dev/null "$url"; then echo "::error::$PAGE did not answer"; exit 1; fi
+          CHROME_PATH="$(node -p "require('playwright-core').chromium.executablePath()")" npx --yes @lhci/cli@0.15.1 autorun --collect.url="$url"
+
+      - name: Upload the Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: lighthouse-${{ matrix.page.name }}
           path: .lighthouseci
           include-hidden-files: true # the folder's name starts with a dot
           retention-days: 14
 
-  # dev → a preview on Vercel, and lusted-dev.vercel.app moved onto it; main → production, only for a merge of dev.
-  # Deploys never cancel each other and run one at a time per branch, after the tests and Lighthouse have passed.
+  # Deploys never cancel each other and run one at a time per branch, and only after lint, types, every test shard
+  # and every Lighthouse page have passed — nothing is built on Vercel before that.
   deploy:
     name: Deploy (${{ github.ref_name }})
     if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
-    needs: [tests, lighthouse]
+    needs: [checks, tests, lighthouse]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
@@ -140,25 +284,35 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 0 # the merge check below reads the commit's parents
+          fetch-depth: 0 # the checks below read the commit's parents
+          persist-credentials: false
 
-      - name: Check the Vercel secrets are there
+      - name: Check the Vercel secrets
         run: |
           for v in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
             if [ -z "${!v}" ]; then echo "::error::Repository secret $v is not set (Settings → Secrets → Actions)."; exit 1; fi
           done
 
-      # production only ever comes from dev: the commit on main must be a merge whose second parent is on dev
-      - name: Production deploys only from a merge of dev
+      # both branches take changes only through pull requests, merged as merge commits: a push whose head has a
+      # single parent was pushed straight to the branch, and is not deployed
+      - name: Check that the push is a merged pull request
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if [ "$(git rev-list --parents -n 1 HEAD | wc -w)" -lt 3 ]; then
+            echo "::error::This push to $BRANCH is not a merge commit — it was pushed directly. Open a pull request into $BRANCH instead; direct pushes are never deployed."
+            exit 1
+          fi
+          echo "A merged pull request."
+
+      # production only ever comes from dev: the merge's second parent must be on dev
+      - name: Check that the merge came from dev
         if: github.ref == 'refs/heads/main'
         run: |
           git fetch origin dev --quiet || { echo "::error::There is no dev branch to merge from."; exit 1; }
-          if [ "$(git rev-list --parents -n 1 HEAD | wc -w)" -lt 3 ]; then
-            echo "::error::This push to main is not a merge commit. Merge dev into main instead of pushing to main directly."
-            exit 1
-          fi
           second="$(git rev-list --parents -n 1 HEAD | cut -d' ' -f3)"
           if ! git merge-base --is-ancestor "$second" origin/dev; then
             echo "::error::This merge did not come from dev (its second parent is not on dev). Only dev is merged into main."
@@ -166,17 +320,30 @@ jobs:
           fi
           echo "A merge of dev — deploying to production."
 
-      - uses: actions/setup-node@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
 
-      # Vercel builds the deployment itself from the source (so its build cache and image optimiser settings apply)
-      - name: Deploy a preview and move lusted-dev.vercel.app onto it
+      # Vercel builds the deployment itself from the source (so its build cache and image optimiser settings apply).
+      # The CLI finds the project through VERCEL_ORG_ID and VERCEL_PROJECT_ID; it is not given --scope, because a
+      # team-scoped token cannot answer the "load user" call that --scope (and `vercel alias`) make — the alias is set
+      # through the REST API instead, which takes the team id directly.
+      - name: Deploy a preview and point lusted-dev.vercel.app at it
         if: github.ref == 'refs/heads/dev'
         run: |
-          url="$(npx --yes vercel@latest deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -o 'https://[a-z0-9.-]*\.vercel\.app' | tail -1)"
-          [ -n "$url" ] || { echo "::error::Could not read the preview URL from the Vercel CLI."; exit 1; }
-          npx --yes vercel@latest alias set "$url" lusted-dev.vercel.app --token "$VERCEL_TOKEN"
+          # the deployment's own address (lusted-<hash>-<team>.vercel.app) — never lusted-dev or lusted.vercel.app, which the
+          # CLI also prints in its hints
+          url="$(npx --yes vercel@latest deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -oE 'https://lusted-[a-z0-9]{6,}-[a-z0-9-]+\.vercel\.app' | head -1)"
+          [ -n "$url" ] || { echo "::error::Could not read the preview deployment's URL from the Vercel CLI output."; exit 1; }
+          host="${url#https://}"
+          id="$(curl -sS "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" -H "Authorization: Bearer $VERCEL_TOKEN" | jq -r '.id // empty')"
+          [ -n "$id" ] || { echo "::error::Vercel has no deployment at $host."; exit 1; }
+          res="$(curl -sS -X POST "https://api.vercel.com/v2/deployments/$id/aliases?teamId=$VERCEL_ORG_ID" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+            -d '{"alias":"lusted-dev.vercel.app"}')"
+          echo "$res"
+          [ "$(echo "$res" | jq -r '.alias // empty')" = "lusted-dev.vercel.app" ] || { echo "::error::Vercel did not point lusted-dev.vercel.app at $host."; exit 1; }
           echo "lusted-dev.vercel.app → $url" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Deploy to production

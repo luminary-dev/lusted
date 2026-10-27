@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import lingerie from "@/assets/images/cat-lingerie.webp";
-import swim from "@/assets/images/cat-swim.webp";
-import afterDark from "@/assets/images/cat-after-dark.webp";
+const lingerie = img("images/cat-lingerie.webp");
+const swim = img("images/cat-swim.webp");
+const afterDark = img("images/cat-after-dark.webp");
 import { categories, type Category } from "@/lib/products";
 import { ArrowRight, Heart, Moon, Sun } from "./icons";
+import { img } from "@/lib/cdn";
 
 // Card art and wording; each collection's name, tagline and category label come from `categories`
 // in src/lib/products.ts (shared with the footer).
@@ -63,7 +64,7 @@ export default function Collections() {
             data-reveal
             style={{ "--d": "0.1s" } as React.CSSProperties}
           >
-            <p>Lace for when you want to be unwrapped, strings for when you want to be stared at, and silk for when you’re not going home alone.</p>
+            <p>Lace for when you want to be undone slowly, strings for when you want to be stared at and soaked through, and silk for when you’re not going home alone — or going home at all.</p>
             <Link className="btn btn-wine" href="/products">
               Tempt me with everything <ArrowRight className="arrow" />
             </Link>

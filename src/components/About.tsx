@@ -1,22 +1,23 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import silkSheets from "@/assets/images/about-wall/silk-sheets.webp";
-import doorway from "@/assets/images/about-wall/doorway.webp";
-import velvetChaise from "@/assets/images/about-wall/velvet-chaise.webp";
-import theBow from "@/assets/images/about-wall/the-bow.webp";
-import windowShot from "@/assets/images/about-wall/window.webp";
-import pearls from "@/assets/images/about-wall/pearls.webp";
-import poolside from "@/assets/images/about-wall/poolside.webp";
+const silkSheets = img("images/about-wall/silk-sheets.webp");
+const doorway = img("images/about-wall/doorway.webp");
+const velvetChaise = img("images/about-wall/velvet-chaise.webp");
+const theBow = img("images/about-wall/the-bow.webp");
+const windowShot = img("images/about-wall/window.webp");
+const pearls = img("images/about-wall/pearls.webp");
+const poolside = img("images/about-wall/poolside.webp");
 import { whatsappLink } from "@/lib/site";
 import PhotoWall from "./PhotoWall";
 import { ArrowRight, Box, ChatDouble, Bolt, Lock } from "./icons";
+import { img } from "@/lib/cdn";
 
 // About us as a photo wall: real prints taped to the wall, in two rows, beside a short story and the four promises.
 const promises = [
-  { icon: Box, title: "A plain box — no one has to know" },
-  { icon: ChatDouble, title: "We’ll help it fit just right" },
+  { icon: Box, title: "A plain box — nobody has to know" },
+  { icon: ChatDouble, title: "We’ll make it fit like it was made on you" },
   { icon: Bolt, title: "A real person, never keeps you waiting" },
-  { icon: Lock, title: "Our little secret, start to finish" },
+  { icon: Lock, title: "Our dirty little secret, start to finish" },
 ];
 
 // the prints stuck to the wall: each keeps its photo's own shape, a hair off straight (`tilt`, degrees) and a touch
@@ -38,10 +39,10 @@ export default function About() {
         <div className="about-copy" data-reveal>
           <p className="eyebrow">About us</p>
           <h2 className="h2">
-            Made to be seen, <em>sent to be our secret.</em>
+            Made to be taken off. <em>Sent so no one knows.</em>
           </h2>
           <p className="lede">
-            Lingerie for the nights you plan and the ones you don’t — lace that lingers, silk that slips, strings that barely try. Picked to make you feel wicked, and delivered so quietly no one knows but you (and whoever gets to see it).
+            Lingerie for the nights you plan and the ones that happen anyway — lace that lingers, silk that slips, strings that give up at the first tug. Picked to make you feel filthy in the best way, and delivered so quietly the only one who’ll know is whoever’s undoing it.
           </p>
           <ul className="about-promises">
             {promises.map(({ icon: Icon, title }) => (
