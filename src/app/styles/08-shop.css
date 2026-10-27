@@ -1,0 +1,501 @@
+/* ───────── shop page ───────── */
+
+.shop,
+.pdp {
+  padding-top: clamp(120px, 12vw, 160px);
+  padding-bottom: var(--section);
+}
+
+.shop-head {
+  max-width: 760px;
+}
+
+.shop-head .h2 {
+  margin-top: 16px;
+}
+
+.shop-head .lede {
+  margin-top: 14px;
+}
+
+.shop-loading {
+  min-height: 60vh;
+}
+
+.cat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 36px;
+}
+
+.cat-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    background 0.3s var(--ease),
+    color 0.3s var(--ease),
+    border-color 0.3s var(--ease);
+}
+
+.cat-tabs button span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cat-tabs button.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+}
+
+.cat-tabs button.is-active span {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  max-width: 460px;
+  padding: 0 14px 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+.search:focus-within {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 4px rgba(179, 84, 106, 0.1);
+}
+
+.search > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 15px;
+}
+
+.search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cream-2);
+  cursor: pointer;
+}
+
+.search button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.filters-btn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filters-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.filters-btn span {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-size: 11px;
+}
+
+.sort {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.sort select {
+  appearance: none;
+  height: 48px;
+  padding: 0 40px 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sort > svg {
+  position: absolute;
+  right: 16px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.browser-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  margin-top: 28px;
+}
+
+.filters {
+  position: sticky;
+  top: 100px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.filters-head,
+.filters-foot,
+.filters-scrim {
+  display: none;
+}
+
+.filters fieldset {
+  border: 0;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--hair);
+}
+
+.filters fieldset:first-of-type {
+  padding-top: 0;
+}
+
+.filters legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 14px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.check {
+  clear: both;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 3px; /* the label is the tap target: 24 px round the box */
+  font-size: 14.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.check input {
+  /* a 24 px tap target (WCAG 2.5.8) drawing an 18 px box inside it */
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.check input::before,
+.check input::after {
+  grid-area: 1 / 1;
+}
+
+.check input::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  background: transparent;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.check input:checked::before {
+  background: var(--btn-bg);
+  border-color: var(--btn-bg);
+}
+
+.check input:checked::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  margin-top: -2px;
+  border: solid var(--btn-ink);
+  border-width: 0 0 1.6px 1.6px;
+  transform: rotate(-45deg);
+}
+
+.check em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.size-chips {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.size-chips button {
+  min-width: 48px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    border-color 0.25s;
+}
+
+.size-chips button:hover {
+  border-color: var(--ink);
+}
+
+.size-chips button.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+}
+
+/* the shop's size filter: all five sizes on one line, sharing the sidebar width */
+.filters .size-chips {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.filters .size-chips button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.color-list {
+  clear: both;
+  display: grid;
+  gap: 4px;
+}
+
+.color-list button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  margin-inline: -8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+}
+
+.color-list button:hover {
+  background: var(--cream-2);
+}
+
+.color-list button .swatch {
+  width: 18px;
+  height: 18px;
+}
+
+.color-list button.is-active {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.color-list button.is-active .swatch {
+  box-shadow:
+    0 0 0 2px var(--cream),
+    0 0 0 3px var(--ink);
+}
+
+.results-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 24px;
+}
+
+.results-bar > p {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--cream-2);
+  font-size: 12.5px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.chip-clear {
+  border: 0;
+  background: transparent;
+  font-size: 12.5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* pagination under the product grid; changing page scrolls back to the results, clear of the fixed nav */
+.results {
+  scroll-margin-top: 110px;
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+.pager button {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+.pager button:hover:not(:disabled) {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.pager button.is-active {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: #fff6f2;
+}
+
+.pager button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pager-step svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pager-step.is-prev svg {
+  transform: scaleX(-1);
+}
+
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  padding: 56px 40px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  border: 1px dashed var(--hair);
+}
+
+.empty p {
+  color: var(--muted);
+}

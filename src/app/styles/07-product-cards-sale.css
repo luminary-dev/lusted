@@ -1,0 +1,555 @@
+/* ───────── product cards ───────── */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(28px, 3vw, 44px) clamp(14px, 1.6vw, 22px);
+}
+
+.product-card {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.product-media {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--cream-2);
+  isolation: isolate;
+}
+
+.product-media img {
+  object-fit: cover;
+  transition: transform 1.2s var(--ease);
+}
+
+.product-card:hover .product-media img {
+  transform: scale(1.04);
+}
+
+/* model-shot pieces: the back view cross-fades in on hover */
+.product-media .product-back {
+  opacity: 0;
+  transition:
+    opacity 0.6s var(--ease),
+    transform 1.2s var(--ease);
+}
+
+.product-card.has-back:hover .product-back {
+  opacity: 1;
+}
+
+.product-card.has-back .product-media img {
+  object-position: 50% 22%;
+}
+
+/* the sale section shows its model shots as full 9:16 portraits */
+/* model shots are 9:16 portraits — everywhere they appear */
+.product-card.has-back .product-media {
+  aspect-ratio: 9 / 16;
+}
+
+.badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.badges .badge {
+  position: static;
+  padding: 6px 11px;
+  font-size: 10px;
+}
+
+.badge-sale {
+  background: #7a1b33 !important;
+  color: #fff6f2 !important;
+}
+
+/* quick add: the lower half of the photo melts into a frosted blur (the blur itself fades in from the top via a
+   mask, so there's no hard edge) and the name, price, sizes and button rise onto it one after another */
+.quick-add {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 58%;
+  padding: 0 12px 12px;
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+}
+
+.quick-add::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(rgba(40, 14, 20, 0), rgba(40, 14, 20, 0.38));
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-mask-image: linear-gradient(transparent, #000 48%);
+  mask-image: linear-gradient(transparent, #000 48%);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+
+.quick-add > * {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.5s var(--ease);
+}
+
+.quick-add-name {
+  max-width: 92%;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-shadow: 0 1px 12px rgba(30, 8, 12, 0.35);
+}
+
+.quick-add-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.quick-add-price s {
+  font-size: 11.5px;
+  opacity: 0.7;
+}
+
+.quick-add-sizes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.quick-add-sizes button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    transform 0.25s var(--ease);
+}
+
+.quick-add-sizes button:hover {
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.quick-add-sizes button[aria-pressed="true"] {
+  background: #fff;
+  color: #2e1418;
+  transform: translateY(-2px);
+}
+
+.quick-add-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  border-radius: 999px;
+  background: #160b0d;
+  color: #fff6f2;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.3s,
+    opacity 0.3s;
+}
+
+.quick-add-cta svg {
+  width: 16px;
+  height: 16px;
+}
+
+.quick-add-cta:hover:not(:disabled) {
+  background: #7a1b33;
+}
+
+.quick-add-cta:disabled {
+  cursor: default;
+  background: rgba(22, 11, 13, 0.55);
+  color: rgba(255, 246, 242, 0.75);
+}
+
+/* the panel itself never catches clicks — anywhere on the photo, the name or the price opens the product; only the
+   size pills and the add button are clickable */
+@media (hover: hover) {
+  .product-card:hover .quick-add-sizes button,
+  .product-card:hover .quick-add-cta,
+  .product-card:focus-within .quick-add-sizes button,
+  .product-card:focus-within .quick-add-cta {
+    pointer-events: auto;
+  }
+  .product-card:hover .quick-add::before,
+  .product-card:focus-within .quick-add::before {
+    opacity: 1;
+  }
+  .product-card:hover .quick-add > *,
+  .product-card:focus-within .quick-add > * {
+    opacity: 1;
+    transform: none;
+  }
+  .product-card:hover .quick-add > :nth-child(2),
+  .product-card:focus-within .quick-add > :nth-child(2) {
+    transition-delay: 0.05s;
+  }
+  .product-card:hover .quick-add > :nth-child(3),
+  .product-card:focus-within .quick-add > :nth-child(3) {
+    transition-delay: 0.1s;
+  }
+  .product-card:hover .quick-add > :nth-child(4),
+  .product-card:focus-within .quick-add > :nth-child(4) {
+    transition-delay: 0.15s;
+  }
+}
+
+@media (hover: none) {
+  .quick-add {
+    display: none;
+  }
+}
+
+.product-info {
+  display: grid;
+  gap: 4px;
+  padding-inline: 2px;
+}
+
+.product-info h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 15.5px;
+  line-height: 1.3;
+}
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.price-now {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.price-was {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.product-card .price:has(.price-was) .price-now {
+  color: var(--rose-ink);
+}
+
+.swatches {
+  display: flex;
+  gap: 12px; /* each 14 px dot answers to a 24 px area — keep those areas clear of each other */
+  padding-inline: 2px;
+}
+
+.swatches .swatch {
+  position: relative;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* the dot stays 14 px; the tappable area round it is 24 px (WCAG 2.5.8) */
+.swatches .swatch::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+}
+
+.swatches .swatch:hover {
+  transform: scale(1.12);
+}
+
+.swatches .swatch.is-active {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 0 0 2px var(--cream),
+    0 0 0 3px var(--ink);
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 0 0 1px var(--hair);
+}
+
+/* ───────── home: sale ───────── */
+
+.sale {
+  padding-bottom: var(--section);
+}
+
+.sale-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 28px);
+  padding-top: 28px; /* room for the hover lift */
+}
+
+/* sale cards (landscape, 2 × 2): the card is its tint; the photo sits on the right and fades softly out into it
+   (a gradient mask, so the photo stays clean), with the text on the left. Hover (SaleCard.tsx): the card tilts
+   towards the pointer with a sheen following it, and the back view opens as a circle from where the pointer came in. */
+.sale-products {
+  perspective: 1400px;
+}
+
+.sale-card {
+  --mx: 70%;
+  --my: 40%;
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, #fff 10%, var(--tint)), transparent 60%),
+    var(--tint);
+  color: #fff;
+  box-shadow: 0 30px 50px -28px color-mix(in srgb, var(--tint) 80%, transparent);
+  transform: rotateX(var(--ry)) rotateY(var(--rx));
+  transition:
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.7s var(--ease);
+  will-change: transform;
+}
+
+.sale-card:hover {
+  transition:
+    transform 0.18s ease-out,
+    box-shadow 0.7s var(--ease);
+  box-shadow: 0 44px 70px -30px color-mix(in srgb, var(--tint) 95%, transparent);
+}
+
+.sale-card-media {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  width: 68%;
+  /* the photo itself fades out to the left — a long, eased mask */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 8%,
+    rgba(0, 0, 0, 0.14) 16%,
+    rgba(0, 0, 0, 0.32) 24%,
+    rgba(0, 0, 0, 0.55) 32%,
+    rgba(0, 0, 0, 0.78) 40%,
+    rgba(0, 0, 0, 0.93) 48%,
+    #000 56%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 8%,
+    rgba(0, 0, 0, 0.14) 16%,
+    rgba(0, 0, 0, 0.32) 24%,
+    rgba(0, 0, 0, 0.55) 32%,
+    rgba(0, 0, 0, 0.78) 40%,
+    rgba(0, 0, 0, 0.93) 48%,
+    #000 56%
+  );
+}
+
+.sale-card-img {
+  object-fit: cover;
+  object-position: 50% 24%;
+  transition: transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sale-card:hover .sale-card-img {
+  transform: scale(1.05);
+}
+
+/* the back view opens as a circle from the pointer */
+.sale-card-back {
+  clip-path: circle(0% at var(--mx) var(--my));
+  transition:
+    clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1),
+    transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sale-card:hover .sale-card-back {
+  clip-path: circle(150% at var(--mx) var(--my));
+}
+
+/* a soft light that follows the pointer, like glossy card stock */
+.sale-card-sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, 0.22), transparent 42%);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+}
+
+.sale-card:hover .sale-card-sheen {
+  opacity: 1;
+}
+
+.sale-card-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 48%;
+  padding: clamp(20px, 2.6vw, 36px);
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--tint) 60%, transparent);
+}
+
+.sale-card-body h3 {
+  margin-top: 12px;
+  font-family: var(--headline);
+  font-size: clamp(28px, 2.7vw, 38px);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.sale-card-off {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.sale-card-blurb {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.sale-card-price {
+  margin-top: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #fff;
+}
+
+.sale-card-price s {
+  margin-left: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.sale-card-cta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  margin-top: 18px;
+  padding: 13px 14px 13px 16px;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: color-mix(in srgb, var(--tint) 55%, rgba(0, 0, 0, 0.3));
+  backdrop-filter: blur(10px);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.94);
+  transition: background 0.5s var(--ease);
+}
+
+/* a light sweep across the button on hover */
+.sale-card-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sale-card:hover .sale-card-cta::before {
+  transform: translateX(120%);
+}
+
+.sale-card:hover .sale-card-cta {
+  background: color-mix(in srgb, var(--tint) 35%, rgba(255, 255, 255, 0.16));
+}
+
+.sale-card-cta svg {
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sale-card:hover .sale-card-cta svg {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sale-card {
+    transform: none;
+  }
+}
+
+/* ───────── home: best sellers ───────── */
+
+.best {
+  background: var(--paper);
+}

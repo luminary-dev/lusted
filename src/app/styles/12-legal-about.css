@@ -1,0 +1,824 @@
+/* ───────── legal pages ───────── */
+
+.legal,
+.about-page {
+  --gap: clamp(48px, 6vw, 88px); /* the page's own section spacing — tighter than the home page's */
+  padding-top: clamp(104px, 10vw, 136px);
+  padding-bottom: var(--gap);
+}
+
+.legal-head {
+  max-width: 760px;
+}
+
+.legal-head .h2 {
+  margin-top: 16px;
+}
+
+.legal-updated {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.legal-head .lede {
+  margin-top: 16px;
+}
+
+.legal-grid {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 720px);
+  gap: clamp(32px, 6vw, 96px);
+  margin-top: clamp(40px, 5vw, 64px);
+  padding-top: clamp(32px, 4vw, 48px);
+  border-top: 1px solid var(--hair);
+}
+
+.legal-toc {
+  position: sticky;
+  top: 110px;
+  align-self: start;
+}
+
+.legal-toc > p {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.legal-toc ol {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  list-style: none;
+}
+
+.legal-toc a {
+  display: block;
+  padding: 6px 12px;
+  margin-left: -12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--ink-2);
+  transition: background 0.2s;
+}
+
+.legal-toc a:hover {
+  background: var(--cream-2);
+  color: var(--ink);
+}
+
+.prose section {
+  scroll-margin-top: 110px;
+  padding-bottom: 32px;
+}
+
+.prose section + section {
+  padding-top: 32px;
+  border-top: 1px solid var(--hair);
+}
+
+.prose h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.2;
+}
+
+.prose h2 span {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--rose-ink);
+}
+
+.prose p,
+.prose li {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.prose p {
+  margin-top: 14px;
+}
+
+.prose ul {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.prose li::marker {
+  color: var(--rose);
+}
+
+.prose strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.prose a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--rose) 60%, transparent);
+  text-underline-offset: 3px;
+}
+
+/* the delivery, returns & FAQ page (src/app/help): each question opens in place — native <details>, gliding open
+   where the browser can animate it */
+.faq {
+  margin-top: 14px;
+}
+
+.faq details {
+  border-bottom: 1px solid var(--hair);
+  interpolate-size: allow-keywords;
+}
+
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 0;
+  font-size: 16.5px;
+  font-weight: 500;
+  color: var(--ink);
+  list-style: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+
+/* a fine plus that turns into a cross as it opens */
+.faq summary::after {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background:
+    linear-gradient(var(--rose-ink), var(--rose-ink)) center / 100% 1.5px no-repeat,
+    linear-gradient(var(--rose-ink), var(--rose-ink)) center / 1.5px 100% no-repeat;
+  transition: transform 0.35s var(--ease);
+}
+
+.faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq summary:hover {
+  color: var(--rose-ink);
+}
+
+.faq summary:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.faq details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.4s var(--ease),
+    content-visibility 0.4s allow-discrete;
+}
+
+.faq details[open]::details-content {
+  block-size: auto;
+}
+
+.faq-a {
+  padding-bottom: 18px;
+}
+
+.prose .faq-a > p:first-child {
+  margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq details::details-content,
+  .faq summary::after {
+    transition: none;
+  }
+}
+
+/* page not found / something went wrong (not-found.tsx, error.tsx): one centred message under the nav */
+.status-page {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: clamp(120px, 14vw, 170px) 0 clamp(64px, 8vw, 104px);
+  text-align: center;
+}
+
+.status-inner {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  max-width: 640px;
+}
+
+.status-code {
+  font-family: var(--headline);
+  font-size: clamp(96px, 16vw, 176px);
+  line-height: 0.9;
+  color: var(--rose-ink);
+}
+
+.status-lede p + p {
+  margin-top: 14px;
+}
+
+.status-lede p:last-child {
+  margin-top: 22px;
+  color: var(--wine);
+}
+
+.status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.status-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.status-links a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-decoration-color: var(--hair);
+  text-underline-offset: 4px;
+  transition: color 0.2s;
+}
+
+.status-links a:hover {
+  color: var(--rose-ink);
+}
+
+/* ───────── about page ───────── */
+
+/* the opener: the dressing-room photo fills the width; the headline sits over its quiet left side on a soft scrim */
+.about-hero {
+  position: relative; /* the copy is placed against the photo, the header's last block */
+  max-width: none;
+}
+
+.about-hero-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  aspect-ratio: 21 / 9;
+  background: var(--cream-2);
+  isolation: isolate;
+}
+
+.about-hero-photo img {
+  object-fit: cover;
+  object-position: 70% 50%;
+}
+
+.about-hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(46, 20, 24, 0.62) 0%, rgba(46, 20, 24, 0.38) 34%, rgba(46, 20, 24, 0) 62%),
+    linear-gradient(0deg, rgba(46, 20, 24, 0.45) 0%, rgba(46, 20, 24, 0) 45%);
+}
+
+.about-hero-copy {
+  position: absolute;
+  z-index: 1;
+  left: clamp(24px, 4.5vw, 72px);
+  right: clamp(24px, 4.5vw, 72px);
+  bottom: clamp(24px, 4.5vw, 64px);
+  max-width: 580px;
+  color: #fff6f2;
+}
+
+.about-hero-copy .eyebrow {
+  color: #f3c9bd;
+}
+
+.about-hero-copy .h1 {
+  margin-top: 16px;
+  font-size: clamp(34px, 4.2vw, 62px);
+  color: #fff6f2;
+  text-shadow: 0 2px 24px rgba(46, 20, 24, 0.35);
+}
+
+.about-hero-copy .h1 em {
+  color: #f3c9bd;
+}
+
+.about-hero-copy .lede {
+  margin-top: 18px;
+  color: rgba(255, 246, 242, 0.88);
+  max-width: 30em;
+}
+
+/* our story */
+.about-story {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(28px, 5vw, 80px);
+  padding-block: var(--gap);
+  border-bottom: 1px solid var(--hair);
+}
+
+.about-story .h2 {
+  margin-top: 16px;
+}
+
+.about-quote {
+  margin: 28px 0 0;
+  padding-left: 18px;
+  border-left: 2px solid color-mix(in srgb, var(--rose) 55%, transparent);
+  font-family: var(--script);
+  font-size: clamp(26px, 2.4vw, 34px);
+  line-height: 1.25;
+  color: var(--rose);
+  max-width: 16em;
+}
+
+.about-story-copy {
+  display: grid;
+  gap: 16px;
+  align-content: center;
+}
+
+/* what we believe: a heading beside a two-by-two of values, divided by hairlines rather than boxed in cards */
+.about-values {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+  padding-block: var(--gap);
+  border-bottom: 1px solid var(--hair);
+}
+
+.about-values-head .h2 {
+  margin-top: 16px;
+}
+
+.about-values-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-value {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 26px 28px 30px;
+  border-top: 1px solid var(--hair);
+}
+
+/* the hairlines: a column between the two, rows above the second pair */
+.about-value:nth-child(odd) {
+  padding-left: 0;
+  border-right: 1px solid var(--hair);
+}
+
+.about-value:nth-child(even) {
+  padding-right: 0;
+}
+
+.about-value:nth-child(-n + 2) {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.about-value .value-icon {
+  transition:
+    background 0.4s var(--ease),
+    color 0.4s var(--ease);
+}
+
+.about-value:hover .value-icon {
+  background: var(--wine);
+  color: #fff6f2;
+}
+
+.about-value .h3 {
+  margin-top: 4px;
+}
+
+.about-value p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 28em;
+}
+
+[data-theme="dark"] .about-value .value-icon,
+[data-theme="dark"] .about-steps .value-icon {
+  color: var(--rose);
+}
+
+[data-theme="dark"] .about-value:hover .value-icon {
+  background: var(--rose);
+  color: #2a0d14;
+}
+
+/* how we work: two prints taped to the page beside the three steps */
+.about-how {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(36px, 6vw, 96px);
+  align-items: center;
+  padding-block: var(--gap);
+  border-bottom: 1px solid var(--hair);
+}
+
+.about-prints {
+  position: relative;
+  aspect-ratio: 1 / 1.08;
+  --print-paper: #fbf7f3;
+}
+
+[data-theme="dark"] .about-prints {
+  --print-paper: #efe6dd;
+}
+
+.about-print {
+  position: absolute;
+  margin: 0;
+  width: 60%;
+  padding: 3% 3% 0;
+  background: var(--print-paper);
+  box-shadow:
+    0 1px 2px rgba(46, 20, 24, 0.18),
+    0 18px 36px -16px rgba(46, 20, 24, 0.45);
+  transform: rotate(var(--tilt));
+}
+
+[data-theme="dark"] .about-print {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 22px 40px -16px rgba(0, 0, 0, 0.75);
+}
+
+.about-print.is-left {
+  left: 0;
+  top: 0;
+  --tilt: -2.6deg;
+}
+
+.about-print.is-right {
+  right: 0;
+  top: 17%;
+  z-index: 1;
+  --tilt: 2.1deg;
+}
+
+.about-print-photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--cream-2);
+}
+
+.about-print-photo img {
+  object-fit: cover;
+}
+
+.about-print figcaption {
+  padding: 10px 2px 12px;
+  font-family: var(--script);
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1;
+  color: #5a3a40;
+  text-align: center;
+}
+
+/* a strip of translucent tape across the top edge */
+.about-tape {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 34%;
+  height: 24px;
+  transform: translateX(-50%) rotate(calc(var(--tilt) * -0.6));
+  background: rgba(255, 244, 236, 0.55);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 1px 2px rgba(46, 20, 24, 0.12);
+  backdrop-filter: blur(1px);
+}
+
+.about-how-copy .h2 {
+  margin-top: 16px;
+}
+
+.about-steps {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 0;
+  list-style: none;
+}
+
+.about-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+}
+
+.about-steps .h3 {
+  margin-top: 10px;
+}
+
+.about-steps p {
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 30em;
+}
+
+/* the closing panel */
+.about-cta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: var(--gap);
+  padding: clamp(32px, 4.5vw, 60px) clamp(28px, 5vw, 72px);
+  border-radius: var(--radius);
+  background: var(--blush-bg);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.about-cta::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10%;
+  z-index: -1;
+  background: radial-gradient(ellipse closest-side at 80% 50%, color-mix(in srgb, var(--rose) 22%, transparent), transparent);
+}
+
+.about-cta .h2 {
+  margin-top: 12px;
+}
+
+.about-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .legal-grid {
+    grid-template-columns: 1fr;
+  }
+  .legal-toc {
+    position: static;
+  }
+  .legal-toc ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .legal-toc a {
+    margin-left: 0;
+    padding: 6px 12px;
+    border: 1px solid var(--hair);
+    border-radius: 999px;
+    font-size: 13px;
+  }
+  /* on narrow screens the headline moves below the photo, which crops in on her */
+  .about-hero-photo {
+    aspect-ratio: 4 / 3;
+  }
+  .about-hero-photo::after {
+    background: linear-gradient(0deg, rgba(46, 20, 24, 0.28) 0%, rgba(46, 20, 24, 0) 40%);
+  }
+  .about-hero-copy {
+    position: static;
+    max-width: 640px;
+    margin-top: 28px;
+    color: var(--ink);
+  }
+  .about-hero-copy .eyebrow {
+    color: var(--rose);
+  }
+  .about-hero-copy .h1 {
+    color: var(--ink);
+    text-shadow: none;
+  }
+  .about-hero-copy .h1 em {
+    color: var(--rose);
+  }
+  .about-hero-copy .lede {
+    color: var(--ink-2);
+  }
+  .about-story,
+  .about-how,
+  .about-values {
+    grid-template-columns: 1fr;
+  }
+  .about-prints {
+    max-width: 520px;
+  }
+  .about-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  /* one column: every value sits under a hairline, none beside another */
+  .about-values-list {
+    grid-template-columns: 1fr;
+  }
+  .about-value,
+  .about-value:nth-child(odd),
+  .about-value:nth-child(even) {
+    padding: 22px 0;
+    border-right: 0;
+    border-top: 1px solid var(--hair);
+  }
+  .about-value:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .footer-credit {
+    line-height: 1.6;
+  }
+}
+
+/* ───────── hero: "Our story" link ───────── */
+
+.hero-actions {
+  align-items: center;
+  gap: 28px;
+}
+
+.hero-story {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 243, 238, 0.55);
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff6f2;
+  transition: border-color 0.3s var(--ease);
+}
+
+.hero-story:hover {
+  border-color: #fff6f2;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding-top: 96px; /* the nav is shorter here */
+  }
+  .hero-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+  .hero-actions .btn {
+    flex: 0 1 auto;
+  }
+}
+
+/* ───────── header: WhatsApp button ───────── */
+
+.nav-whatsapp {
+  height: 42px;
+  padding: 0 18px;
+  margin-right: 6px;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+.nav-whatsapp svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav:not(.is-solid) .nav-whatsapp {
+  background: #fff6f2;
+  color: #7a1b33;
+}
+
+.nav-menu-whatsapp {
+  display: none;
+}
+
+/* mid widths: icon-only WhatsApp button */
+@media (max-width: 1240px) {
+  .nav-whatsapp {
+    width: 42px;
+    padding: 0;
+    margin-right: 2px;
+  }
+  .nav-whatsapp span {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-whatsapp {
+    width: 40px;
+    height: 40px;
+  }
+  .nav-menu-whatsapp {
+    display: inline-flex;
+    margin: 14px 0 4px;
+  }
+  .nav-menu-whatsapp svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* small phones: WhatsApp lives in the menu panel */
+@media (max-width: 479px) {
+  .nav-whatsapp {
+    display: none;
+  }
+}
+
+/* the WhatsApp pill in the mobile menu shouldn't inherit the menu-link styling */
+.nav-links a.nav-menu-whatsapp {
+  height: 50px;
+  padding: 0 22px;
+  border-bottom: 0;
+  opacity: 1;
+  font-size: 15px;
+}
+
+.hero-story {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--headline);
+  font-synthesis: none;
+  font-variation-settings: "SOFT" 100;
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.hero-story svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* sale cards: one per row on phones */
+@media (max-width: 760px) {
+  .sale-products {
+    grid-template-columns: 1fr;
+  }
+  .sale-card {
+    aspect-ratio: auto; /* grow to fit the text on narrow screens */
+    min-height: 300px;
+  }
+  .sale-card-body {
+    width: 56%;
+    padding: 20px 16px;
+  }
+  .sale-card-body h3 {
+    font-size: 22px;
+  }
+  .sale-card-blurb {
+    font-size: 12.5px;
+  }
+  .sale-card-price {
+    font-size: 13.5px;
+  }
+  .sale-card-cta {
+    padding: 11px 12px 11px 14px;
+    font-size: 13px;
+  }
+}

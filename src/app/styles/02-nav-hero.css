@@ -1,0 +1,337 @@
+/* ───────── nav ───────── */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  padding-top: 24px;
+  transition:
+    transform 0.5s var(--ease),
+    padding 0.5s var(--ease);
+}
+
+.nav.is-solid,
+.nav.is-open {
+  padding-top: 12px;
+}
+
+.nav .container {
+  position: relative;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 10px 0 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: #fff6f2;
+  transition:
+    background 0.5s var(--ease),
+    color 0.5s var(--ease),
+    border-color 0.5s var(--ease),
+    box-shadow 0.5s var(--ease);
+}
+
+.nav.is-solid .nav-bar,
+.nav.is-open .nav-bar {
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px) saturate(1.3);
+  border-color: var(--hair);
+  box-shadow: 0 10px 40px var(--shadow);
+  color: var(--ink);
+}
+
+.nav-logo {
+  position: relative;
+  display: block;
+  width: 112px;
+}
+
+.nav-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.4s var(--ease);
+}
+
+/* champagne mark over the hero and in dark mode; wine mark on the light frosted bar */
+.nav-logo .logo-wine {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+:root:not([data-theme="dark"]) .nav.is-solid .logo-wine {
+  opacity: 1;
+}
+
+:root:not([data-theme="dark"]) .nav.is-solid .logo-champagne {
+  opacity: 0;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  margin: 0 auto;
+}
+
+.nav-links a {
+  position: relative;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  transition: opacity 0.25s;
+}
+
+.nav-links a:hover,
+.nav-links a.is-active {
+  opacity: 1;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease);
+}
+
+.nav-links a:hover::after,
+.nav-links a.is-active::after {
+  transform: scaleX(1);
+}
+
+.nav-toggle {
+  display: none;
+}
+
+/* ───────── hero ───────── */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  /* a full screen, but never shorter than the copy needs: on a short window the hero grows past the viewport instead of
+     the headline sliding up under the fixed nav, whose height is reserved at the top */
+  min-height: max(620px, 100svh);
+  padding-top: 112px;
+  overflow: hidden;
+  color: #fff6f2;
+  background: #3a1d20;
+}
+
+/* background slides with an iris-bloom transition (HeroSlides.tsx) */
+@property --iris {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 150%;
+}
+
+.hero-slides {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  --hero-hold: 8s; /* matches INTERVAL in HeroSlides.tsx */
+  --hero-reveal: 4.2s;
+  --hero-curve: cubic-bezier(0.45, 0, 0.2, 1);
+  --hero-drift: cubic-bezier(0.22, 0.61, 0.36, 1); /* smooth ease-out: no stalls, glides to rest */
+  --iris-at: 68% 38%; /* where the model sits in the frame — the bloom opens from here */
+  background: #1c0a0d;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  visibility: hidden;
+}
+
+.hero-slide.is-leaving {
+  z-index: 1;
+  visibility: visible;
+}
+
+.hero-slide.is-active {
+  z-index: 2;
+  visibility: visible;
+}
+
+.hero-slide img {
+  object-fit: cover;
+  object-position: var(--pos, 72% 25%);
+  will-change: transform, filter;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* first photo on load: a gentle settle */
+  .hero-slide.is-first img {
+    animation: hero-settle var(--hero-hold) var(--hero-drift) both;
+  }
+
+  /* next photo: opens slowly from the model outwards, through a very soft-edged iris… */
+  .hero-slide.is-entering {
+    -webkit-mask-image: radial-gradient(circle farthest-corner at var(--iris-at), #000 calc(var(--iris) - 45%), transparent var(--iris));
+    mask-image: radial-gradient(circle farthest-corner at var(--iris-at), #000 calc(var(--iris) - 45%), transparent var(--iris));
+    animation: hero-iris var(--hero-reveal) var(--hero-curve) both;
+  }
+
+  /* …lit by a warm champagne bloom that swells and fades… */
+  .hero-slide.is-entering::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--iris-at), rgba(255, 220, 196, 0.5), rgba(255, 200, 180, 0.12) 55%, transparent 80%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: hero-bloom var(--hero-reveal) ease-in-out both;
+  }
+
+  /* …while the photo emerges from a soft, bright haze into focus. The zoom is its own animation on one
+     continuous curve for the whole hold, so focus and haze never interrupt its motion. */
+  .hero-slide.is-entering img {
+    animation:
+      hero-zoom var(--hero-hold) var(--hero-drift) both,
+      hero-focus var(--hero-reveal) var(--hero-curve) both;
+  }
+
+  /* the outgoing photo melts into soft focus and dims */
+  .hero-slide.is-leaving img {
+    animation: hero-depart var(--hero-reveal) var(--hero-curve) both;
+  }
+}
+
+@keyframes hero-iris {
+  from {
+    --iris: 0%;
+  }
+  to {
+    --iris: 150%;
+  }
+}
+
+@keyframes hero-bloom {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes hero-focus {
+  from {
+    filter: blur(10px) brightness(1.25) saturate(0.85);
+  }
+  to {
+    filter: blur(0) brightness(1) saturate(1);
+  }
+}
+
+/* no transform here: the photo has just glided to rest at scale(1), so it stays put while it softens */
+@keyframes hero-depart {
+  from {
+    transform: scale(1);
+    filter: blur(0) brightness(1);
+  }
+  to {
+    transform: scale(1);
+    filter: blur(12px) brightness(0.6);
+  }
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(40, 16, 20, 0.6) 0%, rgba(40, 16, 20, 0.3) 38%, rgba(40, 16, 20, 0) 62%),
+    linear-gradient(0deg, rgba(40, 16, 20, 0.6) 0%, rgba(40, 16, 20, 0) 50%),
+    linear-gradient(180deg, rgba(40, 16, 20, 0.55) 0%, rgba(40, 16, 20, 0.2) 12%, rgba(40, 16, 20, 0) 26%);
+}
+
+.hero-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 48px;
+  padding-bottom: clamp(40px, 7vh, 88px);
+}
+
+.hero-copy {
+  max-width: 620px;
+}
+
+.hero .eyebrow {
+  color: #f6cfc6;
+}
+
+.hero .h1 {
+  margin-top: 22px;
+}
+
+@media (max-height: 720px) {
+  .hero .h1 {
+    font-size: clamp(44px, 5.6vw, 76px);
+  }
+  .hero .lede {
+    margin-top: 16px;
+  }
+  .hero-actions {
+    margin-top: 24px;
+  }
+}
+
+
+.hero .h1 em {
+  color: #f5c2b8;
+}
+
+.hero .lede {
+  margin-top: 22px;
+  color: rgba(255, 244, 240, 0.86);
+  max-width: 30em;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
