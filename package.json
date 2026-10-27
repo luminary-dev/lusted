@@ -12,13 +12,13 @@
     "test:report": "playwright show-report test-results/report"
   },
   "dependencies": {
-    "@tabler/icons-react": "3.48.0",
+    "@tabler/icons-react": "3.49.0",
     "aws4fetch": "^1.0.20",
-    "lucide-react": "^1.57.0",
+    "lucide-react": "^1.60.0",
     "next": "16.4.2",
     "qrcode": "1.5.4",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "three": "0.186.1"
   },
   "devDependencies": {
