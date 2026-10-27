@@ -39,6 +39,7 @@ npm run lint
 
 - `NEWSLETTER_WEBHOOK_URL` — optional. Where the newsletter form posts sign-ups. Until it is set the form says sign-ups open soon.
 - `OPENAI_API_KEY` — only for the image-generation scripts, never at runtime.
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`, `GITHUB_ADMIN_TOKEN`, `ANTHROPIC_API_KEY` — the owner console, see below.
 
 ## Tests
 
@@ -97,6 +98,47 @@ site itself (inline scripts and styles are allowed because Next's hydration scri
 `layout.tsx` are inline), no framing, `nosniff`, a strict referrer policy, a permissions policy that switches off
 camera, microphone, location and payment, and cross-origin isolation headers. HSTS comes from Vercel. The source is
 published to be read, not reused — see `LICENSE`.
+
+## The owner console
+
+**/admin** — unlinked, kept out of search, never cached — is where the owner runs the catalogue without opening the
+repository: add a piece, change a name, collection, price, offer price or best-seller rank, remove a piece, or put a
+percentage off a whole collection. It is modelled on the Luvana console, with two differences: the photos are the
+owner's own (front, back and side — nothing is generated or retouched; each is cropped to the catalogue's 9:16 frame
+and given the wordmark, `scripts/lib/wordmark.mjs`), and the words are Claude's to start with. "Write it with AI"
+sends the front photo and the brief (collection, price, colours, fit, notes) to Claude, which writes the name, the
+description, the one-line blurb, the details, the fit note and the three moments in the catalogue's voice, next to
+three pieces from the same collection; the owner reads, changes and approves before anything is added.
+
+Nothing in the console touches the repository directly. The browser puts the photos straight into the bucket on
+signed addresses (`src/lib/admin/r2.ts`, under `incoming/`), then every change fires a `repository_dispatch`
+(`src/lib/admin/github.ts`) that the **Console** workflow (`.github/workflows/console.yml`) picks up: it applies the
+change on a branch off `dev` (`scripts/admin/add-product.mjs` finishes the photos, puts them in the bucket, updates
+the manifest, the catalogue and `product-images.ts`; `scripts/admin/apply-update.mjs` makes the smaller changes, and
+a removal deletes the photos too), commits it as `admin: <what changed>`, opens a pull request into `dev` and merges
+it once the checks are green — ten minutes or so, after which CI deploys the dev site. A console change takes the same
+road as every other change. The console reads the catalogue off the `dev` branch, watches its pull requests and
+says "done" the moment a change lands; `console-refresh.yml` keeps a queued console pull request up to date when
+another merges first. Live changes still go out by the usual release (`dev → main`). The tests read the catalogue
+facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece added or changed from the console
+doesn't fail them — the home page's hero piece, `rose-lace-balconette-bra`, is the one piece the suite and Lighthouse
+name directly, so it shouldn't be removed from the console.
+
+The console needs, on Vercel (Production and Preview): `ADMIN_EMAIL`; `ADMIN_PASSWORD_HASH` — `<salt-hex>:<scrypt-hex>`,
+made with the one-liner below; `ADMIN_SESSION_SECRET` — any long random string; `GITHUB_ADMIN_TOKEN` — a fine-grained
+token for this repository with Contents read/write and Pull requests read (it fires the dispatches and reads `dev`);
+`ANTHROPIC_API_KEY` — for the copy; and the four `R2_*` keys it already has. The repository needs one more Actions
+secret, `CONSOLE_TOKEN` — a fine-grained token with Contents and Pull requests read/write, used by the workflow to push
+the branch and open and merge the pull request (the workflow's own token could push, but nothing it pushes runs CI).
+The bucket must allow the browser's uploads: `node --env-file=.env.local scripts/admin/bucket-cors.mjs` once sets
+its CORS rules for the site's addresses — through Cloudflare's API with `CLOUDFLARE_API_TOKEN` in `.env.local` (an API
+token with "Workers R2 Storage: Edit"), since the site's own R2 keys can't change bucket settings; without it the script
+prints the rules to paste into the dashboard. Sessions are a signed cookie for seven days; eight wrong passwords in ten
+minutes lock an address out for ten.
+
+```bash
+node -e "const c=require('crypto');const s=c.randomBytes(16);const p=process.argv[1];console.log(s.toString('hex')+':'+c.scryptSync(p.normalize('NFKC'),s,32).toString('hex'))" 'the-password'
+```
 
 ## Errors and missing pages
 
