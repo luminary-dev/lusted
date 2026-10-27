@@ -55,3 +55,6 @@ next-env.d.ts
 
 # Photos live outside git and are served from Cloudflare R2 (scripts/images.mjs); the manifest in src/lib is what the site builds from
 /assets/
+
+# marina local instance — database, WAL and the key-encryption/local-api secrets
+marina.db*

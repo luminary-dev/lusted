@@ -1,0 +1,751 @@
+/* ───────── the back room (src/app/admin) · the room ─────────
+   The console itself: the rail down the left, the script title, the figures, the fitting (pinned photos, tag chips),
+   the offers sentence, the ledger and the day book, and the ticket stubs. The tokens and the shared controls — fields,
+   buttons, the sheet, the dot — are in 17-admin.css. */
+.adm-room {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 0 clamp(32px, 5vw, 80px);
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px) clamp(64px, 10vh, 120px);
+}
+
+/* ─ the rail ─ */
+.adm-rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  min-height: 100svh;
+  padding: clamp(28px, 5vh, 48px) 0 32px;
+  border-right: 1px solid var(--a-hair);
+}
+
+.adm-rail-top .adm-eyebrow {
+  margin-top: 12px;
+}
+
+.adm-contents {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adm-contents a {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--a-ink-2);
+  text-decoration: none;
+  transition: color 0.2s, padding-left 0.3s var(--ease);
+}
+
+.adm-contents a .adm-num {
+  width: 20px;
+  font-size: 19px;
+}
+
+.adm-contents a:hover {
+  color: var(--a-ink);
+  padding-left: 6px;
+}
+
+.adm-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--a-muted);
+}
+
+.adm-doors {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.adm-signout {
+  margin-top: auto;
+  align-self: flex-start;
+  color: var(--a-muted);
+}
+
+/* ─ the floor ─ */
+.adm-floor {
+  min-width: 0;
+  padding-top: clamp(28px, 5vh, 48px);
+}
+
+.adm-hero {
+  padding-bottom: 28px;
+}
+
+.adm-title {
+  margin: 10px 0 18px;
+  font-family: var(--parisienne);
+  font-weight: 400;
+  font-size: clamp(56px, 7vw, 96px);
+  line-height: 0.95;
+  color: var(--a-ink);
+}
+
+.adm-lede {
+  max-width: 68ch;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--a-ink-2);
+}
+
+.adm-lede strong {
+  font-weight: 500;
+  color: var(--a-ink);
+}
+
+/* the figures: one ruled line of big numerals */
+.adm-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0 0 clamp(48px, 7vh, 80px);
+  padding: 22px 0 0;
+  border-top: 1px solid var(--a-hair);
+  border-bottom: 1px solid var(--a-hair);
+}
+
+.adm-figure {
+  flex: 1 1 120px;
+  padding: 0 24px 22px 0;
+}
+
+.adm-figure + .adm-figure {
+  padding-left: 24px;
+  border-left: 1px solid var(--a-hair);
+}
+
+.adm-figure dd {
+  margin: 0;
+  font-family: var(--fraunces);
+  font-weight: 300;
+  font-variation-settings: "SOFT" 100, "opsz" 72;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.adm-figure dt {
+  margin-top: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+}
+
+/* ─ sections ─ */
+.adm-section {
+  margin-bottom: clamp(56px, 8vh, 96px);
+  scroll-margin-top: 24px;
+}
+
+.adm-h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  margin-bottom: 26px;
+}
+
+.adm-h2 .adm-num {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.adm-h2 h2 {
+  margin: 0;
+  font-family: var(--fraunces);
+  font-weight: 300;
+  font-variation-settings: "SOFT" 100, "opsz" 72;
+  font-size: clamp(26px, 2.6vw, 34px);
+  line-height: 1.1;
+  color: var(--a-ink);
+}
+
+.adm-h2-aside {
+  margin-left: auto;
+  font-size: 12.5px;
+  font-style: italic;
+  font-family: var(--fraunces);
+  color: var(--a-muted);
+}
+
+.adm-sheet.adm-fitting,
+.adm-sheet.adm-offers {
+  padding: clamp(24px, 3.5vw, 44px);
+}
+
+.adm-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 40px;
+}
+
+.adm-grid-2 .adm-field + .adm-field {
+  margin-top: 0;
+}
+
+.adm-span {
+  grid-column: 1 / -1;
+}
+
+.adm-copy {
+  margin-top: 30px;
+  padding-top: 28px;
+  border-top: 1px dashed var(--a-hair-2);
+}
+
+.adm-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+  margin-top: 28px;
+}
+
+.adm-row-tight {
+  margin-top: 20px;
+}
+
+.adm-row .adm-help {
+  flex: 1 1 260px;
+}
+
+/* ─ the fitting: steps, then the photos pinned up ─ */
+.adm-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 0 0 30px;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--a-muted);
+}
+
+.adm-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-step-n {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--a-hair-2);
+  border-radius: 50%;
+  font-family: var(--fraunces);
+  font-size: 12px;
+}
+
+.adm-steps li.is-now {
+  color: var(--a-ink);
+}
+
+.adm-steps li.is-now .adm-step-n {
+  border-color: var(--a-rose);
+  color: var(--a-rose);
+}
+
+.adm-steps li.is-done .adm-step-n {
+  background: var(--a-rose);
+  border-color: var(--a-rose);
+  color: #fff6f2;
+}
+
+.adm-pins {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin-bottom: 34px;
+}
+
+.adm-pins-note {
+  grid-column: 1 / -1;
+}
+
+.adm-pin {
+  position: relative;
+  display: block;
+  padding: 10px 10px 34px;
+  background: #fffaf7;
+  box-shadow: 0 14px 30px -14px rgba(46, 20, 24, 0.5), 0 1px 2px rgba(46, 20, 24, 0.2);
+  transform: rotate(var(--tilt));
+  cursor: pointer;
+  transition: transform 0.3s var(--ease), box-shadow 0.3s;
+}
+
+.adm-pin:hover,
+.adm-pin:focus-within {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: 0 22px 40px -16px rgba(46, 20, 24, 0.55), 0 1px 2px rgba(46, 20, 24, 0.2);
+  z-index: 1;
+}
+
+.adm-pin-tack {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f2b9b0, #7a1b33 70%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.adm-pin-frame {
+  position: relative;
+  display: block;
+  aspect-ratio: 9 / 13;
+  overflow: hidden;
+  background: var(--a-paper-2);
+}
+
+.adm-pin-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.adm-pin-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--a-muted);
+  border: 1px dashed var(--a-hair-2);
+  margin: 8px;
+}
+
+.adm-pin-plus {
+  font-family: var(--fraunces);
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--a-rose);
+}
+
+.adm-pin-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9px;
+  text-align: center;
+  font-family: var(--fraunces);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--a-ink-2);
+}
+
+.adm-pin input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ─ chips: colours as swatches, sizes as little garment tags ─ */
+.adm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px;
+  border: 1px solid var(--a-hair-2);
+  border-radius: 999px;
+  background: var(--a-chip);
+  font: inherit;
+  font-size: 13px;
+  color: var(--a-ink-2);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.adm-chip.is-on {
+  border-color: var(--a-rose);
+  background: rgba(160, 68, 89, 0.1);
+  color: var(--a-ink);
+}
+
+.adm-chip-tag {
+  position: relative;
+  padding: 7px 14px 7px 20px;
+  border-radius: 3px;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%);
+  font-family: var(--fraunces);
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+}
+
+.adm-chip-tag::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--a-hair-2);
+}
+
+.adm-chip-tag.is-on {
+  background: var(--a-paper-ink);
+  border-color: var(--a-paper-ink);
+  color: #fff6f2;
+}
+
+.adm-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+/* ─ offers: a sentence to fill in ─ */
+.adm-offer-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 16px;
+  margin: 0;
+  font-family: var(--fraunces);
+  font-weight: 300;
+  font-variation-settings: "SOFT" 100, "opsz" 72;
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.1;
+}
+
+.adm-offer-pct {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.adm-input-big {
+  width: auto;
+  padding: 0 4px 4px;
+  font: inherit;
+  font-size: inherit;
+  color: var(--a-rose);
+  border-bottom: 2px solid var(--a-hair-2);
+  -moz-appearance: textfield;
+}
+
+.adm-input-big::-webkit-outer-spin-button,
+.adm-input-big::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input.adm-input-big {
+  width: 2.2ch;
+  min-width: 2.2ch;
+  text-align: right;
+}
+
+select.adm-input-big {
+  max-width: 100%;
+  font-style: italic;
+}
+
+/* ─ the ledger ─ */
+.adm-ledger-wrap {
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+
+.adm-ledger {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.adm-ledger th {
+  padding: 0 18px 12px 0;
+  border-bottom: 1px solid var(--a-hair-2);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--a-rose);
+}
+
+.adm-ledger td {
+  padding: 12px 18px 12px 0;
+  border-bottom: 1px solid var(--a-hair);
+  vertical-align: middle;
+}
+
+.adm-ledger tbody tr {
+  transition: background 0.2s;
+}
+
+.adm-ledger tbody tr:hover {
+  background: rgba(251, 241, 236, 0.025);
+}
+
+.adm-ledger tr.is-dirty td {
+  background: rgba(232, 180, 170, 0.06);
+}
+
+.adm-ledger tr.is-waiting td {
+  opacity: 0.6;
+}
+
+.adm-th-num,
+.adm-td-num {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.adm-td-piece {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 280px;
+}
+
+.adm-thumb-wrap {
+  flex: none;
+  width: 44px;
+  height: 66px;
+  overflow: visible;
+}
+
+.adm-thumb {
+  width: 44px;
+  height: 66px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #2a1216;
+  transform-origin: left center;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s;
+}
+
+.adm-ledger tr:hover .adm-thumb {
+  transform: scale(2.6);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 2;
+}
+
+.adm-piece {
+  flex: 1;
+  min-width: 0;
+  display: block;
+}
+
+.adm-offer-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-off {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--a-blush);
+}
+
+.adm-pct-pick {
+  width: 72px;
+}
+
+.adm-td-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.adm-td-actions .adm-quiet + .adm-quiet {
+  margin-left: 18px;
+}
+
+.adm-ledger tr:not(.is-dirty) .adm-save {
+  visibility: hidden;
+}
+
+.adm-applying {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-style: italic;
+  font-family: var(--fraunces);
+  color: var(--a-blush);
+}
+
+/* ─ the day book ─ */
+.adm-pulls,
+.adm-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.adm-pulls {
+  margin-bottom: 22px;
+}
+
+.adm-pull,
+.adm-feed li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--a-hair);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.adm-feed-time {
+  flex: none;
+  width: 118px;
+  font-family: var(--fraunces);
+  font-style: italic;
+  font-variant-numeric: tabular-nums;
+  color: var(--a-muted);
+}
+
+.adm-feed li > span:last-child,
+.adm-pull a {
+  flex: 1 1 320px;
+  color: var(--a-ink-2);
+  text-decoration: none;
+}
+
+.adm-pull a:hover {
+  color: var(--a-ink);
+  text-decoration: underline;
+}
+
+/* ─ tickets: what's on its way, bottom right ─ */
+.adm-tickets {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(380px, calc(100vw - 40px));
+}
+
+.adm-ticket {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px 14px 16px;
+  background: var(--a-paper);
+  color: var(--a-paper-ink);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  font-size: 13px;
+  line-height: 1.55;
+  /* a ticket stub: perforated down the left */
+  border-left: 1px dashed rgba(46, 20, 24, 0.4);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 12px), 6px calc(100% - 8px), 0 calc(100% - 4px));
+}
+
+.adm-ticket .adm-dot {
+  margin-top: 5px;
+}
+
+/* ─ smaller rooms ─ */
+@media (max-width: 1040px) {
+  .adm-room {
+    grid-template-columns: 1fr;
+  }
+  .adm-rail {
+    position: static;
+    min-height: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 28px;
+    padding: 22px 0 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--a-hair);
+  }
+  .adm-rail-top .adm-eyebrow {
+    display: none;
+  }
+  .adm-wordmark {
+    width: 110px;
+  }
+  .adm-contents {
+    display: none;
+  }
+  .adm-doors {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+  .adm-signout {
+    margin-top: 0;
+    margin-left: auto;
+  }
+  .adm-floor {
+    padding-top: 24px;
+  }
+}
+
+@media (max-width: 760px) {
+  .adm-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .adm-pins {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .adm-pin {
+    padding: 6px 6px 26px;
+  }
+  .adm-pin-caption {
+    bottom: 6px;
+    font-size: 12px;
+  }
+  .adm-h2-aside {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .adm-figure {
+    flex-basis: 40%;
+  }
+  .adm-figure + .adm-figure {
+    padding-left: 16px;
+  }
+  .adm-ledger tr:hover .adm-thumb {
+    transform: none;
+    box-shadow: none;
+  }
+}
+

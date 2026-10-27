@@ -14,12 +14,12 @@ test.describe("owner console", () => {
     expect(res?.headers()["cache-control"]).toContain("no-store");
     expect(res?.headers()["x-robots-tag"]).toContain("noindex");
     expect(res?.headers()["content-security-policy"]).toContain("r2.cloudflarestorage.com");
-    await expect(page).toHaveTitle(/console/i);
+    await expect(page).toHaveTitle(/back room/i);
     const form = page.locator("main.adm-login form");
     await expect(form).toBeVisible();
     await expect(form.getByLabel("Email")).toBeVisible();
     await expect(form.getByLabel("Password")).toBeVisible();
-    await expect(form.getByRole("button", { name: /Sign in/ })).toBeVisible();
+    await expect(form.getByRole("button", { name: /Let me in/ })).toBeVisible();
     // its own page: the shop's nav, footer, cursor and intro are hidden around it (17-admin.css)
     for (const chrome of ["header.nav", "footer.footer", ".scroll-rail"]) await expect(page.locator(chrome), chrome).toBeHidden();
     await context.close();
