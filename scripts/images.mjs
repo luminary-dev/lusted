@@ -11,7 +11,7 @@
 // upload, check and pull need the bucket's keys in the environment (.env.local has them on the laptop; Vercel and CI
 // hold the same four): R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY.
 import { createHash } from "node:crypto";
-import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, open, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { AwsClient } from "aws4fetch";
 import sharp from "sharp";
@@ -105,12 +105,23 @@ async function pull() {
   let n = 0;
   for (const rel of Object.keys(images)) {
     const file = path.join(ASSETS, rel);
-    if (await stat(file).catch(() => null)) continue;
-    const res = await get(rel);
-    if (!res.ok) throw new Error(`${rel}: ${res.status}`);
     await mkdir(path.dirname(file), { recursive: true });
-    await writeFile(file, Buffer.from(await res.arrayBuffer()));
-    n++;
+    // create-only: a photo that's already here is left alone, with no check-then-write gap in between
+    let handle;
+    try {
+      handle = await open(file, "wx");
+    } catch (e) {
+      if (e.code === "EEXIST") continue;
+      throw e;
+    }
+    try {
+      const res = await get(rel);
+      if (!res.ok) throw new Error(`${rel}: ${res.status}`);
+      await handle.writeFile(Buffer.from(await res.arrayBuffer()));
+      n++;
+    } finally {
+      await handle.close();
+    }
   }
   console.log(`pull: ${n} photo(s) fetched into assets/`);
 }
