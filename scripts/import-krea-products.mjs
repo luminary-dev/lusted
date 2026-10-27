@@ -7,7 +7,7 @@
 //    enlargement so lace, hair and eyes sharpen without plastic skin (same recipe as scripts/enhance-images.mjs). Needs
 //    the realesrgan-ncnn-vulkan binary: in .tools/realesrgan/ (git-ignored), ESRGAN_BIN or on PATH. Without it the photo is imported un-enhanced, with a warning.
 //  · cropped to exactly 9:16 (the frame the site shows), then watermarked — the Lusted wordmark in white, bottom right,
-//    the same gap from the right and bottom edges, softly shadowed.
+//    the same gap from the right and bottom edges, softly shadowed (scripts/lib/wordmark.mjs, shared with every photo).
 // The PNGs in refs/ stay clean originals.
 //
 // Usage: node scripts/import-krea-products.mjs [--all]   (--all re-finishes photos that are already imported)
@@ -16,6 +16,7 @@ import { mkdtemp, readdir, rm, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import sharp from "sharp";
+import { watermark } from "./lib/wordmark.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "assets/products");
@@ -39,35 +40,6 @@ function findEsrgan() {
 }
 const ESRGAN = findEsrgan();
 if (!ESRGAN) console.warn("⚠ realesrgan-ncnn-vulkan not found (set ESRGAN_BIN) — importing without enhancement");
-
-// white wordmark, alpha taken from the brand master
-const wordmark = await sharp(path.join(ROOT, "brand/source/wordmark-light.png")).trim({ threshold: 1 }).png().toBuffer();
-async function watermark(width, height) {
-  const w = Math.round(width * 0.2);
-  const alpha = await sharp(wordmark).resize(w).extractChannel("alpha").raw().toBuffer({ resolveWithObject: true });
-  const { width: mw, height: mh } = alpha.info;
-  const make = (rgb, opacity) =>
-    sharp({ create: { width: mw, height: mh, channels: 3, background: rgb } })
-      .joinChannel(alpha.data, { raw: { width: mw, height: mh, channels: 1 } })
-      .ensureAlpha()
-      .linear([1, 1, 1, opacity], [0, 0, 0, 0])
-      .png()
-      .toBuffer();
-  const pad = Math.round(w * 0.12);
-  const shadow = await sharp(await make({ r: 30, g: 8, b: 14 }, 0.35))
-    .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .blur(Math.max(1, w / 60))
-    .png()
-    .toBuffer();
-  const mark = await make({ r: 255, g: 255, b: 255 }, 0.6);
-  const margin = Math.round(width * 0.07); // the same gap from the right edge and the bottom edge
-  const left = width - margin - mw;
-  const top = height - margin - mh;
-  return [
-    { input: shadow, left: left - pad, top: top - pad + Math.round(w / 90) },
-    { input: mark, left, top },
-  ];
-}
 
 async function finish(src, dest) {
   const { width, height } = await sharp(src).metadata();

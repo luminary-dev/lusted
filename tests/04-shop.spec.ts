@@ -125,7 +125,7 @@ test.describe("the shop", () => {
     for (let i = 0; i < 6; i++) await expect(cards(page).nth(i).locator(".badge", { hasText: "New" })).toHaveCount(1);
     await select.selectOption("best");
     await expect(page).toHaveURL(/sort=best/);
-    expect((await slugs(cards(page))).slice(0, 6)).toEqual(CATALOG.bestSellers);
+    expect((await slugs(cards(page))).slice(0, 6)).toEqual(CATALOG.bestSellers.slice(0, 6));
     await select.selectOption("featured");
     await expect(page).not.toHaveURL(/sort=/);
   });
@@ -136,9 +136,10 @@ test.describe("the shop", () => {
     await filters.getByLabel("On sale").click();
     await expect(page).toHaveURL(/sale=1/);
     await expect(filters.getByLabel("On sale")).toBeChecked();
-    expect((await slugs(cards(page))).sort()).toEqual([...CATALOG.sale].sort());
-    for (let i = 0; i < 4; i++) {
-      await expect(cards(page).nth(i).locator(".badge-sale")).toHaveText("−20%");
+    const onSale = await slugs(cards(page));
+    expect([...onSale].sort()).toEqual([...CATALOG.sale].sort());
+    for (const [i, s] of onSale.entries()) {
+      await expect(cards(page).nth(i).locator(".badge-sale")).toHaveText(`−${CATALOG.discount(s)}%`);
       await expect(cards(page).nth(i).locator(".price-was")).toBeVisible();
     }
     await filters.getByLabel("On sale").click();

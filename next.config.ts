@@ -35,10 +35,23 @@ const securityHeaders = [
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
 ];
 
+const consoleHeaders = [
+  { key: "Content-Security-Policy", value: csp.replace("connect-src 'self'", "connect-src 'self' https://*.r2.cloudflarestorage.com") },
+  { key: "Cache-Control", value: "no-store" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow" },
+];
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      // the owner console (src/app/admin): never cached, never indexed, and its browser puts photos straight into the
+      // bucket (src/lib/admin/r2.ts), so its connect-src also allows the bucket's address
+      { source: "/admin", headers: consoleHeaders },
+      { source: "/admin/:path*", headers: consoleHeaders },
+      { source: "/api/admin/:path*", headers: consoleHeaders },
+    ];
   },
   partialPrefetching: true,
   // lets a phone on the laptop's iPhone hotspot (172.20.10.x) load the dev server's scripts and live reload

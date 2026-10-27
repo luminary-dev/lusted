@@ -54,7 +54,7 @@ test.describe("bag", () => {
   test("the WhatsApp order message lists every line and the subtotal; clear bag empties it", async ({ prepared: page }) => {
     await seed([
       { slug, size: "S", color: "wine", qty: 2 },
-      { slug: CATALOG.sale[1], size: "M", color: "wine", qty: 1 },
+      { slug: CATALOG.bagSale.slug, size: "M", color: CATALOG.bagSale.color, qty: 1 },
     ])(page);
     await go(page, "/");
     await openBag(page).click();

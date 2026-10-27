@@ -17,6 +17,9 @@ const slugs = new Set(catalog.map((p) => p.slug));
 export function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
+  // the owner console (src/app/admin) is its own door: never the reveal page, never a product check
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return NextResponse.next();
+
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? ""; // the public domain on Vercel
   const devHost = host.startsWith("dev.");
   if (site.revealGate && !devHost && Date.now() < REVEAL_AT && process.env.REVEAL_GATE !== "off") {

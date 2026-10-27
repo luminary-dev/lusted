@@ -124,13 +124,15 @@ test.describe("product page", () => {
 
 test.describe("other product shapes", () => {
   test("a single-colour sale piece: no colour picker, sale badge and struck-through price, discount maths", async ({ prepared: page }) => {
-    await go(page, `/products/${CATALOG.sale[0]}`);
-    await expect(page.locator(".buy-colors")).toHaveCount(0);
-    await expect(page.locator(".pdp-main .badge-sale")).toHaveText("−20%");
+    const sample = CATALOG.sampleSale;
+    await go(page, `/products/${sample.slug}`);
+    if (sample.singleColour) await expect(page.locator(".buy-colors")).toHaveCount(0);
+    await expect(page.locator(".pdp-main .badge-sale")).toHaveText(`−${CATALOG.discount(sample.slug)}%`);
     const now = parsePrice((await page.locator(".pdp-price .price-now").textContent())!);
     const was = parsePrice((await page.locator(".pdp-price .price-was").textContent())!);
-    expect(Math.round(was * 0.8)).toBe(now);
-    await expect(page.locator(".pdp-info .eyebrow")).toHaveText("Sun Kissed");
+    expect(now).toBe(CATALOG.salePriceOf(sample.slug));
+    expect(was).toBe(CATALOG.priceOf(sample.slug));
+    await expect(page.locator(".pdp-info .eyebrow")).toHaveText(sample.collection);
     await page.locator(".pdp-info .size-chips").getByRole("button").first().click();
     await page.getByRole("button", { name: /Add to bag/ }).click();
     await expect(bagDialog(page).locator(".drawer-total strong")).toHaveText(`LKR ${now.toLocaleString("en-LK")}`);

@@ -1,0 +1,33 @@
+# Console — keeps the console's open pull requests mergeable. A pull request into dev has to be up to date with dev
+# (the rulesets), and when two console changes are on their way at once the second falls behind as soon as the first
+# merges. Every push to dev brings each open console/… branch up to date, which runs its checks again; the Console
+# workflow waiting on it then merges it. Needs CONSOLE_TOKEN (see console.yml): a branch updated with the workflow's own
+# token gets no checks.
+name: Console refresh
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    name: Bring console pull requests up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Update every open console branch
+        env:
+          GH_TOKEN: ${{ secrets.CONSOLE_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          [ -n "$GH_TOKEN" ] || { echo "CONSOLE_TOKEN is not set — nothing to do."; exit 0; }
+          for pr in $(gh pr list --repo "$REPO" --base dev --state open --json number,headRefName --jq '.[] | select(.headRefName | startswith("console/")) | .number'); do
+            state="$(gh pr view "$pr" --repo "$REPO" --json mergeStateStatus --jq .mergeStateStatus)"
+            echo "#$pr: $state"
+            if [ "$state" = BEHIND ]; then
+              gh api -X PUT "repos/$REPO/pulls/$pr/update-branch" >/dev/null && echo "#$pr brought up to date"
+            fi
+          done
