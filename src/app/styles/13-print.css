@@ -52,6 +52,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 
 .reveal-inner {
   width: min(100%, 720px);
+  min-width: 0; /* never wider than the screen: nothing inside may push the block off-centre */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -89,14 +90,18 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
 .reveal-count {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(4, minmax(64px, 110px));
+  grid-template-columns: repeat(4, minmax(0, 110px)); /* the cells may shrink: the labels are what used to hold them wide */
   gap: clamp(8px, 2vw, 18px);
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
   margin-top: 14px;
 }
 
 .reveal-count li {
   display: grid;
   gap: 4px;
+  min-width: 0;
   padding: 14px 6px 12px;
   border: 1px solid rgba(235, 198, 180, 0.28);
   border-radius: 14px;
@@ -118,6 +123,7 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   font-size: 10px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: rgba(245, 194, 184, 0.9);
 }
 
@@ -183,7 +189,15 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   color: rgba(255, 246, 242, 0.78);
 }
 
+/* the form sits centred under the centred words (the footer's version hangs left) */
+.reveal-news .news-form {
+  width: 100%;
+  margin-inline: auto;
+}
+
 .reveal-news .news-note {
+  padding-left: 0;
+  text-align: center;
   color: rgba(255, 246, 242, 0.62);
 }
 
@@ -192,9 +206,15 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
     object-position: 50% 50%; /* the phone cut already frames the three */
   }
   .reveal-count {
-    grid-template-columns: repeat(4, 1fr);
-    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     max-width: 380px;
+  }
+  .reveal-unit {
+    font-size: 9px;
+    letter-spacing: 0.16em; /* "SECONDS" fits a cell on a 320 px phone */
+  }
+  .reveal-count li {
+    padding: 12px 4px 10px;
   }
   .reveal-actions .btn {
     width: 100%;

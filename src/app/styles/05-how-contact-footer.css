@@ -451,6 +451,7 @@
 
 .news-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* the row may be narrower than its contents want: it never widens the page */
   gap: 10px;
   max-width: 400px;
 }
@@ -470,7 +471,8 @@
 }
 
 .news-row input {
-  flex: 1;
+  flex: 1 1 0;
+  width: 0; /* a definite width, so the field's 20-character default never counts towards the row's minimum */
   min-width: 0;
   padding: 0 16px;
   border: 0;
