@@ -18,6 +18,13 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # the Node types follow the Node the site runs on (24 on Vercel, 24 in CI) — a new major here is a decision, not an update
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # TypeScript 7 isn't supported by typescript-eslint yet ("typescript-eslint does not support TS 7.0"); lift this when it is
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "deps"
 
