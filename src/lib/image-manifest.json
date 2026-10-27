@@ -740,10 +740,20 @@
       "h": 2304,
       "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAACwAQCdASoIAAQAAoBCJQBOgCHfTDWAAP7BwNc/LvTtFcM/b3cdy9Hqt58tVnbimkasnEAA"
     },
-    "images/reveal/group.webp": {
-      "w": 4096,
-      "h": 2304,
-      "blur": "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAACwAQCdASoIAAQAAoBCJYgCdAEO/gLsAP75MGBQ1+xmZQPbLzEZcoCAUWeLXN4OtDdJ+tMWAAA="
+    "images/reveal/three-phone.webp": {
+      "w": 1440,
+      "h": 2560,
+      "blur": "data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAQAgCdASoIAA4AAoBCJYgCdAEO6TH3WciAAP7vk7iykNcBOG57LtLUDFJtadJtehtfy8JWz22stgpAUpgacFT0D90O8UmgM9jC+QhhCtRyE6Jr4QwgIvrCUNhLA4ijvB6yWwAA"
+    },
+    "images/reveal/three-tablet.webp": {
+      "w": 2560,
+      "h": 1920,
+      "blur": "data:image/webp;base64,UklGRk4AAABXRUJQVlA4IEIAAADwAQCdASoIAAYAAoBCJQBOgCHgvXQttAAA/un6GNAEr5B5NtwoZbYASXL9sv+yGE3AtmXc6jvxm7EZeg4Ebyu68AA="
+    },
+    "images/reveal/three-wide.webp": {
+      "w": 2560,
+      "h": 1440,
+      "blur": "data:image/webp;base64,UklGRkYAAABXRUJQVlA4IDoAAADQAQCdASoIAAQAAoBCJQBOgCKfBKYDAAD+7NJmXz2YwlL1xRu3/dhpBdEMC1fQsVoYv4qMoiWvgAAA"
     },
     "images/size-guide.webp": {
       "w": 3200,
