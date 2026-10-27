@@ -714,8 +714,8 @@ export function Console({ initial }: { initial: CatalogEntry[] }) {
     ...COLLECTIONS.map((c) => ({ label: c.name, value: String(count(c.key)) })),
     { label: "on offer", value: String(onOffer) },
     { label: "best sellers", value: String(live.products.filter((p) => p.bestSeller).length) },
-    { label: "from · to, LKR", value: prices.length ? `${lkr(Math.min(...prices))} · ${lkr(Math.max(...prices))}` : "—" },
   ];
+  const range = prices.length ? `LKR ${lkr(Math.min(...prices))} to ${lkr(Math.max(...prices))}` : "";
   const doors = [
     { label: "Dev site", href: SITE_DEV },
     { label: "Live site", href: SITE_LIVE },
@@ -794,7 +794,9 @@ export function Console({ initial }: { initial: CatalogEntry[] }) {
         </section>
 
         <section className="adm-section" aria-labelledby="ledger">
-          <SectionHead id="ledger">{live.products.length} pieces, newest first</SectionHead>
+          <SectionHead id="ledger">
+            {live.products.length} pieces, {range}, newest first
+          </SectionHead>
           <div className="adm-ledger-wrap">
             <table className="adm-ledger">
               <thead>

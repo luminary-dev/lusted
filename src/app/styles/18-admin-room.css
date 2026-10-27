@@ -478,6 +478,7 @@ select.adm-input-big {
 
 /* ─ the ledger ─ */
 .adm-ledger-wrap {
+  position: relative; /* keeps the sr-only header inside the scroll box — positioned against the page it would widen it */
   overflow-x: auto;
   margin-bottom: 14px;
 }

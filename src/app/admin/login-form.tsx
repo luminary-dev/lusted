@@ -43,7 +43,7 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: StaticImage
       </div>
 
       <div className="adm-sheet adm-login-sheet">
-        <form className="adm-login-card" onSubmit={onSubmit}>
+        <form className="adm-login-card" method="post" action="/api/admin/login" onSubmit={onSubmit}>
           <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="150px" />
           <p className="adm-eyebrow adm-login-eyebrow">Owner’s entrance</p>
           <h1 className="adm-login-title">
