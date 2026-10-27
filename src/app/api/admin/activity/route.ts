@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     if (m.startsWith("admin: ")) text = m.slice(7);
     else if (/^Merge pull request #\d+ from [^/]+\/console\//.test(m)) continue; // the merge of a console change; its own commit says what
     else if (/^Merge pull request #\d+/.test(m)) text = `Merged ${m.replace(/^Merge pull request /, "pull request ").replace(/ from .*$/, "")}.`;
-    else if (/^Merge branch/.test(m)) continue;
+    else if (/^Merge (remote-tracking )?branch/.test(m)) continue; // a back-merge, not news
     else text = `Site update — ${m.replace(/^[\w-]+: /, "")}.`;
     items.push({ text, at: commit.date });
     if (items.length === 8) break;
