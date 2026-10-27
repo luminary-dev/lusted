@@ -1,0 +1,694 @@
+/* ───────── size guide ───────── */
+
+.size {
+  background: var(--cream);
+}
+
+/* the tilted tape ribbon runs edge to edge without widening the page; it's the section's top edge */
+.size.section {
+  padding-block: 0 clamp(64px, 6vw, 96px); /* the tape is the top edge */
+  overflow-x: clip;
+}
+
+/* the measuring-tape ribbon (SizeGuide.tsx) */
+.tape {
+  --tick: rgba(122, 27, 51, 0.55);
+  position: relative;
+  z-index: 3;
+  height: 58px;
+  margin: 6px -2vw clamp(44px, 4.5vw, 64px);
+  overflow: hidden;
+  background: linear-gradient(180deg, #f7ddd3, #efcbbf);
+  /* above the tape is the After Dark band: its bottom edge is cut at this same angle and tucked just under the
+     tape's top edge (.after-dark), so there is no gap on either side of the ribbon */
+  box-shadow:
+    0 12px 30px rgba(90, 30, 40, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: rotate(-1.4deg);
+}
+
+.tape-track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  /* ticks every 6px (1 unit), taller every 5 and every 10 — like a real tailor's tape */
+  background:
+    repeating-linear-gradient(90deg, var(--tick) 0 1px, transparent 1px 60px) 0 0 / 100% 26px no-repeat,
+    repeating-linear-gradient(90deg, var(--tick) 0 1px, transparent 1px 30px) 0 0 / 100% 17px no-repeat,
+    repeating-linear-gradient(90deg, var(--tick) 0 1px, transparent 1px 6px) 0 0 / 100% 10px no-repeat;
+}
+
+.tape-track span {
+  flex: none;
+  width: 60px;
+  padding: 30px 0 0 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: #7a1b33;
+}
+
+.tape-track span:first-child {
+  margin-left: 60px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .tape-track {
+      animation: tape-glide linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes tape-glide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-360px);
+  }
+}
+
+.size-layout {
+  --size-gap: clamp(32px, 4vw, 64px);
+  display: grid;
+  grid-template-columns: 0.56fr 1.44fr;
+  gap: var(--size-gap);
+  align-items: stretch;
+}
+
+/* the photo is full-bleed: tucked up under the tape, out to the screen's left edge and down onto the section's
+   bottom border (the bottom margin matches .size.section's padding-bottom) */
+.size-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-top: calc(-1 * clamp(44px, 4.5vw, 64px) + 2px); /* just under the tape's edge, so her hair stays in view */
+  margin-left: calc(-1 * max(var(--gutter), (100vw - var(--container)) / 2));
+  margin-bottom: calc(-1 * clamp(64px, 6vw, 96px));
+}
+
+.size-media {
+  flex: 1;
+  min-height: 460px;
+  border-radius: 0;
+}
+
+.size-media img {
+  object-position: 50% 0%; /* never crop her hair — any trim comes off the bottom */
+}
+
+/* "Where the tape goes" (TapeGuide.tsx): a dress form with the tapes wrapped round it */
+.tape-guide {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 12px 28px;
+  margin-top: 6px;
+  padding: 16px 22px 16px 12px;
+  border-radius: 22px;
+  border: 1px solid var(--hair);
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+}
+
+.tape-form {
+  width: 150px;
+  height: auto;
+  overflow: visible;
+}
+
+.form-body {
+  fill: var(--paper);
+  stroke: color-mix(in srgb, var(--ink) 38%, transparent);
+  stroke-width: 1.1;
+}
+
+.form-cap {
+  fill: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.form-seam {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 14%, transparent);
+  stroke-width: 0.9;
+}
+
+.form-stand {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 55%, transparent);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.tape-wrap {
+  opacity: 0.32;
+  transition: opacity 0.5s var(--ease);
+}
+
+.tape-wrap.is-active {
+  opacity: 1;
+}
+
+.tape-back {
+  fill: none;
+  stroke: var(--rose);
+  stroke-width: 2.4;
+  stroke-dasharray: 2.5 2.5;
+  opacity: 0.45;
+}
+
+.tape-front {
+  fill: none;
+  stroke: #e9a9a0;
+  stroke-width: 4.2;
+  stroke-linecap: round;
+}
+
+.tape-ticks {
+  fill: none;
+  stroke: #7a1b33;
+  stroke-width: 1.6;
+  stroke-dasharray: 0.5 2.6;
+  opacity: 0.75;
+}
+
+.tape-label {
+  font-family: var(--sans);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--rose);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+.tape-wrap.is-active .tape-label {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* the active tape draws itself round the form */
+  .tape-wrap.is-active .tape-front {
+    stroke-dasharray: 1;
+    animation: tape-draw 0.9s var(--ease) both;
+  }
+  .tape-wrap.is-active .tape-label {
+    transition-delay: 0.45s;
+  }
+}
+
+@keyframes tape-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.tape-eyebrow {
+  margin-bottom: 8px;
+  padding-left: 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+
+.tape-copy ol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  list-style: none;
+}
+
+.tape-copy button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1px 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background 0.35s var(--ease),
+    border-color 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+
+.tape-copy button.is-active {
+  border-color: var(--hair);
+  background: var(--paper);
+  box-shadow: 0 10px 26px var(--shadow);
+}
+
+.tape-copy button:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+}
+
+.tape-copy span {
+  grid-row: span 2;
+  font-family: var(--headline);
+  font-size: 27px;
+  line-height: 1.1;
+  color: var(--rose);
+}
+
+.tape-copy strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tape-copy em {
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.size-main .h2 {
+  margin-top: 14px;
+}
+
+.size-lede {
+  margin-top: 14px;
+  max-width: 34em;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.tabs {
+  margin-top: 26px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+    padding: 5px;
+  border-radius: 999px;
+  background: var(--soft);
+  border: 1px solid var(--hair);
+}
+
+.tabs button {
+  height: 40px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    background 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+.tabs button:hover {
+  color: var(--ink);
+}
+
+.tabs button.is-active {
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+}
+
+/* ── WebGL swing tags (SizeTags3D.tsx): measured in the background, then faded in once ready ── */
+.size-tags-stage {
+  --tags-h: clamp(340px, 27vw, 420px); /* the 3D stage's height in the flow (plus 22px above) */
+  position: relative;
+}
+
+/* the 3D tags' room, held from the first paint wherever WebGL can run (they build as the section nears) so nothing
+   below them moves. As its own formatting context the stage keeps the 3D canvas's negative margins (and the HTML
+   tags' cord margin) inside, so its height is exactly this before and after the tags arrive; on phones it also holds
+   the swipe hint's line. */
+.webgl .size-tags-stage:not(.no-3d) {
+  display: flow-root;
+  min-height: calc(var(--tags-h) + 22px + var(--hint-h, 0px));
+}
+
+/* everything else in the column sits above the 3D stage's invisible headroom, so it stays clickable */
+.size-main > :not(.size-tags-stage),
+.tags3d-hint {
+  position: relative;
+  z-index: 2;
+}
+
+.size-tags-3d {
+  --pad: 64px; /* invisible headroom above and below so swinging tags never hit an edge (read by SizeTags3D.tsx) */
+  --bleed-l: var(--size-gap);
+  --bleed-r: max(var(--gutter), (100vw - var(--container)) / 2);
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--bleed-l));
+  right: calc(-1 * var(--bleed-r));
+  height: calc(var(--tags-h) + var(--pad) * 2);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.size-tags-3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+.has-3d .size-tags-3d {
+  position: relative;
+  left: auto;
+  right: auto;
+  margin: calc(22px - var(--pad)) calc(-1 * var(--bleed-r)) calc(-1 * var(--pad)) calc(-1 * var(--bleed-l));
+  visibility: visible;
+  pointer-events: auto;
+  animation: tags3d-in 1s var(--ease) both;
+}
+
+@keyframes tags3d-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+/* with 3D on its way or up, the HTML tags stay only for screen readers */
+.webgl .size-tags-stage:not(.no-3d) .size-tags {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* narrow screens: a hint that the cord scrolls */
+.tags3d-hint {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .size-tags-stage {
+    --hint-h: 22px; /* the hint's line below the 3D tags: 4px + 18px */
+  }
+  .has-3d .tags3d-hint {
+    display: block;
+    margin-top: 4px;
+    line-height: 18px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+}
+
+.has-3d .size-tags *,
+.has-3d .size-tags {
+  animation: none !important;
+}
+
+/* ── fallback without WebGL: the size chart as CSS 3D swing tags, hanging from a satin cord ── */
+.size-tags {
+  --cord: color-mix(in srgb, var(--rose) 70%, transparent);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 62px;
+  list-style: none;
+  perspective: 1100px;
+}
+
+.size-tags::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  top: -36px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--cord);
+  box-shadow: 0 2px 6px rgba(90, 30, 40, 0.15);
+}
+
+.tag3d {
+  position: relative;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+/* the pendulum: pivots at the cord and turns gently in space */
+.tag3d-swing {
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% -36px;
+}
+
+/* the string, from the cord down through the punched hole */
+.tag3d-swing::before {
+  content: "";
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  width: 1px;
+  height: 54px;
+  background: var(--cord);
+  transform: translateZ(3px);
+}
+
+.tag3d-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* card thickness: a few stacked layers between the two faces */
+.tag3d-card::before,
+.tag3d-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px 14px 20px 20px;
+  background: #e2c3b8;
+}
+
+.tag3d-card::before {
+  transform: translateZ(0.8px);
+}
+
+.tag3d-card::after {
+  transform: translateZ(-0.8px);
+}
+
+.tag3d-face {
+  border-radius: 14px 14px 20px 20px;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.tag3d-front {
+  position: relative;
+  padding: 36px 12px 18px;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  box-shadow: 0 18px 40px var(--shadow);
+  text-align: center;
+  transform: translateZ(1.6px);
+}
+
+.tag3d-back {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 36px 14px 20px;
+  background:
+    radial-gradient(120% 90% at 30% 10%, rgba(245, 194, 184, 0.28), transparent 60%),
+    linear-gradient(160deg, #8a2140, #4a0f1f);
+  color: #fff6f2;
+  text-align: center;
+  transform: rotateY(180deg) translateZ(1.6px);
+}
+
+/* punched holes */
+.tag3d-face::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  margin-left: -5.5px;
+  border-radius: 50%;
+  background: var(--cream);
+  box-shadow: inset 0 1px 2px rgba(46, 20, 24, 0.3);
+}
+
+/* a soft light sheen that slides across the card as it turns */
+.tag3d-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.5) 50%, transparent 65%) 0 0 / 260% 100% no-repeat;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.tag3d-front strong,
+.tag3d-back strong {
+  display: block;
+  font-family: var(--headline);
+  font-weight: 400;
+  font-size: clamp(45px, 3.9vw, 60px);
+  line-height: 1.1;
+  color: var(--wine);
+}
+
+.tag3d-back strong {
+  color: #fff6f2;
+}
+
+.tag3d-brand {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #f6cfc6;
+}
+
+.tag3d-back p {
+  font-family: var(--headline);
+  font-size: 22px;
+  line-height: 1.3;
+  color: #f5c2b8;
+}
+
+.tag3d dl {
+  margin-top: 10px;
+  border-top: 1px dashed var(--hair);
+}
+
+.tag3d dl > div {
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--hair);
+}
+
+.tag3d dl > div:last-child {
+  border-bottom: 0;
+}
+
+.tag3d dt {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tag3d dd {
+  margin-top: 2px;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* a tap, click or Enter turns the tag over; on devices with a mouse, hovering does too */
+.tag3d.is-flipped .tag3d-card {
+  transform: rotateY(180deg);
+}
+
+@media (hover: hover) {
+  .tag3d:hover .tag3d-card {
+    transform: rotateY(180deg);
+  }
+}
+
+.tag3d-swing {
+  outline: none;
+}
+
+.tag3d-swing:focus-visible .tag3d-face {
+  outline: 2px solid var(--rose);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* every tag sways at its own pace, so the row never moves in lockstep */
+  .tag3d-swing {
+    animation: tag-sway calc(6s + var(--i, 0) * 0.7s) ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * -1.3s);
+  }
+  .tag3d-face::after {
+    animation: tag-sheen calc(6s + var(--i, 0) * 0.7s) ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * -1.3s);
+  }
+  /* switching category: the tags drop onto the cord, tipping forward in 3D */
+  .tag3d {
+    animation: tag-drop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+}
+
+@keyframes tag-sway {
+  from {
+    transform: rotateY(-6deg) rotateX(1.5deg) rotateZ(0.8deg);
+  }
+  to {
+    transform: rotateY(6deg) rotateX(-1deg) rotateZ(-0.8deg);
+  }
+}
+
+@keyframes tag-sheen {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+@keyframes tag-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-24px) rotateX(-70deg);
+  }
+}
+
+.size-note {
+  margin-top: 30px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.size-note a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--rose-ink);
+}
+
+.size-note a:hover {
+  color: var(--wine);
+}
