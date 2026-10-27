@@ -1,12 +1,32 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-const group = img("images/reveal/group.webp");
+import Image, { getImageProps } from "next/image";
 import wordmark from "@/assets/brand/wordmark-glossy-rosegold.png";
 import Newsletter from "@/components/Newsletter";
 import RevealCountdown from "@/components/RevealCountdown";
 import { ArrowRight, Instagram, WhatsApp } from "@/components/icons";
 import { instagramLink, site, whatsappLink } from "@/lib/site";
 import { img } from "@/lib/cdn";
+
+// The three of them — the swim, the dress, the lingerie — on the penthouse terrace at 3 am, one photo per screen shape
+// (about-wall/reveal-three-prompt.txt): a tall cut for phones, a 4:3 cut for tablets, the wide one everywhere else.
+// All three go through next/image's optimiser as one <picture>, like the "How it works" slides.
+const wide = img("images/reveal/three-wide.webp");
+const tablet = img("images/reveal/three-tablet.webp");
+const phone = img("images/reveal/three-phone.webp");
+
+function RevealPicture() {
+  const common = { alt: "", fill: true as const, quality: 90, sizes: "100vw", className: "reveal-bg" };
+  const { props: narrow } = getImageProps({ ...common, placeholder: "empty", src: phone });
+  const { props: mid } = getImageProps({ ...common, placeholder: "empty", src: tablet });
+  const { props: full } = getImageProps({ ...common, placeholder: "blur", preload: true, src: wide });
+  return (
+    <picture>
+      <source media="(max-width: 600px)" srcSet={narrow.srcSet} sizes={narrow.sizes} />
+      <source media="(max-width: 1100px)" srcSet={mid.srcSet} sizes={mid.sizes} />
+      <img {...full} alt="" />
+    </picture>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Lusted — Revealing soon",
@@ -27,12 +47,12 @@ const revealDate = new Date(site.revealAt).toLocaleString("en-GB", {
   timeZone: "Asia/Colombo",
 });
 
-// The page the whole site shows until reveal day (see src/proxy.ts): the glossy wordmark over the campaign group on the
-// candlelit velvet chaise, the countdown, and three ways to be first — WhatsApp early access, Instagram and the newsletter.
+// The page the whole site shows until reveal day (see src/proxy.ts): the glossy wordmark over the three of them on the
+// terrace, the countdown, and three ways to be first — WhatsApp early access, Instagram and the newsletter.
 export default function RevealingSoon() {
   return (
     <main className="reveal">
-      <Image quality={90} src={group} alt="" fill preload placeholder="blur" sizes="100vw" className="reveal-bg" />
+      <RevealPicture />
       <div className="reveal-inner">
         <Image src={wordmark} alt="Lusted Lingerie" className="reveal-logo" priority sizes="(max-width: 600px) 72vw, 420px" />
         <p className="eyebrow reveal-eyebrow">Something is being unwrapped</p>
