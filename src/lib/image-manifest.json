@@ -150,6 +150,71 @@
       "h": 4096,
       "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAQAgCdASoIAAsAAoBCJYgCdAEU7aig6JQAAP7mZl/klNP9BTe99rsvIkErW70tMKcvBPQymXFcdLGVutJPO1arVKB8VMqUHDCNfJkl2kO5P/yRjOLi3G3gAAA="
     },
+    "images/admin/door-wide-boxes.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAACQAQCdASoIAAQAAoBCJQBOgB6No3QA/u99TPF2Ev0dJEXS4cpNDoWuT80r+6u67AAAAA=="
+    },
+    "images/admin/door-wide-corner.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAACQAQCdASoIAAQAAoBCJQBOgB6No3QA/vFSa8qayTXD0ev3U/DgNeFfjLaRqkedq2P2s3AA"
+    },
+    "images/admin/door-wide-doorway.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRjwAAABXRUJQVlA4IDAAAACwAQCdASoIAAQAAoBCJYwCdAD0gbJgAP7qAUcMZdNn5Bz3FAqsvjjuVna1aTSJAAA="
+    },
+    "images/admin/door-wide-fan.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkYAAABXRUJQVlA4IDoAAACwAQCdASoIAAQAAoBCJZACdAD0hRxAAP734F09yhl/NGgjD4f+SLQkYo+T7znYYTBOuPBkfC6pAAAA"
+    },
+    "images/admin/door-wide-front.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAACwAQCdASoIAAQAAoBCJQBOgCKUYc1gAP7vLzndFAZrxFI+0QCMz6nnaQvhQ9QfFy+BJWrMIAA="
+    },
+    "images/admin/door-wide-key.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRjwAAABXRUJQVlA4IDAAAADwAQCdASoIAAQAAoBCJYwCdAEfbi7mfwAA/vSkqr+Sgx4LqsGl6qpwzd/KvV5XAAA="
+    },
+    "images/admin/door-wide-mirror.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAADQAQCdASoIAAQAAoBCJYgCdAD0h/vOAAD+8aPd58OTa7a/N57eXJ2xn7mIeuq8vr9Nj9fAAAA="
+    },
+    "images/admin/door-wide-rail.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAACwAQCdASoIAAQAAoBCJQBOgB6Rj3swAP7zYObX8a+xZ/IXP5gWw/ARF6tKIE/p0PgAAA=="
+    },
+    "images/admin/door-wide-ribbon.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRjwAAABXRUJQVlA4IDAAAACwAQCdASoIAAQAAoBCJQBOgCHe8ByAAP7qV/FU54c23CjKAZGzsFKFjY3uu4VAAAA="
+    },
+    "images/admin/door-wide-shirt.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkQAAABXRUJQVlA4IDgAAACwAQCdASoIAAQAAoBCJQBOgB6Q/3nAAP72/5MW0t05NHxbQcfgtrX6DaPiBrJtp+3T7ZWthuAgAA=="
+    },
+    "images/admin/door-wide-slip.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADQAQCdASoIAAQAAoBCJQBOgCP7qZx+oAD+82DoL9SkvZakaNqpjxUDE+6UQdV60lUelcAA"
+    },
+    "images/admin/door-wide-trunk.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkQAAABXRUJQVlA4IDgAAADwAQCdASoIAAQAAoBCJYwCdAEfA6BCqUAA/vNDba+aY+/xmyLyiooPU81HnQH3cdgK0ru7JQAAAA=="
+    },
+    "images/admin/door-wide-vanity.webp": {
+      "w": 4096,
+      "h": 2304,
+      "blur": "data:image/webp;base64,UklGRkIAAABXRUJQVlA4IDYAAACwAQCdASoIAAQAAoBCJQBOgCHgFKcAAP7zEX1/mR1YF6adVmH99n8qmYwZ6bJ+aVzxFqgAAAA="
+    },
     "images/cat-after-dark.webp": {
       "w": 2304,
       "h": 4096,
