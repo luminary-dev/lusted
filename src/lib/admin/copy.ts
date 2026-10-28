@@ -10,6 +10,8 @@ import { categories, colors, type Category, type ColorKey } from "@/lib/products
 
 export type Copy = {
   name: string;
+  /** two more names to choose from */
+  names: string[];
   description: string;
   blurb: string;
   details: string[];
@@ -38,12 +40,15 @@ export async function writeCopy(brief: Brief): Promise<Copy> {
     .slice(0, 3)
     .map((p) => ({ name: p.name, description: p.description, blurb: p.blurb, details: p.details, fitNote: p.fitNote, moments: p.moments }));
   const collection = categories.find((c) => c.key === brief.category)!;
+  // the names the catalogue does best: a mood, a sin, a colour or a temptress, then the piece — never a place
+  const goodNames = ["Scarlet Sin Bikini", "Noir Temptress Bikini", "Pearl Seduction Bikini", "Golden Goddess Bikini", "Siren Chainmail Mini", "Vixen Cut-out Bandage Mini", "Rouge Eyelash Lace Bodysuit", "Delilah Backless String Dress", "Nightshade Plunge Mini", "Scarlet Butterfly Teddy", "Juliette Lace Bodysuit", "Rosé Lace Balconette Bra"];
+  const takenNames = catalog.map((p) => p.name);
   const fit = { [-1]: "runs small (size up)", 0: "true to size", 1: "runs large (size down)" }[brief.fit];
   const prompt =
-    `You write product copy for Lusted, a Sri Lankan lingerie, swim and after-dark boutique. The voice is sultry, direct and a little filthy, never crude or anatomical: every piece is written as something to be looked at and taken off. Short sentences. No emoji, no hashtags, no invented fabric claims — describe only what the photo shows and what the owner says. Here are three pieces from the same collection ("${collection.name}") as the voice to match:\n${JSON.stringify(examples, null, 2)}\n\n` +
+    `You write product copy for Lusted, a Sri Lankan lingerie, swim and after-dark boutique. The voice is sultry, direct and filthy with innuendo — the kind of line that makes the reader blush — but never crude or anatomical: every piece is written as something to be looked at, touched, and taken off by someone else. Second person, short sentences, no emoji, no hashtags, no invented fabric claims — describe only what the photo shows and what the owner says. Here are three pieces from the same collection ("${collection.name}") as the voice to match:\n${JSON.stringify(examples, null, 2)}\n\n` +
     `The photo shows a new piece for the "${collection.name}" collection (${collection.label.toLowerCase()}). Colours it comes in: ${brief.colors.map((c) => colors[c].label).join(", ")}. Price: LKR ${brief.price.toLocaleString("en-LK")}. Fit: ${fit}. Owner's notes: ${brief.notes || "(none)"}.\n\n` +
     `Reply with ONLY a JSON object — no markdown fence, no text before or after it — with these keys:\n` +
-    `"name": a two-to-four-word name in the catalogue's style (a given name or a place, then the piece: "Margot Silk Slip", "Capri Bandeau Bikini"), unique, no brand name;\n` +
+    `"name": the best of three names, and "names": the other two. A name is two to four words: a tempting first word or two — a mood, a sin, a colour, a jewel, a temptress's name (Scarlet, Noir, Rouge, Siren, Vixen, Delilah, Nightshade, Velvet, Midnight, Wicked, Honey, Halo…) — then what the piece is. These are the ones the catalogue does best, match them: ${goodNames.join("; ")}. Never a place, a city or a country (no Galle, Colombo, Capri, Mykonos), never a plain description ("Black Lace Bodysuit"), never a brand, and not any of these, already taken: ${takenNames.join("; ")};\n` +
     `"description": two or three sentences like the examples — what it is, what it bares, how it comes off — ending with the care in a few words (e.g. "Hand wash cold.");\n` +
     `"blurb": one short line for a small card, under 70 characters;\n` +
     `"details": an array of three to five short feature strings (fabric, lining, cut, fastening, care), like the examples;\n` +
@@ -97,6 +102,7 @@ function parseCopy(raw: string): Copy {
   const list = (v: unknown, max: number, n: number) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && x.trim()).map((x) => String(x).trim().slice(0, max)).slice(0, n) : []);
   const out: Copy = {
     name: str(copy.name, 60),
+    names: list(copy.names, 60, 3).filter((n) => n !== str(copy.name, 60)),
     description: str(copy.description, 600),
     blurb: str(copy.blurb, 90),
     details: list(copy.details, 80, 6),
