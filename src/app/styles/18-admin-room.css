@@ -1,103 +1,53 @@
-/* ───────── the back room (src/app/admin) · the room ─────────
-   The console itself: the rail down the left, the script title, the figures, the fitting (pinned photos, tag chips),
-   the offers sentence, the ledger and the day book, and the ticket stubs. The tokens and the shared controls — fields,
-   buttons, the sheet, the dot — are in 17-admin.css. */
-.adm-room {
-  display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
-  gap: 0 clamp(32px, 5vw, 80px);
-  max-width: 1360px;
+/* ───────── the back room (src/app/admin) · the rooms ─────────
+   The console's four pages share one header — the wordmark and the doors out, the title, the day's figures on one
+   ruled line, and the way to the four rooms — then the room itself: the fitting (a cream sheet with the photos
+   pinned up and tag chips), the offers (a sentence to fill in, then what's on offer), the ledger (the catalogue,
+   written straight on the dark) and the day book. Ticket stubs in the corner follow each change. The tokens and the
+   shared controls are in 17-admin.css. */
+.adm-page {
+  width: min(100%, 1180px);
   margin: 0 auto;
-  padding: 0 clamp(20px, 4vw, 48px) clamp(64px, 10vh, 120px);
+  padding: clamp(20px, 3vh, 32px) clamp(20px, 4vw, 48px) clamp(64px, 10vh, 120px);
 }
 
-/* ─ the rail ─ */
-.adm-rail {
-  position: sticky;
-  top: 0;
-  align-self: start;
+/* ─ the top: the wordmark and the doors out ─ */
+.adm-top {
   display: flex;
-  flex-direction: column;
-  gap: 34px;
-  min-height: 100svh;
-  padding: clamp(28px, 5vh, 48px) 0 32px;
-  border-right: 1px solid var(--a-hair);
-}
-
-.adm-rail-top .adm-eyebrow {
-  margin-top: 12px;
-}
-
-.adm-contents {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.adm-contents a {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding: 8px 0;
-  font-size: 14px;
-  color: var(--a-ink-2);
-  text-decoration: none;
-  transition: color 0.2s, padding-left 0.3s var(--ease);
-}
-
-.adm-contents a .adm-num {
-  width: 20px;
-  font-size: 19px;
-}
-
-.adm-contents a:hover {
-  color: var(--a-ink);
-  padding-left: 6px;
-}
-
-.adm-status {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--a-muted);
+  justify-content: space-between;
+  gap: 14px 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--a-hair);
+}
+
+.adm-top-mark {
+  display: inline-flex;
 }
 
 .adm-doors {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 26px;
 }
 
-.adm-signout {
-  margin-top: auto;
-  align-self: flex-start;
-  color: var(--a-muted);
-}
-
-/* ─ the floor ─ */
-.adm-floor {
-  min-width: 0;
-  padding-top: clamp(28px, 5vh, 48px);
-}
-
+/* ─ the title and the lede ─ */
 .adm-hero {
-  padding-bottom: 28px;
+  padding: clamp(24px, 4vh, 40px) 0 22px;
 }
 
 .adm-title {
-  margin: 10px 0 18px;
+  margin: 0 0 14px;
   font-family: var(--parisienne);
   font-weight: 400;
-  font-size: clamp(56px, 7vw, 96px);
+  font-size: clamp(52px, 6.5vw, 88px);
   line-height: 0.95;
   color: var(--a-ink);
 }
 
 .adm-lede {
-  max-width: 68ch;
+  max-width: 70ch;
   margin: 0;
   font-size: 14px;
   line-height: 1.7;
@@ -109,20 +59,19 @@
   color: var(--a-ink);
 }
 
-/* the figures: one ruled line of big numerals */
+/* ─ the figures: one ruled line of big numerals ─ */
 .adm-figures {
   display: flex;
   flex-wrap: wrap;
-  gap: 0;
-  margin: 0 0 clamp(48px, 7vh, 80px);
-  padding: 22px 0 0;
+  margin: 0;
+  padding: 20px 0 0;
   border-top: 1px solid var(--a-hair);
   border-bottom: 1px solid var(--a-hair);
 }
 
 .adm-figure {
   flex: 1 1 120px;
-  padding: 0 24px 22px 0;
+  padding: 0 24px 20px 0;
 }
 
 .adm-figure + .adm-figure {
@@ -132,13 +81,10 @@
 
 .adm-figure dd {
   margin: 0;
-  font-family: var(--fraunces);
-  font-weight: 300;
-  font-variation-settings: "SOFT" 100, "opsz" 72;
-  font-variant-numeric: tabular-nums;
   font-size: clamp(28px, 3vw, 40px);
+  font-weight: 200;
   line-height: 1;
-  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .adm-figure dt {
@@ -149,41 +95,72 @@
   color: var(--a-muted);
 }
 
-/* ─ sections ─ */
-.adm-section {
-  margin-bottom: clamp(56px, 8vh, 96px);
-  scroll-margin-top: 24px;
+/* ─ the four rooms: a row of doors, the one you're in lit ─ */
+.adm-rooms {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 26px 0 clamp(32px, 5vh, 48px);
 }
 
-.adm-h2 {
-  display: flex;
-  flex-wrap: wrap;
+.adm-room-link {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
   align-items: baseline;
-  gap: 6px 18px;
-  margin-bottom: 26px;
+  padding: 16px 18px;
+  border: 1px solid var(--a-hair);
+  border-radius: var(--radius-sm);
+  color: var(--a-ink-2);
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.25s var(--ease);
 }
 
-.adm-h2 .adm-num {
-  font-size: 30px;
-  line-height: 1;
+.adm-room-link:hover {
+  border-color: var(--a-hair-2);
+  color: var(--a-ink);
+  transform: translateY(-2px);
 }
 
-.adm-h2 h2 {
-  margin: 0;
-  font-family: var(--fraunces);
-  font-weight: 300;
-  font-variation-settings: "SOFT" 100, "opsz" 72;
-  font-size: clamp(26px, 2.6vw, 34px);
-  line-height: 1.1;
+.adm-room-link.is-here {
+  border-color: var(--a-rose);
+  background: rgba(217, 138, 152, 0.1);
   color: var(--a-ink);
 }
 
-.adm-h2-aside {
-  margin-left: auto;
-  font-size: 12.5px;
-  font-style: italic;
-  font-family: var(--fraunces);
+.adm-room-link .adm-num {
+  grid-row: 1 / span 2;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.adm-room-name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.adm-room-aside {
+  font-size: 11.5px;
   color: var(--a-muted);
+}
+
+/* ─ the room ─ */
+.adm-section {
+  min-width: 0;
+}
+
+.adm-h3 {
+  margin: 36px 0 14px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--a-rose);
+}
+
+.adm-h3:first-child {
+  margin-top: 0;
 }
 
 .adm-sheet.adm-fitting,
@@ -253,8 +230,7 @@
   height: 22px;
   border: 1px solid var(--a-hair-2);
   border-radius: 50%;
-  font-family: var(--fraunces);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .adm-steps li.is-now {
@@ -342,9 +318,8 @@
 }
 
 .adm-pin-plus {
-  font-family: var(--fraunces);
   font-size: 34px;
-  font-weight: 300;
+  font-weight: 200;
   line-height: 1;
   color: var(--a-rose);
 }
@@ -355,9 +330,9 @@
   right: 0;
   bottom: 9px;
   text-align: center;
-  font-family: var(--fraunces);
-  font-style: italic;
-  font-size: 14px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--a-ink-2);
 }
 
@@ -392,7 +367,7 @@
 
 .adm-chip.is-on {
   border-color: var(--a-rose);
-  background: rgba(160, 68, 89, 0.1);
+  background: rgba(160, 68, 89, 0.12);
   color: var(--a-ink);
 }
 
@@ -401,9 +376,9 @@
   padding: 7px 14px 7px 20px;
   border-radius: 3px;
   clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%);
-  font-family: var(--fraunces);
-  font-size: 13.5px;
-  letter-spacing: 0.04em;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
 }
 
 .adm-chip-tag::before {
@@ -431,17 +406,15 @@
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
 
-/* ─ offers: a sentence to fill in ─ */
+/* ─ offers: a sentence to fill in, then what's on offer ─ */
 .adm-offer-line {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 10px 16px;
   margin: 0;
-  font-family: var(--fraunces);
-  font-weight: 300;
-  font-variation-settings: "SOFT" 100, "opsz" 72;
-  font-size: clamp(30px, 3.4vw, 44px);
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 200;
   line-height: 1.1;
 }
 
@@ -455,6 +428,7 @@
   padding: 0 4px 4px;
   font: inherit;
   font-size: inherit;
+  font-weight: 400;
   color: var(--a-rose);
   border-bottom: 2px solid var(--a-hair-2);
   -moz-appearance: textfield;
@@ -473,10 +447,54 @@ input.adm-input-big {
 
 select.adm-input-big {
   max-width: 100%;
-  font-style: italic;
+}
+
+.adm-offer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.adm-offer-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--a-hair);
+  font-size: 13.5px;
+}
+
+.adm-offer-name {
+  flex: 1 1 220px;
+  display: grid;
+  gap: 2px;
+  font-weight: 500;
+}
+
+.adm-offer-prices {
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-offer-prices s {
+  margin-right: 8px;
+  color: var(--a-muted);
 }
 
 /* ─ the ledger ─ */
+.adm-ledger-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+  margin-bottom: 18px;
+}
+
+.adm-input-search {
+  flex: 1 1 220px;
+  max-width: 320px;
+}
+
 .adm-ledger-wrap {
   position: relative; /* keeps the sr-only header inside the scroll box — positioned against the page it would widen it */
   overflow-x: auto;
@@ -543,6 +561,7 @@ select.adm-input-big {
 }
 
 .adm-thumb {
+  flex: none;
   width: 44px;
   height: 66px;
   object-fit: cover;
@@ -599,8 +618,6 @@ select.adm-input-big {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  font-style: italic;
-  font-family: var(--fraunces);
   color: var(--a-blush);
 }
 
@@ -610,10 +627,6 @@ select.adm-input-big {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.adm-pulls {
-  margin-bottom: 22px;
 }
 
 .adm-pull,
@@ -631,8 +644,6 @@ select.adm-input-big {
 .adm-feed-time {
   flex: none;
   width: 118px;
-  font-family: var(--fraunces);
-  font-style: italic;
   font-variant-numeric: tabular-nums;
   color: var(--a-muted);
 }
@@ -681,41 +692,9 @@ select.adm-input-big {
 }
 
 /* ─ smaller rooms ─ */
-@media (max-width: 1040px) {
-  .adm-room {
-    grid-template-columns: 1fr;
-  }
-  .adm-rail {
-    position: static;
-    min-height: 0;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px 28px;
-    padding: 22px 0 18px;
-    border-right: 0;
-    border-bottom: 1px solid var(--a-hair);
-  }
-  .adm-rail-top .adm-eyebrow {
-    display: none;
-  }
-  .adm-wordmark {
-    width: 110px;
-  }
-  .adm-contents {
-    display: none;
-  }
-  .adm-doors {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px 18px;
-  }
-  .adm-signout {
-    margin-top: 0;
-    margin-left: auto;
-  }
-  .adm-floor {
-    padding-top: 24px;
+@media (max-width: 900px) {
+  .adm-rooms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -724,7 +703,6 @@ select.adm-input-big {
     grid-template-columns: 1fr;
   }
   .adm-pins {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
   }
   .adm-pin {
@@ -732,11 +710,7 @@ select.adm-input-big {
   }
   .adm-pin-caption {
     bottom: 6px;
-    font-size: 12px;
-  }
-  .adm-h2-aside {
-    margin-left: 0;
-    flex-basis: 100%;
+    font-size: 10px;
   }
   .adm-figure {
     flex-basis: 40%;
@@ -748,5 +722,37 @@ select.adm-input-big {
     transform: none;
     box-shadow: none;
   }
+  .adm-wordmark {
+    width: 110px;
+  }
 }
 
+@media (max-width: 480px) {
+  .adm-rooms {
+    gap: 8px;
+  }
+  .adm-room-link {
+    padding: 12px 14px;
+    column-gap: 10px;
+  }
+  .adm-room-link .adm-num {
+    font-size: 18px;
+  }
+  .adm-room-name {
+    font-size: 13.5px;
+  }
+  .adm-room-aside {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-pin,
+  .adm-thumb,
+  .adm-room-link {
+    transition: none;
+  }
+  .adm-ledger tr:hover .adm-thumb {
+    transform: none;
+  }
+}

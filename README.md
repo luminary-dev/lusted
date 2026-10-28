@@ -102,7 +102,8 @@ published to be read, not reused — see `LICENSE`.
 ## The owner console
 
 **/admin** — unlinked, kept out of search, never cached — is where the owner runs the catalogue without opening the
-repository: add a piece, change a name, collection, price, offer price or best-seller rank, remove a piece, or put a
+repository, in four rooms on four pages (`/admin/fitting`, `/admin/offers`, `/admin/ledger`, `/admin/daybook`, each
+under the same header): add a piece, change a name, collection, price, offer price or best-seller rank, remove a piece, or put a
 percentage off a whole collection. It is modelled on the Luvana console, with two differences: the photos are the
 owner's own (front, back and side — nothing is generated or retouched; each is cropped to the catalogue's 9:16 frame
 and given the wordmark, `scripts/lib/wordmark.mjs`), and the words are Claude's to start with. "Write it with AI"

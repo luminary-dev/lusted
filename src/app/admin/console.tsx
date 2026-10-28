@@ -1,20 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import wordmark from "@/assets/brand/wordmark-dark.png";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
-// The back room — the owner console. Everything here changes the DEV site: each change is queued as a GitHub
-// workflow that opens a pull request into dev, which merges itself once the checks pass (ten minutes or so) — the
-// same road as every other change, so nothing skips the tests. The console doesn't trust the catalogue baked into its
-// own deploy: it polls /api/admin/state (the dev branch's catalogue and the console's pull requests in flight) and
-// confirms every queued change the moment it lands, as a ticket in the corner and fresh rows in the ledger.
+// The back room — the owner console, four rooms on four pages: the fitting (add a piece), the offers, the ledger
+// (the catalogue) and the day book (what happened). Every page carries the same header: the doors out, the title,
+// the day's figures and the way to the other rooms.
 //
-// The page is laid out like the back of a shop: a rail down the left (the contents, the doors out, the sign-out), and
-// the room itself — a big script title, the numbers of the day on one line, cream sheets for the forms (the fitting
-// and the offers), and the ledger (the catalogue) and the day book (activity) written straight on the dark.
+// Everything here changes the DEV site: each change is queued as a GitHub workflow that opens a pull request into
+// dev, which merges itself once the checks pass (ten minutes or so) — the same road as every other change, so nothing
+// skips the tests. The console doesn't trust the catalogue baked into its own deploy: it polls /api/admin/state (the
+// dev branch's catalogue and the console's pull requests in flight) and confirms every queued change the moment it
+// lands, as a ticket in the corner and fresh figures in the header.
 
 export type CatalogEntry = {
   slug: string;
@@ -34,6 +35,8 @@ export type CatalogEntry = {
   moments: string[];
 };
 
+import { SECTIONS, type Section } from "./sections";
+
 type Pull = { number: number; title: string; url: string; createdAt: string; stage: "checks" | "failed" | "ready" };
 type LiveState = { products: CatalogEntry[]; pulls: Pull[] };
 type Pending = { key: string; doneText: string; startedAt: number; check: (state: LiveState) => boolean; slowMinutes: number };
@@ -47,18 +50,11 @@ const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
 const COLOR_KEYS = Object.keys(colors) as ColorKey[];
 const IMG = (slug: string) => `/img/v2/products/${slug}.webp`;
-const SECTIONS = [
-  { id: "fitting", numeral: "i", name: "The fitting", aside: "add a piece" },
-  { id: "offers", numeral: "ii", name: "Offers", aside: "a collection at once" },
-  { id: "ledger", numeral: "iii", name: "The ledger", aside: "every piece" },
-  { id: "daybook", numeral: "iv", name: "The day book", aside: "what happened" },
-];
 
 /* ───────── live state, pending changes, tickets ───────── */
 
 function useLiveState(initial: CatalogEntry[]) {
   const [live, setLive] = useState<LiveState>({ products: initial, pulls: [] });
-  const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState<Pending[]>([]);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -76,7 +72,6 @@ function useLiveState(initial: CatalogEntry[]) {
     }
     const state: LiveState = { products: body.products, pulls: body.pulls ?? [] };
     setLive(state);
-    setLoaded(true);
     setFailed(false);
     setPending((current) => {
       const still: Pending[] = [];
@@ -117,7 +112,7 @@ function useLiveState(initial: CatalogEntry[]) {
     setToasts((all) => [...all, { key, text: `${applyingText} — on its way…`, phase: "applying" }]);
   }, []);
 
-  return { live, loaded, failed, refresh, track, toasts, pendingCount: pending.length };
+  return { live, failed, track, toasts };
 }
 
 type Track = ReturnType<typeof useLiveState>["track"];
@@ -138,9 +133,10 @@ function Tickets({ toasts }: { toasts: Toast[] }) {
 
 /* ───────── activity ───────── */
 
-function useActivity(signal: string) {
+function useActivity(enabled: boolean, signal: string) {
   const [items, setItems] = useState<ActivityItem[]>([]);
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     const load = () =>
       fetch("/api/admin/activity")
@@ -155,7 +151,7 @@ function useActivity(signal: string) {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [signal]);
+  }, [enabled, signal]);
   return items;
 }
 
@@ -197,19 +193,6 @@ const slugify = (name: string) =>
     .slice(0, 48);
 
 const lkr = (n: number) => n.toLocaleString("en-LK");
-
-function SectionHead({ id, children }: { id: string; children?: React.ReactNode }) {
-  const s = SECTIONS.find((x) => x.id === id)!;
-  return (
-    <div className="adm-h2">
-      <span className="adm-num" aria-hidden="true">
-        {s.numeral}
-      </span>
-      <h2 id={id}>{s.name}</h2>
-      <span className="adm-h2-aside">{children ?? s.aside}</span>
-    </div>
-  );
-}
 
 /* ───────── i · the fitting (add a piece) ───────── */
 
@@ -498,6 +481,7 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
   const matching = products.filter((p) => category === "*" || p.category === category);
   const scope = category === "*" ? "the whole catalogue" : `every ${COLLECTIONS.find((c) => c.key === category)?.name ?? category} piece`;
   const on = matching.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
+  const onOffer = products.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price);
 
   async function send(percentOff: number | null) {
     setBusy(true);
@@ -520,33 +504,59 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
   }
 
   return (
-    <div className="adm-sheet adm-offers">
-      <p className="adm-offer-line">
-        <span className="adm-offer-word">Take</span>
-        <span className="adm-offer-pct">
-          <input className="adm-input adm-input-big" type="number" min={1} max={90} value={percent} aria-label="Percent off" onChange={(e) => setPercent(e.currentTarget.value)} />
-          <span aria-hidden="true">%</span>
-        </span>
-        <span className="adm-offer-word">off</span>
-        <select className="adm-input adm-input-big" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
-          {COLLECTIONS.map((c) => (
-            <option key={c.key} value={c.key}>
-              {c.name}
-            </option>
-          ))}
-          <option value="*">everything</option>
-        </select>
-      </p>
-      <div className="adm-row adm-row-tight">
-        <button type="button" className="adm-btn" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
-          Put it on {matching.length} pieces
-        </button>
-        <button type="button" className="adm-quiet" disabled={busy || on === 0} onClick={() => send(null)}>
-          Clear the {on} on offer
-        </button>
-        <span className="adm-help">Offer prices land on a round ten rupees, always under the full price. For one piece, use its row in the ledger.</span>
+    <>
+      <div className="adm-sheet adm-offers">
+        <p className="adm-offer-line">
+          <span className="adm-offer-word">Take</span>
+          <span className="adm-offer-pct">
+            <input className="adm-input adm-input-big" type="number" min={1} max={90} value={percent} aria-label="Percent off" onChange={(e) => setPercent(e.currentTarget.value)} />
+            <span aria-hidden="true">%</span>
+          </span>
+          <span className="adm-offer-word">off</span>
+          <select className="adm-input adm-input-big" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
+            {COLLECTIONS.map((c) => (
+              <option key={c.key} value={c.key}>
+                {c.name}
+              </option>
+            ))}
+            <option value="*">everything</option>
+          </select>
+        </p>
+        <div className="adm-row adm-row-tight">
+          <button type="button" className="adm-btn" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
+            Put it on {matching.length} pieces
+          </button>
+          <button type="button" className="adm-quiet" disabled={busy || on === 0} onClick={() => send(null)}>
+            Clear the {on} on offer
+          </button>
+          <span className="adm-help">Offer prices land on a round ten rupees, always under the full price. For one piece, use its row in the ledger.</span>
+        </div>
       </div>
-    </div>
+
+      <h2 className="adm-h3">On offer now</h2>
+      {onOffer.length === 0 ? (
+        <p className="adm-help">Nothing is on offer. Everything is full price.</p>
+      ) : (
+        <ul className="adm-offer-list">
+          {onOffer.map((p) => (
+            <li key={p.slug}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size */}
+              <img src={IMG(p.slug)} alt="" className="adm-thumb" loading="lazy" />
+              <span className="adm-offer-name">
+                {p.name}
+                <span className="adm-aside">{COLLECTIONS.find((c) => c.key === p.category)?.name}</span>
+              </span>
+              <span className="adm-offer-prices">
+                <s>{lkr(p.price)}</s> {lkr(p.salePrice!)} <span className="adm-off">−{Math.round((1 - p.salePrice! / p.price) * 100)}%</span>
+              </span>
+              <Link href="/admin/ledger" className="adm-quiet">
+                In the ledger
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 
@@ -663,116 +673,160 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
   );
 }
 
-/* ───────── iv · the day book ───────── */
-
-function Pulls({ pulls }: { pulls: Pull[] }) {
-  if (pulls.length === 0) return null;
-  const stage = { checks: "checks running", ready: "checks passed — merging", failed: "a check failed — needs a look" };
+function Ledger({ products, track }: { products: CatalogEntry[]; track: Track }) {
+  const [query, setQuery] = useState("");
+  const [collection, setCollection] = useState("*");
+  const q = query.trim().toLowerCase();
+  const rows = [...products]
+    .filter((p) => (collection === "*" || p.category === collection) && (!q || p.name.toLowerCase().includes(q) || p.slug.includes(q)))
+    .sort((a, b) => b.added.localeCompare(a.added));
   return (
-    <ul className="adm-pulls">
-      {pulls.map((pull) => (
-        <li key={pull.number} className={`adm-pull is-${pull.stage}`}>
-          <span className="adm-dot" aria-hidden="true" />
-          <a href={pull.url} target="_blank" rel="noopener noreferrer">
-            {pull.title}
-          </a>
-          <span className="adm-aside">
-            {stage[pull.stage]} · {feedTime(pull.createdAt)}
-          </span>
-        </li>
-      ))}
-    </ul>
+    <>
+      <div className="adm-ledger-tools">
+        <input className="adm-input adm-input-search" type="search" placeholder="Find a piece…" aria-label="Find a piece" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
+        <div className="adm-chips" role="group" aria-label="Collection">
+          <button type="button" className={`adm-chip ${collection === "*" ? "is-on" : ""}`} onClick={() => setCollection("*")}>
+            All {products.length}
+          </button>
+          {COLLECTIONS.map((c) => (
+            <button key={c.key} type="button" className={`adm-chip ${collection === c.key ? "is-on" : ""}`} onClick={() => setCollection(c.key)}>
+              {c.name} {products.filter((p) => p.category === c.key).length}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="adm-ledger-wrap">
+        <table className="adm-ledger">
+          <thead>
+            <tr>
+              <th scope="col">Piece</th>
+              <th scope="col" className="adm-th-num">
+                Price
+              </th>
+              <th scope="col" className="adm-th-num">
+                Offer
+              </th>
+              <th scope="col" className="adm-th-num">
+                Rank
+              </th>
+              <th scope="col">
+                <span className="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((p) => (
+              // content-keyed: when the live state confirms a change the row remounts with the fresh values
+              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} />
+            ))}
+          </tbody>
+        </table>
+        {rows.length === 0 && <p className="adm-help">No piece answers to that.</p>}
+      </div>
+      <p className="adm-help">Newest first. Clear the offer price to end an offer. Descriptions and photos change in the repo, or take the piece off and add it again.</p>
+    </>
   );
 }
 
-function DayBook({ items }: { items: ActivityItem[] }) {
-  if (items.length === 0) return <p className="adm-help">Nothing written yet.</p>;
+/* ───────── iv · the day book ───────── */
+
+function DayBook({ pulls, items }: { pulls: Pull[]; items: ActivityItem[] }) {
+  const stage = { checks: "checks running", ready: "checks passed — merging", failed: "a check failed — needs a look" };
   return (
-    <ul className="adm-feed">
-      {items.map((item) => (
-        <li key={item.at + item.text}>
-          <span className="adm-feed-time">{feedTime(item.at)}</span>
-          <span>{item.text}</span>
-        </li>
-      ))}
-    </ul>
+    <>
+      <h2 className="adm-h3">On its way</h2>
+      {pulls.length === 0 ? (
+        <p className="adm-help">Nothing in flight. Every change has landed.</p>
+      ) : (
+        <ul className="adm-pulls">
+          {pulls.map((pull) => (
+            <li key={pull.number} className={`adm-pull is-${pull.stage}`}>
+              <span className="adm-dot" aria-hidden="true" />
+              <a href={pull.url} target="_blank" rel="noopener noreferrer">
+                {pull.title}
+              </a>
+              <span className="adm-aside">
+                {stage[pull.stage]} · {feedTime(pull.createdAt)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <h2 className="adm-h3">What happened</h2>
+      {items.length === 0 ? (
+        <p className="adm-help">Nothing written yet.</p>
+      ) : (
+        <ul className="adm-feed">
+          {items.map((item) => (
+            <li key={item.at + item.text}>
+              <span className="adm-feed-time">{feedTime(item.at)}</span>
+              <span>{item.text}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 
 /* ───────── the room ───────── */
 
-export function Console({ initial }: { initial: CatalogEntry[] }) {
+export function Console({ section, initial }: { section: Section; initial: CatalogEntry[] }) {
   const router = useRouter();
-  const { live, loaded, failed, track, toasts, pendingCount } = useLiveState(initial);
-  const activity = useActivity(`${live.products.length}|${live.pulls.map((p) => `${p.number}${p.stage}`).join(",")}`);
+  const { live, failed, track, toasts } = useLiveState(initial);
+  const activity = useActivity(section === "daybook", `${live.products.length}|${live.pulls.map((p) => `${p.number}${p.stage}`).join(",")}`);
 
   const onOffer = live.products.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
-  const prices = live.products.map((p) => p.price);
   const count = (key: Category) => live.products.filter((p) => p.category === key).length;
   const figures = [
-    { label: "pieces", value: String(live.products.length) },
-    ...COLLECTIONS.map((c) => ({ label: c.name, value: String(count(c.key)) })),
-    { label: "on offer", value: String(onOffer) },
-    { label: "best sellers", value: String(live.products.filter((p) => p.bestSeller).length) },
+    { label: "pieces", value: live.products.length },
+    ...COLLECTIONS.map((c) => ({ label: c.name, value: count(c.key) })),
+    { label: "on offer", value: onOffer },
+    { label: "best sellers", value: live.products.filter((p) => p.bestSeller).length },
   ];
-  const range = prices.length ? `LKR ${lkr(Math.min(...prices))} to ${lkr(Math.max(...prices))}` : "";
   const doors = [
     { label: "Dev site", href: SITE_DEV },
     { label: "Live site", href: SITE_LIVE },
     { label: "GitHub", href: REPO },
     { label: "Vercel", href: VERCEL },
   ];
-  const inFlight = pendingCount + live.pulls.length;
-  const status = failed ? "repo out of reach" : !loaded ? "reading the repo…" : inFlight ? `${inFlight} on the way` : "all landed";
+  const room = SECTIONS.find((s) => s.id === section)!;
 
   return (
     <main className="adm adm-room">
-      <aside className="adm-rail">
-        <div className="adm-rail-top">
-          <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="140px" />
-          <p className="adm-eyebrow">The back room</p>
-        </div>
-        <nav className="adm-contents" aria-label="Contents">
-          {SECTIONS.map((s) => (
-            <a key={s.id} href={`#${s.id}`}>
-              <span className="adm-num">{s.numeral}</span>
-              <span>{s.name}</span>
-            </a>
-          ))}
-        </nav>
-        <p className={`adm-status ${failed ? "is-failed" : inFlight ? "is-busy" : "is-ok"}`}>
-          <span className="adm-dot" aria-hidden="true" />
-          {status}
-        </p>
-        <nav className="adm-doors" aria-label="Elsewhere">
-          {doors.map((d) => (
-            <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" className="adm-quiet">
-              {d.label}
-            </a>
-          ))}
-        </nav>
-        <button
-          type="button"
-          className="adm-quiet adm-signout"
-          onClick={async () => {
-            await fetch("/api/admin/logout", { method: "POST" }).catch(() => null);
-            router.refresh();
-          }}
-        >
-          Sign out
-        </button>
-      </aside>
+      <div className="adm-page">
+        <header className="adm-top">
+          <Link href="/admin/ledger" className="adm-top-mark">
+            <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="140px" />
+          </Link>
+          <nav className="adm-doors" aria-label="Elsewhere">
+            {doors.map((d) => (
+              <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" className="adm-quiet">
+                {d.label}
+              </a>
+            ))}
+            <button
+              type="button"
+              className="adm-quiet"
+              onClick={async () => {
+                await fetch("/api/admin/logout", { method: "POST" }).catch(() => null);
+                router.push("/admin");
+                router.refresh();
+              }}
+            >
+              Sign out
+            </button>
+          </nav>
+        </header>
 
-      <div className="adm-floor">
-        <header className="adm-hero">
-          <p className="adm-eyebrow">Lusted · owner console · the dev branch</p>
+        <div className="adm-hero">
           <h1 className="adm-title">The back room</h1>
           <p className="adm-lede">
             Everything here changes the <strong>dev site</strong>. Each change becomes a pull request that merges itself once the checks pass, ten
             minutes or so, and the dev site follows. Check it there, then ask for a release to put it out front.
             {failed ? " The repo can’t be reached right now (is GITHUB_ADMIN_TOKEN set?) — what you see is the deployed copy." : ""}
           </p>
-        </header>
+        </div>
 
         <dl className="adm-figures" aria-label="The numbers">
           {figures.map((f) => (
@@ -783,56 +837,24 @@ export function Console({ initial }: { initial: CatalogEntry[] }) {
           ))}
         </dl>
 
-        <section className="adm-section" aria-labelledby="fitting">
-          <SectionHead id="fitting" />
-          <Fitting track={track} existing={live.products} />
-        </section>
+        <nav className="adm-rooms" aria-label="Rooms">
+          {SECTIONS.map((s) => (
+            <Link key={s.id} href={`/admin/${s.id}`} className={`adm-room-link ${s.id === section ? "is-here" : ""}`} aria-current={s.id === section ? "page" : undefined}>
+              <span className="adm-num">{s.numeral}</span>
+              <span className="adm-room-name">{s.name}</span>
+              <span className="adm-room-aside">{s.aside}</span>
+            </Link>
+          ))}
+        </nav>
 
-        <section className="adm-section" aria-labelledby="offers">
-          <SectionHead id="offers" />
-          <Offers products={live.products} track={track} />
-        </section>
-
-        <section className="adm-section" aria-labelledby="ledger">
-          <SectionHead id="ledger">
-            {live.products.length} pieces, {range}, newest first
-          </SectionHead>
-          <div className="adm-ledger-wrap">
-            <table className="adm-ledger">
-              <thead>
-                <tr>
-                  <th scope="col">Piece</th>
-                  <th scope="col" className="adm-th-num">
-                    Price
-                  </th>
-                  <th scope="col" className="adm-th-num">
-                    Offer
-                  </th>
-                  <th scope="col" className="adm-th-num">
-                    Rank
-                  </th>
-                  <th scope="col">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...live.products]
-                  .sort((a, b) => b.added.localeCompare(a.added))
-                  .map((p) => (
-                    // content-keyed: when the live state confirms a change the row remounts with the fresh values
-                    <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} />
-                  ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="adm-help">Clear the offer price to end an offer. Descriptions and photos change in the repo, or take the piece off and add it again.</p>
-        </section>
-
-        <section className="adm-section" aria-labelledby="daybook">
-          <SectionHead id="daybook">Sri Lanka time</SectionHead>
-          <Pulls pulls={live.pulls} />
-          <DayBook items={activity} />
+        <section className="adm-section" aria-labelledby="room-title">
+          <h2 id="room-title" className="sr-only">
+            {room.name}
+          </h2>
+          {section === "fitting" && <Fitting track={track} existing={live.products} />}
+          {section === "offers" && <Offers products={live.products} track={track} />}
+          {section === "ledger" && <Ledger products={live.products} track={track} />}
+          {section === "daybook" && <DayBook pulls={live.pulls} items={activity} />}
         </section>
       </div>
       <Tickets toasts={toasts} />

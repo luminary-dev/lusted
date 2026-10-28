@@ -17,12 +17,21 @@ test.describe("owner console", () => {
     await expect(page).toHaveTitle(/back room/i);
     const form = page.locator("main.adm-login form");
     await expect(form).toBeVisible();
-    await expect(form.getByLabel("Email")).toBeVisible();
-    await expect(form.getByLabel("Password")).toBeVisible();
+    await expect(form.getByPlaceholder("Email")).toBeVisible();
+    await expect(form.getByPlaceholder("Password")).toBeVisible();
     await expect(form.getByRole("button", { name: /Let me in/ })).toBeVisible();
     // its own page: the shop's nav, footer, cursor and intro are hidden around it (17-admin.css)
     for (const chrome of ["header.nav", "footer.footer", ".scroll-rail"]) await expect(page.locator(chrome), chrome).toBeHidden();
     await context.close();
+  });
+
+  test("every room asks for the key without a session, and an unknown room is a 404", async ({ request }) => {
+    for (const room of ["fitting", "offers", "ledger", "daybook"]) {
+      const res = await request.get(`/admin/${room}`);
+      expect(res.status(), room).toBe(200);
+      expect(await res.text(), room).toContain("adm-login-card");
+    }
+    expect((await request.get("/admin/cellar")).status()).toBe(404);
   });
 
   test("the console's API answers nothing without a session", async ({ request }) => {
