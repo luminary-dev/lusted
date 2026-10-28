@@ -396,14 +396,6 @@ select.adm-input option {
   background: linear-gradient(180deg, rgba(22, 10, 13, 0.35), transparent 28%, transparent 55%, rgba(22, 10, 13, 0.9));
 }
 
-.adm-frame-mark {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  width: 110px;
-  height: auto;
-}
-
 .adm-frame-caption {
   position: absolute;
   left: 24px;
@@ -423,8 +415,17 @@ select.adm-input option {
 }
 
 .adm-login-side {
+  position: relative;
   min-width: 0;
   max-width: 520px;
+}
+
+.adm-backdrop {
+  display: none;
+}
+
+.adm-glass {
+  position: relative;
 }
 
 .adm-login-top {
@@ -497,6 +498,80 @@ select.adm-input option {
 .adm-wordmark {
   width: 140px;
   height: auto;
+}
+
+/* ─ a wide door: the photo fills the left half, the backdrop the right, and the form sits in a glass box on it ─ */
+@media (min-width: 900px) and (orientation: landscape) {
+  .adm-login {
+    display: block;
+    padding: 0;
+  }
+  .adm-login-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    width: 100%;
+    min-height: 100svh;
+    align-items: stretch;
+  }
+  .adm-frame {
+    position: sticky; /* the photo stays put while the right side scrolls, so its caption is always in view */
+    top: 0;
+    align-self: start;
+    aspect-ratio: auto;
+    height: 100svh;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .adm-frame-caption {
+    left: clamp(28px, 4vw, 56px);
+    right: clamp(28px, 4vw, 56px);
+    bottom: clamp(28px, 4vh, 48px);
+  }
+  .adm-frame-caption .adm-script {
+    font-size: clamp(44px, 4.5vw, 64px);
+  }
+  .adm-login-side {
+    display: grid;
+    place-items: center;
+    max-width: none;
+    min-height: 100svh;
+    padding: clamp(28px, 4vw, 64px);
+    overflow: hidden;
+    background: linear-gradient(180deg, #2a0a14, #160a0d);
+  }
+  .adm-backdrop {
+    display: block;
+    object-fit: cover;
+    object-position: 60% 50%;
+    opacity: 0.85;
+  }
+  .adm-login-side::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(22, 10, 13, 0.55), rgba(22, 10, 13, 0.15) 50%, rgba(22, 10, 13, 0.45));
+    pointer-events: none;
+  }
+  .adm-glass {
+    z-index: 1;
+    width: min(100%, 540px);
+    padding: clamp(28px, 3vw, 40px);
+    border: 1px solid rgba(251, 241, 236, 0.16);
+    border-radius: var(--radius);
+    background: rgba(22, 10, 13, 0.58);
+    backdrop-filter: blur(22px) saturate(120%);
+    -webkit-backdrop-filter: blur(22px) saturate(120%);
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+  }
+  .adm-glass .adm-pill input {
+    background: rgba(251, 241, 236, 0.06);
+  }
+  .adm-inside {
+    margin-top: 28px;
+    padding-top: 22px;
+  }
 }
 
 /* ─ a narrow door ─ */

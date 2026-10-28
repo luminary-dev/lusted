@@ -4,7 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import wordmarkDark from "@/assets/brand/wordmark-dark.png";
+import type { DoorPhoto } from "./photos";
 
 // The door to the back room: a photo in a frame on one side (a dressing room after closing), the invitation and the
 // form on the other. Until the photos are in the bucket the frame holds a drawn curtain.
@@ -16,7 +16,7 @@ const INSIDE = [
   ["The day book", "What landed overnight, and what is still on its way."],
 ];
 
-export function LoginForm({ ready, photo }: { ready: boolean; photo: StaticImageData | null }) {
+export function LoginForm({ ready, photo, backdrop }: { ready: boolean; photo: DoorPhoto | null; backdrop: StaticImageData | null }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -46,16 +46,17 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: StaticImage
     <main className="adm adm-login">
       <div className="adm-login-grid">
         <figure className={`adm-frame ${photo ? "has-photo" : ""}`}>
-          {photo && <Image src={photo} alt="" fill priority sizes="(max-width: 860px) 100vw, 44vw" placeholder="blur" className="adm-frame-photo" />}
+          {photo && <Image src={photo.src} alt="" fill priority sizes="(max-width: 860px) 100vw, 50vw" placeholder="blur" className="adm-frame-photo" />}
           <div className="adm-frame-veil" aria-hidden="true" />
-          <Image src={wordmarkDark} alt="Lusted" className="adm-frame-mark" priority sizes="120px" />
           <figcaption className="adm-frame-caption">
-            <span className="adm-script">after closing</span>
-            <span>She has been waiting since the last customer left. The lights in the mirror are still on.</span>
+            <span className="adm-script">{photo?.script ?? "after closing"}</span>
+            <span>{photo?.line ?? "The shop is shut. The back room never is."}</span>
           </figcaption>
         </figure>
 
         <div className="adm-login-side">
+          {backdrop && <Image src={backdrop} alt="" fill sizes="(max-width: 860px) 100vw, 50vw" placeholder="blur" className="adm-backdrop" aria-hidden="true" />}
+          <div className="adm-glass">
           <p className="adm-login-top">
             <span className="adm-eyebrow">Owner’s entrance</span>
             <Link href="/" className="adm-quiet">
@@ -108,6 +109,7 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: StaticImage
                 </div>
               ))}
             </dl>
+          </div>
           </div>
         </div>
       </div>

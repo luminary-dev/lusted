@@ -6,7 +6,7 @@ import { ADMIN_COOKIE, configured, verifySessionToken } from "@/lib/admin/auth";
 import catalog from "@/lib/catalog.json";
 import { Console, type CatalogEntry } from "../console";
 import { LoginForm } from "../login-form";
-import { tonight } from "../photos";
+import { backdrop, tonight } from "../photos";
 import { SECTIONS, type Section } from "../sections";
 
 // The four rooms of the back room, one page each: /admin/fitting (add a piece), /admin/offers, /admin/ledger (the
@@ -26,6 +26,6 @@ export default async function SectionPage({ params }: PageProps<"/admin/[section
   if (!SECTIONS.some((s) => s.id === section)) notFound();
   await connection(); // rendered per request: the sign-in photo is a fresh draw, the console reads live state
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
-  if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={tonight()} />;
+  if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={tonight()} backdrop={backdrop} />;
   return <Console section={section as Section} initial={catalog as CatalogEntry[]} />;
 }
