@@ -12,6 +12,12 @@ const CAPTIONS: Record<string, [script: string, line: string]> = {
   slip: ["dropped", "The slip is on the floor and she isn’t picking it up. The next one is yours to choose."],
   corner: ["one lamp", "The last stocking comes off slowly when someone is watching. Someone is."],
   doorway: ["staying?", "One foot in the corridor, one on the frame. She hasn’t decided. Neither have you."],
+  chaise: ["the fitting", "Measured twice tonight. The tape says one thing, the way she’s lying says another."],
+  boxes: ["new in", "Nothing in these boxes has been worn yet. She is deciding which goes first."],
+  window: ["rain", "The shop is shut and it’s raining. She has nowhere to be but here, and nothing to put on."],
+  pins: ["pinned", "The dress form wears what she won’t. Every pin is where her hand was a moment ago."],
+  screen: ["behind the screen", "What you can see is the silhouette. What you can’t is what she’s taking off."],
+  key: ["the key", "She found it on the counter. Now she’s deciding whether to let you have it back."],
 };
 const FALLBACK: [string, string] = ["after closing", "The shop is shut. The back room never is."];
 
@@ -19,14 +25,17 @@ const FALLBACK: [string, string] = ["after closing", "The shop is shut. The back
 // room dark and empty): on a wide screen it then fills the whole door and the form sits on its dark side
 export type DoorPhoto = { src: ReturnType<typeof img>; wide: ReturnType<typeof img> | null; script: string; line: string };
 
-const photos: DoorPhoto[] = (Object.keys(manifest.images) as ImagePath[])
-  .map((key) => ({ key, scene: key.match(/^images\/admin\/back-room-(.+)\.webp$/)?.[1] }))
-  .filter((p): p is { key: ImagePath; scene: string } => !!p.scene)
-  .map(({ key, scene }) => {
-    const [script, line] = CAPTIONS[scene] ?? FALLBACK;
-    const wideKey = `images/admin/door-wide-${scene}.webp`;
-    return { src: img(key), wide: wideKey in manifest.images ? img(wideKey as ImagePath) : null, script, line };
-  });
+const keys = Object.keys(manifest.images) as ImagePath[];
+const scenes = new Set(keys.map((key) => key.match(/^images\/admin\/(?:back-room|door-wide)-(.+)\.webp$/)?.[1]).filter((s): s is string => !!s));
+const photos: DoorPhoto[] = [...scenes].map((scene) => {
+  const [script, line] = CAPTIONS[scene] ?? FALLBACK;
+  const portraitKey = `images/admin/back-room-${scene}.webp`;
+  const wideKey = `images/admin/door-wide-${scene}.webp`;
+  const wide = wideKey in manifest.images ? img(wideKey as ImagePath) : null;
+  // a scene with only a wide photo shows its left side on phones
+  const src = portraitKey in manifest.images ? img(portraitKey as ImagePath) : wide!;
+  return { src, wide, script, line };
+});
 
 // which one tonight — the page is rendered per request (connection()), so this is a fresh draw each visit; it lives
 // outside any component because a render itself has to stay pure
