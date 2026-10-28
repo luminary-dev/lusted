@@ -11,27 +11,38 @@ export async function POST(request: Request) {
   const key = clientKey(request);
   if (isRateLimited(key)) {
     await sleep(1200);
+    if ((request.headers.get("content-type") ?? "").includes("form")) return NextResponse.redirect(new URL("/admin", request.url), 303);
     return NextResponse.json({ ok: false, error: "Too many attempts — wait a few minutes." }, { status: 429, headers: { "Retry-After": "600" } });
   }
 
   let email = "";
   let password = "";
+  // the form posts JSON once the page has hydrated; before that (or without JS) the browser posts it as a form, and
+  // the answer is then a redirect back to the console rather than JSON
+  const asForm = (request.headers.get("content-type") ?? "").includes("form");
   try {
-    const body = await request.json();
-    if (typeof body?.email === "string") email = body.email;
-    if (typeof body?.password === "string") password = body.password;
+    if (asForm) {
+      const form = await request.formData();
+      email = String(form.get("email") ?? "");
+      password = String(form.get("password") ?? "");
+    } else {
+      const body = await request.json();
+      if (typeof body?.email === "string") email = body.email;
+      if (typeof body?.password === "string") password = body.password;
+    }
   } catch {
     /* the failure path below */
   }
+  const back = () => NextResponse.redirect(new URL("/admin", request.url), 303);
 
   if (!email || !password || !verifyCredentials(email, password)) {
     recordFailure(key);
     await sleep(1200); // a flat delay keeps guessing slow and the timing uniform
-    return NextResponse.json({ ok: false }, { status: 401 });
+    return asForm ? back() : NextResponse.json({ ok: false }, { status: 401 });
   }
 
   resetFailures(key);
-  const response = NextResponse.json({ ok: true });
+  const response = asForm ? back() : NextResponse.json({ ok: true });
   response.cookies.set(ADMIN_COOKIE, createSessionToken(), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

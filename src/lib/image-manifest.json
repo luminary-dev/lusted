@@ -120,6 +120,36 @@
       "h": 2688,
       "blur": "data:image/webp;base64,UklGRmoAAABXRUJQVlA4IF4AAADwAQCdASoIAAoAAoBCJQBOgB5QdrreTXAA4n999/IISsm8fIFz1x/QTkdAQVE9JhY+EpcEUZzuYu8ooGXyrnbVdbhf+EgRf4eoFJTECTzri5skvJXdVuP1QcEYAAAA"
     },
+    "images/admin/back-room-corner.webp": {
+      "w": 3072,
+      "h": 4096,
+      "blur": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADQAQCdASoIAAsAAoBCJQBOgCPtYehwwAD+zco3777Iymv7MFvVc8JUZhIhhvSPe4v+pKAyMNB4yGTOA8KR2QJzSMa9gPDLIf0Xc5AA"
+    },
+    "images/admin/back-room-doorway.webp": {
+      "w": 3072,
+      "h": 4096,
+      "blur": "data:image/webp;base64,UklGRmIAAABXRUJQVlA4IFYAAABQAgCdASoIAAsAAoBCJagCdDiAAS/Vz7orwAAA/vb+RrY/TdlgPGVXJpMTWHYkQDnG1eb4B2DV/q8IXLvfHsS+cEgOeaxxka8rejG5qFOhIvOuJlSAAA=="
+    },
+    "images/admin/back-room-mirror.webp": {
+      "w": 3072,
+      "h": 4096,
+      "blur": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAAAwAgCdASoIAAsAAoBCJYgCdAYsjkuA1BKmQAD+8VTfPP8kwH3svosL4R/Ba97H3h/9nbbfMc3e7gt2pQfdK2ntGbBpHwCCEYuJSxbynq2oMSkAAAA="
+    },
+    "images/admin/back-room-rail.webp": {
+      "w": 3072,
+      "h": 4096,
+      "blur": "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAADQAQCdASoIAAsAAoBCJZACdAD0l9n8JAD+81Gj91WAnvhfxWJ9m6BfpFX5+mic9+EIcONAGJz4MCp4EKLbrw5J5nsOZTQet1rz827AAAA="
+    },
+    "images/admin/back-room-slip.webp": {
+      "w": 3072,
+      "h": 4096,
+      "blur": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAADQAQCdASoIAAsAAoBCJQBOgBk26kT0AAD+7EnbR90Kw51QQxxzv6OIJRaKezJ/bc0ZZcL44XeSdde2xxsLfHhGEkDdLB0DAAA="
+    },
+    "images/admin/back-room-vanity.webp": {
+      "w": 3072,
+      "h": 4096,
+      "blur": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAQAgCdASoIAAsAAoBCJYgCdAEU7aig6JQAAP7mZl/klNP9BTe99rsvIkErW70tMKcvBPQymXFcdLGVutJPO1arVKB8VMqUHDCNfJkl2kO5P/yRjOLi3G3gAAA="
+    },
     "images/cat-after-dark.webp": {
       "w": 2304,
       "h": 4096,

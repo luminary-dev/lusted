@@ -6,11 +6,15 @@ import { useCallback, useEffect, useState } from "react";
 import wordmark from "@/assets/brand/wordmark-dark.png";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
-// The owner console. Everything here changes the DEV site: each change is queued as a GitHub workflow that opens a
-// pull request into dev, which merges itself once the checks pass (ten minutes or so) — the same road as every other
-// change, so nothing skips the tests. The console doesn't trust the catalogue baked into its own deploy: it polls
-// /api/admin/state (the dev branch's catalogue and the console's pull requests in flight) and confirms every queued
-// change the moment it lands, as a toast in the corner and fresh rows in the table.
+// The back room — the owner console. Everything here changes the DEV site: each change is queued as a GitHub
+// workflow that opens a pull request into dev, which merges itself once the checks pass (ten minutes or so) — the
+// same road as every other change, so nothing skips the tests. The console doesn't trust the catalogue baked into its
+// own deploy: it polls /api/admin/state (the dev branch's catalogue and the console's pull requests in flight) and
+// confirms every queued change the moment it lands, as a ticket in the corner and fresh rows in the ledger.
+//
+// The page is laid out like the back of a shop: a rail down the left (the contents, the doors out, the sign-out), and
+// the room itself — a big script title, the numbers of the day on one line, cream sheets for the forms (the fitting
+// and the offers), and the ledger (the catalogue) and the day book (activity) written straight on the dark.
 
 export type CatalogEntry = {
   slug: string;
@@ -43,8 +47,14 @@ const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
 const COLOR_KEYS = Object.keys(colors) as ColorKey[];
 const IMG = (slug: string) => `/img/v2/products/${slug}.webp`;
+const SECTIONS = [
+  { id: "fitting", numeral: "i", name: "The fitting", aside: "add a piece" },
+  { id: "offers", numeral: "ii", name: "Offers", aside: "a collection at once" },
+  { id: "ledger", numeral: "iii", name: "The ledger", aside: "every piece" },
+  { id: "daybook", numeral: "iv", name: "The day book", aside: "what happened" },
+];
 
-/* ───────── live state, pending changes, toasts ───────── */
+/* ───────── live state, pending changes, tickets ───────── */
 
 function useLiveState(initial: CatalogEntry[]) {
   const [live, setLive] = useState<LiveState>({ products: initial, pulls: [] });
@@ -79,7 +89,7 @@ function useLiveState(initial: CatalogEntry[]) {
             setToasts((all) =>
               all.map((t) =>
                 t.key === item.key && t.phase === "applying"
-                  ? { ...t, phase: "late" as const, text: `${t.text.replace(" — on its way…", "")} — taking longer than usual. See the pull requests under Activity.` }
+                  ? { ...t, phase: "late" as const, text: `${t.text.replace(" — on its way…", "")} — taking longer than usual. See the pull requests in the day book.` }
                   : t,
               ),
             );
@@ -112,12 +122,12 @@ function useLiveState(initial: CatalogEntry[]) {
 
 type Track = ReturnType<typeof useLiveState>["track"];
 
-function ToastStack({ toasts }: { toasts: Toast[] }) {
+function Tickets({ toasts }: { toasts: Toast[] }) {
   if (toasts.length === 0) return null;
   return (
-    <div className="adm-toasts" aria-live="polite">
+    <div className="adm-tickets" aria-live="polite">
       {toasts.map((t) => (
-        <div key={t.key} className={`adm-toast is-${t.phase}`}>
+        <div key={t.key} className={`adm-ticket is-${t.phase}`}>
           <span className="adm-dot" aria-hidden="true" />
           <span>{t.text}</span>
         </div>
@@ -186,22 +196,27 @@ const slugify = (name: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 48);
 
-function Heading({ numeral, children, aside }: { numeral: string; children: React.ReactNode; aside?: React.ReactNode }) {
+const lkr = (n: number) => n.toLocaleString("en-LK");
+
+function SectionHead({ id, children }: { id: string; children?: React.ReactNode }) {
+  const s = SECTIONS.find((x) => x.id === id)!;
   return (
-    <div className="adm-heading">
-      <span className="adm-numeral">{numeral}</span>
-      <span className="adm-label adm-heading-title">{children}</span>
-      {aside && <span className="adm-aside">{aside}</span>}
+    <div className="adm-h2">
+      <span className="adm-num" aria-hidden="true">
+        {s.numeral}
+      </span>
+      <h2 id={id}>{s.name}</h2>
+      <span className="adm-h2-aside">{children ?? s.aside}</span>
     </div>
   );
 }
 
-/* ───────── i · add a piece ───────── */
+/* ───────── i · the fitting (add a piece) ───────── */
 
 type View = "front" | "back" | "side";
 const VIEWS: View[] = ["front", "back", "side"];
 
-function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] }) {
+function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }) {
   const [files, setFiles] = useState<Partial<Record<View, File>>>({});
   const [previews, setPreviews] = useState<Partial<Record<View, string>>>({});
   const [category, setCategory] = useState<Category>("lingerie");
@@ -235,6 +250,7 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
   const slug = slugify(name);
   const taken = !!slug && existing.some((p) => p.slug === slug);
   const canAdd = briefReady && name.trim() && description.trim() && moments.split("\n").filter(Boolean).length === 3 && details.split("\n").filter(Boolean).length > 0 && sizes.length > 0 && !taken;
+  const step = !files.front ? 1 : !written ? 2 : 3;
 
   async function write() {
     if (!briefReady || writing) return;
@@ -275,7 +291,7 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
       for (const view of VIEWS) {
         const file = files[view];
         if (!file) continue;
-        setAdding(`Uploading the ${view} photo…`);
+        setAdding(`Sending the ${view} photo…`);
         const signed = await post("/api/admin/upload-url", { upload, view, type: file.type });
         if (!signed.ok) throw new Error(signed.body?.error ?? "Could not sign the upload");
         upload = signed.body.upload;
@@ -302,7 +318,7 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
       });
       if (!result.ok) throw new Error(result.body?.error ?? "Something went wrong — try again");
       const added = result.body.slug as string;
-      track(`Adding “${name.trim()}” (photos, then the pull request and its checks)`, `“${name.trim()}” is in the catalogue. The dev site updates in a couple of minutes.`, (state) => state.products.some((p) => p.slug === added), 25);
+      track(`Adding “${name.trim()}” (the photos, then the pull request and its checks)`, `“${name.trim()}” is in the ledger. The dev site follows in a couple of minutes.`, (state) => state.products.some((p) => p.slug === added), 25);
       // clear the form
       VIEWS.forEach((v) => pick(v, undefined));
       setPrice("");
@@ -325,26 +341,40 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
   }
 
   return (
-    <div className="adm-panel adm-add">
-      <div className="adm-photos">
-        {VIEWS.map((view) => (
-          <label key={view} className={`adm-photo ${previews[view] ? "has-photo" : ""}`}>
-            {previews[view] ? (
-              // eslint-disable-next-line @next/next/no-img-element -- a local preview of the file just chosen
-              <img src={previews[view]} alt="" />
-            ) : (
-              <span className="adm-photo-empty">
-                <span className="adm-label">{view}</span>
-                <span>{view === "front" ? "needed" : "optional"}</span>
-              </span>
-            )}
+    <div className="adm-sheet adm-fitting">
+      <ol className="adm-steps" aria-label="Steps">
+        {["Pin the photos", "Let Claude write it", "Read it, then add"].map((label, i) => (
+          <li key={label} className={step > i + 1 ? "is-done" : step === i + 1 ? "is-now" : ""}>
+            <span className="adm-step-n">{i + 1}</span>
+            {label}
+          </li>
+        ))}
+      </ol>
+
+      <div className="adm-pins">
+        {VIEWS.map((view, i) => (
+          <label key={view} className={`adm-pin ${previews[view] ? "has-photo" : ""}`} style={{ "--tilt": `${[-1.6, 1.1, -0.8][i]}deg` } as React.CSSProperties}>
+            <span className="adm-pin-tack" aria-hidden="true" />
+            <span className="adm-pin-frame">
+              {previews[view] ? (
+                // eslint-disable-next-line @next/next/no-img-element -- a local preview of the file just chosen
+                <img src={previews[view]} alt="" />
+              ) : (
+                <span className="adm-pin-empty">
+                  <span className="adm-pin-plus" aria-hidden="true">
+                    +
+                  </span>
+                  <span>{view === "front" ? "needed" : "optional"}</span>
+                </span>
+              )}
+            </span>
+            <span className="adm-pin-caption">{view}</span>
             <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => pick(view, e.currentTarget.files?.[0])} />
-            {previews[view] && <span className="adm-photo-tag">{view}</span>}
           </label>
         ))}
-        <p className="adm-help">
-          Front is the photo on the cards; back and side are the extra views on the piece’s page. Any size, portrait is best: they’re cropped to the
-          catalogue’s 9:16 frame and get the wordmark, nothing else is done to them.
+        <p className="adm-help adm-pins-note">
+          Front is the photo on the cards; back and side are the extra views on the piece’s page. Any size, portrait is best: each is cropped to
+          the catalogue’s 9:16 frame and signed with the wordmark. Nothing else is done to them.
         </p>
       </div>
 
@@ -378,7 +408,7 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
           <span className="adm-label">Sizes</span>
           <div className="adm-chips">
             {SIZES.map((s) => (
-              <button key={s} type="button" className={`adm-chip ${sizes.includes(s) ? "is-on" : ""}`} onClick={() => setSizes((all) => toggle(all, s))}>
+              <button key={s} type="button" className={`adm-chip adm-chip-tag ${sizes.includes(s) ? "is-on" : ""}`} onClick={() => setSizes((all) => toggle(all, s))}>
                 {s}
               </button>
             ))}
@@ -399,18 +429,16 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
           <input className="adm-input" type="number" min={1} max={99} placeholder="1 shows first" value={bestSeller} onChange={(e) => setBestSeller(e.currentTarget.value)} />
         </label>
         <label className="adm-field adm-span">
-          <span className="adm-label">Notes for the copy (optional)</span>
-          <input className="adm-input" type="text" maxLength={400} placeholder="Anything the description should know — the fabric, what it does, who it's for" value={notes} onChange={(e) => setNotes(e.currentTarget.value)} />
+          <span className="adm-label">A word for the writer (optional)</span>
+          <input className="adm-input" type="text" maxLength={400} placeholder="The fabric, what it does, who it's for — anything the description should know" value={notes} onChange={(e) => setNotes(e.currentTarget.value)} />
         </label>
       </div>
 
       <div className="adm-row">
-        <button type="button" className="btn btn-light" disabled={!briefReady || writing || !!adding} onClick={write}>
+        <button type="button" className="adm-btn" disabled={!briefReady || writing || !!adding} onClick={write}>
           {writing ? "Writing…" : written ? "Write it again" : "Write it with AI"}
         </button>
-        <span className="adm-help">
-          Claude looks at the front photo and writes the name, the description and the rest in the catalogue’s voice. Change anything before adding.
-        </span>
+        <span className="adm-help">Claude looks at the front photo and writes the name, the description and the rest in the catalogue’s voice. Change anything before adding.</span>
       </div>
 
       {written && (
@@ -418,7 +446,12 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
           <label className="adm-field">
             <span className="adm-label">Name</span>
             <input className="adm-input" type="text" maxLength={60} value={name} onChange={(e) => setName(e.currentTarget.value)} />
-            {slug && <span className="adm-help">/products/{slug}{taken ? " — already in the catalogue, change the name" : ""}</span>}
+            {slug && (
+              <span className="adm-help">
+                /products/{slug}
+                {taken ? " — already in the ledger, change the name" : ""}
+              </span>
+            )}
           </label>
           <label className="adm-field">
             <span className="adm-label">One line for small cards (optional)</span>
@@ -442,8 +475,8 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
       )}
 
       <div className="adm-row">
-        <button type="button" className="btn btn-light" disabled={!canAdd || !!adding} onClick={add}>
-          {adding ?? "Add it to the catalogue"}
+        <button type="button" className="adm-btn adm-btn-ink" disabled={!canAdd || !!adding} onClick={add}>
+          {adding ?? "Add it to the ledger"}
         </button>
         {!written && <span className="adm-help">Write the copy first.</span>}
       </div>
@@ -458,12 +491,13 @@ function AddPiece({ track, existing }: { track: Track; existing: CatalogEntry[] 
 
 /* ───────── ii · offers ───────── */
 
-function CollectionOffer({ products, track }: { products: CatalogEntry[]; track: Track }) {
+function Offers({ products, track }: { products: CatalogEntry[]; track: Track }) {
   const [category, setCategory] = useState<string>("swim");
   const [percent, setPercent] = useState("20");
   const [busy, setBusy] = useState(false);
   const matching = products.filter((p) => category === "*" || p.category === category);
   const scope = category === "*" ? "the whole catalogue" : `every ${COLLECTIONS.find((c) => c.key === category)?.name ?? category} piece`;
+  const on = matching.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
 
   async function send(percentOff: number | null) {
     setBusy(true);
@@ -472,13 +506,13 @@ function CollectionOffer({ products, track }: { products: CatalogEntry[]; track:
       const slugs = matching.map((p) => p.slug);
       track(
         percentOff ? `Putting ${percentOff}% off ${scope} (${matching.length} pieces)` : `Clearing the offers on ${scope}`,
-        percentOff ? `${percentOff}% off ${scope} — on ${matching.length} pieces. The dev site updates in a couple of minutes.` : `The offers on ${scope} are cleared.`,
+        percentOff ? `${percentOff}% off ${scope} — on ${matching.length} pieces. The dev site follows in a couple of minutes.` : `The offers on ${scope} are cleared.`,
         (state) =>
           slugs.every((slug) => {
             const now = state.products.find((p) => p.slug === slug);
             if (!now) return true;
-            const on = typeof now.salePrice === "number" && now.salePrice < now.price;
-            return percentOff ? on : !on;
+            const isOn = typeof now.salePrice === "number" && now.salePrice < now.price;
+            return percentOff ? isOn : !isOn;
           }),
       );
     }
@@ -486,38 +520,39 @@ function CollectionOffer({ products, track }: { products: CatalogEntry[]; track:
   }
 
   return (
-    <div className="adm-panel">
-      <div className="adm-row adm-row-end">
-        <label className="adm-field">
-          <span className="adm-label">Discount a whole collection</span>
-          <select className="adm-input" value={category} onChange={(e) => setCategory(e.currentTarget.value)}>
-            {COLLECTIONS.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.name}
-              </option>
-            ))}
-            <option value="*">Everything</option>
-          </select>
-        </label>
-        <label className="adm-field adm-narrow">
-          <span className="adm-label">Percent off</span>
-          <input className="adm-input" type="number" min={1} max={90} value={percent} onChange={(e) => setPercent(e.currentTarget.value)} />
-        </label>
-        <button type="button" className="btn btn-light" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
-          Apply to {matching.length} pieces
+    <div className="adm-sheet adm-offers">
+      <p className="adm-offer-line">
+        <span className="adm-offer-word">Take</span>
+        <span className="adm-offer-pct">
+          <input className="adm-input adm-input-big" type="number" min={1} max={90} value={percent} aria-label="Percent off" onChange={(e) => setPercent(e.currentTarget.value)} />
+          <span aria-hidden="true">%</span>
+        </span>
+        <span className="adm-offer-word">off</span>
+        <select className="adm-input adm-input-big" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
+          {COLLECTIONS.map((c) => (
+            <option key={c.key} value={c.key}>
+              {c.name}
+            </option>
+          ))}
+          <option value="*">everything</option>
+        </select>
+      </p>
+      <div className="adm-row adm-row-tight">
+        <button type="button" className="adm-btn" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
+          Put it on {matching.length} pieces
         </button>
-        <button type="button" className="adm-quiet" disabled={busy} onClick={() => send(null)}>
-          Clear the offers on {category === "*" ? "everything" : COLLECTIONS.find((c) => c.key === category)?.name}
+        <button type="button" className="adm-quiet" disabled={busy || on === 0} onClick={() => send(null)}>
+          Clear the {on} on offer
         </button>
+        <span className="adm-help">Offer prices land on a round ten rupees, always under the full price. For one piece, use its row in the ledger.</span>
       </div>
-      <p className="adm-help">Sale prices are rounded to the nearest ten rupees and always sit below the full price. For one piece, use the Offer column below.</p>
     </div>
   );
 }
 
-/* ───────── iii · the catalogue ───────── */
+/* ───────── iii · the ledger ───────── */
 
-function ProductRow({ product, track }: { product: CatalogEntry; track: Track }) {
+function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) {
   const [name, setName] = useState(product.name);
   const [category, setCategory] = useState<string>(product.category);
   const [price, setPrice] = useState(String(product.price));
@@ -531,13 +566,14 @@ function ProductRow({ product, track }: { product: CatalogEntry; track: Track })
     Number(price) !== product.price ||
     (sale === "" ? null : Number(sale)) !== (product.salePrice ?? null) ||
     (rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null);
+  const pct = sale && Number(sale) < Number(price) ? Math.round((1 - Number(sale) / Number(price)) * 100) : 0;
 
   async function save() {
     setWaiting(true);
     const data = { name: name.trim(), category, price: Number(price), salePrice: sale === "" ? null : Number(sale), bestSeller: rank === "" ? null : Number(rank) };
     const result = await post("/api/admin/dispatch", { action: "update-product", slug: product.slug, data });
     if (result.ok) {
-      track(`Saving “${product.name}”`, `“${product.name}” is updated. The dev site updates in a couple of minutes.`, (state) => {
+      track(`Saving “${product.name}”`, `“${product.name}” is updated. The dev site follows in a couple of minutes.`, (state) => {
         const now = state.products.find((p) => p.slug === product.slug);
         return (
           !!now &&
@@ -552,74 +588,82 @@ function ProductRow({ product, track }: { product: CatalogEntry; track: Track })
   }
 
   async function remove() {
-    if (!window.confirm(`Remove “${product.name}” and its photos from the site? Bring it back later only by adding it again.`)) return;
+    if (!window.confirm(`Take “${product.name}” off the site, photos and all? It comes back only by adding it again.`)) return;
     setWaiting(true);
     const result = await post("/api/admin/dispatch", { action: "remove-product", slug: product.slug });
-    if (result.ok) track(`Removing “${product.name}”`, `“${product.name}” is out of the catalogue.`, (state) => !state.products.some((p) => p.slug === product.slug));
+    if (result.ok) track(`Removing “${product.name}”`, `“${product.name}” is out of the ledger.`, (state) => !state.products.some((p) => p.slug === product.slug));
     else setWaiting(false);
   }
 
   return (
-    <tr className="adm-tr">
+    <tr className={`adm-tr ${dirty ? "is-dirty" : ""} ${waiting ? "is-waiting" : ""}`}>
       <td className="adm-td-piece">
-        {/* eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size */}
-        <img src={IMG(product.slug)} alt="" className="adm-thumb" loading="lazy" />
-        <div className="adm-piece">
-          <input className="adm-input adm-input-sm" type="text" maxLength={60} value={name} aria-label="Name" onChange={(e) => setName(e.currentTarget.value)} />
-          <select className="adm-input adm-input-xs" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
+        <span className="adm-thumb-wrap">
+          {/* eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size */}
+          <img src={IMG(product.slug)} alt="" className="adm-thumb" loading="lazy" />
+        </span>
+        <span className="adm-piece">
+          <input className="adm-input adm-input-row adm-input-name" type="text" maxLength={60} value={name} aria-label="Name" onChange={(e) => setName(e.currentTarget.value)} />
+          <select className="adm-input adm-input-row adm-input-dim" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
             {COLLECTIONS.map((c) => (
               <option key={c.key} value={c.key}>
                 {c.name}
               </option>
             ))}
           </select>
-        </div>
+        </span>
       </td>
-      <td>
-        <input className="adm-input adm-input-sm adm-w-price" type="number" min={1} value={price} aria-label="Price" onChange={(e) => setPrice(e.currentTarget.value)} />
+      <td className="adm-td-num">
+        <input className="adm-input adm-input-row adm-num-in" type="number" min={1} value={price} aria-label="Price" onChange={(e) => setPrice(e.currentTarget.value)} />
       </td>
-      <td>
-        <input className="adm-input adm-input-sm adm-w-price" type="number" min={1} placeholder="—" value={sale} aria-label="Offer price" onChange={(e) => setSale(e.currentTarget.value)} />
-        <select
-          className="adm-input adm-input-xs adm-w-price"
-          value=""
-          aria-label="Set the offer by percent"
-          onChange={(e) => {
-            const pct = Number(e.currentTarget.value);
-            if (!pct) return;
-            const full = Number(price) || product.price;
-            setSale(String(Math.min(Math.max(10, Math.round((full * (1 - pct / 100)) / 10) * 10), full - 10)));
-          }}
-        >
-          <option value="">% off…</option>
-          {[10, 15, 20, 25, 30, 40, 50].map((pct) => (
-            <option key={pct} value={pct}>
-              {pct}% off
-            </option>
-          ))}
-        </select>
+      <td className="adm-td-num">
+        <span className="adm-offer-cell">
+          <input className="adm-input adm-input-row adm-num-in" type="number" min={1} placeholder="—" value={sale} aria-label="Offer price" onChange={(e) => setSale(e.currentTarget.value)} />
+          {pct > 0 && <span className="adm-off">−{pct}%</span>}
+          <select
+            className="adm-input adm-input-row adm-input-dim adm-pct-pick"
+            value=""
+            aria-label="Set the offer by percent"
+            onChange={(e) => {
+              const p = Number(e.currentTarget.value);
+              if (!p) return;
+              const full = Number(price) || product.price;
+              setSale(String(Math.min(Math.max(10, Math.round((full * (1 - p / 100)) / 10) * 10), full - 10)));
+            }}
+          >
+            <option value="">% off…</option>
+            {[10, 15, 20, 25, 30, 40, 50].map((p) => (
+              <option key={p} value={p}>
+                {p}% off
+              </option>
+            ))}
+          </select>
+        </span>
       </td>
-      <td>
-        <input className="adm-input adm-input-sm adm-w-rank" type="number" min={1} max={99} placeholder="—" value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
+      <td className="adm-td-num">
+        <input className="adm-input adm-input-row adm-num-in adm-rank-in" type="number" min={1} max={99} placeholder="—" value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
       </td>
       <td className="adm-td-actions">
-        {waiting && (
+        {waiting ? (
           <span className="adm-applying">
-            <span className="adm-dot" aria-hidden="true" /> On its way
+            <span className="adm-dot" aria-hidden="true" /> on its way
           </span>
+        ) : (
+          <>
+            <button type="button" className="adm-quiet adm-save" disabled={!dirty} onClick={save}>
+              Save
+            </button>
+            <button type="button" className="adm-quiet is-danger" onClick={remove}>
+              Remove
+            </button>
+          </>
         )}
-        <button type="button" className="adm-quiet" disabled={!dirty || waiting} onClick={save}>
-          Save
-        </button>
-        <button type="button" className="adm-quiet is-danger" disabled={waiting} onClick={remove}>
-          Remove
-        </button>
       </td>
     </tr>
   );
 }
 
-/* ───────── iv · activity ───────── */
+/* ───────── iv · the day book ───────── */
 
 function Pulls({ pulls }: { pulls: Pull[] }) {
   if (pulls.length === 0) return null;
@@ -641,112 +685,135 @@ function Pulls({ pulls }: { pulls: Pull[] }) {
   );
 }
 
-function Activity({ items }: { items: ActivityItem[] }) {
-  if (items.length === 0) return <p className="adm-help">Nothing yet.</p>;
+function DayBook({ items }: { items: ActivityItem[] }) {
+  if (items.length === 0) return <p className="adm-help">Nothing written yet.</p>;
   return (
     <ul className="adm-feed">
       {items.map((item) => (
         <li key={item.at + item.text}>
+          <span className="adm-feed-time">{feedTime(item.at)}</span>
           <span>{item.text}</span>
-          <span className="adm-aside">{feedTime(item.at)}</span>
         </li>
       ))}
     </ul>
   );
 }
 
-/* ───────── the console ───────── */
+/* ───────── the room ───────── */
 
 export function Console({ initial }: { initial: CatalogEntry[] }) {
   const router = useRouter();
-  const { live, loaded, failed, track, toasts } = useLiveState(initial);
+  const { live, loaded, failed, track, toasts, pendingCount } = useLiveState(initial);
   const activity = useActivity(`${live.products.length}|${live.pulls.map((p) => `${p.number}${p.stage}`).join(",")}`);
 
   const onOffer = live.products.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
   const prices = live.products.map((p) => p.price);
   const count = (key: Category) => live.products.filter((p) => p.category === key).length;
-  const stats = [
-    { label: "Pieces", value: String(live.products.length) },
+  const figures = [
+    { label: "pieces", value: String(live.products.length) },
     ...COLLECTIONS.map((c) => ({ label: c.name, value: String(count(c.key)) })),
-    { label: "On offer", value: String(onOffer) },
-    { label: "Best sellers", value: String(live.products.filter((p) => p.bestSeller).length) },
-    { label: "Price range (LKR)", value: prices.length ? `${Math.min(...prices).toLocaleString("en-LK")} – ${Math.max(...prices).toLocaleString("en-LK")}` : "—" },
+    { label: "on offer", value: String(onOffer) },
+    { label: "best sellers", value: String(live.products.filter((p) => p.bestSeller).length) },
   ];
-  const links = [
+  const range = prices.length ? `LKR ${lkr(Math.min(...prices))} to ${lkr(Math.max(...prices))}` : "";
+  const doors = [
     { label: "Dev site", href: SITE_DEV },
     { label: "Live site", href: SITE_LIVE },
-    { label: "Code on GitHub", href: REPO },
+    { label: "GitHub", href: REPO },
     { label: "Vercel", href: VERCEL },
   ];
+  const inFlight = pendingCount + live.pulls.length;
+  const status = failed ? "repo out of reach" : !loaded ? "reading the repo…" : inFlight ? `${inFlight} on the way` : "all landed";
 
   return (
-    <main className="adm">
-      <div className="container adm-inner">
-        <header className="adm-header">
-          <div>
-            <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="150px" />
-            <p className="adm-label">Owner console</p>
-          </div>
-          <nav className="adm-links" aria-label="Console links">
-            {links.map((l) => (
-              <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className="adm-quiet">
-                {l.label}
-              </a>
-            ))}
-            <button
-              type="button"
-              className="adm-quiet"
-              onClick={async () => {
-                await fetch("/api/admin/logout", { method: "POST" }).catch(() => null);
-                router.refresh();
-              }}
-            >
-              Sign out
-            </button>
-          </nav>
+    <main className="adm adm-room">
+      <aside className="adm-rail">
+        <div className="adm-rail-top">
+          <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="140px" />
+          <p className="adm-eyebrow">The back room</p>
+        </div>
+        <nav className="adm-contents" aria-label="Contents">
+          {SECTIONS.map((s) => (
+            <a key={s.id} href={`#${s.id}`}>
+              <span className="adm-num">{s.numeral}</span>
+              <span>{s.name}</span>
+            </a>
+          ))}
+        </nav>
+        <p className={`adm-status ${failed ? "is-failed" : inFlight ? "is-busy" : "is-ok"}`}>
+          <span className="adm-dot" aria-hidden="true" />
+          {status}
+        </p>
+        <nav className="adm-doors" aria-label="Elsewhere">
+          {doors.map((d) => (
+            <a key={d.label} href={d.href} target="_blank" rel="noopener noreferrer" className="adm-quiet">
+              {d.label}
+            </a>
+          ))}
+        </nav>
+        <button
+          type="button"
+          className="adm-quiet adm-signout"
+          onClick={async () => {
+            await fetch("/api/admin/logout", { method: "POST" }).catch(() => null);
+            router.refresh();
+          }}
+        >
+          Sign out
+        </button>
+      </aside>
+
+      <div className="adm-floor">
+        <header className="adm-hero">
+          <p className="adm-eyebrow">Lusted · owner console · the dev branch</p>
+          <h1 className="adm-title">The back room</h1>
+          <p className="adm-lede">
+            Everything here changes the <strong>dev site</strong>. Each change becomes a pull request that merges itself once the checks pass, ten
+            minutes or so, and the dev site follows. Check it there, then ask for a release to put it out front.
+            {failed ? " The repo can’t be reached right now (is GITHUB_ADMIN_TOKEN set?) — what you see is the deployed copy." : ""}
+          </p>
         </header>
 
-        <p className="adm-note">
-          Everything here changes the <strong>dev site</strong>. Each change opens a pull request that merges itself once the checks pass, ten minutes
-          or so, and the dev site follows. Check it there, then ask for a release to put it live.
-          {!loaded && !failed ? " Reading the repo…" : ""}
-          {failed ? " The repo can’t be reached right now (is GITHUB_ADMIN_TOKEN set?) — what you see is the deployed copy." : ""}
-        </p>
-
-        <section className="adm-stats" aria-label="At a glance">
-          {stats.map((s) => (
-            <div key={s.label} className="adm-stat">
-              <span className="adm-label">{s.label}</span>
-              <span className="adm-stat-value">{s.value}</span>
+        <dl className="adm-figures" aria-label="The numbers">
+          {figures.map((f) => (
+            <div key={f.label} className="adm-figure">
+              <dd>{f.value}</dd>
+              <dt>{f.label}</dt>
             </div>
           ))}
+        </dl>
+
+        <section className="adm-section" aria-labelledby="fitting">
+          <SectionHead id="fitting" />
+          <Fitting track={track} existing={live.products} />
         </section>
 
-        <section className="adm-section">
-          <Heading numeral="i" aside="Front, back and side are yours; the words are Claude’s to start with">
-            Add a piece
-          </Heading>
-          <AddPiece track={track} existing={live.products} />
+        <section className="adm-section" aria-labelledby="offers">
+          <SectionHead id="offers" />
+          <Offers products={live.products} track={track} />
         </section>
 
-        <section className="adm-section">
-          <Heading numeral="ii">Offers</Heading>
-          <CollectionOffer products={live.products} track={track} />
-        </section>
-
-        <section className="adm-section">
-          <Heading numeral="iii" aside={`${live.products.length} pieces`}>
-            The catalogue
-          </Heading>
-          <div className="adm-table-wrap">
-            <table className="adm-table">
+        <section className="adm-section" aria-labelledby="ledger">
+          <SectionHead id="ledger">
+            {live.products.length} pieces, {range}, newest first
+          </SectionHead>
+          <div className="adm-ledger-wrap">
+            <table className="adm-ledger">
               <thead>
                 <tr>
-                  {["Piece", "Price (LKR)", "Offer", "Best seller", ""].map((h) => (
-                    <th key={h} className="adm-label">
-                      {h}
-                    </th>
-                  ))}
+                  <th scope="col">Piece</th>
+                  <th scope="col" className="adm-th-num">
+                    Price
+                  </th>
+                  <th scope="col" className="adm-th-num">
+                    Offer
+                  </th>
+                  <th scope="col" className="adm-th-num">
+                    Rank
+                  </th>
+                  <th scope="col">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -754,23 +821,21 @@ export function Console({ initial }: { initial: CatalogEntry[] }) {
                   .sort((a, b) => b.added.localeCompare(a.added))
                   .map((p) => (
                     // content-keyed: when the live state confirms a change the row remounts with the fresh values
-                    <ProductRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} />
+                    <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} />
                   ))}
               </tbody>
             </table>
           </div>
-          <p className="adm-help">Clear the offer price to end an offer on a piece. Descriptions and photos change in the repo, or remove the piece and add it again.</p>
+          <p className="adm-help">Clear the offer price to end an offer. Descriptions and photos change in the repo, or take the piece off and add it again.</p>
         </section>
 
-        <section className="adm-section">
-          <Heading numeral="iv" aside="Sri Lanka time">
-            Activity
-          </Heading>
+        <section className="adm-section" aria-labelledby="daybook">
+          <SectionHead id="daybook">Sri Lanka time</SectionHead>
           <Pulls pulls={live.pulls} />
-          <Activity items={activity} />
+          <DayBook items={activity} />
         </section>
       </div>
-      <ToastStack toasts={toasts} />
+      <Tickets toasts={toasts} />
     </main>
   );
 }
