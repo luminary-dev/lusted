@@ -124,9 +124,9 @@ facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece ad
 doesn't fail them — the home page's hero piece, `rose-lace-balconette-bra`, is the one piece the suite and Lighthouse
 name directly, so it shouldn't be removed from the console.
 
-The sign-in page carries a photo once `assets/images/admin/back-room.webp` exists (the prompt is in
-`about-wall/admin-login-prompt.txt`, outside the repo; watermark it, then `images.mjs manifest` and `upload`); until
-then it draws a curtain. The console needs, on Vercel (Production and Preview): `ADMIN_EMAIL`; `ADMIN_PASSWORD_HASH` — `<salt-hex>:<scrypt-hex>`,
+The sign-in page shows one of the photos under `assets/images/admin/back-room-*.webp`, a different one each time the
+door is opened (the prompts are in `about-wall/admin-login-prompt.txt`, outside the repo; drop a new one in, watermark
+it, then `images.mjs manifest` and `upload`); with none it draws a curtain. The console needs, on Vercel (Production and Preview): `ADMIN_EMAIL`; `ADMIN_PASSWORD_HASH` — `<salt-hex>:<scrypt-hex>`,
 made with the one-liner below; `ADMIN_SESSION_SECRET` — any long random string; `GITHUB_ADMIN_TOKEN` — a fine-grained
 token for this repository with Contents read/write and Pull requests read (it fires the dispatches and reads `dev`);
 `ANTHROPIC_API_KEY` — for the copy; and the four `R2_*` keys it already has. The repository needs one more Actions

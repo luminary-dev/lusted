@@ -20,12 +20,12 @@ export const metadata: Metadata = {
 // Components guide's choice for a signed-in page) rather than streaming a shell no one needs.
 export const instant = false;
 
-// the sign-in page's photo (about-wall/admin-login-prompt.txt): used once it's in assets/images/admin and the manifest
-const BACK_ROOM = "images/admin/back-room.webp";
-const photo = BACK_ROOM in manifest.images ? img(BACK_ROOM as ImagePath) : null;
+// the sign-in page's photos (about-wall/admin-login-prompt.txt, one per scene): every photo in the manifest under
+// images/admin/back-room-*.webp, and the door shows a different one each time it's opened. Without any, a curtain.
+const photos = (Object.keys(manifest.images) as ImagePath[]).filter((key) => /^images\/admin\/back-room-.*\.webp$/.test(key)).map((key) => img(key));
 
 export default async function AdminPage() {
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
-  if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={photo} />;
+  if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={photos.length ? photos[Math.floor(Math.random() * photos.length)] : null} />;
   return <Console initial={catalog as CatalogEntry[]} />;
 }

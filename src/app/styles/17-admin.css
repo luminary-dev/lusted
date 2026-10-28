@@ -414,6 +414,9 @@ select.adm-input option {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(260px, 38vh) auto;
   }
+  .adm-door-photo {
+    object-position: 50% 12%; /* the band shows the top of the photo: keep her face in it */
+  }
   .adm-door-script {
     bottom: 54px;
     font-size: clamp(48px, 14vw, 72px);
