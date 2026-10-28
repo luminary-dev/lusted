@@ -549,7 +549,10 @@ select.adm-input option {
     box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
   }
   .adm-glass .adm-login-title {
-    font-size: clamp(38px, 3.6vw, 52px);
+    font-size: clamp(36px, 3.2vw, 48px);
+  }
+  .adm-glass .adm-login-title .adm-script {
+    font-size: 1.3em; /* "if you have the key." on one line in the box */
   }
   .adm-glass .adm-login-lede {
     font-size: 15px;
