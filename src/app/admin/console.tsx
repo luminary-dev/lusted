@@ -218,6 +218,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
   const [notes, setNotes] = useState("");
   // the copy, written by Claude and then the owner's to change
   const [name, setName] = useState("");
+  const [otherNames, setOtherNames] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [blurb, setBlurb] = useState("");
   const [details, setDetails] = useState("");
@@ -259,6 +260,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
       if (!response?.ok || !body?.copy) throw new Error(body?.error ?? "Could not write it — try again");
       const c = body.copy;
       setName(c.name);
+      setOtherNames(Array.isArray(c.names) ? c.names : []);
       setDescription(c.description);
       setBlurb(c.blurb ?? "");
       setDetails((c.details as string[]).join("\n"));
@@ -318,6 +320,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
       setBestSeller("");
       setNotes("");
       setName("");
+      setOtherNames([]);
       setDescription("");
       setBlurb("");
       setDetails("");
@@ -436,6 +439,24 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
               <span className="adm-help">
                 /products/{slug}
                 {taken ? " — already in the ledger, change the name" : ""}
+              </span>
+            )}
+            {otherNames.length > 0 && (
+              <span className="adm-names">
+                <span className="adm-help">or</span>
+                {otherNames.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className="adm-quiet"
+                    onClick={() => {
+                      setOtherNames((all) => [name, ...all.filter((x) => x !== n)]);
+                      setName(n);
+                    }}
+                  >
+                    {n}
+                  </button>
+                ))}
               </span>
             )}
           </label>

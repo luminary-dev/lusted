@@ -302,6 +302,20 @@
   grid-column: 1 / -1;
 }
 
+.adm-names {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin-top: 10px;
+}
+
+.adm-names .adm-quiet {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+}
+
 .adm-copy {
   margin-top: 30px;
   padding-top: 28px;
