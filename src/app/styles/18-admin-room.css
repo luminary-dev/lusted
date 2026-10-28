@@ -123,63 +123,57 @@
   color: var(--a-blush);
 }
 
-/* ─ the four rooms: four doors across the width, each named in the script, the one you're in lit ─ */
+/* ─ the four rooms: four names in the script, spaced across the width, no lines, no boxes; the one you're in
+   is lit in blush with a small rose mark before it ─ */
 .adm-rooms {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0 0 clamp(32px, 5vh, 48px);
-  border-top: 1px solid var(--a-hair);
-  border-bottom: 1px solid var(--a-hair);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px clamp(40px, 6vw, 112px);
+  margin: clamp(8px, 2vh, 20px) 0 clamp(32px, 5vh, 48px);
 }
 
 .adm-room-link {
   position: relative;
   display: grid;
   gap: 2px;
-  padding: 22px 20px 20px 0;
+  padding-left: 22px;
   color: var(--a-muted);
   text-decoration: none;
-  transition: color 0.25s;
+  transition: color 0.25s, transform 0.3s var(--ease);
 }
 
-.adm-room-link + .adm-room-link {
-  padding-left: 24px;
-  border-left: 1px solid var(--a-hair);
-}
-
-/* the rose line under the lit door */
-.adm-room-link::after {
+/* the mark: a small rose dot that appears before the lit door */
+.adm-room-link::before {
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
+  top: 0.95em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   background: var(--a-rose);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s var(--ease);
-}
-
-.adm-room-link + .adm-room-link::after {
-  left: 24px;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.3s, transform 0.3s var(--ease);
 }
 
 .adm-room-link:hover {
   color: var(--a-ink-2);
+  transform: translateY(-2px);
 }
 
 .adm-room-link.is-here {
   color: var(--a-ink);
 }
 
-.adm-room-link.is-here::after {
-  transform: scaleX(1);
+.adm-room-link.is-here::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .adm-room-name {
   font-family: var(--parisienne);
-  font-size: clamp(28px, 2.4vw, 38px);
+  font-size: clamp(30px, 2.6vw, 42px);
   line-height: 1.1;
   color: inherit;
   transition: color 0.25s;
@@ -778,32 +772,10 @@ select.adm-input-big {
 
 @media (max-width: 760px) {
   .adm-rooms {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .adm-room-link {
-    padding: 16px 12px 14px 0;
-  }
-  .adm-room-link + .adm-room-link {
-    padding-left: 16px;
-    border-left: 0;
-  }
-  .adm-room-link + .adm-room-link::after {
-    left: 16px;
-  }
-  .adm-room-link:nth-child(2n + 1) {
-    padding-left: 0;
-  }
-  .adm-room-link:nth-child(2n + 1)::after {
-    left: 0;
-  }
-  .adm-room-link:nth-child(2n) {
-    border-left: 1px solid var(--a-hair);
-  }
-  .adm-room-link:nth-child(n + 3) {
-    border-top: 1px solid var(--a-hair);
+    gap: 18px 36px;
   }
   .adm-room-name {
-    font-size: 26px;
+    font-size: 28px;
   }
 }
 
@@ -843,15 +815,6 @@ select.adm-input-big {
   }
   .adm-rooms {
     margin-bottom: clamp(40px, 6vh, 64px);
-  }
-  .adm-room-link {
-    padding: 26px 24px 24px 0;
-  }
-  .adm-room-link + .adm-room-link {
-    padding-left: 32px;
-  }
-  .adm-room-link + .adm-room-link::after {
-    left: 32px;
   }
   .adm-sheet.adm-fitting,
   .adm-sheet.adm-offers {
