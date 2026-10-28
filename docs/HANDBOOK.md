@@ -4,7 +4,7 @@
 Everything about how the site is built, tested, deployed and run. The short version is the [README](../README.md).
 The website for **Lusted** — lingerie, swim and after-dark pieces from a Sri Lankan boutique that takes its orders on WhatsApp.
 
-Live at **https://lusted.vercel.app**.
+Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or alias to it).
 
 ## What it is
 
@@ -153,13 +153,21 @@ node -e "const c=require('crypto');const s=c.randomBytes(16);const o={N:131072,r
 
 ## Deploy
 
+**The domain.** `lusted.lk` is registered at the LK Domain Registry (rs.domains.lk), whose nameservers point to
+Cloudflare (`carlane` and `cleo.ns.cloudflare.com`), where its DNS lives: `lusted.lk` an A record to Vercel
+(216.198.79.1), `www` and `dev` CNAMEs to the project's Vercel target — all "DNS only", not proxied, so Vercel issues
+the certificates and runs its own CDN. In the Vercel project `lusted.lk` is the production domain and `www.lusted.lk`
+a 308 redirect to it; `dev.lusted.lk` is pointed at each dev preview by CI (Vercel only ties a domain to Preview
+through a Git branch, and deploys here come from CI). The site's absolute URLs follow Vercel's production domain on
+their own (`src/lib/site-url.ts`).
+
 Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed by CI (`.github/workflows/ci.yml`):
 
 - **`dev`** — integration. Every merged pull request that passes CI is deployed as a Vercel preview and
-  **https://lusted-dev.vercel.app** is pointed at it. Vercel's Preview environment carries `REVEAL_GATE=off`, so the dev
+  **https://dev.lusted.lk** (and the older https://lusted-dev.vercel.app) is pointed at it. Vercel's Preview environment carries `REVEAL_GATE=off`, so the dev
   site shows the real pages. (Preview deployments ask for a Vercel login unless Deployment Protection is relaxed in the
   project settings.)
-- **`main`** — production, **https://lusted.vercel.app**, which shows the "Revealing soon" page until reveal day. Only
+- **`main`** — production, **https://lusted.lk** (and lusted.vercel.app), which shows the "Revealing soon" page until reveal day. Only
   merges of `dev` reach it.
 
 **Versions and releases.** Every release carries a version in `package.json` (the footer shows it as `v0.9.0`), and
@@ -183,5 +191,5 @@ them on. To deploy by hand from a laptop:
 
 ```bash
 vercel deploy --prod   # production
-vercel                 # a preview; then: vercel alias set <its url> lusted-dev.vercel.app
+vercel                 # a preview; then: vercel alias set <its url> dev.lusted.lk (and lusted-dev.vercel.app)
 ```
