@@ -451,7 +451,8 @@ select.adm-input option {
 
 /* ─ one wide photo across the whole door (door-wide-<scene>.webp): the portrait frame steps aside, her side of the
    room is the left, and the form sits on the dark right side of the same picture ─ */
-.adm-wide {
+.adm-wide,
+.adm-wide-mark {
   display: none;
 }
 
@@ -472,8 +473,20 @@ select.adm-input option {
     position: absolute;
     inset: 0;
     z-index: 0;
-    background: linear-gradient(90deg, transparent 38%, rgba(22, 10, 13, 0.55) 55%, rgba(22, 10, 13, 0.82) 70%);
+    background: linear-gradient(90deg, transparent 36%, rgba(22, 10, 13, 0.62) 54%, rgba(22, 10, 13, 0.88) 68%);
     pointer-events: none;
+  }
+  .adm-login.has-wide .adm-wide-mark {
+    /* the photo itself is unmarked (a baked-in mark would be cut by the crop); the page signs it here instead */
+    display: block;
+    position: absolute;
+    right: clamp(24px, 3vw, 48px);
+    bottom: clamp(20px, 3vh, 36px);
+    z-index: 1;
+    width: 150px;
+    height: auto;
+    opacity: 0.6;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
   }
   .adm-login.has-wide .adm-frame {
     background: none; /* the caption stays, over the photo's left foot */

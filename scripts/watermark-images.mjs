@@ -1,7 +1,7 @@
 // Puts the Lusted wordmark on every photo under assets/images — the same mark the product photos carry
 // (scripts/lib/wordmark.mjs): white, bottom right, with a soft shadow, sized from the photo's shorter side so it reads
 // the same on a wide hero photo and a tall phone cut. Transparent cut-outs (the FAQ models) are left alone: they sit
-// on a card, not in a frame. The unmarked originals are kept outside the repo (../images/unmarked/<path>) and a photo
+// on a card, not in a frame; so are the console door's wide photos, which the page signs itself. The unmarked originals are kept outside the repo (../images/unmarked/<path>) and a photo
 // is only ever marked once (assets/.watermarked.json remembers which), so the script can be run again after new
 // photos land. Usage: node scripts/watermark-images.mjs [path-under-assets/images …]
 import { readFile, writeFile, mkdir, copyFile, readdir } from "node:fs/promises";
@@ -29,6 +29,9 @@ for await (const file of walk(IMAGES)) {
   const rel = path.relative(IMAGES, file);
   if (only.length && !only.some((o) => rel.startsWith(o))) continue;
   if (done[rel]) { kept++; continue; }
+  // the console door's wide photos are left unmarked: they're cropped to the screen, so a baked-in mark would be cut;
+  // the page signs them itself (src/app/admin/login-form.tsx)
+  if (/^admin\/door-wide-/.test(rel)) { skipped++; continue; }
   const meta = await sharp(file).metadata();
   if (meta.hasAlpha) {
     // a cut-out: see whether it really has transparency (a photo saved with an alpha channel is still a photo)
