@@ -5,9 +5,10 @@
    written straight on the dark) and the day book. Ticket stubs in the corner follow each change. The tokens and the
    shared controls are in 17-admin.css. */
 .adm-page {
-  width: min(100%, 1180px);
+  /* the room uses the screen: a gutter that grows with the width, and only a very wide screen is held back */
+  width: min(100%, 1720px);
   margin: 0 auto;
-  padding: clamp(20px, 3vh, 32px) clamp(20px, 4vw, 48px) clamp(64px, 10vh, 120px);
+  padding: clamp(20px, 3vh, 36px) clamp(20px, 5vw, 96px) clamp(64px, 10vh, 120px);
 }
 
 /* ─ the top: the wordmark and the doors out ─ */
@@ -51,7 +52,7 @@
 }
 
 .adm-lede {
-  max-width: 56ch;
+  max-width: 62ch;
   margin: 0;
   font-size: 14px;
   line-height: 1.75;
@@ -781,5 +782,85 @@ select.adm-input-big {
   }
   .adm-ledger tr:hover .adm-thumb {
     transform: none;
+  }
+}
+
+/* ─ a wide screen (a 16-inch laptop and up): more air everywhere ─ */
+@media (min-width: 1500px) {
+  .adm-masthead {
+    gap: 24px clamp(80px, 10vw, 200px);
+    padding-bottom: clamp(32px, 5vh, 56px);
+  }
+  .adm-title {
+    font-size: clamp(96px, 6.5vw, 124px);
+  }
+  .adm-lede {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .adm-figure {
+    padding: 9px 0;
+    font-size: 11.5px;
+  }
+  .adm-figure dd {
+    font-size: 30px;
+  }
+  .adm-figure:first-child dd {
+    font-size: 40px;
+  }
+  .adm-rooms {
+    gap: 0 clamp(56px, 5vw, 96px);
+    margin-bottom: clamp(40px, 6vh, 64px);
+  }
+  .adm-room-link {
+    padding: 22px 0 20px;
+  }
+  .adm-room-name {
+    font-size: 16px;
+  }
+  .adm-sheet.adm-fitting,
+  .adm-sheet.adm-offers {
+    padding: clamp(40px, 3.5vw, 64px);
+  }
+  .adm-grid-2 {
+    gap: 30px 64px;
+  }
+  .adm-pins {
+    gap: 32px;
+    max-width: 1100px;
+  }
+  .adm-ledger th {
+    padding-bottom: 16px;
+  }
+  .adm-ledger td {
+    padding: 16px 28px 16px 0;
+  }
+  .adm-td-piece {
+    gap: 22px;
+    min-width: 360px;
+  }
+  .adm-thumb-wrap,
+  .adm-thumb {
+    width: 52px;
+    height: 78px;
+  }
+  .adm-input-row {
+    font-size: 15px;
+  }
+  .adm-num-in {
+    width: 110px;
+    font-size: 15.5px;
+  }
+  .adm-ledger-tools {
+    margin-bottom: 26px;
+  }
+  .adm-feed li,
+  .adm-pull,
+  .adm-offer-list li {
+    padding: 14px 0;
+    font-size: 14.5px;
+  }
+  .adm-top {
+    padding-bottom: 26px;
   }
 }
