@@ -14,9 +14,9 @@ const CAPTIONS: Record<string, [script: string, line: string]> = {
   doorway: ["staying?", "One foot in the corridor, one on the frame. She hasn’t decided. Neither have you."],
   trunk: ["the trunk", "An old trunk of pieces nobody has seen. She’s trying them against herself, one by one."],
   boxes: ["new in", "Nothing in these boxes has been worn yet. She is deciding which goes first."],
-  window: ["rain", "The shop is shut and it’s raining. She has nowhere to be but here, and nothing to put on."],
-  pins: ["pinned", "The dress form wears what she won’t. Every pin is where her hand was a moment ago."],
-  screen: ["behind the screen", "What you can see is the silhouette. What you can’t is what she’s taking off."],
+  front: ["face down", "The bra is on the floor and she isn’t getting up for it. Come and have a word."],
+  shirt: ["whose shirt", "Not hers. Unbuttoned all the way, held shut in one fist. For now."],
+  ribbon: ["the ribbon", "Her wrists are only wrapped, not tied. One pull and it falls. She hasn’t pulled."],
   key: ["the key", "She found it on the counter. Now she’s deciding whether to let you have it back."],
 };
 const FALLBACK: [string, string] = ["after closing", "The shop is shut. The back room never is."];
