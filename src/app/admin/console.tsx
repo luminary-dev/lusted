@@ -819,23 +819,25 @@ export function Console({ section, initial }: { section: Section; initial: Catal
           </nav>
         </header>
 
-        <div className="adm-hero">
-          <h1 className="adm-title">The back room</h1>
-          <p className="adm-lede">
-            Everything here changes the <strong>dev site</strong>. Each change becomes a pull request that merges itself once the checks pass, ten
-            minutes or so, and the dev site follows. Check it there, then ask for a release to put it out front.
-            {failed ? " The repo can’t be reached right now (is GITHUB_ADMIN_TOKEN set?) — what you see is the deployed copy." : ""}
-          </p>
+        <div className="adm-masthead">
+          <div className="adm-hero">
+            <h1 className="adm-title">The back room</h1>
+            <p className="adm-lede">
+              Everything here changes the <strong>dev site</strong>. Each change becomes a pull request that merges itself once the checks pass, ten
+              minutes or so, and the dev site follows. Check it there, then ask for a release to put it out front.
+              {failed ? " The repo can’t be reached right now (is GITHUB_ADMIN_TOKEN set?) — what you see is the deployed copy." : ""}
+            </p>
+          </div>
+          {/* the figures as a ledger: a label, a dotted leader, the number */}
+          <dl className="adm-figures" aria-label="The numbers">
+            {figures.map((f) => (
+              <div key={f.label} className="adm-figure">
+                <dt>{f.label}</dt>
+                <dd>{f.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-
-        <dl className="adm-figures" aria-label="The numbers">
-          {figures.map((f) => (
-            <div key={f.label} className="adm-figure">
-              <dd>{f.value}</dd>
-              <dt>{f.label}</dt>
-            </div>
-          ))}
-        </dl>
 
         <nav className="adm-rooms" aria-label="Rooms">
           {SECTIONS.map((s) => (
