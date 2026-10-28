@@ -354,16 +354,31 @@ jobs:
           host="${url#https://}"
           id="$(curl -sS "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" -H "Authorization: Bearer $VERCEL_TOKEN" | jq -r '.id // empty')"
           [ -n "$id" ] || { echo "::error::Vercel has no deployment at $host."; exit 1; }
-          # dev.lusted.lk is the dev site's address (its DNS is a CNAME to Vercel in Cloudflare; the proxy treats any dev.
-          # host as the dev site); lusted-dev.vercel.app keeps working alongside it
-          for alias in lusted-dev.vercel.app dev.lusted.lk; do
-            res="$(curl -sS -X POST "https://api.vercel.com/v2/deployments/$id/aliases?teamId=$VERCEL_ORG_ID" \
-              -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
-              -d "{\"alias\":\"$alias\"}")"
-            echo "$res"
-            [ "$(echo "$res" | jq -r '.alias // empty')" = "$alias" ] || { echo "::error::Vercel did not point $alias at $host."; exit 1; }
-            echo "$alias → $url" >> "$GITHUB_STEP_SUMMARY"
-          done
+          point() {
+            curl -sS -X POST "https://api.vercel.com/v2/deployments/$id/aliases?teamId=$VERCEL_ORG_ID" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" -d "{\"alias\":\"$1\"}"
+          }
+          res="$(point lusted-dev.vercel.app)"
+          echo "$res"
+          [ "$(echo "$res" | jq -r '.alias // empty')" = "lusted-dev.vercel.app" ] || { echo "::error::Vercel did not point lusted-dev.vercel.app at $host."; exit 1; }
+          echo "lusted-dev.vercel.app → $url" >> "$GITHUB_STEP_SUMMARY"
+          # dev.lusted.lk is the dev site's own address (a CNAME to Vercel in Cloudflare; the proxy treats any dev. host as
+          # the dev site). Vercel only aliases a custom domain it holds a certificate for, so a missing one is asked for and
+          # the alias tried again; that only works once the DNS reaches Vercel, so until then this is a warning, not a
+          # failed deploy — lusted-dev.vercel.app is already pointed.
+          res="$(point dev.lusted.lk)"
+          if [ "$(echo "$res" | jq -r '.error.code // empty')" = "cert_missing" ]; then
+            curl -sS -X POST "https://api.vercel.com/v8/certs?teamId=$VERCEL_ORG_ID" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" -d '{"cns":["dev.lusted.lk"]}'
+            echo
+            res="$(point dev.lusted.lk)"
+          fi
+          echo "$res"
+          if [ "$(echo "$res" | jq -r '.alias // empty')" = "dev.lusted.lk" ]; then
+            echo "dev.lusted.lk → $url" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::dev.lusted.lk is not pointed at this deploy yet ($(echo "$res" | jq -r '.error.message // "no answer"')) — usually its DNS has not reached Vercel."
+          fi
 
       - name: Deploy to production
         if: github.ref == 'refs/heads/main'
