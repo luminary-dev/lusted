@@ -8,8 +8,8 @@
 <p align="center"><em>Lingerie, swim and after-dark pieces for women who like being looked at — and like what happens next.</em></p>
 
 <p align="center">
-  <a href="https://lusted.vercel.app"><strong>lusted.vercel.app</strong></a> &nbsp;·&nbsp; the shop, out front<br>
-  <a href="https://lusted-dev.vercel.app"><strong>lusted-dev.vercel.app</strong></a> &nbsp;·&nbsp; the fitting room, where new pieces are tried on first
+  <a href="https://lusted.lk"><strong>lusted.lk</strong></a> &nbsp;·&nbsp; the shop, out front<br>
+  <a href="https://dev.lusted.lk"><strong>dev.lusted.lk</strong></a> &nbsp;·&nbsp; the fitting room, where new pieces are tried on first
 </p>
 
 ---
