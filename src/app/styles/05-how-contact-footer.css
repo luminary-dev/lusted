@@ -556,3 +556,14 @@
   width: 14px;
   height: 14px;
 }
+
+/* the version out front, after the copyright line */
+.footer-version {
+  margin-left: 6px;
+  padding-left: 10px;
+  border-left: 1px solid currentColor;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}

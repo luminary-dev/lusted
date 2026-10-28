@@ -111,9 +111,9 @@ test.describe("search dialog", () => {
     await page.getByRole("button", { name: "Search" }).click();
     const dialog = searchDialog(page);
     await expect(dialog.locator(".search-label")).toHaveText("Best sellers");
-    await expect(dialog.locator(".search-results li")).toHaveCount(6);
+    await expect(dialog.locator(".search-results li")).toHaveCount(Math.min(6, CATALOG.bestSellers.length));
     const shown = await dialog.locator(".search-results li a").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
-    expect(shown).toEqual(CATALOG.bestSellers);
+    expect(shown).toEqual(CATALOG.bestSellers.slice(0, 6));
     for (const chip of ["lace", "silk", "bikini", "black", "bodysuit", "sale"]) await expect(dialog.getByRole("button", { name: chip, exact: true })).toBeVisible();
     await dialog.getByRole("button", { name: "bikini", exact: true }).click();
     await expect(page.getByRole("searchbox", { name: "Search products" })).toHaveValue("bikini");

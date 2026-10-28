@@ -118,17 +118,19 @@ test("hero slideshow advances when motion is allowed and holds with reduced moti
 
 test("sale: the four bikinis at exactly 20% off, prices struck through, each linking to its product", async ({ prepared: page }) => {
   const sale = page.locator("#sale");
-  await expect(sale.locator("h2")).toContainText(/20% off/);
+  await expect(sale.locator("h2")).toContainText(`${CATALOG.maxDiscount}% off`);
   const cards = sale.locator(".sale-card");
-  await expect(cards).toHaveCount(4);
-  const hrefs = await cards.evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
-  expect([...hrefs].sort()).toEqual([...CATALOG.sale].sort());
-  for (let i = 0; i < 4; i++) {
+  const shown = Math.min(4, CATALOG.sale.length); // the band shows up to four
+  await expect(cards).toHaveCount(shown);
+  const hrefs = (await cards.evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()))) as string[];
+  expect([...hrefs].sort()).toEqual([...CATALOG.sale.slice(0, 4)].sort());
+  for (let i = 0; i < shown; i++) {
     const c = cards.nth(i);
-    await expect(c.locator(".sale-card-off")).toHaveText("−20%");
+    await expect(c.locator(".sale-card-off")).toHaveText(`−${CATALOG.discount(hrefs[i])}%`);
     const now = parsePrice((await c.locator(".sale-card-price").textContent())!);
     const was = parsePrice((await c.locator(".sale-card-price s").textContent())!);
-    expect(Math.round(was * 0.8)).toBe(now);
+    expect(now).toBe(CATALOG.salePriceOf(hrefs[i]));
+    expect(was).toBe(CATALOG.priceOf(hrefs[i]));
     await expect(c.locator("h3")).not.toBeEmpty();
     await expect(c.locator(".sale-card-blurb")).not.toBeEmpty();
   }
@@ -161,10 +163,11 @@ test("collections: three cards open the shop filtered by category, plus the all-
 test("best sellers: the six ranked pieces in order, with the badge, linking to the sorted shop", async ({ prepared: page }) => {
   const sec = page.locator("#best-sellers");
   const cards = sec.locator(".product-card");
-  await expect(cards).toHaveCount(6);
+  const six = Math.min(6, CATALOG.bestSellers.length);
+  await expect(cards).toHaveCount(six);
   const hrefs = await cards.locator(".product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
-  expect(hrefs).toEqual(CATALOG.bestSellers);
-  for (let i = 0; i < 6; i++) await expect(cards.nth(i).locator(".badge", { hasText: "Best seller" })).toHaveCount(1);
+  expect(hrefs).toEqual(CATALOG.bestSellers.slice(0, 6));
+  for (let i = 0; i < six; i++) await expect(cards.nth(i).locator(".badge", { hasText: "Best seller" })).toHaveCount(1);
   await expect(sec.getByRole("link", { name: /See all|best/i }).last()).toHaveAttribute("href", "/products?best=1&sort=best");
 });
 

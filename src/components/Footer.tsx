@@ -6,6 +6,7 @@ import { collectionName } from "@/lib/products";
 import { emailLink, instagramLink, whatsappLink } from "@/lib/site";
 import Newsletter from "./Newsletter";
 import Year from "./Year";
+import { version } from "../../package.json";
 import { ArrowUpRight, Instagram, Mail, WhatsApp } from "./icons";
 import { img } from "@/lib/cdn";
 
@@ -88,6 +89,9 @@ export default function Footer() {
         <div className="footer-bottom">
           <span>
             © <Year /> Lusted. Designed for every version of you.
+            <span className="footer-version" title={`Lusted ${version}`}>
+              v{version}
+            </span>
           </span>
           <span className="footer-credit">
             Designed by the Luminary team

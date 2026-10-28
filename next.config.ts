@@ -9,9 +9,11 @@ const imageCdn = process.env.NEXT_PUBLIC_IMAGE_CDN ? new URL(process.env.NEXT_PU
 // inline because Next's hydration scripts, the theme/intro scripts in layout.tsx and the component styles are inline —
 // a per-request nonce would make every page dynamic. frame-ancestors 'none' stops the site being framed; form-action
 // keeps forms on the site. HSTS is set by Vercel.
+// 'unsafe-eval' only while developing: React's dev tooling (stack reconstruction) wants eval, production never does
+const dev = process.env.NODE_ENV === "development";
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
@@ -35,10 +37,23 @@ const securityHeaders = [
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
 ];
 
+const consoleHeaders = [
+  { key: "Content-Security-Policy", value: csp.replace("connect-src 'self'", "connect-src 'self' https://*.r2.cloudflarestorage.com") },
+  { key: "Cache-Control", value: "no-store" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow" },
+];
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      // the owner console (src/app/admin): never cached, never indexed, and its browser puts photos straight into the
+      // bucket (src/lib/admin/r2.ts), so its connect-src also allows the bucket's address
+      { source: "/admin", headers: consoleHeaders },
+      { source: "/admin/:path*", headers: consoleHeaders },
+      { source: "/api/admin/:path*", headers: consoleHeaders },
+    ];
   },
   partialPrefetching: true,
   // lets a phone on the laptop's iPhone hotspot (172.20.10.x) load the dev server's scripts and live reload

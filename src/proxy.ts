@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { SECTIONS } from "@/app/admin/sections";
 import catalog from "@/lib/catalog.json";
 import { site } from "@/lib/site";
 
@@ -13,9 +14,19 @@ const PREVIEW_COOKIE = "lusted-preview";
 // A product URL that isn't in the catalogue gets a real 404. The product route is partially prerendered, so its
 // shell would otherwise answer 200 and only the streamed body would say "not found" — which search engines index.
 const slugs = new Set(catalog.map((p) => p.slug));
+const ROOMS = new Set<string>(SECTIONS.map((s) => s.id));
 
 export function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  // the owner console (src/app/admin) is its own door: never the reveal page, never a product check. Its rooms are
+  // /admin/<section>; anything else under /admin is a real 404 (the room pages are rendered per request, so their
+  // shell would otherwise answer 200 and only the streamed body would say "not found")
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    const room = pathname.slice("/admin/".length);
+    if (pathname !== "/admin" && !ROOMS.has(room)) return NextResponse.rewrite(new URL("/_not-found", request.url), { status: 404 });
+    return NextResponse.next();
+  }
 
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? ""; // the public domain on Vercel
   const devHost = host.startsWith("dev.");

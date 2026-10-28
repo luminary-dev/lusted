@@ -1,4 +1,6 @@
 import { test as base, expect, type Page, type Locator } from "@playwright/test";
+import catalogJson from "../src/lib/catalog.json";
+import manifest from "../src/lib/image-manifest.json";
 
 /* ───────── the viewport matrix (responsive-dimensions-oct-2026.txt) ───────── */
 export type Viewport = { name: string; w: number; h: number; kind: "phone" | "foldable" | "tablet" | "laptop" | "desktop" | "boundary" | "landscape"; dpr?: number };
@@ -111,19 +113,47 @@ export const MINIMUM_SET: Viewport[] = [
   desktop("1920", 1920, 1080), desktop("2560", 2560, 1440), desktop("3440", 3440, 1440),
 ];
 
-/* ───────── catalogue facts the tests assert against ───────── */
+/* ───────── catalogue facts the tests assert against ─────────
+   Read from the catalogue itself (src/lib/catalog.json, and the photo manifest for which pieces are photographed), the
+   way src/lib/products.ts reads it, so a piece added, changed or removed from the owner console (/admin) doesn't fail
+   the suite. */
+type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string };
+const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
+const bySlug = Object.fromEntries(photographed.map((p) => [p.slug, p]));
+const priceOf = (p: Entry) => p.salePrice ?? p.price;
+const onSale = photographed.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price);
+const COLLECTIONS = { lingerie: "Lace Secrets", swim: "Sun Kissed", "after-dark": "Midnight Sins" } as const;
+// the sample sale piece the product-page tests open: a single-colour one, so there is no colour picker
+const sampleSale = onSale.find((p) => p.colors.length === 1) ?? onSale[0];
+// the sample for the bag: a sale piece that comes in wine, like the hero piece the test puts next to it
+const bagSale = onSale.find((p) => p.colors.includes("wine")) ?? onSale[0];
 export const CATALOG = {
-  total: 37,
-  byCategory: { lingerie: 19, swim: 11, "after-dark": 7 },
-  sale: ["pearl-seduction-bikini", "scarlet-sin-bikini", "noir-temptress-bikini", "golden-goddess-bikini"],
-  bestSellers: ["rose-lace-balconette-bra", "siren-chainmail-mini", "bloom-lace-up-ruffle-mini", "fleur-embroidered-satin-slip", "mykonos-chain-bikini", "wisteria-embroidered-bustier-set"],
-  newest: ["fleur-embroidered-satin-slip", "lotus-satin-cheongsam", "scarlet-butterfly-teddy", "bloom-lace-up-ruffle-mini", "jade-dragon-cheongsam", "wisteria-embroidered-bustier-set"],
-  multiColour: { "rose-lace-balconette-bra": ["blush", "wine"], "rose-lace-high-waist-brief": ["blush", "wine"], "camille-satin-bow-bralette": ["ivory", "blush"], "juliette-lace-bodysuit": ["black", "blush"], "margot-silk-slip": ["champagne", "wine"], "amelie-garter-belt": ["black", "blush"], "wisteria-embroidered-bustier-set": ["lilac", "aqua"] },
+  total: photographed.length,
+  byCategory: {
+    lingerie: photographed.filter((p) => p.category === "lingerie").length,
+    swim: photographed.filter((p) => p.category === "swim").length,
+    "after-dark": photographed.filter((p) => p.category === "after-dark").length,
+  },
+  sale: onSale.map((p) => p.slug),
+  /** a piece's discount the way the site shows it, its offer price and its full price */
+  discount: (slug: string) => Math.round((1 - bySlug[slug].salePrice! / bySlug[slug].price) * 100),
+  salePriceOf: (slug: string) => bySlug[slug].salePrice!,
+  priceOf: (slug: string) => bySlug[slug].price,
+  maxDiscount: Math.max(0, ...onSale.map((p) => Math.round((1 - p.salePrice! / p.price) * 100))),
+  sampleSale: { slug: sampleSale?.slug ?? "", singleColour: (sampleSale?.colors.length ?? 1) === 1, collection: sampleSale ? COLLECTIONS[sampleSale.category] : "" },
+  bagSale: { slug: bagSale?.slug ?? "", color: bagSale?.colors.includes("wine") ? "wine" : (bagSale?.colors[0] ?? "wine") },
+  // every ranked piece, in rank order; the home page, the search dialog and the shop's "best" sort show the first six
+  bestSellers: photographed.filter((p) => p.bestSeller).sort((a, b) => a.bestSeller! - b.bestSeller!).map((p) => p.slug),
+  newest: [...photographed].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug),
+  // multi-colour pieces whose every colour is photographed
+  multiColour: Object.fromEntries(
+    photographed.filter((p) => p.colors.length > 1 && p.colors.slice(1).every((c) => `products/${p.slug}--${c}.webp` in manifest.images)).map((p) => [p.slug, p.colors]),
+  ) as Record<string, string[]>,
   sizes: ["XS", "S", "M", "L", "XL"],
   colours: { blush: "Blush", wine: "Wine", black: "Black", ivory: "Ivory", champagne: "Champagne", mocha: "Mocha", lilac: "Lilac", aqua: "Aqua" },
-  priceRange: [2900, 12900],
+  priceRange: [Math.min(...photographed.map(priceOf)), Math.max(...photographed.map(priceOf))],
   perPage: 15,
-  pages: 3,
+  pages: Math.ceil(photographed.length / 15),
   whatsapp: "6581234567",
   email: "support@lusted.lk",
   instagram: "lusted.lk",

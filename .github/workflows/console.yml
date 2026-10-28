@@ -1,0 +1,122 @@
+# Console — fired by the owner console (src/app/admin) through repository_dispatch (src/lib/admin/github.ts).
+#
+# One run per change. It applies the change on a fresh branch off dev (scripts/admin/add-product.mjs for a new piece —
+# the photos are finished and put in the bucket here — or scripts/admin/apply-update.mjs for everything else), commits
+# it as "admin: <what changed>", opens a pull request into dev and waits for the checks; when they're green it merges
+# the pull request, which deploys the dev site like any other merge. So a console change takes the same road as every
+# other change and no rule is bypassed. If a check fails the run fails and the pull request stays open for a look; the
+# console shows both under Activity.
+#
+# Needs the repository secrets R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY (the photos) and
+# CONSOLE_TOKEN: a fine-grained personal access token for this repository with Contents and Pull requests read/write.
+# The workflow's own GITHUB_TOKEN would do for the push, but nothing it pushes or opens runs CI (GitHub's rule against
+# workflow loops), so the pull request would never get its checks.
+name: Console
+
+on:
+  repository_dispatch:
+    types: [add-product, update-product, remove-product, bulk-offer]
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  apply:
+    name: ${{ github.event.action }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Check the secrets
+        env:
+          CONSOLE_TOKEN: ${{ secrets.CONSOLE_TOKEN }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+        run: |
+          [ -n "$CONSOLE_TOKEN" ] || { echo "::error::Repository secret CONSOLE_TOKEN is not set (a fine-grained token with Contents and Pull requests read/write)."; exit 1; }
+          [ -n "$R2_ACCESS_KEY_ID" ] || { echo "::error::The R2_* repository secrets are not set."; exit 1; }
+
+      - name: Check out dev
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: dev
+          persist-credentials: false # the push below uses CONSOLE_TOKEN through gh, never a token left in .git
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply the change
+        env:
+          ADMIN_ACTION: ${{ github.event.action }}
+          ADMIN_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          if [ "$ADMIN_ACTION" = add-product ]; then node scripts/admin/add-product.mjs; else node scripts/admin/apply-update.mjs; fi
+
+      - name: Commit on a branch and open the pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.CONSOLE_TOKEN }}
+          ACTOR: ${{ github.actor }}
+          ACTOR_ID: ${{ github.actor_id }}
+          ACTION: ${{ github.event.action }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          summary="$(cat .admin-summary 2>/dev/null || echo "$ACTION")"
+          rm -f .admin-summary
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit — the change was already applied."
+            echo "number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "$ACTOR"
+          git config user.email "$ACTOR_ID+$ACTOR@users.noreply.github.com"
+          gh auth setup-git # git pushes with CONSOLE_TOKEN
+          branch="console/$ACTION-$RUN_ID"
+          git checkout -b "$branch"
+          git commit -m "admin: $summary"
+          git push origin "$branch"
+          url="$(gh pr create --base dev --head "$branch" --title "admin: $summary" --body "From the owner console. Merges itself once the checks pass.")"
+          echo "$url"
+          echo "number=${url##*/}" >> "$GITHUB_OUTPUT"
+          echo "Pull request: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      # the checks take ten minutes or so; a pull request opened while another console change is merging falls behind
+      # dev and is brought up to date here (and by console-refresh.yml), which runs the checks again
+      - name: Wait for the checks and merge
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.CONSOLE_TOKEN }}
+          PR: ${{ steps.pr.outputs.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          for _ in $(seq 1 120); do
+            sleep 30
+            state="$(gh pr view "$PR" --json state,mergeStateStatus --jq '.state + " " + .mergeStateStatus')"
+            echo "$(date -u +%H:%M:%S) $state"
+            case "$state" in
+              MERGED*) echo "Merged." ; exit 0 ;;
+              CLOSED*) echo "::error::The pull request was closed without merging."; exit 1 ;;
+              "OPEN DIRTY") echo "::error::The pull request conflicts with dev — it needs a look."; exit 1 ;;
+              "OPEN BEHIND") gh api -X PUT "repos/$REPO/pulls/$PR/update-branch" >/dev/null || true ;;
+              "OPEN CLEAN"|"OPEN HAS_HOOKS"|"OPEN UNSTABLE")
+                if gh pr merge "$PR" --merge --delete-branch; then echo "Merged."; exit 0; fi ;;
+            esac
+            if gh pr checks "$PR" --json state --jq '.[].state' | grep -qE 'FAILURE|ERROR|CANCELLED'; then
+              echo "::error::A check failed on the pull request — see the pull request."
+              exit 1
+            fi
+          done
+          echo "::error::The checks did not finish within an hour — see the pull request."
+          exit 1

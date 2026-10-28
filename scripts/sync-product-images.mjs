@@ -1,31 +1,31 @@
-// Rewrites src/lib/product-images.ts (static imports, so next/image gets dimensions + blur placeholders) to match
-// src/lib/catalog.json: a main photo per product (assets/products/<slug>.webp) plus any extra views that exist —
-// <slug>-back.webp and <slug>-side.webp. No API key needed.
-// Usage: node scripts/sync-product-images.mjs (generate-products.mjs and import-krea-products.mjs also run it).
-import { readFile, writeFile, access } from "node:fs/promises";
+// Rewrites src/lib/product-images.ts (one img() per photographed piece, so next/image gets dimensions + blur
+// placeholders) to match src/lib/catalog.json: a main photo per product (products/<slug>.webp) plus any extra views —
+// <slug>-back.webp and <slug>-side.webp — and colourways (<slug>--<colour>.webp, + -back / -side). Which photos exist is
+// read from src/lib/image-manifest.json, the record of the bucket (scripts/images.mjs), not from the laptop's assets/,
+// so it gives the same answer on a fresh clone and on a CI runner. No API key needed.
+// Usage: node scripts/sync-product-images.mjs (import-krea-products.mjs and the console's scripts also run it).
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const OUT = path.join(ROOT, "assets/products");
-const exists = (p) => access(p).then(() => true, () => false);
+const manifest = JSON.parse(await readFile(path.join(ROOT, "src/lib/image-manifest.json"), "utf8"));
+const has = (name) => `products/${name}` in manifest.images;
 // only products whose main photo exists — new pieces appear in the shop as soon as their front shot lands
 const all = JSON.parse(await readFile(path.join(ROOT, "src/lib/catalog.json"), "utf8"));
-const catalog = [];
-for (const p of all) if (await exists(path.join(OUT, `${p.slug}.webp`))) catalog.push(p);
+const catalog = all.filter((p) => has(`${p.slug}.webp`));
 const id = (s) => s.replace(/-([a-z])/g, (_, x) => x.toUpperCase());
 const VIEWS = ["back", "side"];
 
 const extra = []; // [slug, view]
-for (const p of catalog) for (const v of VIEWS) if (await exists(path.join(OUT, `${p.slug}-${v}.webp`))) extra.push([p.slug, v]);
+for (const p of catalog) for (const v of VIEWS) if (has(`${p.slug}-${v}.webp`)) extra.push([p.slug, v]);
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 // colourways: <slug>--<colour>.webp (+ -back / -side) — the same piece photographed in its other colours
 const ways = []; // [slug, colour, view | ""]
 for (const p of catalog)
   for (const c of p.colors)
-    if (c !== p.colors[0] && (await exists(path.join(OUT, `${p.slug}--${c}.webp`))))
-      for (const v of ["", ...VIEWS])
-        if (await exists(path.join(OUT, `${p.slug}--${c}${v ? `-${v}` : ""}.webp`))) ways.push([p.slug, c, v]);
+    if (c !== p.colors[0] && has(`${p.slug}--${c}.webp`))
+      for (const v of ["", ...VIEWS]) if (has(`${p.slug}--${c}${v ? `-${v}` : ""}.webp`)) ways.push([p.slug, c, v]);
 const wayId = (s, c, v) => `${id(s)}${cap(c)}${v ? cap(v) : ""}`;
 
 await writeFile(
