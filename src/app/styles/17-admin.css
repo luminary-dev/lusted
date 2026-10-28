@@ -602,12 +602,57 @@ select.adm-input option {
   }
   .adm-glass {
     z-index: 1;
-    width: min(100%, 620px);
-    padding: clamp(24px, 3vh, 40px) 0;
+    width: min(100%, 640px);
+    padding: clamp(32px, 4vh, 56px) 0;
+  }
+  /* room between the words */
+  .adm-glass .adm-login-mark {
+    margin-bottom: 40px;
+  }
+  .adm-glass .adm-login-top {
+    margin-bottom: 34px;
+  }
+  .adm-glass .adm-login-title {
+    margin-bottom: 26px;
+    line-height: 1.15;
+  }
+  .adm-glass .adm-login-title .adm-script {
+    margin-top: 10px;
+  }
+  .adm-glass .adm-login-lede {
+    margin-bottom: 44px;
+    line-height: 1.85;
+  }
+  .adm-glass .adm-pill + .adm-pill {
+    margin-top: 16px;
+  }
+  .adm-glass .adm-btn-wide {
+    margin-top: 26px;
+  }
+  .adm-glass .adm-login-card .adm-help {
+    margin-top: 20px;
+    line-height: 1.75;
+  }
+  .adm-glass .adm-inside {
+    margin-top: 48px;
+    padding-top: 34px;
+  }
+  .adm-glass .adm-inside-head {
+    margin-bottom: 22px;
+  }
+  .adm-glass .adm-inside dl {
+    gap: 26px 40px;
+  }
+  .adm-glass .adm-inside dd {
+    margin-top: 8px;
+    line-height: 1.75;
   }
   .adm-glass .adm-door-figures {
-    margin-top: 36px;
-    gap: 16px 36px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 48px;
+    padding-top: 32px;
+    gap: 20px 32px;
   }
   .adm-glass .adm-door-figures dd {
     font-size: 30px;
