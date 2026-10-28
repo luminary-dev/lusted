@@ -56,18 +56,21 @@ export type ConsolePull = {
   title: string;
   url: string;
   createdAt: string;
+  // the branch it comes from, and whether the console made it (console/…) or someone did by hand
+  branch: string;
+  fromConsole: boolean;
   // where it is on the road into dev
   stage: "checks" | "failed" | "ready";
 };
 
-// the console's own pull requests still on their way into dev (their branches are named console/…)
+// every pull request still on its way into dev — the console's own (their branches are named console/…) and the ones
+// made by hand — so the day book shows all of what's pending, not only what the console queued
 export async function listConsolePulls(): Promise<ConsolePull[]> {
   const response = await fetch(`${API}/repos/${repo()}/pulls?state=open&base=${BRANCH}&per_page=30`, { headers: headers(), cache: "no-store" });
   if (!response.ok) return [];
   const body = (await response.json()) as Array<{ number: number; title: string; html_url: string; created_at: string; head: { ref: string; sha: string } }>;
-  const ours = body.filter((pull) => pull.head.ref.startsWith("console/"));
   return Promise.all(
-    ours.map(async (pull) => {
+    body.map(async (pull) => {
       let stage: ConsolePull["stage"] = "checks";
       const runs = await fetch(`${API}/repos/${repo()}/commits/${pull.head.sha}/check-runs?per_page=50`, { headers: headers(), cache: "no-store" });
       if (runs.ok) {
@@ -75,7 +78,7 @@ export async function listConsolePulls(): Promise<ConsolePull[]> {
         if (check_runs.some((run) => run.conclusion === "failure" || run.conclusion === "timed_out" || run.conclusion === "cancelled")) stage = "failed";
         else if (check_runs.length > 0 && check_runs.every((run) => run.status === "completed")) stage = "ready";
       }
-      return { number: pull.number, title: pull.title, url: pull.html_url, createdAt: pull.created_at, stage };
+      return { number: pull.number, title: pull.title, url: pull.html_url, createdAt: pull.created_at, branch: pull.head.ref, fromConsole: pull.head.ref.startsWith("console/"), stage };
     }),
   );
 }

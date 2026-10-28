@@ -37,7 +37,7 @@ export type CatalogEntry = {
 
 import { SECTIONS, type Section } from "./sections";
 
-type Pull = { number: number; title: string; url: string; createdAt: string; stage: "checks" | "failed" | "ready" };
+type Pull = { number: number; title: string; url: string; createdAt: string; branch: string; fromConsole: boolean; stage: "checks" | "failed" | "ready" };
 type LiveState = { products: CatalogEntry[]; pulls: Pull[] };
 type Pending = { key: string; doneText: string; startedAt: number; check: (state: LiveState) => boolean; slowMinutes: number };
 type Toast = { key: string; text: string; phase: "applying" | "done" | "late" };
@@ -736,7 +736,7 @@ function DayBook({ pulls, items }: { pulls: Pull[]; items: ActivityItem[] }) {
     <>
       <h2 className="adm-h3">On its way</h2>
       {pulls.length === 0 ? (
-        <p className="adm-help">Nothing in flight. Every change has landed.</p>
+        <p className="adm-help">Nothing in flight. Every pull request into dev has landed.</p>
       ) : (
         <ul className="adm-pulls">
           {pulls.map((pull) => (
@@ -746,7 +746,7 @@ function DayBook({ pulls, items }: { pulls: Pull[]; items: ActivityItem[] }) {
                 {pull.title}
               </a>
               <span className="adm-aside">
-                {stage[pull.stage]} · {feedTime(pull.createdAt)}
+                #{pull.number} · {pull.fromConsole ? "from the console" : `by hand, ${pull.branch}`} · {stage[pull.stage]} · {feedTime(pull.createdAt)}
               </span>
             </li>
           ))}
