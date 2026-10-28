@@ -23,9 +23,12 @@ export const instant = false;
 // the sign-in page's photos (about-wall/admin-login-prompt.txt, one per scene): every photo in the manifest under
 // images/admin/back-room-*.webp, and the door shows a different one each time it's opened. Without any, a curtain.
 const photos = (Object.keys(manifest.images) as ImagePath[]).filter((key) => /^images\/admin\/back-room-.*\.webp$/.test(key)).map((key) => img(key));
+// which one tonight: the page is rendered per request (instant = false), so this is a fresh draw each visit; it lives
+// outside the component because a render itself has to stay pure
+const tonight = () => (photos.length ? photos[Math.floor(Math.random() * photos.length)] : null);
 
 export default async function AdminPage() {
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
-  if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={photos.length ? photos[Math.floor(Math.random() * photos.length)] : null} />;
+  if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={tonight()} />;
   return <Console initial={catalog as CatalogEntry[]} />;
 }
