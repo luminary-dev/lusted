@@ -336,8 +336,14 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
 
       <div className="adm-pins">
         {VIEWS.map((view, i) => (
-          <label key={view} className={`adm-pin ${previews[view] ? "has-photo" : ""}`} style={{ "--tilt": `${[-1.6, 1.1, -0.8][i]}deg` } as React.CSSProperties}>
-            <span className="adm-pin-tack" aria-hidden="true" />
+          <label
+            key={view}
+            className={`adm-pin ${i % 2 ? "tape-corners" : "tape-top"} ${previews[view] ? "has-photo" : ""}`}
+            style={{ "--tilt": `${[-1.6, 1.1, -0.8][i]}deg`, "--tape": `${[-3, 2, 4][i]}deg` } as React.CSSProperties}
+          >
+            {/* strips of paper tape, the same ones that hold the prints on the about wall */}
+            <span className="print-tape" aria-hidden="true" />
+            <span className="print-tape is-second" aria-hidden="true" />
             <span className="adm-pin-frame">
               {previews[view] ? (
                 // eslint-disable-next-line @next/next/no-img-element -- a local preview of the file just chosen
