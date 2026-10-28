@@ -496,7 +496,7 @@ select.adm-input option {
   height: auto;
 }
 
-/* ─ a wide door: the photo fills the left half, the invitation and the form sit in a box on the dark right half ─ */
+/* ─ a wide door: the photo fills the left half, the invitation and the form sit on the dark right half ─ */
 @media (min-width: 900px) and (orientation: landscape) {
   .adm-login {
     display: block;
@@ -541,12 +541,8 @@ select.adm-input option {
   }
   .adm-glass {
     z-index: 1;
-    width: min(100%, 680px);
-    padding: clamp(36px, 4vw, 56px);
-    border: 1px solid rgba(251, 241, 236, 0.14);
-    border-radius: var(--radius);
-    background: rgba(251, 241, 236, 0.035);
-    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
+    width: min(100%, 600px);
+    padding: clamp(24px, 3vh, 40px) 0;
   }
   .adm-glass .adm-login-title {
     font-size: clamp(36px, 3.2vw, 48px);
