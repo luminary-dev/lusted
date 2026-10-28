@@ -13,6 +13,7 @@ const { slug, views = {} } = payload;
 if (!SLUG.test(slug ?? "")) throw new Error("add-product: a slug is needed");
 if (!(payload.category in COLLECTIONS)) throw new Error("add-product: unknown collection");
 if (!INCOMING.test(views.front ?? "")) throw new Error("add-product: the front photo's address is needed");
+if (!INCOMING.test(views.back ?? "")) throw new Error("add-product: the back photo's address is needed");
 
 const catalog = await readJson(CATALOG);
 if (catalog.some((p) => p.slug === slug)) {
@@ -20,6 +21,7 @@ if (catalog.some((p) => p.slug === slug)) {
   process.exit(0);
 }
 
+if (payload.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) throw new Error("add-product: six best sellers already");
 const store = bucket();
 const manifest = await readJson(MANIFEST);
 for (const view of ["front", "back", "side"]) {

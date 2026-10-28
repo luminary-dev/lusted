@@ -70,6 +70,7 @@ export async function POST(request: Request) {
   if (details.length === 0) return NextResponse.json({ ok: false, error: "At least one detail" }, { status: 400 });
   if (bestSeller !== undefined && (!Number.isInteger(bestSeller) || bestSeller < 1 || bestSeller > 99)) return NextResponse.json({ ok: false, error: "Best-seller rank" }, { status: 400 });
   if (!keys.front) return NextResponse.json({ ok: false, error: "The front photo is needed" }, { status: 400 });
+  if (!keys.back) return NextResponse.json({ ok: false, error: "The back photo is needed" }, { status: 400 });
   const upload = keys.front.split("/")[1];
   for (const key of Object.values(keys)) if (key.split("/")[1] !== upload) return NextResponse.json({ ok: false, error: "The photos belong to different uploads" }, { status: 400 });
 
@@ -78,8 +79,9 @@ export async function POST(request: Request) {
 
   try {
     const catalogFile = await getFile("src/lib/catalog.json");
-    const taken = catalogFile ? (JSON.parse(catalogFile.toString("utf8")) as Array<{ slug: string }>).some((p) => p.slug === slug) : false;
-    if (taken) return NextResponse.json({ ok: false, error: `“${name}” is already in the catalogue — change the name` }, { status: 409 });
+    const catalog = catalogFile ? (JSON.parse(catalogFile.toString("utf8")) as Array<{ slug: string; bestSeller?: number }>) : [];
+    if (catalog.some((p) => p.slug === slug)) return NextResponse.json({ ok: false, error: `“${name}” is already in the catalogue — change the name` }, { status: 409 });
+    if (bestSeller !== undefined && catalog.filter((p) => p.bestSeller).length >= 6) return NextResponse.json({ ok: false, error: "Six best sellers already — clear one in the ledger first" }, { status: 409 });
     for (const [view, key] of Object.entries(keys)) {
       if (!(await store.exists(key))) return NextResponse.json({ ok: false, error: `The ${view} photo didn't finish uploading — try again` }, { status: 400 });
     }

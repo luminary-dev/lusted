@@ -1,10 +1,9 @@
 /* ───────── the back room (src/app/admin) · the door and the shared controls ─────────
-   The owner console, laid out like the back of the shop rather than a dashboard: a rail down the left (contents, the
-   doors out, the sign-out), and the room — a script title, the day's figures on one line in Fraunces, cream "sheets"
-   for the two forms (the fitting, the offers), and the ledger and the day book written straight onto the dark. The
-   sign-in is a door: the photo on one side, the sheet on the other. Colours are the site's own: wine and ink, blush,
-   paper. Everything reads from two sets of tokens — the dark room and the cream sheet — so a control looks right on
-   either.
+   The owner console, laid out like the back of the shop rather than a dashboard. Two fonts only: the brand's script
+   (Parisienne) for the title and the odd whispered word, Montserrat for everything else. Colours are the site's own:
+   wine and ink, blush, paper. Everything reads from two sets of tokens — the dark room and the cream sheet — so a
+   control looks right on either. This file: the tokens, the type, the controls, and the door (sign-in). The rooms
+   are in 18-admin-room.css.
    The console stands alone like the reveal page (13-print.css): no nav, rail, curtain intro, cursor smoke or footer
    around it, and no search or bag for the keyboard shortcuts to open over it. */
 body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-root, .cursor-trail) {
@@ -13,7 +12,7 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
 
 .adm {
   /* the room */
-  --a-bg: #180a0e;
+  --a-bg: #160a0d;
   --a-ink: #fbf1ec;
   --a-ink-2: rgba(251, 241, 236, 0.72);
   --a-muted: rgba(251, 241, 236, 0.46);
@@ -22,7 +21,7 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
   --a-blush: #e8b4aa;
   --a-rose: #d98a98;
   --a-wine: #7a1b33;
-  --a-field: transparent;
+  --a-field: rgba(251, 241, 236, 0.04);
   --a-chip: rgba(251, 241, 236, 0.05);
   --a-paper: #f8f1ec;
   --a-paper-2: #f2e6df;
@@ -33,8 +32,8 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
   min-height: 100svh;
   color: var(--a-ink);
   background:
-    radial-gradient(1200px 700px at 8% -10%, rgba(122, 27, 51, 0.55), transparent 60%),
-    radial-gradient(900px 600px at 100% 100%, rgba(232, 180, 170, 0.12), transparent 60%),
+    radial-gradient(1100px 700px at 10% -10%, rgba(122, 27, 51, 0.5), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, rgba(232, 180, 170, 0.1), transparent 60%),
     var(--a-bg);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -67,6 +66,13 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
   color: var(--a-rose);
 }
 
+.adm-script {
+  font-family: var(--parisienne);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .adm-help {
   font-size: 13px;
   line-height: 1.6;
@@ -86,9 +92,9 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
 }
 
 .adm-num {
-  font-family: var(--fraunces);
   font-style: italic;
-  font-variation-settings: "SOFT" 100, "opsz" 72;
+  font-weight: 300;
+  letter-spacing: 0.04em;
   color: var(--a-rose);
 }
 
@@ -100,26 +106,16 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
   --a-hair: var(--a-paper-hair);
   --a-hair-2: rgba(46, 20, 24, 0.34);
   --a-rose: #a04459;
+  --a-field: transparent;
   --a-chip: rgba(46, 20, 24, 0.04);
   position: relative;
   color: var(--a-ink);
   background: linear-gradient(180deg, var(--a-paper), var(--a-paper-2));
+  border-radius: var(--radius);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.5) inset,
     0 30px 60px -30px rgba(0, 0, 0, 0.7),
     0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-/* the sheet's deckled top edge — a torn strip of paper, not a card */
-.adm-sheet::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -7px;
-  height: 8px;
-  background: inherit;
-  clip-path: polygon(0 100%, 2% 20%, 5% 80%, 8% 10%, 12% 70%, 15% 25%, 19% 90%, 22% 30%, 26% 75%, 30% 15%, 33% 85%, 37% 35%, 41% 70%, 44% 10%, 48% 80%, 52% 25%, 56% 90%, 60% 30%, 63% 65%, 67% 15%, 71% 85%, 75% 40%, 78% 75%, 82% 10%, 86% 70%, 89% 30%, 93% 85%, 96% 20%, 100% 60%, 100% 100%);
 }
 
 /* ─ fields ─ */
@@ -142,7 +138,7 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
   border: 0;
   border-bottom: 1px solid var(--a-hair-2);
   border-radius: 0;
-  background: var(--a-field);
+  background: transparent;
   font: inherit;
   font-size: 14.5px;
   color: var(--a-ink);
@@ -152,6 +148,14 @@ body:has(.adm) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .drawer-
 
 .adm-input:focus {
   border-bottom-color: var(--a-rose);
+}
+
+.adm-input.is-wrong {
+  border-bottom-color: #ff9c8f;
+}
+
+.adm-wrong {
+  color: #ff9c8f;
 }
 
 .adm-input::placeholder {
@@ -195,10 +199,8 @@ select.adm-input option {
 
 .adm-num-in {
   width: 92px;
-  font-family: var(--fraunces);
-  font-variation-settings: "SOFT" 50, "opsz" 14;
   font-variant-numeric: tabular-nums;
-  font-size: 15px;
+  font-size: 14.5px;
 }
 
 .adm-rank-in {
@@ -209,11 +211,212 @@ select.adm-input option {
   margin-top: 22px;
 }
 
+/* the pill field: the door's inputs, a rounded box with the whole label inside it */
+.adm-pill {
+  display: block;
+}
+
+.adm-pill + .adm-pill {
+  margin-top: 12px;
+}
+
+.adm-pill input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 1px solid var(--a-hair-2);
+  border-radius: 14px;
+  background: var(--a-field);
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--a-ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.adm-pill input::placeholder {
+  color: var(--a-muted);
+}
+
+.adm-pill input:focus {
+  border-color: var(--a-rose);
+  box-shadow: 0 0 0 3px rgba(217, 138, 152, 0.18);
+}
+
+/* ─ the console's own dropdown (select.tsx): the field as a button, the list beneath it ─ */
+.adm-select {
+  position: relative;
+  min-width: 0;
+}
+
+.adm-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  border-bottom: 1px solid var(--a-hair-2);
+  background: transparent;
+  font: inherit;
+  font-size: 14.5px;
+  text-align: left;
+  color: var(--a-ink);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.adm-select-btn:focus-visible,
+.adm-select.is-open .adm-select-btn {
+  outline: none;
+  border-bottom-color: var(--a-rose);
+}
+
+.adm-select-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-select-chev {
+  flex: none;
+  width: 12px;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23d98a98' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform 0.25s var(--ease);
+}
+
+.adm-sheet .adm-select-chev {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a04459' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.adm-select.is-open .adm-select-chev {
+  transform: rotate(180deg);
+}
+
+.adm-select-list {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  min-width: max(100%, 180px);
+  max-height: 280px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid rgba(251, 241, 236, 0.14);
+  border-radius: var(--radius-sm);
+  background: #22090f;
+  box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.7);
+  animation: adm-drop 0.18s var(--ease);
+}
+
+.adm-select-list li {
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--a-ink-2);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.adm-select-list li.is-active {
+  background: rgba(251, 241, 236, 0.07);
+  color: var(--a-ink);
+}
+
+.adm-select-list li.is-chosen {
+  color: var(--a-blush);
+}
+
+.adm-select-list li.is-chosen::before {
+  content: "· ";
+}
+
+@keyframes adm-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* on a cream sheet the list is paper too */
+.adm-sheet .adm-select-list {
+  border-color: var(--a-paper-hair);
+  background: #fffaf7;
+  color: var(--a-paper-ink);
+  box-shadow: 0 24px 50px -20px rgba(46, 20, 24, 0.4);
+}
+
+.adm-sheet .adm-select-list li {
+  color: var(--a-paper-ink-2);
+}
+
+.adm-sheet .adm-select-list li.is-active {
+  background: rgba(46, 20, 24, 0.06);
+  color: var(--a-paper-ink);
+}
+
+.adm-sheet .adm-select-list li.is-chosen {
+  color: #a04459;
+}
+
+/* sizes: a ledger row, a dim one in a row, and the big one in the offers sentence */
+.adm-select.is-row .adm-select-btn {
+  padding: 5px 0;
+  font-size: 14px;
+  border-bottom-color: transparent;
+}
+
+.adm-select.is-row .adm-select-btn:hover {
+  border-bottom-color: var(--a-hair-2);
+}
+
+.adm-select.is-dim .adm-select-btn {
+  padding: 2px 0;
+  font-size: 12px;
+  color: var(--a-muted);
+  border-bottom-color: transparent;
+}
+
+.adm-select.is-dim .adm-select-btn:hover {
+  color: var(--a-ink-2);
+}
+
+.adm-select.is-big {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+}
+
+.adm-select.is-big .adm-select-btn {
+  gap: 0.35em;
+  padding: 0 0.1em 4px;
+  font: inherit;
+  font-size: inherit;
+  color: var(--a-rose);
+  border-bottom: 2px solid var(--a-hair-2);
+}
+
+.adm-select.is-big .adm-select-chev {
+  width: 0.5em;
+  height: 0.34em;
+}
+
+.adm-select.is-big .adm-select-list {
+  font-size: 15px;
+  font-weight: 400;
+}
+
 /* ─ buttons ─ */
 .adm-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   min-height: 46px;
   padding: 0 26px;
   border: 0;
@@ -245,6 +448,29 @@ select.adm-input option {
 
 .adm-btn-ink:hover {
   background: #1b0a0d;
+}
+
+.adm-btn-wide {
+  width: 100%;
+  min-height: 52px;
+  margin-top: 18px;
+  border-radius: 14px;
+  background: var(--a-paper);
+  color: var(--a-paper-ink);
+}
+
+.adm-btn-wide:hover {
+  background: #fff;
+}
+
+.adm-btn-arrow {
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.25s var(--ease);
+}
+
+.adm-btn-wide:hover .adm-btn-arrow {
+  transform: translateX(4px);
 }
 
 .adm-quiet {
@@ -289,15 +515,13 @@ select.adm-input option {
 }
 
 .adm-pull.is-ready .adm-dot,
-.adm-ticket.is-done .adm-dot,
-.adm-status.is-ok .adm-dot {
+.adm-ticket.is-done .adm-dot {
   background: #8fd6a3;
   animation: none;
 }
 
 .adm-pull.is-failed .adm-dot,
-.adm-ticket.is-late .adm-dot,
-.adm-status.is-failed .adm-dot {
+.adm-ticket.is-late .adm-dot {
   background: #ff9c8f;
   animation: none;
 }
@@ -308,70 +532,67 @@ select.adm-input option {
   }
 }
 
-/* ═══════════ the door (sign in) ═══════════ */
+/* ═══════════ the door (sign in) ═══════════
+   Two halves. The photo fills the left, with its two lines at the foot; the right is dark and holds only what's
+   needed to come in, centred: the wordmark, one line, two fields, the button. On phones the photo is a band on top. */
 .adm-login {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 100svh;
 }
 
-.adm-door {
-  position: relative;
+.adm-frame {
+  position: sticky; /* the photo stays put if the right side ever scrolls */
+  top: 0;
+  align-self: start;
+  height: 100svh;
+  margin: 0;
   overflow: hidden;
   background:
     repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.22) 0 18px, transparent 18px 44px, rgba(255, 255, 255, 0.03) 44px 62px),
     linear-gradient(180deg, #4a1022, #2a0a14 60%, #180a0e);
 }
 
-.adm-door-photo {
+.adm-frame-photo {
   object-fit: cover;
-  object-position: 50% 30%;
+  object-position: 50% 20%;
 }
 
-.adm-door-veil {
+.adm-frame-veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(24, 10, 14, 0.1) 40%, rgba(24, 10, 14, 0.85));
+  background: linear-gradient(180deg, rgba(22, 10, 13, 0.2), transparent 25%, transparent 55%, rgba(22, 10, 13, 0.92));
 }
 
-.adm-door-script {
+.adm-frame-caption {
   position: absolute;
-  left: clamp(28px, 5vw, 64px);
-  bottom: clamp(64px, 10vh, 120px);
-  margin: 0;
-  font-family: var(--parisienne);
-  font-size: clamp(56px, 7.5vw, 112px);
+  left: clamp(28px, 4vw, 56px);
+  right: clamp(28px, 4vw, 56px);
+  bottom: clamp(28px, 4vh, 48px);
+  display: grid;
+  gap: 10px;
+  max-width: 44ch;
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 246, 242, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.adm-frame-caption .adm-script {
+  font-size: clamp(44px, 4.5vw, 64px);
   line-height: 1;
   color: #fff6f2;
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 }
 
-.adm-door-line {
-  position: absolute;
-  left: clamp(28px, 5vw, 64px);
-  right: clamp(28px, 5vw, 64px);
-  bottom: clamp(28px, 5vh, 56px);
-  margin: 0;
-  max-width: 44ch;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  line-height: 1.6;
-  color: rgba(255, 246, 242, 0.7);
-}
-
-.adm-login-sheet {
+.adm-login-side {
   display: grid;
   place-items: center;
-  padding: clamp(32px, 6vw, 72px) clamp(24px, 5vw, 72px);
-  box-shadow: -30px 0 60px -30px rgba(0, 0, 0, 0.7);
-}
-
-.adm-login-sheet::before {
-  display: none;
+  min-width: 0;
+  padding: clamp(32px, 6vh, 72px) clamp(24px, 6vw, 96px);
 }
 
 .adm-login-card {
-  width: min(100%, 400px);
+  width: min(100%, 480px);
 }
 
 .adm-wordmark {
@@ -379,66 +600,168 @@ select.adm-input option {
   height: auto;
 }
 
-.adm-login-eyebrow {
-  margin: 14px 0 20px;
+/* the door's own mark is larger than the rooms' */
+.adm-login-card .adm-wordmark {
+  width: 220px;
+}
+
+.adm-login-card .adm-eyebrow {
+  margin: 30px 0 0;
 }
 
 .adm-login-title {
-  margin: 0 0 32px;
-  font-family: var(--fraunces);
+  margin: 14px 0 22px;
+  font-size: clamp(30px, 2.6vw, 38px);
   font-weight: 300;
-  font-variation-settings: "SOFT" 100, "opsz" 72;
-  font-size: clamp(30px, 3.2vw, 40px);
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--a-ink);
 }
 
-.adm-login-title em {
-  font-style: italic;
+.adm-login-title .adm-script {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.5em;
+  line-height: 1;
   color: var(--a-rose);
 }
 
-.adm-login-btn {
-  width: 100%;
-  margin-top: 30px;
+.adm-login-lede {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--a-ink-2);
+}
+
+.adm-rules {
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.adm-rules li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--a-ink-2);
+}
+
+.adm-rules li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 10px;
+  height: 1px;
+  background: var(--a-rose);
 }
 
 .adm-login-foot {
-  margin-top: 22px;
+  display: grid;
+  gap: 14px;
+  margin: 24px 0 0;
 }
 
-/* ─ a narrow door ─ */
+.adm-login-foot .adm-quiet {
+  justify-self: start;
+}
+
+/* ─ one wide photo across the whole door (door-wide-<scene>.webp): the portrait frame steps aside, her side of the
+   room is the left, and the form sits on the dark right side of the same picture ─ */
+.adm-wide,
+.adm-wide-mark {
+  display: none;
+}
+
+@media (min-width: 861px) {
+  .adm-login.has-wide {
+    position: relative;
+    isolation: isolate;
+  }
+  .adm-login.has-wide .adm-wide {
+    display: block;
+    object-fit: cover;
+    object-position: 0% 50%;
+    z-index: -1;
+  }
+  .adm-login.has-wide::before {
+    /* the right side darkens so the words read, the left is left alone */
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(90deg, transparent 34%, rgba(22, 10, 13, 0.74) 52%, rgba(22, 10, 13, 0.94) 64%);
+    pointer-events: none;
+  }
+  .adm-login.has-wide .adm-wide-mark {
+    /* the photo itself is unmarked (a baked-in mark would be cut by the crop); the page signs it here instead */
+    display: block;
+    position: absolute;
+    right: clamp(24px, 3vw, 48px);
+    bottom: clamp(20px, 3vh, 36px);
+    z-index: 1;
+    width: 150px;
+    height: auto;
+    opacity: 0.6;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+  }
+  .adm-login.has-wide .adm-frame {
+    background: none; /* the caption stays, over the photo's left foot */
+  }
+  .adm-login.has-wide .adm-frame-veil {
+    background: linear-gradient(180deg, transparent 60%, rgba(22, 10, 13, 0.85));
+  }
+  .adm-login.has-wide .adm-frame-photo {
+    display: none;
+  }
+  .adm-login.has-wide .adm-login-side {
+    position: relative;
+    z-index: 1;
+  }
+  .adm-login.has-wide .adm-pill input {
+    background: rgba(22, 10, 13, 0.45);
+  }
+}
+
+/* ─ a narrow door: the photo on top, the form below ─ */
 @media (max-width: 860px) {
   .adm-login {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(260px, 38vh) auto;
+    grid-template-rows: auto 1fr;
   }
-  .adm-door-photo {
-    object-position: 50% 12%; /* the band shows the top of the photo: keep her face in it */
+  .adm-frame {
+    position: relative;
+    height: min(78vw, 52svh);
+    min-height: 320px;
   }
-  .adm-door-script {
-    bottom: 54px;
-    font-size: clamp(48px, 14vw, 72px);
+  .adm-frame-photo {
+    object-position: 50% 15%;
   }
-  .adm-door-line {
-    bottom: 20px;
-    font-size: 12px;
+  .adm-frame-caption {
+    left: 20px;
+    right: 20px;
+    bottom: 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    gap: 6px;
   }
-  .adm-login-sheet {
-    box-shadow: 0 -30px 60px -30px rgba(0, 0, 0, 0.7);
+  .adm-frame-caption .adm-script {
+    font-size: 36px;
+  }
+  .adm-login-side {
+    place-items: start center;
+    padding: 36px 20px 56px;
+  }
+  .adm-login-title {
+    margin: 28px 0 28px;
   }
 }
 
-
 @media (prefers-reduced-motion: reduce) {
-  .adm-dot,
-  .adm-pin,
-  .adm-thumb {
+  .adm-dot {
     animation: none;
-    transition: none;
-  }
-  .adm-ledger tr:hover .adm-thumb {
-    transform: none;
   }
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin/guard";
-import { dispatch } from "@/lib/admin/github";
+import { dispatch, getFile } from "@/lib/admin/github";
 import { categories } from "@/lib/products";
 
 // Small catalogue changes from the console: a piece's name, collection, price, offer price or best-seller rank, a
@@ -38,6 +38,13 @@ export async function POST(request: Request) {
       if (typeof body.slug !== "string" || !SLUG.test(body.slug) || !body.data) return NextResponse.json({ ok: false }, { status: 400 });
       const data = sanitizeUpdate(body.data);
       if (Object.keys(data).length === 0) return NextResponse.json({ ok: false }, { status: 400 });
+      if (typeof data.bestSeller === "number") {
+        // six best sellers at most: a piece that isn't one yet can't become the seventh
+        const file = await getFile("src/lib/catalog.json");
+        const catalog = file ? (JSON.parse(file.toString("utf8")) as Array<{ slug: string; bestSeller?: number }>) : [];
+        const me = catalog.find((p) => p.slug === body.slug);
+        if (me && !me.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) return NextResponse.json({ ok: false, error: "Six best sellers already — clear one first" }, { status: 409 });
+      }
       await dispatch("update-product", { slug: body.slug, data });
     } else if (body.action === "remove-product") {
       if (typeof body.slug !== "string" || !SLUG.test(body.slug)) return NextResponse.json({ ok: false }, { status: 400 });

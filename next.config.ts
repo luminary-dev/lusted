@@ -9,9 +9,11 @@ const imageCdn = process.env.NEXT_PUBLIC_IMAGE_CDN ? new URL(process.env.NEXT_PU
 // inline because Next's hydration scripts, the theme/intro scripts in layout.tsx and the component styles are inline —
 // a per-request nonce would make every page dynamic. frame-ancestors 'none' stops the site being framed; form-action
 // keeps forms on the site. HSTS is set by Vercel.
+// 'unsafe-eval' only while developing: React's dev tooling (stack reconstruction) wants eval, production never does
+const dev = process.env.NODE_ENV === "development";
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
