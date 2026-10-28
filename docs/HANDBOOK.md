@@ -129,7 +129,9 @@ name directly, so it shouldn't be removed from the console.
 
 The sign-in page shows one of the photos under `assets/images/admin/back-room-*.webp`, a different one each time the
 door is opened (the prompts are in `about-wall/admin-login-prompt.txt`, outside the repo; drop a new one in, watermark
-it, then `images.mjs manifest` and `upload`); with none it draws a curtain. The console needs, on Vercel (Production and Preview): `ADMIN_EMAIL`; `ADMIN_PASSWORD_HASH` — `<salt-hex>:<scrypt-hex>`,
+it, then `images.mjs manifest` and `upload`); with none it draws a curtain. The console needs, on Vercel (Production and Preview): `ADMIN_EMAIL`; `ADMIN_PASSWORD_HASH` — `<N>:<r>:<p>:<salt-hex>:<scrypt-hex>`, the scrypt cost and the hash (the older
+`<salt-hex>:<scrypt-hex>` still works and means N=16384; re-running the one-liner below is all it takes to move
+to OWASP's N=131072 — set the variable, no deploy),
 made with the one-liner below; `ADMIN_SESSION_SECRET` — any long random string; `GITHUB_ADMIN_TOKEN` — a fine-grained
 token for this repository with Contents read/write and Pull requests read (it fires the dispatches and reads `dev`);
 `ANTHROPIC_API_KEY` — for the copy; and the four `R2_*` keys it already has. The repository needs one more Actions
@@ -142,7 +144,7 @@ prints the rules to paste into the dashboard. Sessions are a signed cookie for s
 minutes lock an address out for ten.
 
 ```bash
-node -e "const c=require('crypto');const s=c.randomBytes(16);const p=process.argv[1];console.log(s.toString('hex')+':'+c.scryptSync(p.normalize('NFKC'),s,32).toString('hex'))" 'the-password'
+node -e "const c=require('crypto');const s=c.randomBytes(16);const o={N:131072,r:8,p:1,maxmem:268435456};console.log('131072:8:1:'+s.toString('hex')+':'+c.scryptSync(process.argv[1].normalize('NFKC'),s,32,o).toString('hex'))" 'the-password'
 ```
 
 ## Errors and missing pages
