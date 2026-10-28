@@ -4,6 +4,71 @@
    pinned up and tag chips), the offers (a sentence to fill in, then what's on offer), the ledger (the catalogue,
    written straight on the dark) and the day book. Ticket stubs in the corner follow each change. The tokens and the
    shared controls are in 17-admin.css. */
+/* ─ the lights on: the room on paper, in ink; the door stays dark whatever the setting ─ */
+:root[data-theme="light"] .adm-room {
+  --a-bg: #f8f1ec;
+  --a-ink: #2e1418;
+  --a-ink-2: #5e4246;
+  --a-muted: #8a6a70;
+  --a-hair: rgba(46, 20, 24, 0.12);
+  --a-hair-2: rgba(46, 20, 24, 0.3);
+  --a-blush: #b3546a;
+  --a-rose: #a04459;
+  --a-field: rgba(46, 20, 24, 0.04);
+  --a-chip: rgba(46, 20, 24, 0.04);
+  background:
+    radial-gradient(1100px 700px at 10% -10%, rgba(232, 180, 170, 0.35), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, rgba(122, 27, 51, 0.08), transparent 60%),
+    var(--a-bg);
+}
+
+:root[data-theme="light"] .adm-room::before {
+  opacity: 0.18;
+}
+
+:root[data-theme="light"] .adm-room .adm-sheet {
+  background: linear-gradient(180deg, #fffaf7, #fbf4ef);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 24px 48px -28px rgba(46, 20, 24, 0.35),
+    0 1px 3px rgba(46, 20, 24, 0.12);
+}
+
+:root[data-theme="light"] .adm-room .adm-ledger tbody tr:hover {
+  background: rgba(46, 20, 24, 0.03);
+}
+
+:root[data-theme="light"] .adm-room .adm-ledger tr.is-dirty td {
+  background: rgba(179, 84, 106, 0.07);
+}
+
+:root[data-theme="light"] .adm-room .adm-thumb {
+  background: #e8dcd4;
+}
+
+:root[data-theme="light"] .adm-room .adm-ticket {
+  background: #2e1418;
+  color: #fbf1ec;
+  border-left-color: rgba(251, 241, 236, 0.4);
+}
+
+:root[data-theme="light"] .adm-room .adm-room-link.is-here .adm-room-name {
+  color: var(--a-wine);
+}
+
+/* the wordmark for each setting */
+.adm-mark-light {
+  display: none;
+}
+
+:root[data-theme="light"] .adm-room .adm-mark-dark {
+  display: none;
+}
+
+:root[data-theme="light"] .adm-room .adm-mark-light {
+  display: block;
+}
+
 .adm-page {
   /* the room uses the screen: a gutter that grows with the width, and only a very wide screen is held back */
   width: min(100%, 1720px);
@@ -545,6 +610,29 @@ select.adm-input-big {
 .adm-input-search {
   flex: 1 1 220px;
   max-width: 320px;
+}
+
+.adm-sort {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.adm-sort .adm-label {
+  display: inline;
+}
+
+.adm-sort .adm-input {
+  width: auto;
+}
+
+.adm-ledger-tools .adm-aside {
+  margin-left: auto;
+}
+
+.adm-help strong {
+  font-weight: 500;
+  color: var(--a-ink-2);
 }
 
 .adm-ledger-wrap {

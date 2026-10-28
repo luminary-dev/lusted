@@ -70,6 +70,7 @@ export async function POST(request: Request) {
   if (details.length === 0) return NextResponse.json({ ok: false, error: "At least one detail" }, { status: 400 });
   if (bestSeller !== undefined && (!Number.isInteger(bestSeller) || bestSeller < 1 || bestSeller > 99)) return NextResponse.json({ ok: false, error: "Best-seller rank" }, { status: 400 });
   if (!keys.front) return NextResponse.json({ ok: false, error: "The front photo is needed" }, { status: 400 });
+  if (!keys.back) return NextResponse.json({ ok: false, error: "The back photo is needed" }, { status: 400 });
   const upload = keys.front.split("/")[1];
   for (const key of Object.values(keys)) if (key.split("/")[1] !== upload) return NextResponse.json({ ok: false, error: "The photos belong to different uploads" }, { status: 400 });
 

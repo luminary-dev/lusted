@@ -13,6 +13,7 @@ const { slug, views = {} } = payload;
 if (!SLUG.test(slug ?? "")) throw new Error("add-product: a slug is needed");
 if (!(payload.category in COLLECTIONS)) throw new Error("add-product: unknown collection");
 if (!INCOMING.test(views.front ?? "")) throw new Error("add-product: the front photo's address is needed");
+if (!INCOMING.test(views.back ?? "")) throw new Error("add-product: the back photo's address is needed");
 
 const catalog = await readJson(CATALOG);
 if (catalog.some((p) => p.slug === slug)) {

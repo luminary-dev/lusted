@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import wordmark from "@/assets/brand/wordmark-dark.png";
+import wordmarkDark from "@/assets/brand/wordmark-dark.png";
+import wordmarkLight from "@/assets/brand/wordmark-light.png";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
 // The back room — the owner console, four rooms on four pages: the fitting (add a piece), the offers, the ledger
@@ -229,11 +230,11 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
     });
   };
   const toggle = <T,>(list: T[], item: T) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item]);
-  const briefReady = !!files.front && Number(price) > 0 && picked.length > 0;
+  const briefReady = !!files.front && !!files.back && Number(price) > 0 && picked.length > 0;
   const slug = slugify(name);
   const taken = !!slug && existing.some((p) => p.slug === slug);
   const canAdd = briefReady && name.trim() && description.trim() && moments.split("\n").filter(Boolean).length === 3 && details.split("\n").filter(Boolean).length > 0 && sizes.length > 0 && !taken;
-  const step = !files.front ? 1 : !written ? 2 : 3;
+  const step = !files.front || !files.back ? 1 : !written ? 2 : 3;
 
   async function write() {
     if (!briefReady || writing) return;
@@ -353,7 +354,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
                   <span className="adm-pin-plus" aria-hidden="true">
                     +
                   </span>
-                  <span>{view === "front" ? "needed" : "optional"}</span>
+                  <span>{view === "side" ? "optional" : "needed"}</span>
                 </span>
               )}
             </span>
@@ -362,8 +363,9 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
           </label>
         ))}
         <p className="adm-help adm-pins-note">
-          Front is the photo on the cards; back and side are the extra views on the piece’s page. Any size, portrait is best: each is cropped to
-          the catalogue’s 9:16 frame and signed with the wordmark. Nothing else is done to them.
+          Front is the photo on the cards and back is the one that shows on hover; both are needed. Side is an extra view on the piece’s page, if
+          you have one. Any size, portrait is best: each is cropped to the catalogue’s 9:16 frame and signed with the wordmark. Nothing else is
+          done to them.
         </p>
       </div>
 
@@ -657,7 +659,7 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
         </span>
       </td>
       <td className="adm-td-num">
-        <input className="adm-input adm-input-row adm-num-in adm-rank-in" type="number" min={1} max={99} placeholder="—" value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
+        <input className="adm-input adm-input-row adm-num-in adm-rank-in" type="number" min={1} max={99} placeholder="—" title="A number makes it a best seller: 1 shows first. Clear it to take it out." value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
       </td>
       <td className="adm-td-actions">
         {waiting ? (
@@ -679,13 +681,39 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
   );
 }
 
+type Flag = "offer" | "best" | "new" | "full";
+const FLAGS: Array<{ key: Flag; label: string }> = [
+  { key: "offer", label: "On offer" },
+  { key: "best", label: "Best sellers" },
+  { key: "new", label: "New in" },
+  { key: "full", label: "Full price" },
+];
+
 function Ledger({ products, track }: { products: CatalogEntry[]; track: Track }) {
   const [query, setQuery] = useState("");
   const [collection, setCollection] = useState("*");
+  const [flags, setFlags] = useState<Flag[]>([]);
+  const [sort, setSort] = useState<"new" | "name" | "price-asc" | "price-desc" | "best">("new");
   const q = query.trim().toLowerCase();
+  const onOffer = (p: CatalogEntry) => typeof p.salePrice === "number" && p.salePrice < p.price;
+  // "new in" is what the shop calls new: the six most recently added
+  const newest = new Set([...products].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug));
+  const passes = (p: CatalogEntry) =>
+    flags.every((f) => (f === "offer" ? onOffer(p) : f === "best" ? !!p.bestSeller : f === "new" ? newest.has(p.slug) : !onOffer(p)));
   const rows = [...products]
-    .filter((p) => (collection === "*" || p.category === collection) && (!q || p.name.toLowerCase().includes(q) || p.slug.includes(q)))
-    .sort((a, b) => b.added.localeCompare(a.added));
+    .filter((p) => (collection === "*" || p.category === collection) && passes(p) && (!q || p.name.toLowerCase().includes(q) || p.slug.includes(q)))
+    .sort((a, b) =>
+      sort === "name"
+        ? a.name.localeCompare(b.name)
+        : sort === "price-asc"
+          ? (a.salePrice ?? a.price) - (b.salePrice ?? b.price)
+          : sort === "price-desc"
+            ? (b.salePrice ?? b.price) - (a.salePrice ?? a.price)
+            : sort === "best"
+              ? (a.bestSeller ?? 999) - (b.bestSeller ?? 999)
+              : b.added.localeCompare(a.added),
+    );
+  const toggleFlag = (f: Flag) => setFlags((all) => (all.includes(f) ? all.filter((x) => x !== f) : [...all.filter((x) => !(f === "offer" && x === "full") && !(f === "full" && x === "offer")), f]));
   return (
     <>
       <div className="adm-ledger-tools">
@@ -700,6 +728,26 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
             </button>
           ))}
         </div>
+        <div className="adm-chips" role="group" aria-label="Only">
+          {FLAGS.map((f) => (
+            <button key={f.key} type="button" className={`adm-chip adm-chip-tag ${flags.includes(f.key) ? "is-on" : ""}`} aria-pressed={flags.includes(f.key)} onClick={() => toggleFlag(f.key)}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <label className="adm-sort">
+          <span className="adm-label">Sort</span>
+          <select className="adm-input adm-input-row" value={sort} onChange={(e) => setSort(e.currentTarget.value as typeof sort)}>
+            <option value="new">Newest first</option>
+            <option value="best">Best sellers first</option>
+            <option value="name">By name</option>
+            <option value="price-asc">Price, low to high</option>
+            <option value="price-desc">Price, high to low</option>
+          </select>
+        </label>
+        <span className="adm-aside">
+          {rows.length} of {products.length}
+        </span>
       </div>
       <div className="adm-ledger-wrap">
         <table className="adm-ledger">
@@ -713,7 +761,7 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
                 Offer
               </th>
               <th scope="col" className="adm-th-num">
-                Rank
+                Best seller
               </th>
               <th scope="col">
                 <span className="sr-only">Actions</span>
@@ -729,7 +777,11 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
         </table>
         {rows.length === 0 && <p className="adm-help">No piece answers to that.</p>}
       </div>
-      <p className="adm-help">Newest first. Clear the offer price to end an offer. Descriptions and photos change in the repo, or take the piece off and add it again.</p>
+      <p className="adm-help">
+        <strong>Best sellers:</strong> give a piece a number in the Best seller column — 1 shows first, the home page and the search show the first six —
+        and Save. Clear the number to take it out. <strong>Offers:</strong> clear the offer price to end one. Descriptions and photos change in the
+        repo, or take the piece off and add it again.
+      </p>
     </>
   );
 }
@@ -775,11 +827,31 @@ function DayBook({ pulls, items }: { pulls: Pull[]; items: ActivityItem[] }) {
   );
 }
 
+/* ───────── the lights: the site's own theme (data-theme on <html>, remembered as lusted-theme) ───────── */
+
+function useLights() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading what the theme script set before paint
+    setTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
+  }, []);
+  const flip = () => {
+    const next = theme === "light" ? "dark" : "light";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("lusted-theme", next);
+    } catch {}
+    setTheme(next);
+  };
+  return { theme, flip };
+}
+
 /* ───────── the room ───────── */
 
 export function Console({ section, initial }: { section: Section; initial: CatalogEntry[] }) {
   const router = useRouter();
   const { live, failed, track, toasts } = useLiveState(initial);
+  const lights = useLights();
   const activity = useActivity(section === "daybook", `${live.products.length}|${live.pulls.map((p) => `${p.number}${p.stage}`).join(",")}`);
 
   const onOffer = live.products.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
@@ -803,7 +875,8 @@ export function Console({ section, initial }: { section: Section; initial: Catal
       <div className="adm-page">
         <header className="adm-top">
           <Link href="/admin/ledger" className="adm-top-mark">
-            <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="140px" />
+            <Image src={wordmarkDark} alt="Lusted" className="adm-wordmark adm-mark-dark" priority sizes="140px" />
+            <Image src={wordmarkLight} alt="" className="adm-wordmark adm-mark-light" priority sizes="140px" aria-hidden="true" />
           </Link>
           <nav className="adm-doors" aria-label="Elsewhere">
             {doors.map((d) => (
@@ -811,6 +884,9 @@ export function Console({ section, initial }: { section: Section; initial: Catal
                 {d.label}
               </a>
             ))}
+            <button type="button" className="adm-quiet" onClick={lights.flip} aria-pressed={lights.theme === "light"}>
+              {lights.theme === "light" ? "Lights off" : "Lights on"}
+            </button>
             <button
               type="button"
               className="adm-quiet"
