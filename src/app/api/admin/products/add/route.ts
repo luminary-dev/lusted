@@ -79,8 +79,9 @@ export async function POST(request: Request) {
 
   try {
     const catalogFile = await getFile("src/lib/catalog.json");
-    const taken = catalogFile ? (JSON.parse(catalogFile.toString("utf8")) as Array<{ slug: string }>).some((p) => p.slug === slug) : false;
-    if (taken) return NextResponse.json({ ok: false, error: `“${name}” is already in the catalogue — change the name` }, { status: 409 });
+    const catalog = catalogFile ? (JSON.parse(catalogFile.toString("utf8")) as Array<{ slug: string; bestSeller?: number }>) : [];
+    if (catalog.some((p) => p.slug === slug)) return NextResponse.json({ ok: false, error: `“${name}” is already in the catalogue — change the name` }, { status: 409 });
+    if (bestSeller !== undefined && catalog.filter((p) => p.bestSeller).length >= 6) return NextResponse.json({ ok: false, error: "Six best sellers already — clear one in the ledger first" }, { status: 409 });
     for (const [view, key] of Object.entries(keys)) {
       if (!(await store.exists(key))) return NextResponse.json({ ok: false, error: `The ${view} photo didn't finish uploading — try again` }, { status: 400 });
     }

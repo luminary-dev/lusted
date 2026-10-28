@@ -37,6 +37,7 @@ export type CatalogEntry = {
 };
 
 import { SECTIONS, type Section } from "./sections";
+import { Select } from "./select";
 
 type Pull = { number: number; title: string; url: string; createdAt: string; branch: string; fromConsole: boolean; stage: "checks" | "failed" | "ready" };
 type LiveState = { products: CatalogEntry[]; pulls: Pull[] };
@@ -51,6 +52,10 @@ const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
 const COLOR_KEYS = Object.keys(colors) as ColorKey[];
 const IMG = (slug: string) => `/img/v2/products/${slug}.webp`;
+const COLLECTION_OPTIONS = COLLECTIONS.map((c) => ({ value: c.key, label: c.name }));
+// the home page and the search show six best sellers, so six is the limit
+const BEST_LIMIT = 6;
+const bestCount = (products: CatalogEntry[]) => products.filter((p) => p.bestSeller).length;
 
 /* ───────── live state, pending changes, tickets ───────── */
 
@@ -201,6 +206,7 @@ type View = "front" | "back" | "side";
 const VIEWS: View[] = ["front", "back", "side"];
 
 function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }) {
+  const bestFull = bestCount(existing) >= BEST_LIMIT;
   const [files, setFiles] = useState<Partial<Record<View, File>>>({});
   const [previews, setPreviews] = useState<Partial<Record<View, string>>>({});
   const [category, setCategory] = useState<Category>("lingerie");
@@ -372,13 +378,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
       <div className="adm-grid-2">
         <label className="adm-field">
           <span className="adm-label">Collection</span>
-          <select className="adm-input" value={category} onChange={(e) => setCategory(e.currentTarget.value as Category)}>
-            {COLLECTIONS.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Select label="Collection" value={category} options={COLLECTION_OPTIONS} onChange={(v) => setCategory(v as Category)} />
         </label>
         <label className="adm-field">
           <span className="adm-label">Price (LKR)</span>
@@ -407,17 +407,12 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
         </div>
         <label className="adm-field">
           <span className="adm-label">Fit</span>
-          <select className="adm-input" value={fit} onChange={(e) => setFit(Number(e.currentTarget.value) as -1 | 0 | 1)}>
-            {([-1, 0, 1] as const).map((f) => (
-              <option key={f} value={f}>
-                {fitLabels[f]}
-              </option>
-            ))}
-          </select>
+          <Select label="Fit" value={String(fit)} options={([-1, 0, 1] as const).map((f) => ({ value: String(f), label: fitLabels[f] }))} onChange={(v) => setFit(Number(v) as -1 | 0 | 1)} />
         </label>
         <label className="adm-field">
           <span className="adm-label">Best-seller rank (optional)</span>
-          <input className="adm-input" type="number" min={1} max={99} placeholder="1 shows first" value={bestSeller} onChange={(e) => setBestSeller(e.currentTarget.value)} />
+          <input className="adm-input" type="number" min={1} max={BEST_LIMIT} placeholder={bestFull ? "the six are taken" : "1 shows first"} disabled={bestFull} value={bestSeller} onChange={(e) => setBestSeller(e.currentTarget.value)} />
+          {bestFull && <span className="adm-help">Six best sellers already. Clear one in the ledger to make room.</span>}
         </label>
         <label className="adm-field adm-span">
           <span className="adm-label">A word for the writer (optional)</span>
@@ -514,22 +509,15 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
   return (
     <>
       <div className="adm-sheet adm-offers">
-        <p className="adm-offer-line">
+        <div className="adm-offer-line">
           <span className="adm-offer-word">Take</span>
           <span className="adm-offer-pct">
             <input className="adm-input adm-input-big" type="number" min={1} max={90} value={percent} aria-label="Percent off" onChange={(e) => setPercent(e.currentTarget.value)} />
             <span aria-hidden="true">%</span>
           </span>
           <span className="adm-offer-word">off</span>
-          <select className="adm-input adm-input-big" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
-            {COLLECTIONS.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.name}
-              </option>
-            ))}
-            <option value="*">everything</option>
-          </select>
-        </p>
+          <Select label="Collection" size="big" value={category} options={[...COLLECTION_OPTIONS, { value: "*", label: "everything" }]} onChange={setCategory} />
+        </div>
         <div className="adm-row adm-row-tight">
           <button type="button" className="adm-btn" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
             Put it on {matching.length} pieces
@@ -570,7 +558,7 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
 
 /* ───────── iii · the ledger ───────── */
 
-function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) {
+function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track: Track; bestTaken: number }) {
   const [name, setName] = useState(product.name);
   const [category, setCategory] = useState<string>(product.category);
   const [price, setPrice] = useState(String(product.price));
@@ -585,8 +573,11 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
     (sale === "" ? null : Number(sale)) !== (product.salePrice ?? null) ||
     (rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null);
   const pct = sale && Number(sale) < Number(price) ? Math.round((1 - Number(sale) / Number(price)) * 100) : 0;
+  // a seventh best seller: the six are already taken by other pieces
+  const seventh = rank !== "" && !product.bestSeller && bestTaken >= BEST_LIMIT;
 
   async function save() {
+    if (seventh) return;
     setWaiting(true);
     const data = { name: name.trim(), category, price: Number(price), salePrice: sale === "" ? null : Number(sale), bestSeller: rank === "" ? null : Number(rank) };
     const result = await post("/api/admin/dispatch", { action: "update-product", slug: product.slug, data });
@@ -622,13 +613,7 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
         </span>
         <span className="adm-piece">
           <input className="adm-input adm-input-row adm-input-name" type="text" maxLength={60} value={name} aria-label="Name" onChange={(e) => setName(e.currentTarget.value)} />
-          <select className="adm-input adm-input-row adm-input-dim" value={category} aria-label="Collection" onChange={(e) => setCategory(e.currentTarget.value)}>
-            {COLLECTIONS.map((c) => (
-              <option key={c.key} value={c.key}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <Select label="Collection" size="dim" value={category} options={COLLECTION_OPTIONS} onChange={setCategory} />
         </span>
       </td>
       <td className="adm-td-num">
@@ -638,28 +623,24 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
         <span className="adm-offer-cell">
           <input className="adm-input adm-input-row adm-num-in" type="number" min={1} placeholder="—" value={sale} aria-label="Offer price" onChange={(e) => setSale(e.currentTarget.value)} />
           {pct > 0 && <span className="adm-off">−{pct}%</span>}
-          <select
-            className="adm-input adm-input-row adm-input-dim adm-pct-pick"
+          <Select
+            label="Set the offer by percent"
+            size="dim"
+            className="adm-pct-pick"
             value=""
-            aria-label="Set the offer by percent"
-            onChange={(e) => {
-              const p = Number(e.currentTarget.value);
+            options={[{ value: "", label: "% off…" }, ...[10, 15, 20, 25, 30, 40, 50].map((p) => ({ value: String(p), label: `${p}% off` }))]}
+            onChange={(v) => {
+              const p = Number(v);
               if (!p) return;
               const full = Number(price) || product.price;
               setSale(String(Math.min(Math.max(10, Math.round((full * (1 - p / 100)) / 10) * 10), full - 10)));
             }}
-          >
-            <option value="">% off…</option>
-            {[10, 15, 20, 25, 30, 40, 50].map((p) => (
-              <option key={p} value={p}>
-                {p}% off
-              </option>
-            ))}
-          </select>
+          />
         </span>
       </td>
       <td className="adm-td-num">
-        <input className="adm-input adm-input-row adm-num-in adm-rank-in" type="number" min={1} max={99} placeholder="—" title="A number makes it a best seller: 1 shows first. Clear it to take it out." value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
+        <input className={`adm-input adm-input-row adm-num-in adm-rank-in ${seventh ? "is-wrong" : ""}`} type="number" min={1} max={BEST_LIMIT} placeholder="—" title={seventh ? "Six best sellers already — clear one first." : "A number makes it a best seller: 1 shows first, six at most. Clear it to take it out."} value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
+        {seventh && <span className="adm-off adm-wrong">six already</span>}
       </td>
       <td className="adm-td-actions">
         {waiting ? (
@@ -668,7 +649,7 @@ function LedgerRow({ product, track }: { product: CatalogEntry; track: Track }) 
           </span>
         ) : (
           <>
-            <button type="button" className="adm-quiet adm-save" disabled={!dirty} onClick={save}>
+            <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh} onClick={save}>
               Save
             </button>
             <button type="button" className="adm-quiet is-danger" onClick={remove}>
@@ -738,13 +719,19 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
         <div className="adm-ledger-right">
           <label className="adm-sort">
             <span className="adm-label">Sort</span>
-            <select className="adm-input adm-input-row" value={sort} onChange={(e) => setSort(e.currentTarget.value as typeof sort)}>
-              <option value="new">Newest first</option>
-              <option value="best">Best sellers first</option>
-              <option value="name">By name</option>
-              <option value="price-asc">Price, low to high</option>
-              <option value="price-desc">Price, high to low</option>
-            </select>
+            <Select
+              label="Sort"
+              size="row"
+              value={sort}
+              options={[
+                { value: "new", label: "Newest first" },
+                { value: "best", label: "Best sellers first" },
+                { value: "name", label: "By name" },
+                { value: "price-asc", label: "Price, low to high" },
+                { value: "price-desc", label: "Price, high to low" },
+              ]}
+              onChange={(v) => setSort(v as typeof sort)}
+            />
           </label>
           <span className="adm-aside">
             {rows.length} of {products.length}
@@ -773,15 +760,15 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
           <tbody>
             {rows.map((p) => (
               // content-keyed: when the live state confirms a change the row remounts with the fresh values
-              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} />
+              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} bestTaken={bestCount(products)} />
             ))}
           </tbody>
         </table>
         {rows.length === 0 && <p className="adm-help">No piece answers to that.</p>}
       </div>
       <p className="adm-help">
-        <strong>Best sellers:</strong> give a piece a number in the Best seller column — 1 shows first, the home page and the search show the first six —
-        and Save. Clear the number to take it out. <strong>Offers:</strong> clear the offer price to end one. Descriptions and photos change in the
+        <strong>Best sellers:</strong> give a piece a number in the Best seller column — 1 shows first — and Save. Six at most, the six the home page
+        and the search show; to make room, clear another piece’s number. <strong>Offers:</strong> clear the offer price to end one. Descriptions and photos change in the
         repo, or take the piece off and add it again.
       </p>
     </>

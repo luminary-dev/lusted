@@ -49,6 +49,7 @@ if (action === "update-product") {
     parts.push("no longer a best seller");
     delete product.bestSeller;
   } else if (Number.isInteger(data.bestSeller) && data.bestSeller >= 1 && data.bestSeller !== product.bestSeller) {
+    if (!product.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) throw new Error("update-product: six best sellers already");
     parts.push(`best seller #${data.bestSeller}`);
     product.bestSeller = data.bestSeller;
   }

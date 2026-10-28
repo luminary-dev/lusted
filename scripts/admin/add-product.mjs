@@ -21,6 +21,7 @@ if (catalog.some((p) => p.slug === slug)) {
   process.exit(0);
 }
 
+if (payload.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) throw new Error("add-product: six best sellers already");
 const store = bucket();
 const manifest = await readJson(MANIFEST);
 for (const view of ["front", "back", "side"]) {
