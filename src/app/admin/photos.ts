@@ -12,7 +12,7 @@ const CAPTIONS: Record<string, [script: string, line: string]> = {
   slip: ["dropped", "The slip is on the floor and she isn’t picking it up. The next one is yours to choose."],
   corner: ["one lamp", "The last stocking comes off slowly when someone is watching. Someone is."],
   doorway: ["staying?", "One foot in the corridor, one on the frame. She hasn’t decided. Neither have you."],
-  chaise: ["the fitting", "Measured twice tonight. The tape says one thing, the way she’s lying says another."],
+  trunk: ["the trunk", "An old trunk of pieces nobody has seen. She’s trying them against herself, one by one."],
   boxes: ["new in", "Nothing in these boxes has been worn yet. She is deciding which goes first."],
   window: ["rain", "The shop is shut and it’s raining. She has nowhere to be but here, and nothing to put on."],
   pins: ["pinned", "The dress form wears what she won’t. Every pin is where her hand was a moment ago."],
