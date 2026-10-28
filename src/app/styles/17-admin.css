@@ -415,7 +415,7 @@ select.adm-input option {
 }
 
 .adm-login-card {
-  width: min(100%, 440px);
+  width: min(100%, 480px);
 }
 
 .adm-wordmark {
@@ -423,8 +423,17 @@ select.adm-input option {
   height: auto;
 }
 
+/* the door's own mark is larger than the rooms' */
+.adm-login-card .adm-wordmark {
+  width: 220px;
+}
+
+.adm-login-card .adm-eyebrow {
+  margin: 30px 0 0;
+}
+
 .adm-login-title {
-  margin: 36px 0 36px;
+  margin: 14px 0 22px;
   font-size: clamp(30px, 2.6vw, 38px);
   font-weight: 300;
   line-height: 1.15;
@@ -440,13 +449,47 @@ select.adm-input option {
   color: var(--a-rose);
 }
 
+.adm-login-lede {
+  margin: 0 0 22px;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--a-ink-2);
+}
+
+.adm-rules {
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.adm-rules li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--a-ink-2);
+}
+
+.adm-rules li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 10px;
+  height: 1px;
+  background: var(--a-rose);
+}
+
 .adm-login-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px 24px;
+  display: grid;
+  gap: 14px;
   margin: 24px 0 0;
+}
+
+.adm-login-foot .adm-quiet {
+  justify-self: start;
 }
 
 /* ─ one wide photo across the whole door (door-wide-<scene>.webp): the portrait frame steps aside, her side of the
@@ -473,7 +516,7 @@ select.adm-input option {
     position: absolute;
     inset: 0;
     z-index: 0;
-    background: linear-gradient(90deg, transparent 36%, rgba(22, 10, 13, 0.62) 54%, rgba(22, 10, 13, 0.88) 68%);
+    background: linear-gradient(90deg, transparent 34%, rgba(22, 10, 13, 0.74) 52%, rgba(22, 10, 13, 0.94) 64%);
     pointer-events: none;
   }
   .adm-login.has-wide .adm-wide-mark {
@@ -514,8 +557,8 @@ select.adm-input option {
   }
   .adm-frame {
     position: relative;
-    height: min(62vw, 46svh);
-    min-height: 280px;
+    height: min(78vw, 52svh);
+    min-height: 320px;
   }
   .adm-frame-photo {
     object-position: 50% 15%;
@@ -523,8 +566,9 @@ select.adm-input option {
   .adm-frame-caption {
     left: 20px;
     right: 20px;
-    bottom: 18px;
-    font-size: 13.5px;
+    bottom: 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
     gap: 6px;
   }
   .adm-frame-caption .adm-script {

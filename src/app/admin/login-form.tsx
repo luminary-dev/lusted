@@ -56,10 +56,20 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto |
 
       <div className="adm-login-side">
         <form className="adm-login-card" method="post" action="/api/admin/login" onSubmit={onSubmit}>
-          <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="150px" />
+          <Image src={wordmark} alt="Lusted" className="adm-wordmark" priority sizes="220px" />
+          <p className="adm-eyebrow">Owner’s entrance · after hours</p>
           <h1 className="adm-login-title">
             Come in, <span className="adm-script">if you have the key.</span>
           </h1>
+          <p className="adm-login-lede">
+            She’s been waiting in the back since the last customer left: lights on, door unlocked, not much else on. Everything in here comes off —
+            the prices, the pieces, and whatever she’s still wearing by the time you’ve typed the password.
+          </p>
+          <ul className="adm-rules" aria-label="House rules">
+            <li>Say the password like you mean it. She can tell.</li>
+            <li>Touch everything. Price it, put it on offer, take it off the shelf. Nothing in here says no.</li>
+            <li>What happens in the back room stays in the back room, except the parts that reach the dev site.</li>
+          </ul>
           {!ready && (
             <p className="adm-alert" role="alert">
               The console isn’t set up on this deployment yet: ADMIN_EMAIL, ADMIN_PASSWORD_HASH and ADMIN_SESSION_SECRET are missing.
@@ -85,7 +95,7 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto |
             </span>
           </button>
           <p className="adm-login-foot">
-            <span className="adm-help">Seven days a key, then it asks again.</span>
+            <span className="adm-help">Seven days a key, then she asks again. Get it wrong eight times and she locks the door and makes you wait ten minutes.</span>
             <Link href="/" className="adm-quiet">
               The shop is out front
             </Link>
