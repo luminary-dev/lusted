@@ -162,6 +162,11 @@ Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed 
 - **`main`** — production, **https://lusted.vercel.app**, which shows the "Revealing soon" page until reveal day. Only
   merges of `dev` reach it.
 
+**Versions and releases.** Every release carries a version in `package.json` (the footer shows it as `v0.9.0`), and
+the pull request into `main` must bump it — the Branch rules check refuses one that doesn't. When the merge deploys
+to production, the deploy job tags the commit `v<version>` and cuts a GitHub release with notes written from the
+pull requests since the last one. Patch for fixes, minor for new things; `1.0.0` is reveal day.
+
 **The flow:** work on a branch → pull request into `dev` → merge → pull request `dev → main` → merge. Pull requests are
 merged as merge commits (the repository allows no other method), must be up to date with their base, and must have every
 check green; `main` takes pull requests from `dev` only. A direct push to either branch runs the checks but is never

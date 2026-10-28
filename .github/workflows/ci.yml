@@ -62,6 +62,19 @@ jobs:
           fi
           echo "From dev — fine."
 
+      # every release carries a new version (package.json): the tag and the GitHub release are cut from it on deploy
+      - name: Check that the release bumps the version
+        if: github.base_ref == 'main'
+        run: |
+          git fetch origin main --quiet
+          head="$(node -p "require('./package.json').version")"
+          live="$(git show origin/main:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")"
+          if [ "$head" = "$live" ]; then
+            echo "::error::package.json is still $live — bump the version for this release (the footer shows it, and the deploy tags it)."
+            exit 1
+          fi
+          echo "Release $head (production is on $live)."
+
       - name: Check that the branch is up to date with its base
         env:
           HEAD_REF: ${{ github.head_ref }}
@@ -276,6 +289,8 @@ jobs:
     needs: [checks, tests, lighthouse]
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write # the production deploy cuts a tag and a GitHub release
     concurrency:
       group: deploy-${{ github.ref }}
       cancel-in-progress: false
@@ -351,3 +366,21 @@ jobs:
         run: |
           npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
           echo "lusted.vercel.app ← $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+
+      # the release: a tag v<version> on this commit and a GitHub release with the notes written from the pull requests
+      # since the last one (once per version — a re-run of the deploy doesn't cut a second)
+      - name: Cut the release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          tag="v$version"
+          if gh release view "$tag" --repo "$REPO" >/dev/null 2>&1; then
+            echo "$tag is already released."
+          else
+            gh release create "$tag" --repo "$REPO" --target "$SHA" --title "Lusted $version" --generate-notes
+            echo "Released $tag" >> "$GITHUB_STEP_SUMMARY"
+          fi
