@@ -449,6 +449,50 @@ select.adm-input option {
   margin: 24px 0 0;
 }
 
+/* ─ one wide photo across the whole door (door-wide-<scene>.webp): the portrait frame steps aside, her side of the
+   room is the left, and the form sits on the dark right side of the same picture ─ */
+.adm-wide {
+  display: none;
+}
+
+@media (min-width: 861px) {
+  .adm-login.has-wide {
+    position: relative;
+    isolation: isolate;
+  }
+  .adm-login.has-wide .adm-wide {
+    display: block;
+    object-fit: cover;
+    object-position: 0% 50%;
+    z-index: -1;
+  }
+  .adm-login.has-wide::before {
+    /* the right side darkens so the words read, the left is left alone */
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(90deg, transparent 38%, rgba(22, 10, 13, 0.55) 55%, rgba(22, 10, 13, 0.82) 70%);
+    pointer-events: none;
+  }
+  .adm-login.has-wide .adm-frame {
+    background: none; /* the caption stays, over the photo's left foot */
+  }
+  .adm-login.has-wide .adm-frame-veil {
+    background: linear-gradient(180deg, transparent 60%, rgba(22, 10, 13, 0.85));
+  }
+  .adm-login.has-wide .adm-frame-photo {
+    display: none;
+  }
+  .adm-login.has-wide .adm-login-side {
+    position: relative;
+    z-index: 1;
+  }
+  .adm-login.has-wide .adm-pill input {
+    background: rgba(22, 10, 13, 0.45);
+  }
+}
+
 /* ─ a narrow door: the photo on top, the form below ─ */
 @media (max-width: 860px) {
   .adm-login {

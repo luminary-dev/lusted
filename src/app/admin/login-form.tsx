@@ -38,7 +38,8 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto |
   }
 
   return (
-    <main className="adm adm-login">
+    <main className={`adm adm-login ${photo?.wide ? "has-wide" : ""}`}>
+      {photo?.wide && <Image src={photo.wide} alt="" fill priority sizes="100vw" placeholder="blur" className="adm-wide" aria-hidden="true" />}
       <figure className={`adm-frame ${photo ? "has-photo" : ""}`}>
         {photo && <Image src={photo.src} alt="" fill priority sizes="(max-width: 860px) 100vw, 50vw" placeholder="blur" className="adm-frame-photo" />}
         <div className="adm-frame-veil" aria-hidden="true" />

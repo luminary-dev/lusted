@@ -15,14 +15,17 @@ const CAPTIONS: Record<string, [script: string, line: string]> = {
 };
 const FALLBACK: [string, string] = ["after closing", "The shop is shut. The back room never is."];
 
-export type DoorPhoto = { src: ReturnType<typeof img>; script: string; line: string };
+// a scene may also have a wide photo (images/admin/door-wide-<scene>.webp, 16:9, her on the left, the right of the
+// room dark and empty): on a wide screen it then fills the whole door and the form sits on its dark side
+export type DoorPhoto = { src: ReturnType<typeof img>; wide: ReturnType<typeof img> | null; script: string; line: string };
 
 const photos: DoorPhoto[] = (Object.keys(manifest.images) as ImagePath[])
   .map((key) => ({ key, scene: key.match(/^images\/admin\/back-room-(.+)\.webp$/)?.[1] }))
   .filter((p): p is { key: ImagePath; scene: string } => !!p.scene)
   .map(({ key, scene }) => {
     const [script, line] = CAPTIONS[scene] ?? FALLBACK;
-    return { src: img(key), script, line };
+    const wideKey = `images/admin/door-wide-${scene}.webp`;
+    return { src: img(key), wide: wideKey in manifest.images ? img(wideKey as ImagePath) : null, script, line };
   });
 
 // which one tonight — the page is rendered per request (connection()), so this is a fresh draw each visit; it lives
