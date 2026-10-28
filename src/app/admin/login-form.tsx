@@ -1,6 +1,6 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -16,7 +16,7 @@ const INSIDE = [
   ["The day book", "What landed overnight, and what is still on its way."],
 ];
 
-export function LoginForm({ ready, photo, backdrop }: { ready: boolean; photo: DoorPhoto | null; backdrop: StaticImageData | null }) {
+export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto | null }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -55,7 +55,6 @@ export function LoginForm({ ready, photo, backdrop }: { ready: boolean; photo: D
         </figure>
 
         <div className="adm-login-side">
-          {backdrop && <Image src={backdrop} alt="" fill sizes="(max-width: 860px) 100vw, 50vw" placeholder="blur" className="adm-backdrop" aria-hidden="true" />}
           <div className="adm-glass">
           <p className="adm-login-top">
             <span className="adm-eyebrow">Owner’s entrance</span>

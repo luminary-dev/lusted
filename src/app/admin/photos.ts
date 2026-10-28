@@ -3,7 +3,7 @@ import manifest from "@/lib/image-manifest.json";
 
 // The sign-in page's photos (about-wall/admin-login-prompt.txt, one per scene): every photo in the manifest under
 // images/admin/back-room-<scene>.webp, each with its own two lines. The door opens on a different one each time; with
-// none, it draws a curtain. The backdrop behind the form on wide screens is images/admin/door-backdrop.webp.
+// none, it draws a curtain.
 
 const CAPTIONS: Record<string, [script: string, line: string]> = {
   vanity: ["after closing", "She has been waiting since the last customer left. The lights in the mirror are still on."],
@@ -24,9 +24,6 @@ const photos: DoorPhoto[] = (Object.keys(manifest.images) as ImagePath[])
     const [script, line] = CAPTIONS[scene] ?? FALLBACK;
     return { src: img(key), script, line };
   });
-
-const BACKDROP = "images/admin/door-backdrop.webp";
-export const backdrop = BACKDROP in manifest.images ? img(BACKDROP as ImagePath) : null;
 
 // which one tonight — the page is rendered per request (connection()), so this is a fresh draw each visit; it lives
 // outside any component because a render itself has to stay pure

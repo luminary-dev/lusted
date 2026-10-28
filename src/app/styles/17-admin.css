@@ -420,10 +420,6 @@ select.adm-input option {
   max-width: 520px;
 }
 
-.adm-backdrop {
-  display: none;
-}
-
 .adm-glass {
   position: relative;
 }
@@ -500,7 +496,7 @@ select.adm-input option {
   height: auto;
 }
 
-/* ─ a wide door: the photo fills the left half, the backdrop the right, and the form sits in a glass box on it ─ */
+/* ─ a wide door: the photo fills the left half, the invitation and the form sit in a box on the dark right half ─ */
 @media (min-width: 900px) and (orientation: landscape) {
   .adm-login {
     display: block;
@@ -539,34 +535,39 @@ select.adm-input option {
     min-height: 100svh;
     padding: clamp(28px, 4vw, 64px);
     overflow: hidden;
-    background: linear-gradient(180deg, #2a0a14, #160a0d);
-  }
-  .adm-backdrop {
-    display: block;
-    object-fit: cover;
-    object-position: 60% 50%;
-    opacity: 0.85;
-  }
-  .adm-login-side::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, rgba(22, 10, 13, 0.55), rgba(22, 10, 13, 0.15) 50%, rgba(22, 10, 13, 0.45));
-    pointer-events: none;
+    background:
+      radial-gradient(900px 600px at 80% 0%, rgba(122, 27, 51, 0.45), transparent 60%),
+      linear-gradient(180deg, #24090f, #160a0d);
   }
   .adm-glass {
     z-index: 1;
-    width: min(100%, 540px);
-    padding: clamp(28px, 3vw, 40px);
-    border: 1px solid rgba(251, 241, 236, 0.16);
+    width: min(100%, 680px);
+    padding: clamp(36px, 4vw, 56px);
+    border: 1px solid rgba(251, 241, 236, 0.14);
     border-radius: var(--radius);
-    background: rgba(22, 10, 13, 0.58);
-    backdrop-filter: blur(22px) saturate(120%);
-    -webkit-backdrop-filter: blur(22px) saturate(120%);
+    background: rgba(251, 241, 236, 0.035);
     box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
   }
+  .adm-glass .adm-login-title {
+    font-size: clamp(38px, 3.6vw, 52px);
+  }
+  .adm-glass .adm-login-lede {
+    font-size: 15px;
+  }
   .adm-glass .adm-pill input {
-    background: rgba(251, 241, 236, 0.06);
+    padding: 17px 22px;
+    font-size: 15.5px;
+    background: rgba(251, 241, 236, 0.05);
+  }
+  .adm-glass .adm-btn-wide {
+    min-height: 56px;
+    font-size: 14px;
+  }
+  .adm-glass .adm-inside dt {
+    font-size: 14px;
+  }
+  .adm-glass .adm-inside dd {
+    font-size: 13px;
   }
   .adm-inside {
     margin-top: 28px;
