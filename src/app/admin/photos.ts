@@ -1,7 +1,5 @@
-import catalog from "@/lib/catalog.json";
 import { img, type ImagePath } from "@/lib/cdn";
 import manifest from "@/lib/image-manifest.json";
-import { categories } from "@/lib/products";
 
 // The sign-in page's photos (about-wall/admin-login-prompt.txt, one per scene): every photo in the manifest under
 // images/admin/back-room-<scene>.webp, each with its own two lines. The door opens on a different one each time; with
@@ -26,12 +24,6 @@ const photos: DoorPhoto[] = (Object.keys(manifest.images) as ImagePath[])
     const [script, line] = CAPTIONS[scene] ?? FALLBACK;
     return { src: img(key), script, line };
   });
-
-// the shop's figures for the door, from the catalogue baked into the deploy (the room reads the live ones)
-export const figures: Array<{ value: number; label: string }> = [
-  { value: catalog.length, label: "pieces" },
-  ...categories.map((c) => ({ value: catalog.filter((p) => p.category === c.key).length, label: c.name })),
-];
 
 // which one tonight — the page is rendered per request (connection()), so this is a fresh draw each visit; it lives
 // outside any component because a render itself has to stay pure
