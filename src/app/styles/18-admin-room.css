@@ -326,6 +326,14 @@
   transition: transform 0.3s var(--ease), box-shadow 0.3s;
 }
 
+/* the tape reads darker on the cream sheet than on the wall */
+.adm-pin .print-tape {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22), transparent 30%, rgba(255, 255, 255, 0.14) 60%, transparent),
+    rgba(201, 176, 143, 0.78);
+  box-shadow: 0 1px 3px rgba(46, 20, 24, 0.25);
+}
+
 .adm-pin:hover,
 .adm-pin:focus-within {
   transform: rotate(0deg) translateY(-3px);

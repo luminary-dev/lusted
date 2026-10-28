@@ -326,7 +326,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
   return (
     <div className="adm-sheet adm-fitting">
       <ol className="adm-steps" aria-label="Steps">
-        {["Pin the photos", "Let Claude write it", "Read it, then add"].map((label, i) => (
+        {["Tape the photos up", "Let Claude write it", "Read it, then add"].map((label, i) => (
           <li key={label} className={step > i + 1 ? "is-done" : step === i + 1 ? "is-now" : ""}>
             <span className="adm-step-n">{i + 1}</span>
             {label}
