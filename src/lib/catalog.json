@@ -1169,5 +1169,37 @@
       "spring getaways",
       "being untied one bow at a time, very slowly"
     ]
+  },
+  {
+    "slug": "amethyst-sin-sling-bodysuit",
+    "name": "Amethyst Sin Sling Bodysuit",
+    "category": "lingerie",
+    "price": 5200,
+    "colors": [
+      "lilac"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "added": "2026-10-29",
+    "description": "Sheer straps run from a choker collar down to a deep, daring V, with a lace bandeau across the middle that hides almost nothing. Slip the straps back and let them take their time finding out what's underneath. Hand wash cold.",
+    "blurb": "A sheer lilac sling with a lace secret. Size down.",
+    "details": [
+      "Sheer halter straps with choker neckband",
+      "Sheer floral lace bandeau panel",
+      "Deep plunging V front",
+      "Hand wash cold"
+    ],
+    "fit": 1,
+    "fitNote": "Runs large, so size down for the sling to stay close and the V to sit exactly where it should.",
+    "moments": [
+      "candlelit evenings",
+      "being watched across the room",
+      "slow unwrapping"
+    ]
   }
 ]
