@@ -599,17 +599,29 @@ select.adm-input-big {
 }
 
 /* ─ the ledger ─ */
+/* the tools: the search and the sort on one line, the collections and the flags as quiet words on the next */
 .adm-ledger-tools {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "search right"
+    "seg flags";
   align-items: center;
-  gap: 14px 24px;
-  margin-bottom: 18px;
+  gap: 18px 32px;
+  margin-bottom: 22px;
 }
 
 .adm-input-search {
-  flex: 1 1 220px;
-  max-width: 320px;
+  grid-area: search;
+  max-width: 360px;
+}
+
+.adm-ledger-right {
+  grid-area: right;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  justify-self: end;
 }
 
 .adm-sort {
@@ -626,8 +638,97 @@ select.adm-input-big {
   width: auto;
 }
 
-.adm-ledger-tools .adm-aside {
-  margin-left: auto;
+/* the collections: words on a line, the chosen one in ink with a rose underline */
+.adm-seg {
+  grid-area: seg;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 26px;
+}
+
+.adm-seg button,
+.adm-flags button {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--a-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.adm-seg button small {
+  margin-left: 4px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--a-muted);
+}
+
+.adm-seg button {
+  position: relative;
+}
+
+.adm-seg button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  background: var(--a-rose);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease);
+}
+
+.adm-seg button:hover {
+  color: var(--a-ink-2);
+}
+
+.adm-seg button.is-on {
+  color: var(--a-ink);
+}
+
+.adm-seg button.is-on::after {
+  transform: scaleX(1);
+}
+
+/* the flags: words with a small ring before each, filled when on */
+.adm-flags {
+  grid-area: flags;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  justify-self: end;
+}
+
+.adm-flags button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-flags button::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--a-hair-2);
+  border-radius: 50%;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.adm-flags button:hover {
+  color: var(--a-ink-2);
+}
+
+.adm-flags button.is-on {
+  color: var(--a-ink);
+}
+
+.adm-flags button.is-on::before {
+  background: var(--a-rose);
+  border-color: var(--a-rose);
 }
 
 .adm-help strong {
@@ -866,6 +967,19 @@ select.adm-input-big {
 }
 
 @media (max-width: 760px) {
+  .adm-ledger-tools {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "search"
+      "seg"
+      "flags"
+      "right";
+    gap: 14px;
+  }
+  .adm-ledger-right,
+  .adm-flags {
+    justify-self: start;
+  }
   .adm-rooms {
     gap: 18px 36px;
   }

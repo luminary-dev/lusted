@@ -718,36 +718,38 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
     <>
       <div className="adm-ledger-tools">
         <input className="adm-input adm-input-search" type="search" placeholder="Find a piece…" aria-label="Find a piece" value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
-        <div className="adm-chips" role="group" aria-label="Collection">
-          <button type="button" className={`adm-chip ${collection === "*" ? "is-on" : ""}`} onClick={() => setCollection("*")}>
-            All {products.length}
+        <div className="adm-seg" role="group" aria-label="Collection">
+          <button type="button" className={collection === "*" ? "is-on" : ""} onClick={() => setCollection("*")}>
+            All <small>{products.length}</small>
           </button>
           {COLLECTIONS.map((c) => (
-            <button key={c.key} type="button" className={`adm-chip ${collection === c.key ? "is-on" : ""}`} onClick={() => setCollection(c.key)}>
-              {c.name} {products.filter((p) => p.category === c.key).length}
+            <button key={c.key} type="button" className={collection === c.key ? "is-on" : ""} onClick={() => setCollection(c.key)}>
+              {c.name} <small>{products.filter((p) => p.category === c.key).length}</small>
             </button>
           ))}
         </div>
-        <div className="adm-chips" role="group" aria-label="Only">
+        <div className="adm-flags" role="group" aria-label="Only">
           {FLAGS.map((f) => (
-            <button key={f.key} type="button" className={`adm-chip adm-chip-tag ${flags.includes(f.key) ? "is-on" : ""}`} aria-pressed={flags.includes(f.key)} onClick={() => toggleFlag(f.key)}>
+            <button key={f.key} type="button" className={flags.includes(f.key) ? "is-on" : ""} aria-pressed={flags.includes(f.key)} onClick={() => toggleFlag(f.key)}>
               {f.label}
             </button>
           ))}
         </div>
-        <label className="adm-sort">
-          <span className="adm-label">Sort</span>
-          <select className="adm-input adm-input-row" value={sort} onChange={(e) => setSort(e.currentTarget.value as typeof sort)}>
-            <option value="new">Newest first</option>
-            <option value="best">Best sellers first</option>
-            <option value="name">By name</option>
-            <option value="price-asc">Price, low to high</option>
-            <option value="price-desc">Price, high to low</option>
-          </select>
-        </label>
-        <span className="adm-aside">
-          {rows.length} of {products.length}
-        </span>
+        <div className="adm-ledger-right">
+          <label className="adm-sort">
+            <span className="adm-label">Sort</span>
+            <select className="adm-input adm-input-row" value={sort} onChange={(e) => setSort(e.currentTarget.value as typeof sort)}>
+              <option value="new">Newest first</option>
+              <option value="best">Best sellers first</option>
+              <option value="name">By name</option>
+              <option value="price-asc">Price, low to high</option>
+              <option value="price-desc">Price, high to low</option>
+            </select>
+          </label>
+          <span className="adm-aside">
+            {rows.length} of {products.length}
+          </span>
+        </div>
       </div>
       <div className="adm-ledger-wrap">
         <table className="adm-ledger">
