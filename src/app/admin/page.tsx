@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ADMIN_COOKIE, configured, verifySessionToken } from "@/lib/admin/auth";
 import { LoginForm } from "./login-form";
-import { tonight } from "./photos";
+import { figures, tonight } from "./photos";
 
 // The door to the back room. Unlinked from every page, kept out of search, never cached (next.config.ts). Without a
 // session cookie this is the sign-in page; with one it goes straight through to the first room, the ledger.
@@ -23,5 +23,5 @@ export default async function AdminPage() {
   await connection(); // rendered per request: the photo is a fresh draw each visit
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
   if (verifySessionToken(token)) redirect("/admin/ledger");
-  return <LoginForm ready={configured()} photo={tonight()} />;
+  return <LoginForm ready={configured()} photo={tonight()} figures={figures} />;
 }

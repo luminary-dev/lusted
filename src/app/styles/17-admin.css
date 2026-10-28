@@ -402,10 +402,12 @@ select.adm-input option {
   right: 24px;
   bottom: 22px;
   display: grid;
-  gap: 6px;
-  font-size: 12.5px;
+  gap: 8px;
+  max-width: 40ch;
+  font-size: 14px;
   line-height: 1.6;
-  color: rgba(255, 246, 242, 0.72);
+  color: rgba(255, 246, 242, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 .adm-frame-caption .adm-script {
@@ -418,6 +420,42 @@ select.adm-input option {
   position: relative;
   min-width: 0;
   max-width: 520px;
+}
+
+.adm-login-mark {
+  display: block;
+  margin-bottom: 26px;
+}
+
+/* the shop's figures, the door's footer */
+.adm-door-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  margin: 30px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--a-hair);
+}
+
+.adm-door-figures div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.adm-door-figures dd {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 200;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-door-figures dt {
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--a-muted);
 }
 
 .adm-glass {
@@ -525,8 +563,31 @@ select.adm-input option {
     right: clamp(28px, 4vw, 56px);
     bottom: clamp(28px, 4vh, 48px);
   }
+  .adm-frame-caption {
+    gap: 10px;
+    max-width: 44ch;
+    font-size: 16px;
+    line-height: 1.65;
+  }
   .adm-frame-caption .adm-script {
     font-size: clamp(44px, 4.5vw, 64px);
+  }
+  .adm-frame-veil {
+    background: linear-gradient(180deg, rgba(22, 10, 13, 0.25), transparent 25%, transparent 50%, rgba(22, 10, 13, 0.92));
+  }
+  /* the right half: a whisper of the room's name across the dark behind the words, so the column isn't alone */
+  .adm-login-side::before {
+    content: "the back room";
+    position: absolute;
+    right: -0.6em;
+    top: 2vh;
+    z-index: 0;
+    font-family: var(--parisienne);
+    font-size: clamp(140px, 15vw, 240px);
+    line-height: 1;
+    white-space: nowrap;
+    color: rgba(251, 241, 236, 0.045);
+    pointer-events: none;
   }
   .adm-login-side {
     display: grid;
@@ -541,8 +602,15 @@ select.adm-input option {
   }
   .adm-glass {
     z-index: 1;
-    width: min(100%, 600px);
+    width: min(100%, 620px);
     padding: clamp(24px, 3vh, 40px) 0;
+  }
+  .adm-glass .adm-door-figures {
+    margin-top: 36px;
+    gap: 16px 36px;
+  }
+  .adm-glass .adm-door-figures dd {
+    font-size: 30px;
   }
   .adm-glass .adm-login-title {
     font-size: clamp(36px, 3.2vw, 48px);

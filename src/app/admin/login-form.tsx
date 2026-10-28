@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import wordmark from "@/assets/brand/wordmark-dark.png";
 import type { DoorPhoto } from "./photos";
 
 // The door to the back room: a photo in a frame on one side (a dressing room after closing), the invitation and the
@@ -16,7 +17,7 @@ const INSIDE = [
   ["The day book", "What landed overnight, and what is still on its way."],
 ];
 
-export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto | null }) {
+export function LoginForm({ ready, photo, figures }: { ready: boolean; photo: DoorPhoto | null; figures: Array<{ value: number; label: string }> }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -56,6 +57,7 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto |
 
         <div className="adm-login-side">
           <div className="adm-glass">
+          <Image src={wordmark} alt="Lusted" className="adm-wordmark adm-login-mark" priority sizes="140px" />
           <p className="adm-login-top">
             <span className="adm-eyebrow">Owner’s entrance</span>
             <Link href="/" className="adm-quiet">
@@ -109,6 +111,15 @@ export function LoginForm({ ready, photo }: { ready: boolean; photo: DoorPhoto |
               ))}
             </dl>
           </div>
+
+          <dl className="adm-door-figures" aria-label="Out front tonight">
+            {figures.map((f) => (
+              <div key={f.label}>
+                <dd>{f.value}</dd>
+                <dt>{f.label}</dt>
+              </div>
+            ))}
+          </dl>
           </div>
         </div>
       </div>
