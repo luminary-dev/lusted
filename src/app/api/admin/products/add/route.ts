@@ -85,21 +85,11 @@ export async function POST(request: Request) {
     for (const [view, key] of Object.entries(keys)) {
       if (!(await store.exists(key))) return NextResponse.json({ ok: false, error: `The ${view} photo didn't finish uploading — try again` }, { status: 400 });
     }
+    // a repository_dispatch payload may carry ten fields at most, so the piece travels as one
     await dispatch("add-product", {
       slug,
-      name,
-      description,
-      blurb: blurb || undefined,
-      details,
-      fitNote,
-      moments,
-      category,
-      price,
-      fit,
-      colors: picked,
-      sizes,
-      bestSeller,
       views: keys,
+      piece: { name, description, blurb: blurb || undefined, details, fitNote, moments, category, price, fit, colors: picked, sizes, bestSeller },
     });
   } catch (error) {
     console.error(error);

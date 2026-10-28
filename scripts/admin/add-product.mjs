@@ -10,8 +10,10 @@ import sharp from "sharp";
 
 const INCOMING = /^incoming\/[a-f0-9]{24}\/(front|back|side)\.(jpg|png|webp)$/;
 const { slug, views = {} } = payload;
+// the piece itself travels under one field (a dispatch payload carries ten fields at most)
+const piece = payload.piece ?? payload;
 if (!SLUG.test(slug ?? "")) throw new Error("add-product: a slug is needed");
-if (!(payload.category in COLLECTIONS)) throw new Error("add-product: unknown collection");
+if (!(piece.category in COLLECTIONS)) throw new Error("add-product: unknown collection");
 if (!INCOMING.test(views.front ?? "")) throw new Error("add-product: the front photo's address is needed");
 if (!INCOMING.test(views.back ?? "")) throw new Error("add-product: the back photo's address is needed");
 
@@ -21,7 +23,7 @@ if (catalog.some((p) => p.slug === slug)) {
   process.exit(0);
 }
 
-if (payload.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) throw new Error("add-product: six best sellers already");
+if (piece.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) throw new Error("add-product: six best sellers already");
 const store = bucket();
 const manifest = await readJson(MANIFEST);
 for (const view of ["front", "back", "side"]) {
@@ -49,19 +51,19 @@ await writeJson(MANIFEST, sortManifest(manifest));
 catalog.push(
   normalise({
     slug,
-    name: payload.name,
-    category: payload.category,
-    price: payload.price,
-    colors: payload.colors,
-    sizes: payload.sizes,
-    bestSeller: payload.bestSeller ?? undefined,
+    name: piece.name,
+    category: piece.category,
+    price: piece.price,
+    colors: piece.colors,
+    sizes: piece.sizes,
+    bestSeller: piece.bestSeller ?? undefined,
     added: today(),
-    description: payload.description,
-    blurb: payload.blurb || undefined,
-    details: payload.details,
-    fit: payload.fit,
-    fitNote: payload.fitNote,
-    moments: payload.moments,
+    description: piece.description,
+    blurb: piece.blurb || undefined,
+    details: piece.details,
+    fit: piece.fit,
+    fitNote: piece.fitNote,
+    moments: piece.moments,
   }),
 );
 await writeJson(CATALOG, catalog);
@@ -70,4 +72,4 @@ for (const incoming of Object.values(views)) if (typeof incoming === "string" &&
 
 await import("../sync-product-images.mjs");
 const photos = Object.keys(views).length;
-await summarise(`added ${quote(payload.name)} to ${COLLECTIONS[payload.category]} at ${lkr(payload.price)} (${photos} photo${photos === 1 ? "" : "s"})`);
+await summarise(`added ${quote(piece.name)} to ${COLLECTIONS[piece.category]} at ${lkr(piece.price)} (${photos} photo${photos === 1 ? "" : "s"})`);
