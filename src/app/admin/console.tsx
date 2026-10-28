@@ -840,7 +840,6 @@ export function Console({ section, initial }: { section: Section; initial: Catal
         <nav className="adm-rooms" aria-label="Rooms">
           {SECTIONS.map((s) => (
             <Link key={s.id} href={`/admin/${s.id}`} className={`adm-room-link ${s.id === section ? "is-here" : ""}`} aria-current={s.id === section ? "page" : undefined}>
-              <span className="adm-num">{s.numeral}</span>
               <span className="adm-room-name">{s.name}</span>
               <span className="adm-room-aside">{s.aside}</span>
             </Link>

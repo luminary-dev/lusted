@@ -105,10 +105,7 @@
 
 .adm-room-link {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 12px;
-  align-items: baseline;
+  gap: 4px;
   padding: 16px 18px;
   border: 1px solid var(--a-hair);
   border-radius: var(--radius-sm);
@@ -127,12 +124,6 @@
   border-color: var(--a-rose);
   background: rgba(217, 138, 152, 0.1);
   color: var(--a-ink);
-}
-
-.adm-room-link .adm-num {
-  grid-row: 1 / span 2;
-  font-size: 22px;
-  line-height: 1;
 }
 
 .adm-room-name {
@@ -733,10 +724,6 @@ select.adm-input-big {
   }
   .adm-room-link {
     padding: 12px 14px;
-    column-gap: 10px;
-  }
-  .adm-room-link .adm-num {
-    font-size: 18px;
   }
   .adm-room-name {
     font-size: 13.5px;
