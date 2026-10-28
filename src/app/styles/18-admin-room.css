@@ -38,16 +38,23 @@
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
   gap: 24px clamp(40px, 7vw, 120px);
-  align-items: end;
+  align-items: start;
   padding: clamp(28px, 5vh, 48px) 0 clamp(28px, 4vh, 40px);
+}
+
+/* the title is sized from its own column (container units), so the script can never run into the figures */
+.adm-hero {
+  container-type: inline-size;
+  min-width: 0;
 }
 
 .adm-title {
   margin: 0 0 18px;
+  padding-top: 0.12em; /* room for the script's flourishes above the x-height */
   font-family: var(--parisienne);
   font-weight: 400;
-  font-size: clamp(56px, 7vw, 100px);
-  line-height: 0.95;
+  font-size: clamp(48px, 13.5cqw, 108px);
+  line-height: 1;
   color: var(--a-ink);
 }
 
@@ -66,7 +73,7 @@
 
 .adm-figures {
   margin: 0;
-  padding: 0;
+  padding: 10px 0 0;
 }
 
 .adm-figure {
@@ -792,7 +799,7 @@ select.adm-input-big {
     padding-bottom: clamp(32px, 5vh, 56px);
   }
   .adm-title {
-    font-size: clamp(96px, 6.5vw, 124px);
+    font-size: clamp(96px, 13.5cqw, 128px);
   }
   .adm-lede {
     font-size: 15px;
