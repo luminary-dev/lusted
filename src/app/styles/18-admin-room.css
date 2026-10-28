@@ -123,32 +123,31 @@
   color: var(--a-blush);
 }
 
-/* ─ the four rooms: a row of names on one rule, the one you're in underlined ─ */
+/* ─ the four rooms: four doors across the width, each named in the script, the one you're in lit ─ */
 .adm-rooms {
-  display: flex;
-  gap: 0 clamp(24px, 4vw, 56px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   margin: 0 0 clamp(32px, 5vh, 48px);
   border-top: 1px solid var(--a-hair);
   border-bottom: 1px solid var(--a-hair);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.adm-rooms::-webkit-scrollbar {
-  display: none;
 }
 
 .adm-room-link {
   position: relative;
   display: grid;
-  gap: 3px;
-  flex: none;
-  padding: 18px 0 16px;
+  gap: 2px;
+  padding: 22px 20px 20px 0;
   color: var(--a-muted);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.25s;
 }
 
+.adm-room-link + .adm-room-link {
+  padding-left: 24px;
+  border-left: 1px solid var(--a-hair);
+}
+
+/* the rose line under the lit door */
 .adm-room-link::after {
   content: "";
   position: absolute;
@@ -159,7 +158,11 @@
   background: var(--a-rose);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.3s var(--ease);
+  transition: transform 0.35s var(--ease);
+}
+
+.adm-room-link + .adm-room-link::after {
+  left: 24px;
 }
 
 .adm-room-link:hover {
@@ -175,14 +178,21 @@
 }
 
 .adm-room-name {
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-family: var(--parisienne);
+  font-size: clamp(28px, 2.4vw, 38px);
+  line-height: 1.1;
+  color: inherit;
+  transition: color 0.25s;
+}
+
+.adm-room-link.is-here .adm-room-name {
+  color: var(--a-blush);
 }
 
 .adm-room-aside {
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: var(--a-muted);
 }
 
@@ -766,18 +776,34 @@ select.adm-input-big {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 760px) {
   .adm-rooms {
-    gap: 0 22px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .adm-room-link {
-    padding: 14px 0 12px;
+    padding: 16px 12px 14px 0;
+  }
+  .adm-room-link + .adm-room-link {
+    padding-left: 16px;
+    border-left: 0;
+  }
+  .adm-room-link + .adm-room-link::after {
+    left: 16px;
+  }
+  .adm-room-link:nth-child(2n + 1) {
+    padding-left: 0;
+  }
+  .adm-room-link:nth-child(2n + 1)::after {
+    left: 0;
+  }
+  .adm-room-link:nth-child(2n) {
+    border-left: 1px solid var(--a-hair);
+  }
+  .adm-room-link:nth-child(n + 3) {
+    border-top: 1px solid var(--a-hair);
   }
   .adm-room-name {
-    font-size: 13.5px;
-  }
-  .adm-room-aside {
-    display: none;
+    font-size: 26px;
   }
 }
 
@@ -816,14 +842,16 @@ select.adm-input-big {
     font-size: 40px;
   }
   .adm-rooms {
-    gap: 0 clamp(56px, 5vw, 96px);
     margin-bottom: clamp(40px, 6vh, 64px);
   }
   .adm-room-link {
-    padding: 22px 0 20px;
+    padding: 26px 24px 24px 0;
   }
-  .adm-room-name {
-    font-size: 16px;
+  .adm-room-link + .adm-room-link {
+    padding-left: 32px;
+  }
+  .adm-room-link + .adm-room-link::after {
+    left: 32px;
   }
   .adm-sheet.adm-fitting,
   .adm-sheet.adm-offers {
