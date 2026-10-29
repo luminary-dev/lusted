@@ -49,7 +49,7 @@ const social = [
 
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" data-wa-source="footer">
       <Image quality={90} src={footerImg} alt="" fill placeholder="blur" sizes="(max-width: 700px) 1500px, (max-width: 1100px) 1130px, 100vw" className="footer-img" />
       <div className="container">
         <div className="footer-main">

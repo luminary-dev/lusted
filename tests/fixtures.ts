@@ -117,8 +117,8 @@ export const MINIMUM_SET: Viewport[] = [
    Read from the catalogue itself (src/lib/catalog.json, and the photo manifest for which pieces are photographed), the
    way src/lib/products.ts reads it, so a piece added, changed or removed from the owner console (/admin) doesn't fail
    the suite. */
-type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; details: string[] };
-const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
+type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; description: string; details: string[] };
+export const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
 const bySlug = Object.fromEntries(photographed.map((p) => [p.slug, p]));
 const priceOf = (p: Entry) => p.salePrice ?? p.price;
 const onSale = photographed.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price);
@@ -226,6 +226,10 @@ export const test = base.extend<{ errors: string[]; prepared: Page }>({
       if (m.type() !== "error") return;
       const t = m.text();
       if (/favicon|ERR_ABORTED|net::ERR_|Download the React DevTools/i.test(t)) return;
+      // Vercel's analytics scripts (/_vercel/insights, /_vercel/speed-insights — src/components/SiteAnalytics.tsx) only
+      // exist once the site is deployed there, so under `next start` asking for them is an expected 404 (and the browser
+      // then refuses the 404 page as a script, a second error naming the same address)
+      if (t.includes("/_vercel/") || m.location().url.includes("/_vercel/")) return;
       errors.push(t);
     });
     page.on("response", (r) => {

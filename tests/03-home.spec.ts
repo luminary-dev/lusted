@@ -292,6 +292,11 @@ test("newsletter: the browser blocks a bad address, a good one reports the sign-
   const form = page.locator("form.news-form");
   const input = form.getByRole("textbox", { name: "Email address" });
   await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
+  // the consent line: what they get, the way out, the policy — and it is read out with the field
+  const consent = form.locator(".news-consent");
+  await expect(consent).toContainText("unsubscribe any time", { ignoreCase: true });
+  await expect(consent.getByRole("link", { name: "privacy policy" })).toHaveAttribute("href", "/privacy");
+  await expect(input).toHaveAccessibleDescription(/unsubscribe any time/i);
   await input.fill("not-an-email");
   await form.getByRole("button", { name: /Subscribe/ }).click();
   expect(await input.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false); // native validation stops the submit

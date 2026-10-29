@@ -2,5 +2,5 @@ Contact: https://github.com/luminary-dev/lusted/security/advisories/new
 Contact: mailto:support@lusted.lk
 Expires: 2027-10-31T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://lusted.vercel.app/.well-known/security.txt
+Canonical: https://lusted.lk/.well-known/security.txt
 Policy: https://github.com/luminary-dev/lusted/blob/main/SECURITY.md
