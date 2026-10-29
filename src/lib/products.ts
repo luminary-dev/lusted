@@ -89,7 +89,8 @@ export const toViews = (v: ViewSet, mainLabel = "Front") => {
 // how the gallery speaks of a view: "the back view", but "photo 4" rather than "photo 4 view"
 export const viewName = (label: string) => (/^Photo \d$/.test(label) ? label.toLowerCase() : `${label.toLowerCase()} view`);
 
-// The six most recently added pieces are flagged "New".
+// The six most recently added pieces are flagged "New" — the badge, the shop's "New in" filter and the home page's
+// "Just arrived" row all go by this one rule, so they never disagree about what is new.
 const shot = catalog.filter((p) => p.slug in productImages); // pieces appear once they have a photo
 const newest = new Set([...shot].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug));
 
@@ -117,6 +118,8 @@ export const discountPct = (p: Product) => (p.salePrice ? Math.round((1 - p.sale
 export const formatPrice = (n: number) => `LKR ${n.toLocaleString("en-LK")}`;
 
 export const bestSellers = products.filter((p) => p.bestSeller).sort((a, b) => a.bestSeller! - b.bestSeller!);
+// The "New" pieces, newest first; pieces added on the same day keep their catalogue order, as the shop's "Newest" sort does.
+export const newArrivals = products.filter((p) => p.isNew).sort((a, b) => b.added.localeCompare(a.added));
 
 /** Can this size be ordered right now? */
 export const inStock = (p: Product, size: string) => !(p.soldOut ?? []).includes(size);
