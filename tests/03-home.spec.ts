@@ -174,6 +174,29 @@ test("best sellers: the six ranked pieces in order, with the badge, linking to t
   await expect(sec.getByRole("link", { name: /See all|best/i }).last()).toHaveAttribute("href", "/products?best=1&sort=best");
 });
 
+test("new in: the pieces with the New badge, newest first, right after best sellers, linking to the newest-first shop", async ({ prepared: page }) => {
+  const sec = page.locator("#new-in");
+  test.skip(CATALOG.newest.length < 3, "fewer than three new pieces: the row stays hidden");
+  const cards = sec.locator(".product-card");
+  await expect(cards).toHaveCount(CATALOG.newest.length);
+  const hrefs = await cards.locator(".product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
+  expect(hrefs).toEqual(CATALOG.newest);
+  // newest first by the catalogue's own dates, and every one wears the same badge the shop gives it
+  const dates = hrefs.map((s) => CATALOG.addedOf(s!));
+  expect(dates).toEqual([...dates].sort().reverse());
+  for (let i = 0; i < CATALOG.newest.length; i++) await expect(cards.nth(i).locator(".badge", { hasText: "New" })).toHaveCount(1);
+  const ids = await page.locator("main > section[id]").evaluateAll((els) => els.map((e) => e.id));
+  expect(ids.indexOf("new-in")).toBe(ids.indexOf("best-sellers") + 1);
+  await expect(sec.locator("h2")).toBeVisible();
+  const link = sec.getByRole("link", { name: "Shop everything new" });
+  await expect(link).toHaveAttribute("href", "/products?new=1&sort=new");
+  await link.click();
+  await expect(page).toHaveURL(/\/products\?new=1&sort=new$/);
+  await expect(main(page).getByRole("combobox", { name: "Sort" })).toHaveValue("new");
+  const shop = await main(page).locator(".product-card .product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
+  expect(shop).toEqual(CATALOG.newest);
+});
+
 test("how it works: three steps, the ordering anchor and the WhatsApp button", async ({ prepared: page }) => {
   const how = page.locator("#ordering");
   await expect(how).toBeVisible();
