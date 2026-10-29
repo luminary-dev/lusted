@@ -19,6 +19,7 @@ const columns = [
       { label: collectionName("swim"), href: "/products?cat=swim" },
       { label: collectionName("after-dark"), href: "/products?cat=after-dark" },
       { label: "Sale", href: "/products?sale=1" },
+      { label: "Gift vouchers", href: "/gift-vouchers" },
     ],
   },
   {
