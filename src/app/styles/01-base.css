@@ -227,6 +227,90 @@ svg {
   transition: none !important;
 }
 
+/* ───────── card → product page ───────── */
+
+/* A tapped card's photo glides into the product page's main frame, and back on Back, while the rest of the page fades
+   across (src/components/shop/PhotoMorph.tsx). React names the elements only while one of those navigations runs, and
+   every rule here is scoped to their classes or their transition type, so the theme switch's transition above (the
+   root's alone, started by hand, with no type) never meets them. */
+::view-transition-group(.photo-morph) {
+  animation-duration: 0.42s;
+  animation-timing-function: var(--ease);
+  /* the card's photo is captured square-cornered; the frame keeps the rounded corners both ends show */
+  border-radius: var(--radius);
+  overflow: clip;
+}
+
+/* both ends cropped to fill the moving frame, so the card's 3:4 photo and the page's 9:16 one meet without a gap or a
+   squash */
+::view-transition-old(.photo-morph),
+::view-transition-new(.photo-morph) {
+  height: 100%;
+  object-fit: cover;
+  animation-duration: 0.42s;
+  animation-timing-function: var(--ease);
+}
+
+/* the page being left steps back quickly; the next one settles in under the photo */
+::view-transition-old(.page-fade) {
+  animation: page-fade-out 0.2s var(--ease) both;
+}
+
+::view-transition-new(.page-fade) {
+  animation: page-fade-in 0.38s var(--ease) 0.04s both;
+}
+
+@keyframes page-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* a tap while it plays reaches the page underneath instead of being swallowed by the snapshot */
+:root:active-view-transition-type(photo-trip)::view-transition {
+  pointer-events: none;
+}
+
+/* The bar stays put above the fading pages. It is fixed over them, and their snapshots would otherwise paint over it;
+   named, it is captured on its own and simply shown as it is on the next page. */
+:root:active-view-transition-type(photo-trip) .nav {
+  view-transition-name: site-nav;
+}
+
+::view-transition-group(site-nav) {
+  z-index: 1;
+  animation: none;
+}
+
+::view-transition-old(site-nav) {
+  display: none;
+}
+
+::view-transition-new(site-nav) {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* no glide: the photo is simply in its new place, and the page only cross-fades, briefly */
+  ::view-transition-group(.photo-morph),
+  ::view-transition-new(.photo-morph) {
+    animation: none;
+  }
+  ::view-transition-old(.photo-morph) {
+    display: none;
+  }
+  ::view-transition-old(.page-fade),
+  ::view-transition-new(.page-fade) {
+    animation-duration: 0.15s;
+    animation-delay: 0s;
+  }
+}
 
 .theme-switch {
   position: relative;
