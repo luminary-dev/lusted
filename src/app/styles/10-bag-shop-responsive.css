@@ -119,11 +119,11 @@
 }
 
 .bag-row .stepper {
-  height: 36px;
+  height: 44px; /* the quantity is changed with a thumb, so it gets a thumb-sized control */
 }
 
 .bag-row .stepper button {
-  width: 32px;
+  width: 44px;
   font-size: 16px;
 }
 
@@ -138,8 +138,11 @@
   right: 0;
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  /* 28px in the hardest corner for a right thumb to reach. The box is 44px now and the icon still draws at 28px,
+     so nothing looks heavier — and a mis-tap has Undo behind it (BagToast). */
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px 0 0;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -338,8 +341,73 @@
   }
 }
 
+/* An empty 80vh block told the shopper nothing and let the page jump when the detail landed. This holds the real
+   layout — a 9:16 photo beside the name, price and buttons — so the page settles into itself. */
 .pdp-skeleton {
   min-height: 80vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  gap: var(--gutter);
+  align-items: start;
+}
+
+.pdp-skeleton-media {
+  aspect-ratio: 9 / 16;
+  border-radius: var(--radius);
+  background: var(--cream-2);
+}
+
+.pdp-skeleton-info {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+}
+
+.pdp-skeleton-line {
+  display: block;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--cream-2);
+}
+
+.pdp-skeleton-line.is-title {
+  height: 30px;
+  width: 70%;
+}
+
+.pdp-skeleton-line.is-price {
+  height: 18px;
+  width: 30%;
+}
+
+.pdp-skeleton-line.is-short {
+  width: 55%;
+}
+
+.pdp-skeleton-line.is-cta {
+  height: 52px;
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-3);
+}
+
+/* it's a placeholder, so it breathes rather than shimmers — a shimmer on a dark lingerie page reads as a fault */
+@media (prefers-reduced-motion: no-preference) {
+  .pdp-skeleton-media,
+  .pdp-skeleton-line {
+    animation: pdp-pulse 1.6s var(--ease) infinite;
+  }
+}
+
+@keyframes pdp-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 900px) {
+  .pdp-skeleton {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ───────── header controls ───────── */
@@ -397,8 +465,9 @@
   }
   .nav-actions .icon-btn,
   .nav-toggle {
-    width: 40px !important;
-    height: 40px !important;
+    /* 40px sat just under the 44px target, on the one bar that's on every page */
+    width: 44px !important;
+    height: 44px !important;
   }
   .nav-toggle {
     margin-left: 4px;
@@ -423,4 +492,104 @@
     padding: 16px 0 8px;
     font-size: 16px;
   }
+}
+
+/* ───────── the bag in the dark ─────────
+   The drawer is separated from the page by a drop shadow alone. On a near-black page a near-black shadow over a
+   black scrim is invisible, so the panel has no edge: it needs a drawn one. */
+
+:root[data-theme="dark"] .drawer {
+  border: 1px solid var(--hair);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="dark"] .filters {
+  border: 1px solid var(--hair);
+}
+
+/* ───────── the bag: the line's own detail ───────── */
+
+/* the saving belongs on the line, not only on the card — it reassures where the decision is made */
+.bag-price s {
+  margin-left: var(--space-2);
+  font-weight: 400;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+.bag-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* the wrong size is the commonest mistake in a bag, so it's changed here rather than by starting over */
+.bag-size select {
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--step--1);
+  cursor: pointer;
+}
+
+/* two taps, because one sat under the send button with an empty bag behind it */
+.drawer-clear.is-confirming {
+  color: var(--rose-ink);
+  font-weight: 600;
+}
+
+/* an empty bag is the best place on the site to offer something back */
+.drawer-suggest {
+  margin-top: var(--space-6);
+  width: 100%;
+}
+
+.drawer-suggest-head {
+  margin: 0 0 var(--space-3);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.drawer-suggest ul {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.drawer-suggest a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.drawer-suggest-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--cream-2);
+}
+
+.drawer-suggest-media img {
+  object-fit: cover;
+}
+
+.drawer-suggest-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: var(--space-2);
+  font-size: var(--step--2);
+  line-height: 1.3;
 }

@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useTrackNoResults } from "@/lib/analytics";
-import { categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
+import { bestSellers, categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { Chevron, ChevronNext, Close, Search, Sliders } from "../icons";
 
@@ -316,11 +316,44 @@ export default function ProductBrowser() {
             </>
           ) : (
             <div className="empty">
-              <h3 className="h3">No pieces match those filters.</h3>
-              <p>Try removing a filter, or message us — we may have it in the back.</p>
+              {/* a search that found nothing and a filter set that found nothing are different dead ends, and
+                  "those filters" is the wrong answer to a typed word. Each one is offered the way out it needs. */}
+              <h3 className="h3 empty-title">
+                {urlQuery && !filterCount
+                  ? `Nothing matched “${urlQuery}”.`
+                  : urlQuery
+                    ? `Nothing matched “${urlQuery}” with these filters.`
+                    : "No pieces match those filters."}
+              </h3>
+              <p>
+                {urlQuery && !filterCount
+                  ? "Try a shorter word, or message us — we may have it in the back."
+                  : "Drop one of these and see, or message us — we may have it in the back."}
+              </p>
+              {/* dropping one filter is usually what's wanted, not losing the lot */}
+              {chips.length > 1 && (
+                <ul className="empty-chips">
+                  {chips.map((c) => (
+                    <li key={c.label}>
+                      <button type="button" onClick={c.clear}>
+                        Remove {c.label} <Close />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <button className="btn btn-wine" onClick={clearAll}>
-                Clear filters
+                {urlQuery && !filterCount ? "Clear the search" : "Clear filters"}
               </button>
+              {/* never a dead end: four pieces to carry on with */}
+              <div className="empty-suggest">
+                <p className="empty-suggest-head">Best sellers</p>
+                <div className="empty-suggest-grid">
+                  {bestSellers.slice(0, 4).map((p) => (
+                    <ProductCard key={p.slug} product={p} sizes="(min-width: 901px) 20vw, 44vw" />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -128,7 +128,8 @@ test.describe("product page", () => {
     const bag = bagDialog(page);
     await expect(page.locator(".drawer-root")).toHaveClass(/is-open/);
     await expect(bag.locator(".drawer-head h2")).toContainText("(2)");
-    await expect(bag.locator(".bag-item")).toContainText("Wine · XL");
+    await expect(bag.locator(".bag-item .bag-meta")).toContainText("Wine");
+    await expect(bag.locator(".bag-item .bag-size select")).toHaveValue("XL");
     await expect(bag.locator(".bag-item .stepper span")).toHaveText("2");
     await expect(bag.locator(".bag-item strong")).toHaveText(fmt(price * 2));
     await expect(bag.locator(".drawer-total strong")).toHaveText(fmt(price * 2));

@@ -83,8 +83,10 @@ test.describe("the shop", () => {
     await page.locator(".chips .chip", { hasText: "silk bikini" }).click();
     await expect(box).toHaveValue("");
     await box.fill("qqqqq");
-    await expect(page.locator(".empty")).toContainText("No pieces match");
-    await page.locator(".empty").getByRole("button", { name: "Clear filters" }).click();
+    // a search that found nothing says so about the word, not about "those filters" — and offers a way on
+    await expect(page.locator(".empty-title")).toContainText("Nothing matched “qqqqq”");
+    await expect(page.locator(".empty-suggest .product-card")).toHaveCount(4);
+    await page.locator(".empty").getByRole("button", { name: "Clear the search" }).click();
     await expect(page).not.toHaveURL(/q=/);
     expect(await count(page)).toBe(CATALOG.total);
     await expect(box).toHaveValue("");
@@ -315,7 +317,9 @@ test.describe("the shop", () => {
     const bag = bagDialog(page);
     await expect(bag.locator(".bag-item")).toHaveCount(1);
     await expect(bag.locator(".bag-item")).toContainText(CATALOG.hero.name);
-    await expect(bag.locator(".bag-item")).toContainText("Blush · L");
+    await expect(bag.locator(".bag-item .bag-meta")).toContainText("Blush");
+    // the size is a control now, so the line can be corrected without starting the piece again
+    await expect(bag.locator(".bag-item .bag-size select")).toHaveValue("L");
     await expect(bag.locator(".drawer-total strong")).toHaveText(`LKR ${CATALOG.hero.price.toLocaleString("en-LK")}`);
   });
 
@@ -328,7 +332,8 @@ test.describe("the shop", () => {
     await card.locator(".quick-add-cta").click();
     // quick add is quiet now, so the bag is opened to read the line
     await page.getByRole("button", { name: /Open bag/ }).click();
-    await expect(bagDialog(page).locator(".bag-item")).toContainText("Wine · S");
+    await expect(bagDialog(page).locator(".bag-item .bag-meta")).toContainText("Wine");
+    await expect(bagDialog(page).locator(".bag-item .bag-size select")).toHaveValue("S");
   });
 });
 

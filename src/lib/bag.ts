@@ -85,6 +85,18 @@ export const bag = {
     added = null;
     emit();
   },
+  // Changing a size in the bag, rather than removing the line and starting again. If that size is already in the
+  // bag the two lines become one, capped like any other add.
+  changeSize(item: BagItem, size: string) {
+    if (size === item.size) return;
+    const merged = items.find((i) => same(i, { ...item, size }));
+    const rest = items.filter((i) => !same(i, item));
+    save(
+      merged
+        ? rest.map((i) => (same(i, { ...item, size }) ? { ...i, qty: Math.min(i.qty + item.qty, 10) } : i))
+        : items.map((i) => (same(i, item) ? { ...i, size } : i)),
+    );
+  },
   setQty(item: BagItem, qty: number) {
     save(qty <= 0 ? items.filter((i) => !same(i, item)) : items.map((i) => (same(i, item) ? { ...i, qty: Math.min(qty, 10) } : i)));
   },

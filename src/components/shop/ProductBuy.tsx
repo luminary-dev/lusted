@@ -45,6 +45,17 @@ export default function ProductBuy({ slug }: { slug: string }) {
   const [nudge, setNudge] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const sizeGroup = useRef<HTMLDivElement>(null);
+  const actions = useRef<HTMLDivElement>(null);
+  // On a phone the 9:16 photo puts the price and the button a screenful down. The bar carries them within reach,
+  // and only appears once the real button has scrolled out of sight, so it never doubles up.
+  const [barShown, setBarShown] = useState(false);
+  useEffect(() => {
+    const el = actions.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setBarShown(!e.isIntersecting), { rootMargin: "0px 0px -8px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Asking for a size has to be noticed: the warning is announced, and the chips are brought into view and focused,
   // because on a phone they're usually scrolled off when the button is tapped.
@@ -143,7 +154,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
         </p>
       </div>
 
-      <div className="buy-actions">
+      <div className="buy-actions" ref={actions}>
         <div className="stepper" aria-label="Quantity">
           <button
             aria-label="Decrease quantity"
@@ -183,6 +194,24 @@ export default function ProductBuy({ slug }: { slug: string }) {
         <WhatsApp /> Order now on WhatsApp
       </a>
       <TrustStrip />
+
+      {/* aria-hidden while it's away so the same two controls aren't announced twice */}
+      <div className={`buy-bar ${barShown ? "is-shown" : ""}`} aria-hidden={!barShown} inert={!barShown}>
+        <div className="buy-bar-price">
+          <span>{product.name}</span>
+          <strong>{formatPrice(priceOf(product) * qty)}</strong>
+        </div>
+        <button
+          className="btn btn-wine"
+          onClick={() => {
+            if (!requireSize()) return;
+            bag.add({ slug, size: size!, color, qty });
+          }}
+        >
+          <Bag /> {size ? "Add to bag" : "Pick a size"}
+        </button>
+      </div>
+
       {guideOpen && (
         <SizeGuideDialog
           category={product.category}

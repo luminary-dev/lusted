@@ -43,7 +43,22 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
       <JsonLd data={productJsonLd(product)} />
       <JsonLd data={breadcrumbJsonLd(product)} />
       <div className="container">
-        <Suspense fallback={<div className="pdp-skeleton" />}>
+        {/* the shape of the page, not an empty block: the photo, the name, the price and the buttons all hold
+            their room, so nothing jumps when the detail arrives */}
+        <Suspense
+          fallback={
+            <div className="pdp-skeleton" aria-hidden="true">
+              <div className="pdp-skeleton-media" />
+              <div className="pdp-skeleton-info">
+                <span className="pdp-skeleton-line is-title" />
+                <span className="pdp-skeleton-line is-price" />
+                <span className="pdp-skeleton-line" />
+                <span className="pdp-skeleton-line is-short" />
+                <span className="pdp-skeleton-line is-cta" />
+              </div>
+            </div>
+          }
+        >
           <ProductDetails product={product} />
         </Suspense>
       </div>
