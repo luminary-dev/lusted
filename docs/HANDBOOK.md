@@ -59,7 +59,7 @@ sent back) and the scripts' console output (plain "done" and "warning:"):
 - **Image `sizes` are measured, not guessed.** Each photo's `sizes` says how wide it is actually drawn — for `object-fit: cover` photos in tall boxes that is wider than the box (the hero is ~1.9× the screen height below 16:9, the size-guide photo ~900px on desktop). Too small and it looks soft on retina; too big and it wastes data. After a layout change, re-measure before editing.
 - **The 3D size tags build late.** `SizeTags3D.tsx` loads three.js and builds the scene only when the size guide is about a screen and a half away, in small steps, with shaders compiled in the background — on a phone that work used to block the page for seconds at load.
 - **The loading screen only greets a visit that begins on the home page**, once per tab. A visit that lands anywhere else — a product link opened from Instagram or WhatsApp, whose in-app browsers start a fresh session every time — goes straight to the page, and doesn't meet the curtain on the home page later either. The inline script in `src/app/layout.tsx` decides before first paint, so it never flashes.
-- **Nothing hidden competes with the first screen:** hero slides after the first load at low priority, search thumbnails only after search is first opened, and the filmstrip's looped copies carry no blur placeholder.
+- **Nothing hidden competes with the first screen:** hero slides after the first load at low priority, search thumbnails only after search is first opened, the product photo viewer's script only once a shopper reaches for the photo (hover, focus or touch) and its large photos only once it opens, and the filmstrip's looped copies carry no blur placeholder.
 
 ## Environment
 
@@ -241,6 +241,8 @@ Custom events (Vercel → Analytics → Events), sent through `src/lib/analytics
 - `hint` — a hint sent: `source` (`product` or `favourites`) and `via` (`share` — the phone's share sheet, counted once
   it's sent, not when it's dismissed; `whatsapp`; or `copy`).
 - `add_to_bag` and `favourite` (saving only) — with the piece's `slug`.
+- `photo_zoom` — the product page's main photo opened full screen (`components/shop/PdpViewer.tsx`, to swipe between
+  the colour's photos and pinch, double-tap or double-click to zoom), with the piece's `slug`.
 - `gift_voucher` — a gift voucher request sent, with its `amount`: one of the set amounts, or `other` for one the
   shopper typed.
 - `search_no_results` — a search that found nothing, the `query` cut to 40 characters, from the search dialog
