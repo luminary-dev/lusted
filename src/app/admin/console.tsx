@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import wordmarkDark from "@/assets/brand/wordmark-dark.png";
 import wordmarkLight from "@/assets/brand/wordmark-light.png";
+import { IMAGE_VERSION } from "@/lib/cdn";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
 // The back room — the owner console, four rooms on four pages: the fitting (add a piece), the offers, the ledger
@@ -51,7 +52,8 @@ const REPO = "https://github.com/luminary-dev/lusted";
 const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
 const COLOR_KEYS = Object.keys(colors) as ColorKey[];
-const IMG = (slug: string) => `/img/v2/products/${slug}.webp`;
+// the photo route serves only the current version, so the thumbnails follow it
+const IMG = (slug: string) => `/img/v${IMAGE_VERSION}/products/${slug}.webp`;
 const COLLECTION_OPTIONS = COLLECTIONS.map((c) => ({ value: c.key, label: c.name }));
 // the home page and the search show six best sellers, so six is the limit
 const BEST_LIMIT = 6;
