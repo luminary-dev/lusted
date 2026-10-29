@@ -18,29 +18,29 @@ export interface SaleBand {
 
 type Copy = Omit<SaleBand, "eyebrow" | "offer" | "href">;
 
-// One voice per collection: the swim lines are the band as it first launched, word for word.
+// One voice per collection, each about what its pieces do (and how fast they come off).
 const COPY: Record<Category, Copy> = {
   swim: {
-    lead: "Barely there.",
-    body: "Less fabric, less to pay, nothing left to hide behind. Consider it permission to show them everything — while your size lasts.",
+    lead: "Strip down for less.",
+    body: "Less fabric, less to pay and nothing left to hide behind. Show them everything and spend less doing it — while your size lasts.",
     cta: "Shop the bikini sale",
   },
   lingerie: {
-    lead: "Undone for less.",
-    body: "Lace that clings, satin that slips, and a price that gives in as easily as the clasp. Take the hint — while your size lasts.",
+    lead: "Slipping off for less.",
+    body: "Lace that clings, satin that slips, and prices that come down as easily as your straps. Take the hint — while your size lasts.",
     cta: "Shop the lingerie sale",
   },
   "after-dark": {
-    lead: "Wicked for less.",
-    body: "Plunges, slits and hems that were never meant to last the night — and now neither are the prices. Go on, misbehave — while your size lasts.",
+    lead: "Bad decisions, discounted.",
+    body: "Plunges, slits and hems that were never meant to last the night — and now neither are the prices. Misbehave twice — while your size lasts.",
     cta: "Shop the after-dark sale",
   },
 };
 
 // A sale across collections speaks for all of them.
 const MIXED: Copy = {
-  lead: "Your excuse.",
-  body: "Lace, strings and after-dark hems, all for less than they’re worth. Pick your sin — while your size lasts.",
+  lead: "Be greedy.",
+  body: "Lace, strings and after-dark hems, all marked down and all made to come off. Take more than one to bed — while your size lasts.",
   cta: "Shop the sale",
 };
 
