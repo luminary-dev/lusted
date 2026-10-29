@@ -178,7 +178,7 @@ export const productImages = {
   "amethyst-sin-sling-bodysuit": amethystSinSlingBodysuit,
 };
 
-export type ProductView = "back" | "side";
+export type ProductView = "back" | "side" | "extra1" | "extra2" | "extra3";
 export const productViews: Partial<Record<keyof typeof productImages, Partial<Record<ProductView, StaticImageData>>>> = {
   "rose-lace-balconette-bra": { back: roseLaceBalconetteBraBack, side: roseLaceBalconetteBraSide },
   "rose-lace-high-waist-brief": { back: roseLaceHighWaistBriefBack, side: roseLaceHighWaistBriefSide },

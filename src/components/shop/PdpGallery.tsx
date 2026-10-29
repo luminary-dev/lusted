@@ -3,11 +3,12 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useColorChoice } from "@/lib/color-choice";
-import type { ColorKey, Product } from "@/lib/products";
+import { viewName, type ColorKey, type Product } from "@/lib/products";
 import { Badges } from "./ProductCard";
 
-// The product page gallery: the front view large, the other views as small thumbnails underneath. Choosing a
-// thumbnail cross-fades it into the main frame (and the main view drops down into the thumbnails).
+// The product page gallery: the front view large, the other views (back, side, and up to three more photos) as small
+// thumbnails underneath. Choosing a thumbnail cross-fades it into the main frame (and the main view drops down into the
+// thumbnails).
 export default function PdpGallery({ product }: { product: Product }) {
   // the picked colour's photos when that colour has been photographed, otherwise the main colour's
   const color = useColorChoice(product.slug, product.colors[0]) as ColorKey;
@@ -27,7 +28,7 @@ export default function PdpGallery({ product }: { product: Product }) {
             key={v.label}
             quality={90}
             src={v.src}
-            alt={`${product.name} — ${v.label.toLowerCase()} view`}
+            alt={`${product.name} — ${viewName(v.label)}`}
             fill
             preload={i === 0}
             placeholder="blur"
@@ -48,7 +49,7 @@ export default function PdpGallery({ product }: { product: Product }) {
         <div className="pdp-thumbs" role="group" aria-label="More views">
           {views.map((v, i) =>
             i === active ? null : (
-              <button key={v.label} type="button" className="pdp-thumb" onClick={() => setActive(i)} aria-label={`Show the ${v.label.toLowerCase()} view`}>
+              <button key={v.label} type="button" className="pdp-thumb" onClick={() => setActive(i)} aria-label={`Show the ${viewName(v.label)}`}>
                 <Image quality={75} src={v.src} alt="" fill placeholder="blur" sizes="80px" />
                 <span>{v.label}</span>
               </button>

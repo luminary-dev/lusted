@@ -1,9 +1,13 @@
 // Applies one small console change to the catalogue: runs in the Console workflow (.github/workflows/console.yml) with
-//   ADMIN_ACTION   update-product | remove-product | bulk-offer
+//   ADMIN_ACTION   update-product | remove-product | bulk-offer | product-photo
 //   ADMIN_PAYLOAD  the dispatch's client_payload as JSON (shaped and checked by src/app/api/admin/dispatch/route.ts)
 // A removal also takes the piece's photos out of the manifest, but leaves them in the bucket, and drops it from any
-// other piece's pairsWith. The workflow commits what changed, with the summary written here as the message.
-import { CATALOG, COLLECTIONS, MANIFEST, SLUG, lkr, normalise, payload, quote, readJson, summarise, writeJson } from "./lib.mjs";
+// other piece's pairsWith. A photo change finishes the owner's new photos the way add-product.mjs does and puts each
+// under a key of its own (scripts/lib/photo-keys.mjs); a photo it replaces or removes leaves the manifest but stays in
+// the bucket, for the same reason a removed piece's do. The workflow commits what changed, with the summary written
+// here as the message.
+import { VIEWS, photoBase, photoKey, revKey } from "../lib/photo-keys.mjs";
+import { CATALOG, COLLECTIONS, INCOMING, MANIFEST, SLUG, bucket, finishPhoto, lkr, normalise, payload, quote, readJson, sortManifest, summarise, writeJson } from "./lib.mjs";
 
 const action = process.env.ADMIN_ACTION;
 const catalog = await readJson(CATALOG);
@@ -118,6 +122,78 @@ if (action === "update-product") {
   await writeJson(CATALOG, catalog);
   const scope = category === "*" ? "everything" : COLLECTIONS[category];
   await summarise(pct === null ? `offers cleared on ${scope} (${changed} piece${changed === 1 ? "" : "s"})` : `${pct}% off ${scope} (${changed} piece${changed === 1 ? "" : "s"})`);
+} else if (action === "product-photo") {
+  const i = find(payload.slug);
+  const product = catalog[i];
+  const manifest = await readJson(MANIFEST);
+  const has = (colour, view) => photoKey(manifest.images, photoBase(product.slug, colour, view));
+  // each change is a photo (an incoming/ address) for one view of the piece (front, back, side or one of the three
+  // extras), or of one of its other colours, or null to
+  // remove that view's photo. The console and the dispatch route refuse anything else before it is queued
+  // (src/lib/admin/photos.ts); this is the last line of defence.
+  const changes = (Array.isArray(payload.changes) ? payload.changes : []).map(({ colour = null, view, photo = null } = {}) => ({ colour, view, photo }));
+  if (changes.length === 0 || changes.length > 48) throw new Error("product-photo: one to 48 changes");
+  const seen = new Set();
+  for (const { colour, view, photo } of changes) {
+    if (!VIEWS.includes(view)) throw new Error("product-photo: front, back, side or an extra");
+    if (colour !== null && !/^[a-z]{1,20}$/.test(colour)) throw new Error("product-photo: not a colour");
+    if (colour === product.colors[0]) throw new Error(`product-photo: the ${colour} photos are the piece's own`);
+    if (seen.has(`${colour}/${view}`)) throw new Error("product-photo: one change per photo");
+    seen.add(`${colour}/${view}`);
+    if (photo === null && colour === null && view === "front") throw new Error("product-photo: a piece keeps its front photo");
+    if (photo !== null && (!INCOMING.test(photo) || !photo.includes(`/${view}.`))) throw new Error(`product-photo: the ${view} photo's address is wrong`);
+  }
+  // a colour's other photos show only with its front (sync-product-images.mjs)
+  for (const colour of new Set(changes.filter((c) => c.colour !== null && c.photo !== null).map((c) => c.colour))) {
+    const front = changes.find((c) => c.colour === colour && c.view === "front");
+    if (!(front ? front.photo !== null : has(colour, "front"))) throw new Error(`product-photo: the ${colour} photos need a front`);
+  }
+
+  const store = changes.some((c) => c.photo !== null) ? bucket() : null;
+  const said = [];
+  let kept = 0; // photos out of the manifest, still in the bucket
+  for (const { colour, view, photo } of changes) {
+    const was = has(colour, view);
+    const label = `${colour ? `${colour} ` : ""}${view.replace(/^extra/, "extra ")}`;
+    if (photo === null) {
+      // already gone: a second run of the same change, or the colour's front took it along just before
+      if (!was) continue;
+      // a colour's other photos go with its front, since they never show without it
+      const gone = [was, ...(colour && view === "front" ? VIEWS.filter((v) => v !== "front").map((v) => has(colour, v)).filter(Boolean) : [])];
+      for (const key of gone) {
+        delete manifest.images[key];
+        console.log(`  – ${key}`);
+      }
+      kept += gone.length;
+      said.push(gone.length > 1 ? `${colour} photos removed` : `${label} photo removed`);
+    } else {
+      const key = revKey(photoBase(product.slug, colour, view), photo);
+      if (was === key) continue; // in already: a second run of the same change
+      manifest.images[key] = await finishPhoto(store, photo, key);
+      if (was) {
+        delete manifest.images[was];
+        console.log(`  – ${was}`);
+        kept++;
+      }
+      said.push(was ? `${label} photo replaced` : `new ${label} photo`);
+    }
+  }
+  // a photo of the piece in a colour it doesn't list yet adds the colour, after the ones it has
+  const added = [...new Set(changes.filter((c) => c.colour !== null && c.photo !== null && !product.colors.includes(c.colour)).map((c) => c.colour))];
+  if (said.length === 0 && added.length === 0) {
+    console.log("nothing changed");
+    process.exit(0);
+  }
+  if (added.length) {
+    product.colors = [...product.colors, ...added];
+    catalog[i] = normalise(product);
+    await writeJson(CATALOG, catalog);
+    said.push(`${added.join(" and ")} added to its colours`);
+  }
+  await writeJson(MANIFEST, sortManifest(manifest));
+  for (const { photo } of changes) if (photo !== null) await store.del(photo);
+  await import("../sync-product-images.mjs");
+  await summarise(`${quote(product.name)}: ${said.join(", ")}${kept ? ` (${kept} old photo${kept === 1 ? "" : "s"} kept in the bucket)` : ""}`);
 } else {
   throw new Error(`unknown action: ${action}`);
 }

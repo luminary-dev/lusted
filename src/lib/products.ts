@@ -1,6 +1,6 @@
 import catalog from "./catalog.json";
 import type { StaticImageData } from "next/image";
-import { colorImages, productImages, productViews } from "./product-images";
+import { colorImages, productImages, productViews, type ProductView } from "./product-images";
 
 // Product data lives in catalog.json (placeholder catalogue — replace with your real range).
 
@@ -67,19 +67,27 @@ export interface Product {
   image: (typeof productImages)[keyof typeof productImages];
   /** model-shot pieces: the back view, shown on hover in cards */
   backImage?: StaticImageData;
-  /** every photo of the piece, front first (front, back and side where they exist) — the product page gallery */
+  /** every photo of the piece, front first (front, back, side and up to three more where they exist) — the product page gallery */
   views: { label: string; src: StaticImageData }[];
   /** the gallery per colour: the main colour (colors[0]) is `views`; other colours appear once they're photographed */
   colorViews: Partial<Record<ColorKey, { label: string; src: StaticImageData }[]>>;
   isNew: boolean;
 }
 
-type ViewSet = { front: StaticImageData; back?: StaticImageData; side?: StaticImageData };
-const toViews = (v: ViewSet, mainLabel = "Front") => [
-  { label: mainLabel, src: v.front },
-  ...(v.back ? [{ label: "Back", src: v.back }] : []),
-  ...(v.side ? [{ label: "Side", src: v.side }] : []),
-];
+type ViewSet = { front: StaticImageData } & Partial<Record<ProductView, StaticImageData>>;
+// The gallery's order: front, back, side, then the up to three optional photos in their slots' order. Those have no
+// name of their own, so each is called by where it shows ("Photo 4"); a gap left by one taken off just closes up.
+export const toViews = (v: ViewSet, mainLabel = "Front") => {
+  const views = [
+    { label: mainLabel, src: v.front },
+    ...(v.back ? [{ label: "Back", src: v.back }] : []),
+    ...(v.side ? [{ label: "Side", src: v.side }] : []),
+  ];
+  for (const extra of [v.extra1, v.extra2, v.extra3]) if (extra) views.push({ label: `Photo ${views.length + 1}`, src: extra });
+  return views;
+};
+// how the gallery speaks of a view: "the back view", but "photo 4" rather than "photo 4 view"
+export const viewName = (label: string) => (/^Photo \d$/.test(label) ? label.toLowerCase() : `${label.toLowerCase()} view`);
 
 // The six most recently added pieces are flagged "New".
 const shot = catalog.filter((p) => p.slug in productImages); // pieces appear once they have a photo

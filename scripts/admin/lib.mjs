@@ -1,9 +1,12 @@
 // Shared by the console's two scripts (add-product.mjs, apply-update.mjs): the catalogue and manifest files, the
-// bucket, the entry's canonical key order, and the one-line summary the workflow turns into the commit message (and
-// so into the console's activity feed — it must say exactly what changed).
+// bucket, the owner's photos on their way from incoming/ into the catalogue, the entry's canonical key order, and the
+// one-line summary the workflow turns into the commit message (and so into the console's activity feed — it must say
+// exactly what changed).
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { AwsClient } from "aws4fetch";
+import sharp from "sharp";
+import { blurPlaceholder, finishProduct } from "../lib/wordmark.mjs";
 
 export const ROOT = path.resolve(import.meta.dirname, "../..");
 export const CATALOG = path.join(ROOT, "src/lib/catalog.json");
@@ -11,6 +14,8 @@ export const MANIFEST = path.join(ROOT, "src/lib/image-manifest.json");
 export const SUMMARY = path.join(ROOT, ".admin-summary");
 
 export const SLUG = /^[a-z0-9-]{1,64}$/;
+// where the console's upload-url route puts the owner's photos (src/app/api/admin/upload-url/route.ts)
+export const INCOMING = /^incoming\/[a-f0-9]{24}\/(front|back|side|extra[123])\.(jpg|png|webp)$/;
 export const COLLECTIONS = { lingerie: "Lace Secrets", swim: "Sun Kissed", "after-dark": "Midnight Sins" };
 export const lkr = (n) => `LKR ${Number(n).toLocaleString("en-US")}`;
 export const quote = (s) => `“${s}”`;
@@ -56,6 +61,26 @@ export function bucket() {
       if (!res.ok && res.status !== 404) console.warn(`  ! could not delete ${key} (HTTP ${res.status})`);
     },
   };
+}
+
+// One of the owner's photos, from incoming/ to the catalogue: finished the way every product photo is
+// (scripts/lib/wordmark.mjs: cropped to 9:16, the wordmark), put in the bucket under `key`, and its manifest entry
+// returned. The original stays in incoming/ until the script is done with the change (it deletes them last).
+export async function finishPhoto(store, incoming, key) {
+  const original = await store.get(incoming);
+  let finished;
+  if (original) {
+    finished = await finishProduct(original);
+    await store.put(key, finished.buf, "image/webp");
+  } else {
+    // a second run of the same change (the originals went with the first) — the finished photo is already there
+    const done = await store.get(key);
+    if (!done) throw new Error(`the photo is not in the bucket (${incoming})`);
+    const { width, height } = await sharp(done).metadata();
+    finished = { buf: done, width, height };
+  }
+  console.log(`  ✓ ${key} ${finished.width}×${finished.height}`);
+  return { w: finished.width, h: finished.height, blur: await blurPlaceholder(finished.buf) };
 }
 
 export async function summarise(text) {

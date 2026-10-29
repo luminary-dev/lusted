@@ -1,6 +1,7 @@
 import { test as base, expect, type Page, type Locator } from "@playwright/test";
 import catalogJson from "../src/lib/catalog.json";
 import manifest from "../src/lib/image-manifest.json";
+import { photoKey } from "../src/lib/admin/photos";
 import { saleBand } from "../src/lib/sale-band";
 
 /* ───────── the viewport matrix (responsive-dimensions-oct-2026.txt) ───────── */
@@ -119,7 +120,9 @@ export const MINIMUM_SET: Viewport[] = [
    way src/lib/products.ts reads it, so a piece added, changed or removed from the owner console (/admin) doesn't fail
    the suite. */
 type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; description: string; details: string[]; pairsWith?: string[] };
-export const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
+// a photo the console replaced has a key of its own (src/lib/admin/photos.ts), so the keys are looked up, not assumed
+const photoKeys = Object.keys(manifest.images);
+export const photographed = (catalogJson as Entry[]).filter((p) => photoKey(photoKeys, p.slug, null, "front"));
 const bySlug = Object.fromEntries(photographed.map((p) => [p.slug, p]));
 const priceOf = (p: Entry) => p.salePrice ?? p.price;
 const onSale = photographed.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price);
@@ -152,7 +155,7 @@ export const CATALOG = {
   newest: [...photographed].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug),
   // multi-colour pieces whose every colour is photographed
   multiColour: Object.fromEntries(
-    photographed.filter((p) => p.colors.length > 1 && p.colors.slice(1).every((c) => `products/${p.slug}--${c}.webp` in manifest.images)).map((p) => [p.slug, p.colors]),
+    photographed.filter((p) => p.colors.length > 1 && p.colors.slice(1).every((c) => photoKey(photoKeys, p.slug, c, "front"))).map((p) => [p.slug, p.colors]),
   ) as Record<string, string[]>,
   sizes: ["XS", "S", "M", "L", "XL"],
   colours: { blush: "Blush", wine: "Wine", black: "Black", ivory: "Ivory", champagne: "Champagne", mocha: "Mocha", lilac: "Lilac", aqua: "Aqua" },

@@ -33,6 +33,7 @@
 /* gallery: the main view large, the other views as small thumbnails underneath */
 .pdp-thumbs {
   display: flex;
+  flex-wrap: wrap; /* up to five thumbnails with the three optional photos — more than a phone's width holds */
   gap: 10px;
 }
 

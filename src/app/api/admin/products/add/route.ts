@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin/guard";
 import { dispatch, getFile } from "@/lib/admin/github";
+import { photoNamesClash } from "@/lib/admin/photos";
 import { bucket } from "@/lib/admin/r2";
 import { categories, colors, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
@@ -81,6 +82,8 @@ export async function POST(request: Request) {
     const catalogFile = await getFile("src/lib/catalog.json");
     const catalog = catalogFile ? (JSON.parse(catalogFile.toString("utf8")) as Array<{ slug: string; bestSeller?: number }>) : [];
     if (catalog.some((p) => p.slug === slug)) return NextResponse.json({ ok: false, error: `“${name}” is already in the catalogue — change the name` }, { status: 409 });
+    // "Rose 4" next to "Rose": its photos' names would read as the other's fourth photo
+    if (photoNamesClash(slug, catalog.map((p) => p.slug))) return NextResponse.json({ ok: false, error: `“${name}” reads like another piece's photo — change the name` }, { status: 409 });
     if (bestSeller !== undefined && catalog.filter((p) => p.bestSeller).length >= 6) return NextResponse.json({ ok: false, error: "Six best sellers already — clear one in the ledger first" }, { status: 409 });
     for (const [view, key] of Object.entries(keys)) {
       if (!(await store.exists(key))) return NextResponse.json({ ok: false, error: `The ${view} photo didn't finish uploading — try again` }, { status: 400 });
