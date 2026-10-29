@@ -587,12 +587,16 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
   const [rank, setRank] = useState(product.bestSeller ? String(product.bestSeller) : "");
   const [waiting, setWaiting] = useState(false);
 
-  const dirty =
-    name.trim() !== product.name ||
-    category !== product.category ||
-    Number(price) !== product.price ||
-    (sale === "" ? null : Number(sale)) !== (product.salePrice ?? null) ||
-    (rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null);
+  // Only the fields changed in this row, against its values when editing began: the change lands minutes later, so
+  // sending the rest would put back whatever this row last saw — undoing an offer still on its way, say. A cleared
+  // offer price or rank is sent as null, which ends it; a field that isn't sent is left alone.
+  const changes: Partial<{ name: string; category: string; price: number; salePrice: number | null; bestSeller: number | null }> = {};
+  if (name.trim() !== product.name) changes.name = name.trim();
+  if (category !== product.category) changes.category = category;
+  if (Number(price) !== product.price) changes.price = Number(price);
+  if ((sale === "" ? null : Number(sale)) !== (product.salePrice ?? null)) changes.salePrice = sale === "" ? null : Number(sale);
+  if ((rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null)) changes.bestSeller = rank === "" ? null : Number(rank);
+  const dirty = Object.keys(changes).length > 0;
   const pct = sale && Number(sale) < Number(price) ? Math.round((1 - Number(sale) / Number(price)) * 100) : 0;
   // a seventh best seller: the six are already taken by other pieces
   const seventh = rank !== "" && !product.bestSeller && bestTaken >= BEST_LIMIT;
@@ -600,19 +604,13 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
   async function save() {
     if (seventh) return;
     setWaiting(true);
-    const data = { name: name.trim(), category, price: Number(price), salePrice: sale === "" ? null : Number(sale), bestSeller: rank === "" ? null : Number(rank) };
+    const data = changes;
     const result = await post("/api/admin/dispatch", { action: "update-product", slug: product.slug, data });
     if (result.ok) {
       track(`Saving “${product.name}”`, `“${product.name}” is updated. The dev site follows in a couple of minutes.`, (state) => {
         const now = state.products.find((p) => p.slug === product.slug);
-        return (
-          !!now &&
-          now.name === data.name &&
-          now.category === data.category &&
-          now.price === data.price &&
-          (now.salePrice ?? null) === data.salePrice &&
-          (now.bestSeller ?? null) === data.bestSeller
-        );
+        // done when what was sent has landed; the fields not sent may have moved on in the meantime
+        return !!now && (Object.keys(data) as Array<keyof typeof data>).every((key) => (now[key] ?? null) === data[key]);
       });
     } else setWaiting(false);
   }
