@@ -21,7 +21,7 @@ const art: {
     cat: "lingerie",
     badge: "Boudoir",
     Icon: Heart,
-    cta: "Unwrap the lace",
+    cta: "Come undone in lace",
     img: lingerie,
     alt: "Model reclining on blush satin pillows in a pink lace balconette bra and brief",
   },
@@ -29,7 +29,7 @@ const art: {
     cat: "swim",
     badge: "Poolside",
     Icon: Sun,
-    cta: "Take the plunge",
+    cta: "Get wet",
     img: swim,
     alt: "Model in an ivory string bikini on a linen daybed by the sea",
   },
@@ -37,7 +37,7 @@ const art: {
     cat: "after-dark",
     badge: "Afterparty",
     Icon: Moon,
-    cta: "Steal the night",
+    cta: "Make bad decisions",
     img: afterDark,
     alt: "Model in a black sequin halter mini dress with gold chain cut-outs in a candlelit lounge",
   },
@@ -54,9 +54,9 @@ export default function Collections() {
       <div className="container">
         <header className="head">
           <div data-reveal>
-            <p className="eyebrow">Choose your sin</p>
+            <p className="eyebrow">Three flavours of trouble</p>
             <h2 className="h2">
-              Pick your <em>pleasure</em>
+              Pick your <em>sin</em>
             </h2>
           </div>
           <div
@@ -64,9 +64,9 @@ export default function Collections() {
             data-reveal
             style={{ "--d": "0.1s" } as React.CSSProperties}
           >
-            <p>Lace for when you want to be undone slowly, strings for when you want to be stared at and soaked through, and silk for when you’re not going home alone — or going home at all.</p>
+            <p>Lace for when you want to be unhooked slowly, one clasp at a time. Strings for when you want every head at the pool to turn. Silk for when you have no intention of sleeping — or of going home.</p>
             <Link className="btn btn-wine" href="/products">
-              Tempt me with everything <ArrowRight className="arrow" />
+              Show me all of it <ArrowRight className="arrow" />
             </Link>
           </div>
         </header>

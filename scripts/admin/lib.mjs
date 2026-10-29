@@ -79,7 +79,7 @@ export async function finishPhoto(store, incoming, key) {
     const { width, height } = await sharp(done).metadata();
     finished = { buf: done, width, height };
   }
-  console.log(`  ✓ ${key} ${finished.width}×${finished.height}`);
+  console.log(`  done ${key} ${finished.width}×${finished.height}`);
   return { w: finished.width, h: finished.height, blur: await blurPlaceholder(finished.buf) };
 }
 
