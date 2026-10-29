@@ -13,6 +13,22 @@ export function orderRef() {
   return `LST-${Array.from(bytes, (b) => REF_CHARS[b % REF_CHARS.length]).join("")}`;
 }
 
+// The bag's reference for this visit, kept in the browser only: it's made the first time it's asked for there, and is
+// empty while the server prerenders (Next refuses random values during a prerender, and the bag is on every page), so
+// the server's HTML and the first client render agree. `newOrderRef` starts a fresh one when the bag is cleared.
+let current = "";
+const refListeners = new Set<() => void>();
+export const useOrderRef = () =>
+  useSyncExternalStore(
+    (l) => (refListeners.add(l), () => refListeners.delete(l)),
+    () => (current ||= orderRef()),
+    () => "",
+  );
+export function newOrderRef() {
+  current = orderRef();
+  refListeners.forEach((l) => l());
+}
+
 // The site's own address in the visitor's browser, for links in the message that open wherever the order came from.
 // Empty while rendering on the server and during hydration (there's no window there), so the server's HTML and the
 // first client render agree; the links become absolute straight after.

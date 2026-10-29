@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { bag, useBag, useBagOpen } from "@/lib/bag";
 import { colors, formatPrice, getProduct, priceOf } from "@/lib/products";
-import { fillIn, orderRef, productUrl, useOrigin } from "@/lib/order";
+import { fillIn, newOrderRef, productUrl, useOrderRef, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Close, WhatsApp } from "../icons";
 
@@ -17,7 +17,7 @@ export default function BagDrawer() {
   const origin = useOrigin();
   // one reference for the visit, so an order sent again after a change still matches the first message; clearing the
   // bag starts a new one
-  const [ref, setRef] = useState(orderRef);
+  const ref = useOrderRef();
   // the gift option only shapes this message — it isn't saved with the bag
   const [gift, setGift] = useState(false);
   const [note, setNote] = useState("");
@@ -135,7 +135,7 @@ export default function BagDrawer() {
                 className="drawer-clear"
                 onClick={() => {
                   bag.clear();
-                  setRef(orderRef());
+                  newOrderRef();
                   setGift(false);
                   setNote("");
                 }}
