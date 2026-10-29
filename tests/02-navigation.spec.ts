@@ -5,6 +5,7 @@ const NAV = [
   ["Collections", "/#collections"],
   ["Size Guide", "/#size-guide"],
   ["Ordering", "/#ordering"],
+  ["FAQ", "/help"],
   ["Contact", "/#contact"],
 ] as const;
 
@@ -35,6 +36,8 @@ test.describe("header", () => {
     await expect(nav.getByRole("link", { name: "Contact", exact: true })).toHaveClass(/is-active/);
     await go(page, "/products");
     await expect(nav.getByRole("link", { name: "Shop", exact: true })).toHaveClass(/is-active/);
+    await go(page, "/help");
+    await expect(nav.getByRole("link", { name: "FAQ", exact: true })).toHaveClass(/is-active/);
   });
 
   test("WhatsApp button opens wa.me with a prefilled message in a new tab", async ({ prepared: page }) => {

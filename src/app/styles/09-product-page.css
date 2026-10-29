@@ -257,6 +257,66 @@
   margin-top: -12px;
 }
 
+/* the trust strip under the WhatsApp button (here and in the bag): four promises, two to a row, and the way to the
+   help page — small and quiet, so it reassures without competing with the button above it. The columns are only as
+   wide as their words, and give way (the words wrap) only when the room runs out. */
+.trust {
+  display: grid;
+  gap: 10px;
+}
+
+.buy .trust {
+  margin-top: -4px;
+}
+
+.trust-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 8px 28px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.trust-list li {
+  display: flex;
+  gap: 9px;
+}
+
+.trust-list svg {
+  width: 15px;
+  height: 15px;
+  margin-top: 2px; /* centred on the first line of a label that wraps */
+  color: var(--rose-ink);
+}
+
+.trust-link {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px; /* a tap target on its own line, not a link in running text */
+  font-size: 12.5px;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.25s;
+}
+
+.trust-link:hover {
+  color: var(--ink);
+}
+
+.trust-link svg {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.3s var(--ease);
+}
+
+.trust-link:hover svg {
+  transform: translateX(2px);
+}
+
 .btn-ghost {
   border-color: var(--hair);
   color: var(--ink);

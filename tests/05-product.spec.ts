@@ -73,6 +73,21 @@ test.describe("product page", () => {
     expect(text).toContain(fmt(price));
   });
 
+  test("a trust strip under the WhatsApp button promises only what the terms do and leads to delivery, returns & FAQ", async ({ prepared: page }) => {
+    const promises = ["Plain, unbranded box", "Delivery across Sri Lanka", "7-day exchange", "Sizing help from a real person"];
+    const strip = main(page).locator(".buy").getByRole("list", { name: "Ordering with Lusted" });
+    await expect(strip.getByRole("listitem")).toHaveText(promises);
+    await expect(main(page).locator(".buy").getByRole("link", { name: "Delivery, returns & FAQ" })).toHaveAttribute("href", "/help");
+    // the bag carries the same strip beside its send button, and following its link closes the bag
+    await page.locator(".pdp-info .size-chips").getByRole("button", { name: "M", exact: true }).click();
+    await page.getByRole("button", { name: /Add to bag/ }).click();
+    const bag = bagDialog(page);
+    await expect(bag.getByRole("list", { name: "Ordering with Lusted" }).getByRole("listitem")).toHaveText(promises);
+    await bag.getByRole("link", { name: "Delivery, returns & FAQ" }).click();
+    await expect(page).toHaveURL(/\/help$/);
+    await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
+  });
+
   test("quantity stepper stays within 1–10 and the button price multiplies", async ({ prepared: page }) => {
     const stepper = page.locator(".buy-actions .stepper");
     const minus = stepper.getByRole("button", { name: "Decrease quantity" });
