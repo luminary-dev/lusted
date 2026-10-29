@@ -8,7 +8,7 @@ Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or a
 
 ## What it is
 
-A Next.js 16 site: a single scrolling home page (hero slideshow, bikini sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop.
+A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop.
 
 ## Run it
 
@@ -45,7 +45,7 @@ npm run lint
 
 ## Tests
 
-End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section, the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag and favourites, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1.
+End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section (and, in Node, the sale band's wording for every kind of sale), the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag and favourites, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1.
 
 ```bash
 npm run test:build   # production build, then the whole suite (about 10 minutes)
@@ -106,7 +106,8 @@ published to be read, not reused — see `LICENSE`.
 **/admin** — unlinked, kept out of search, never cached — is where the owner runs the catalogue without opening the
 repository, in four rooms on four pages (`/admin/fitting`, `/admin/offers`, `/admin/ledger`, `/admin/daybook`, each
 under the same header): add a piece, change a name, collection, price, offer price or best-seller rank, remove a piece, or put a
-percentage off a whole collection. It is modelled on the Luvana console, with two differences: the photos are the
+percentage off a whole collection (the home page's sale band then names that collection and links to its sale pieces —
+`src/lib/sale-band.ts` holds its words). It is modelled on the Luvana console, with two differences: the photos are the
 owner's own (front, back and side — nothing is generated or retouched; each is cropped to the catalogue's 9:16 frame
 and given the wordmark, `scripts/lib/wordmark.mjs`), and the words are Claude's to start with. "Write it with AI"
 sends the front photo and the brief (collection, price, colours, fit, notes) to Claude, which writes the name, the

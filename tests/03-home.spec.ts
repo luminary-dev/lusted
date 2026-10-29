@@ -119,6 +119,9 @@ test("hero slideshow advances when motion is allowed and holds with reduced moti
 test("sale: the four bikinis at exactly 20% off, prices struck through, each linking to its product", async ({ prepared: page }) => {
   const sale = page.locator("#sale");
   await expect(sale.locator("h2")).toContainText(`${CATALOG.maxDiscount}% off`);
+  // the band names what is on sale: the bikini sale while it is all swim
+  await expect(sale.locator(".eyebrow")).toHaveText(CATALOG.saleBand!.eyebrow);
+  await expect(sale.locator("h2")).toHaveText(`${CATALOG.saleBand!.lead} ${CATALOG.saleBand!.offer}`);
   const cards = sale.locator(".sale-card");
   const shown = Math.min(4, CATALOG.sale.length); // the band shows up to four
   await expect(cards).toHaveCount(shown);
@@ -134,7 +137,7 @@ test("sale: the four bikinis at exactly 20% off, prices struck through, each lin
     await expect(c.locator("h3")).not.toBeEmpty();
     await expect(c.locator(".sale-card-blurb")).not.toBeEmpty();
   }
-  await expect(sale.getByRole("link", { name: /Shop the sale|sale/i }).last()).toHaveAttribute("href", "/products?sale=1");
+  await expect(sale.getByRole("link", { name: /Shop the sale|sale/i }).last()).toHaveAttribute("href", CATALOG.saleBand!.href);
   await cards.first().click();
   await expect(page).toHaveURL(new RegExp(`/products/${hrefs[0]}$`));
 });
