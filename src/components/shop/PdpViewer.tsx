@@ -272,8 +272,8 @@ export default function PdpViewer({ name, views, start, onClose }: { name: strin
       )}
 
       <p className="pv-hint" aria-hidden="true">
-        <span className="pv-hint-touch">Pinch or double-tap to zoom</span>
-        <span className="pv-hint-mouse">Double-click to zoom · arrow keys to move</span>
+        <span className="pv-hint-touch">Get closer — pinch or double-tap to zoom</span>
+        <span className="pv-hint-mouse">Get closer — double-click to zoom · arrow keys to move</span>
       </p>
     </dialog>
   );
