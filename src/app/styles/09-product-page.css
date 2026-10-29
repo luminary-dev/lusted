@@ -198,10 +198,11 @@
 }
 
 .buy-label .buy-warn {
-  color: var(--rose);
+  color: var(--rose-ink); /* --rose doesn't clear 4.5:1 at this size (see 01-base.css) */
 }
 
-.buy-label a {
+.buy-label a,
+.buy-label .buy-guide {
   margin-left: auto;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -209,6 +210,24 @@
   color: var(--ink-2);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.buy-label .buy-guide {
+  /* a button, so it opens the chart over the piece, but it reads as the link it replaced. The padding lifts a
+     21px-tall line to a 45px target (WCAG 2.5.8); the matching negative margin keeps the row exactly where it was. */
+  padding-block: 12px;
+  margin-block: -12px;
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+/* a single-colour piece has no picker, so this line is the only place its colour is named */
+.buy-label-static {
+  margin-bottom: var(--space-5);
 }
 
 .buy-colors {

@@ -59,7 +59,13 @@ test.describe("product page", () => {
 
   test("size is required: add to bag and WhatsApp both nudge until one is picked, the fit note shows", async ({ prepared: page }) => {
     await expect(page.locator(".buy-fit")).toContainText(/True to size|Runs small|Runs large/);
-    await expect(page.locator(".buy-group").getByRole("link", { name: "Size guide" })).toHaveAttribute("href", "/#size-guide");
+    // the guide opens over the piece now instead of sending the shopper to the home page and losing their choices
+    const guide = page.locator(".buy-group").getByRole("button", { name: "Size guide" });
+    await guide.click();
+    const chart = page.getByRole("dialog", { name: "Find your size" });
+    await expect(chart).toBeVisible();
+    await chart.getByRole("button", { name: "Close the size guide" }).click();
+    await expect(chart).toBeHidden();
     await page.getByRole("button", { name: /Add to bag/ }).click();
     await expect(page.locator(".buy-warn")).toHaveText("Please choose a size");
     await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);

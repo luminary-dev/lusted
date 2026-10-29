@@ -1,47 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Corinthia, Fraunces, Montserrat, Parisienne, Petit_Formal_Script, Playfair_Display } from "next/font/google";
+import { Corinthia, Montserrat, Parisienne } from "next/font/google";
 import Nav from "@/components/Nav";
 import ScrollRail from "@/components/ScrollRail";
 import FluidCursor from "@/components/FluidCursor";
 import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
+import BagToast from "@/components/shop/BagToast";
 import SearchDialog from "@/components/SearchDialog";
 import SiteAnalytics from "@/components/SiteAnalytics";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
-// Headlines: Parisienne (a casual connecting script — set ~1.5× the Petit Formal Script sizes, its x-height is small).
-// Alternatives kept unloaded until used — switch --headline in globals.css:
-// Petit Formal Script (formal copperplate), Fraunces (soft serif), Playfair Display (closest free match to the logo)
-// or Corinthia (fine script).
+// Headlines: Parisienne, a casual connecting script set large because its x-height is small (--headline in
+// 01-base.css). Corinthia is the finer script used for the signature lines on the about and legal pages (--script).
+// Montserrat carries everything else. Three faces, all of them used — alternates were tried and dropped.
 const parisienne = Parisienne({
   variable: "--font-parisienne",
   subsets: ["latin"],
   weight: "400",
 });
 
-const formal = Petit_Formal_Script({
-  variable: "--font-formal",
-  subsets: ["latin"],
-  weight: "400",
-  preload: false,
-});
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["SOFT", "opsz"],
-  preload: false,
-});
 
-const serif = Playfair_Display({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  preload: false,
-});
 
 const script = Corinthia({
   variable: "--font-script",
@@ -74,6 +55,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // The bag toast and the sticky buy bar sit at the bottom of the screen, so they have to clear a phone's home
+  // indicator. env(safe-area-inset-*) only reports a real inset once the page asks to draw into those areas.
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f8f1ec" },
     { media: "(prefers-color-scheme: dark)", color: "#140a0c" },
@@ -93,7 +77,7 @@ const webglScript = `if(window.WebGLRenderingContext)document.documentElement.cl
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${parisienne.variable} ${formal.variable} ${fraunces.variable} ${serif.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${parisienne.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
@@ -107,6 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         <Footer />
         <BagDrawer />
+        <BagToast />
         <SearchDialog />
         <SiteAnalytics />
       </body>

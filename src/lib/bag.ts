@@ -13,6 +13,10 @@ const EMPTY: BagItem[] = [];
 let items: BagItem[] = EMPTY;
 let loaded = false;
 let open = false;
+// The last line added from a card and the last one removed anywhere — what the toast shows, and what "Undo" puts
+// back. Both are one-deep on purpose: a shopper only ever means the thing they just did.
+let added: { item: BagItem; at: number } | null = null;
+let removed: { item: BagItem; at: number } | null = null;
 const listeners = new Set<() => void>();
 
 // A saved line is only kept if it still makes sense against today's catalogue: the piece exists and still comes in
@@ -63,17 +67,47 @@ function save(next: BagItem[]) {
 const same = (a: BagItem, b: Omit<BagItem, "qty">) => a.slug === b.slug && a.size === b.size && a.color === b.color;
 
 export const bag = {
-  add(item: BagItem) {
+  // `quiet` is how a product card adds: opening the drawer over the grid interrupts anyone building a set, so the
+  // card only announces the line (BagToast) and leaves them browsing. The product page and the nav keep the drawer.
+  add(item: BagItem, opts: { quiet?: boolean } = {}) {
     load();
     const existing = items.find((i) => same(i, item));
     save(existing ? items.map((i) => (same(i, item) ? { ...i, qty: Math.min(i.qty + item.qty, 10) } : i)) : [...items, item]);
-    bag.setOpen(true);
+    if (opts.quiet) {
+      added = { item, at: Date.now() };
+      emit();
+    } else {
+      bag.setOpen(true);
+    }
     trackEvent("add_to_bag", { slug: item.slug });
+  },
+  dismissAdded() {
+    added = null;
+    emit();
   },
   setQty(item: BagItem, qty: number) {
     save(qty <= 0 ? items.filter((i) => !same(i, item)) : items.map((i) => (same(i, item) ? { ...i, qty: Math.min(qty, 10) } : i)));
   },
-  remove: (item: BagItem) => save(items.filter((i) => !same(i, item))),
+  remove(item: BagItem) {
+    const line = items.find((i) => same(i, item));
+    save(items.filter((i) => !same(i, item)));
+    if (line) {
+      removed = { item: line, at: Date.now() };
+      emit();
+    }
+  },
+  // Puts the line back exactly as it was, quantity included — a mis-tap on a 28px button shouldn't cost a re-pick.
+  undoRemove() {
+    if (!removed) return;
+    const line = removed.item;
+    removed = null;
+    load();
+    save(items.find((i) => same(i, line)) ? items.map((i) => (same(i, line) ? { ...i, qty: Math.min(i.qty + line.qty, 10) } : i)) : [...items, line]);
+  },
+  dismissRemoved() {
+    removed = null;
+    emit();
+  },
   clear: () => save([]),
   setOpen(next: boolean) {
     open = next;
@@ -93,6 +127,21 @@ export function useBag() {
   const subtotal = live.reduce((n, i) => n + i.qty * priceOf(getProduct(i.slug)!), 0);
   return { items: live, count, subtotal };
 }
+
+// The one-deep add/remove notices, for the toast.
+export const useBagAdded = () =>
+  useSyncExternalStore(
+    subscribe,
+    () => added,
+    () => null,
+  );
+
+export const useBagRemoved = () =>
+  useSyncExternalStore(
+    subscribe,
+    () => removed,
+    () => null,
+  );
 
 export const useBagOpen = () =>
   useSyncExternalStore(

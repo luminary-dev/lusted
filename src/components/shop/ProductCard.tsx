@@ -61,7 +61,7 @@ function QuickAdd({ product, color }: { product: Product; color: ColorKey }) {
         type="button"
         className="quick-add-cta"
         disabled={!size}
-        onClick={() => size && bag.add({ slug: product.slug, size, color, qty: 1 })}
+        onClick={() => size && bag.add({ slug: product.slug, size, color, qty: 1 }, { quiet: true })}
       >
         <Bag /> {size ? (oneSize ? "Add to bag" : `Add to bag · ${size}`) : "Pick your size"}
       </button>
@@ -78,9 +78,11 @@ export default function ProductCard({
   color?: ColorKey; // start on this colourway (e.g. the colour the shop is filtered by)
   sizes?: string;
 }) {
-  const href = `/products/${product.slug}`;
   // the swatches swap the photo to that colourway when it has been photographed
   const [color, setColor] = useState<ColorKey>(initialColor ?? product.colors[0]);
+  // The link carries the colourway being looked at, so the piece opens on it instead of resetting to the first one.
+  // Only when it isn't the default, to keep the common link clean and shareable.
+  const href = color === product.colors[0] ? `/products/${product.slug}` : `/products/${product.slug}?colour=${color}`;
   const views = product.colorViews[color] ?? product.views;
   const front = views[0].src;
   const back = views.find((v) => v.label === "Back")?.src;
