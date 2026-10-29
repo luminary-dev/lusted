@@ -136,7 +136,7 @@ export default function SizeGuideDialog({
         </table>
 
         <p className="sg-foot">
-          Between two sizes? Follow the fit note on the piece. Still unsure, message us — a real person answers.
+          Between two sizes? Follow the fit note on the piece. Still unsure? Message us — a real person answers, and rather enjoys this part.
         </p>
       </div>
     </dialog>

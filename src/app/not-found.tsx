@@ -92,7 +92,7 @@ export default function NotFound() {
           </div>
           <div className="lost-actions" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
             <Link href="/products" className="btn btn-light">
-              Show me everything <ArrowRight className="arrow" />
+              Show me what you’ve got <ArrowRight className="arrow" />
             </Link>
             <Link href="/" className="lost-home">
               Take me back to bed

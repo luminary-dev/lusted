@@ -31,9 +31,9 @@ export default function Hero() {
             data-reveal
             style={{ "--d": "0.2s" } as React.CSSProperties}
           >
-            Lace that begs to come off, strings that untie with one tug, silk
-            that slides away the second a hand finds it — for the version of
-            you that wants to be watched, and worse.
+            Lace that’s practically begging, strings that quit at the first
+            tug, silk that hits the floor unasked — for the shameless you who
+            wants to be watched, and worse.
           </p>
           <div
             className="hero-actions"
@@ -41,7 +41,7 @@ export default function Hero() {
             style={{ "--d": "0.3s" } as React.CSSProperties}
           >
             <Link href="/products" className="btn btn-light">
-              Find your temptation <ArrowRight className="arrow" />
+              Shop everything naughty <ArrowRight className="arrow" />
             </Link>
             <a
               href={whatsappLink(
@@ -52,7 +52,7 @@ export default function Hero() {
               className="hero-story"
               data-wa-source="hero"
             >
-              <WhatsApp /> Whisper to us
+              <WhatsApp /> Tell us your fantasy
             </a>
           </div>
         </div>
