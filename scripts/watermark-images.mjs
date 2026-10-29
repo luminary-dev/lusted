@@ -47,7 +47,7 @@ for await (const file of walk(IMAGES)) {
   await writeFile(file, buf);
   done[rel] = { w: meta.width, h: meta.height, at: new Date().toISOString().slice(0, 10) };
   marked++;
-  console.log(`  ✓ ${rel}`);
+  console.log(`  done ${rel}`);
 }
 await writeFile(STATE, JSON.stringify(done, null, 2) + "\n");
 console.log(`watermark: ${marked} marked, ${skipped} cut-outs left alone, ${kept} already marked`);

@@ -134,7 +134,7 @@ test.describe("search dialog", () => {
     await page.keyboard.press("/");
     const box = page.getByRole("searchbox", { name: "Search products" });
     await box.fill("qzxv");
-    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nothing’s wearing");
+    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nobody’s wearing");
     await expect(searchDialog(page).getByRole("button", { name: /See all/ })).toHaveCount(0);
     await box.fill("sale");
     await expect(searchDialog(page).locator(".search-label")).toHaveText(`${CATALOG.sale.length} results`);
@@ -245,7 +245,7 @@ test.describe("bag drawer chrome", () => {
     await bagDialog(page).getByRole("button", { name: "Close bag" }).click();
     await expect(root).not.toHaveClass(/is-open/);
     await openBag(page).click();
-    await bagDialog(page).getByRole("link", { name: /Browse the shop/ }).click();
+    await bagDialog(page).getByRole("link", { name: /Shop, shamelessly/ }).click();
     await expect(page).toHaveURL(/\/products$/);
     await expect(root).not.toHaveClass(/is-open/);
   });

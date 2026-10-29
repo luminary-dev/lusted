@@ -55,18 +55,18 @@ export default function RevealingSoon() {
       <RevealPicture />
       <div className="reveal-inner">
         <Image src={wordmark} alt="Lusted Lingerie" className="reveal-logo" priority sizes="(max-width: 600px) 72vw, 420px" />
-        <p className="eyebrow reveal-eyebrow">Something is being unwrapped</p>
+        <p className="eyebrow reveal-eyebrow">Something’s coming off</p>
         <h1 className="h1 reveal-title">
           Revealing <em>soon.</em>
         </h1>
-        <p className="reveal-lede">Lingerie, swim and after dark — made to tempt, cut to come off, sent so no one knows. Plain box, private ordering, a real person on the other end who won’t blush.</p>
+        <p className="reveal-lede">Lingerie, swim and after dark — made to tempt, cut to come off, sent so no one knows. Plain box, private ordering, and a real person on the other end who won’t blush, whatever you ask for.</p>
 
         <RevealCountdown at={site.revealAt} />
         <p className="reveal-date">{revealDate}</p>
 
         <div className="reveal-actions">
           <a className="btn btn-light" data-wa-source="revealing-soon" href={whatsappLink("Hi Lusted! Put me on the early-access list.")} target="_blank" rel="noopener noreferrer">
-            <WhatsApp /> Want it first? Message us <ArrowRight className="arrow" />
+            <WhatsApp /> Can’t wait? Get early access <ArrowRight className="arrow" />
           </a>
           <a className="reveal-ig" href={instagramLink} target="_blank" rel="noopener noreferrer">
             <Instagram /> @{site.instagramHandle}
@@ -74,7 +74,7 @@ export default function RevealingSoon() {
         </div>
 
         <div className="reveal-news">
-          <p className="reveal-news-title">Or leave your email — we’ll whisper when it’s time to come in.</p>
+          <p className="reveal-news-title">Or leave your email, and we’ll tell you the moment you can come in.</p>
           <Newsletter />
         </div>
       </div>

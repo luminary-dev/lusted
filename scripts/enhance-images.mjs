@@ -34,5 +34,5 @@ for (const src of inputs) {
   const dest = path.join(outDir, `${path.basename(src, path.extname(src)).replace(/[\s()]+/g, "-").replace(/-+$/, "")}-2x.png`);
   await sharp(ai).composite([{ input: plain }]).png({ compressionLevel: 6 }).toFile(dest);
   await rm(tmp, { recursive: true, force: true });
-  console.log(`✓ ${path.basename(dest)}  ${W}×${H}`);
+  console.log(`done ${path.basename(dest)}  ${W}×${H}`);
 }
