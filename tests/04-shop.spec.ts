@@ -369,4 +369,32 @@ test.describe("the shop on a phone", () => {
     const xs = await cards(page).evaluateAll((els) => els.slice(0, 2).map((e) => Math.round(e.getBoundingClientRect().left)));
     expect(xs[0]).not.toBe(xs[1]);
   });
+
+  test("the first pieces show on the first screen, and search, Filters and Sort stay in reach under the nav", async ({ prepared: page }) => {
+    await go(page, "/products");
+    const first = await cards(page).first().boundingBox();
+    expect(first!.y, "first card starts on the first screen").toBeLessThan(844 / 2 + 150);
+    // the collections are one row that scrolls sideways
+    const tabs = await page.getByRole("tab").evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().top)))]);
+    expect(tabs).toHaveLength(1);
+    // search, Filters and Sort share a line, which sticks under the nav as the grid scrolls past
+    const toolbar = page.locator(".toolbar");
+    const row = await Promise.all([toolbar.locator(".search"), page.getByRole("button", { name: /Filters/ }), page.getByRole("combobox", { name: "Sort" })].map((l) => l.boundingBox()));
+    for (const b of row) expect(Math.abs(b!.y + b!.height / 2 - (row[0]!.y + row[0]!.height / 2))).toBeLessThan(2);
+    await page.evaluate(() => window.scrollTo(0, 1500));
+    const nav = await page.locator(".nav-bar").boundingBox();
+    await expect.poll(async () => Math.round((await toolbar.boundingBox())!.y)).toBeGreaterThanOrEqual(Math.floor(nav!.y + nav!.height));
+    expect((await toolbar.boundingBox())!.y).toBeLessThan(nav!.y + nav!.height + 20);
+  });
+
+  test("a card's badges stay clear of its heart", async ({ prepared: page }) => {
+    await go(page, "/products?best=1");
+    for (const card of await cards(page).all()) {
+      const heart = await card.locator(".card-fav").boundingBox();
+      for (const badge of await card.locator(".badge").all()) {
+        const b = await badge.boundingBox();
+        expect(b!.x + b!.width, `${await badge.textContent()} ends before the heart`).toBeLessThanOrEqual(heart!.x);
+      }
+    }
+  });
 });

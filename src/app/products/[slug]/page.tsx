@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ProductBuy from "@/components/shop/ProductBuy";
 import PdpGallery from "@/components/shop/PdpGallery";
+import RecentlyViewed from "@/components/shop/RecentlyViewed";
 import ProductCard, { Price } from "@/components/shop/ProductCard";
 import JsonLd from "@/components/JsonLd";
 import { collectionName, getProduct, priceOf, products, type Product } from "@/lib/products";
@@ -199,6 +200,8 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
           </div>
         </section>
       )}
+
+      <RecentlyViewed slug={product.slug} />
     </>
   );
 }

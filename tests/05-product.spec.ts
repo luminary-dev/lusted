@@ -233,6 +233,15 @@ test.describe("product page on a phone", () => {
     await expect(page.locator(".pdp-main")).toBeVisible();
     await page.getByRole("group", { name: "More views" }).getByRole("button", { name: /back/ }).tap();
     await expect(page.locator(".pdp-view")).toHaveText("Back");
+    // Add to bag keeps the full height of a button (as a column it was squeezed to 26px), with the heart beside it,
+    // square and as tall, rather than alone on a row of its own
+    const add = await page.locator(".buy-actions .btn").boundingBox();
+    const heart = await page.locator(".buy-actions .buy-fav").boundingBox();
+    expect(add!.height, "Add to bag height").toBeGreaterThanOrEqual(44);
+    expect(heart!.height, "heart height").toBeCloseTo(add!.height, 0);
+    expect(heart!.width, "heart is square").toBeCloseTo(heart!.height, 0);
+    expect(Math.abs(heart!.y - add!.y), "heart beside Add to bag").toBeLessThan(2);
+    expect(heart!.x).toBeGreaterThan(add!.x + add!.width);
     await page.locator(".pdp-info .size-chips").getByRole("button", { name: "M", exact: true }).tap();
     await page.getByRole("button", { name: /Add to bag/ }).tap();
     await expect(page.locator(".drawer-root")).toHaveClass(/is-open/);
