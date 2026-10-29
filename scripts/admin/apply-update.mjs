@@ -1,9 +1,9 @@
 // Applies one small console change to the catalogue: runs in the Console workflow (.github/workflows/console.yml) with
 //   ADMIN_ACTION   update-product | remove-product | bulk-offer
 //   ADMIN_PAYLOAD  the dispatch's client_payload as JSON (shaped and checked by src/app/api/admin/dispatch/route.ts)
-// A removal also deletes the piece's photos from the bucket and the manifest. The workflow commits what changed, with
-// the summary written here as the message.
-import { CATALOG, COLLECTIONS, MANIFEST, SLUG, bucket, lkr, normalise, payload, quote, readJson, summarise, writeJson } from "./lib.mjs";
+// A removal also takes the piece's photos out of the manifest, but leaves them in the bucket. The workflow commits what
+// changed, with the summary written here as the message.
+import { CATALOG, COLLECTIONS, MANIFEST, SLUG, lkr, normalise, payload, quote, readJson, summarise, writeJson } from "./lib.mjs";
 
 const action = process.env.ADMIN_ACTION;
 const catalog = await readJson(CATALOG);
@@ -19,6 +19,8 @@ const offer = (price, pct) => Math.max(10, Math.min(Math.round((price * (1 - pct
 if (action === "update-product") {
   const i = find(payload.slug);
   const product = catalog[i];
+  // only the fields the owner changed are sent; one that's absent is left as the catalogue has it now (another change
+  // may have moved it since the console last looked), and a null offer price or rank ends it
   const data = payload.data ?? {};
   const was = product.name;
   const parts = [];
@@ -39,12 +41,15 @@ if (action === "update-product") {
     delete product.salePrice;
   } else if (typeof data.salePrice === "number" && data.salePrice > 0) {
     const sale = Math.round(data.salePrice);
-    if (sale >= product.price) throw new Error("update-product: the offer price must be below the full price");
     if (sale !== product.salePrice) {
       parts.push(`${product.salePrice ? "offer" : "on offer at"} ${lkr(sale)}`);
       product.salePrice = sale;
     }
   }
+  // checked on the piece as it ends up, since a new price may come without the offer it sits above (or the other way);
+  // the console and the dispatch route refuse this before it is queued (src/lib/admin/offers.ts), so this is the last
+  // line of defence
+  if (("price" in data || "salePrice" in data) && product.salePrice !== undefined && product.salePrice >= product.price) throw new Error("update-product: the offer price must be below the full price");
   if (data.bestSeller === null && product.bestSeller !== undefined) {
     parts.push("no longer a best seller");
     delete product.bestSeller;
@@ -64,18 +69,20 @@ if (action === "update-product") {
   const i = find(payload.slug);
   const [product] = catalog.splice(i, 1);
   await writeJson(CATALOG, catalog);
-  // its photos: the front, the back and side views and any colourways (products/<slug>--<colour>…)
+  // its photos: the front, the back and side views and any colourways (products/<slug>--<colour>…). They come out of
+  // the manifest but stay in the bucket. The live site reads the same bucket and keeps listing the piece until the next
+  // release from dev to main, so deleting them here would leave it showing broken images until then — and, if this
+  // change's pull request failed, would leave dev with the piece and no photos. Once nothing lists them they are never
+  // fetched, and unlisted photos can be cleared from the bucket by hand later.
   const manifest = await readJson(MANIFEST);
   const mine = Object.keys(manifest.images).filter((key) => key.startsWith(`products/${product.slug}.`) || key.startsWith(`products/${product.slug}-`));
-  const store = bucket();
   for (const key of mine) {
-    await store.del(key);
     delete manifest.images[key];
     console.log(`  – ${key}`);
   }
   await writeJson(MANIFEST, manifest);
   await import("../sync-product-images.mjs");
-  await summarise(`removed ${quote(product.name)} (${mine.length} photo${mine.length === 1 ? "" : "s"})`);
+  await summarise(`removed ${quote(product.name)} (${mine.length} photo${mine.length === 1 ? "" : "s"} kept in the bucket)`);
 } else if (action === "bulk-offer") {
   const { category, percentOff } = payload;
   if (category !== "*" && !(category in COLLECTIONS)) throw new Error("bulk-offer: unknown collection");

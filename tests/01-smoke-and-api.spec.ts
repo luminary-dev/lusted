@@ -1,4 +1,5 @@
 import { test, expect, go, ROUTES, CATALOG } from "./fixtures";
+import { IMAGE_VERSION } from "../src/lib/cdn";
 import { site } from "../src/lib/site";
 
 test.describe("routes", () => {
@@ -109,6 +110,20 @@ test.describe("routes", () => {
       expect(r.status(), p).toBe(200);
       expect(r.headers()["content-type"]).toMatch(/image/);
     }
+  });
+
+  test("photos answer only at the current version, and next/image optimises nothing else", async ({ request }) => {
+    // any other version would be a fresh, uncached address for the same photo (src/lib/cdn.ts, src/app/img)
+    const photo = "images/footer.webp";
+    const current = `/img/v${IMAGE_VERSION}/${photo}`;
+    expect((await request.get(current)).status(), current).toBe(200);
+    for (const v of [IMAGE_VERSION - 1, IMAGE_VERSION + 1, 987]) {
+      const res = await request.get(`/img/v${v}/${photo}`);
+      expect(res.status(), `v${v}`).toBe(404);
+    }
+    const optimise = (url: string) => request.get(`/_next/image?url=${encodeURIComponent(url)}&w=640&q=75`);
+    expect((await optimise(current)).status(), current).toBe(200);
+    for (const url of [`/img/v987/${photo}`, `/img/${photo}`, `${current}?bust=1`]) expect((await optimise(url)).status(), url).toBe(400);
   });
 });
 
