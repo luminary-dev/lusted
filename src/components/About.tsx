@@ -14,10 +14,10 @@ import { img } from "@/lib/cdn";
 
 // About us as a photo wall: real prints taped to the wall, in two rows, beside a short story and the four promises.
 const promises = [
-  { icon: Box, title: "A plain box — nobody has to know" },
-  { icon: ChatDouble, title: "We’ll make it fit like it was made on you" },
-  { icon: Bolt, title: "A real person, never keeps you waiting" },
-  { icon: Lock, title: "Our dirty little secret, start to finish" },
+  { icon: Box, title: "A plain box — the neighbours will never know" },
+  { icon: ChatDouble, title: "Sized by hand until it fits like sin" },
+  { icon: Bolt, title: "A real person who hates to keep you waiting" },
+  { icon: Lock, title: "Discreet from first message to last strap" },
 ];
 
 // the prints stuck to the wall: each keeps its photo's own shape, a hair off straight (`tilt`, degrees) and a touch
@@ -39,10 +39,10 @@ export default function About() {
         <div className="about-copy" data-reveal>
           <p className="eyebrow">About us</p>
           <h2 className="h2">
-            Made to be taken off. <em>Sent so no one knows.</em>
+            Wicked on the inside. <em>Plain on the outside.</em>
           </h2>
           <p className="lede">
-            Lingerie for the nights you plan and the ones that happen anyway — lace that lingers, silk that slips, strings that give up at the first tug. Picked to make you feel filthy in the best way, and delivered so quietly the only one who’ll know is whoever’s undoing it.
+            Lingerie for the nights you plan and the ones that just happen — lace that lingers, silk that slips, straps that surrender without a fight. Chosen to make you feel gorgeously slutty in the best way, and delivered so quietly only whoever unwraps you will know.
           </p>
           <ul className="about-promises">
             {promises.map(({ icon: Icon, title }) => (
@@ -54,10 +54,10 @@ export default function About() {
           </ul>
           <div className="about-actions">
             <a className="btn btn-wine" data-wa-source="about" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
-              Tempt me <ArrowRight className="arrow" />
+              Order something wicked <ArrowRight className="arrow" />
             </a>
             <Link href="/about" className="btn btn-ghost">
-              Read our story <ArrowRight className="arrow" />
+              Read our story, uncensored <ArrowRight className="arrow" />
             </Link>
           </div>
         </div>

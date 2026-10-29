@@ -12,12 +12,12 @@ import { SIZES, guides, type GuideTab } from "@/lib/sizing";
 
 // the line on the back of each swing tag
 const TEASE = [
-  "Small. Precise. Trouble.",
-  "Made to be noticed, then handled.",
-  "Every curve, held exactly right.",
-  "More to love. More to take off.",
-  "Every inch, worshipped.",
-  "Made for all of you — slowly.",
+  "Petite. Precise. Pure trouble.",
+  "Fits like a secret. Keeps none.",
+  "Holds every curve — for now.",
+  "All curves. No apologies.",
+  "Built to be worshipped, slowly.",
+  "Room for every curve and sin.",
 ];
 
 // each size is a swing tag: [label, value] lines
@@ -73,12 +73,12 @@ export default function SizeGuide() {
           <div data-reveal>
             <p className="eyebrow">Size guide</p>
             <h2 className="h2">
-              Fitted to <em>every inch of you</em>
+              Measured for <em>misbehaving</em>
             </h2>
             <p className="size-lede">
-              Wrap a soft tape around every curve, slowly, and find the tag
-              that’s been waiting to be pulled off you. Touch one to turn it
-              over.
+              Run a soft tape round every curve — take your time, nobody’s
+              rushing you — then find the tag with your name on it. Tap one to
+              see what it says behind your back.
             </p>
           </div>
 
@@ -111,7 +111,7 @@ export default function SizeGuide() {
           >
             <SizeTags3D tags={tags3d} onReady={setReady3d} />
             <p className="tags3d-hint" aria-hidden="true">
-              ← Swipe along the cord →
+              ← Run a finger along the cord →
             </p>
             <ul className="size-tags">
               {guides[tab].map((lines, i) => (
@@ -166,7 +166,7 @@ export default function SizeGuide() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              or let us whisper the answer <ArrowRight />
+              or let us size you up <ArrowRight />
             </a>
           </p>
         </div>
