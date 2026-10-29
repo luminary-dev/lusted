@@ -172,7 +172,7 @@ export const CATALOG = {
   // the hero piece's details (fabric, construction, care) come from the catalogue like everything above
   hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"], details: bySlug["rose-lace-balconette-bra"]?.details ?? [] },
 };
-export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/help", "/favourites", "/privacy", "/terms"];
+export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/help", "/gift-vouchers", "/favourites", "/privacy", "/terms"];
 
 /* ───────── helpers ───────── */
 export const parsePrice = (s: string) => Number((s.match(/LKR\s*([\d,]+)/)?.[1] ?? "0").replace(/,/g, ""));

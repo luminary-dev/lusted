@@ -59,7 +59,12 @@ export default function Nav() {
           </Link>
           <nav className="nav-links" aria-label="Main">
             {navLinks.map((l) => (
-              <Link key={l.href} href={l.href} className={isActive(l.href) ? "is-active" : ""} onClick={() => setOpen(false)}>
+              <Link
+                key={l.href}
+                href={l.href}
+                className={[isActive(l.href) && "is-active", l.menuOnly && "nav-menu-only"].filter(Boolean).join(" ")}
+                onClick={() => setOpen(false)}
+              >
                 {l.label}
               </Link>
             ))}
