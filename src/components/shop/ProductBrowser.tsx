@@ -185,7 +185,7 @@ export default function ProductBrowser() {
           )}
         </label>
         <button className="filters-btn" onClick={() => setDrawer(true)}>
-          <Sliders /> Filters {filterCount > 0 && <span>{filterCount}</span>}
+          <Sliders /> <span className="filters-label">Filters</span> {filterCount > 0 && <span className="filters-count">{filterCount}</span>}
         </button>
         <label className="sort">
           <span>Sort</span>

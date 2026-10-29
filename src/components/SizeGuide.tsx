@@ -118,7 +118,7 @@ export default function SizeGuide() {
                 <li
                   key={`${tab}-${SIZES[i]}`}
                   className={`tag3d ${flipped === i ? "is-flipped" : ""}`}
-                  style={{ "--i": i } as React.CSSProperties}
+                  style={{ "--i": i, "--len": SIZES[i].length } as React.CSSProperties}
                 >
                   <div
                     className="tag3d-swing"

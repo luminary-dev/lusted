@@ -301,12 +301,6 @@
   background: var(--paper);
 }
 
-.related,
-.pairs {
-  padding-top: var(--section);
-  border-top: 1px solid var(--hair);
-}
-
 /* ───────── footer: trust row + credit ───────── */
 
 .footer-credit {
