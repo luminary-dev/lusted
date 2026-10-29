@@ -3,9 +3,9 @@ import { SECTIONS } from "@/app/admin/sections";
 import catalog from "@/lib/catalog.json";
 import { site } from "@/lib/site";
 
-// With site.revealGate on, every page shows /revealing-soon in place until reveal day (site.revealAt) — the address
-// bar keeps the real URL. To see the actual site before then, open any page with ?preview=1 once: it sets a cookie
-// that lets you through for 30 days. The gate never applies where REVEAL_GATE=off is set in the environment (Vercel's
+// With site.revealGate on, every page but the privacy policy shows /revealing-soon in place until reveal day
+// (site.revealAt) — the address bar keeps the real URL. To see the actual site before then, open any page with
+// ?preview=1 once: it sets a cookie that lets you through for 30 days. The gate never applies where REVEAL_GATE=off is set in the environment (Vercel's
 // Preview environment carries it, so lusted-dev.vercel.app shows the real site while production shows the reveal
 // page) or on a host beginning with "dev."; after the moment passes it is simply gone, no deploy needed.
 const REVEAL_AT = Date.parse(site.revealAt);
@@ -38,7 +38,8 @@ export function proxy(request: NextRequest) {
       res.cookies.set(PREVIEW_COOKIE, "1", { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
       return res;
     }
-    if (!request.cookies.has(PREVIEW_COOKIE) && pathname !== "/revealing-soon") {
+    // the privacy policy stays readable: the reveal page's newsletter form links to it, and sign-ups need it seen
+    if (!request.cookies.has(PREVIEW_COOKIE) && pathname !== "/revealing-soon" && pathname !== "/privacy") {
       return NextResponse.rewrite(new URL("/revealing-soon", request.url));
     }
   }
