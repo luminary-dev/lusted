@@ -29,7 +29,7 @@ export default function FavouritesList() {
 
   const ask = `Hi Lusted! I'm interested in these pieces:\n\n${saved.map((p) => `• ${p.name}`).join("\n")}`;
   // the whole list as one hint, each piece with its link, so whoever gets it can choose
-  const hint = `Thinking of ${saved.length === 1 ? "this one" : "these"}… 😉 Consider this a hint.\n\n${saved.map((p) => `• ${p.name}\n${productUrl(origin, p.slug)}`).join("\n")}`;
+  const hint = `Picture me in ${saved.length === 1 ? "this" : "these"} — then picture peeling ${saved.length === 1 ? "it" : "them"} off me. Consider this a hint.\n\n${saved.map((p) => `• ${p.name}\n${productUrl(origin, p.slug)}`).join("\n")}`;
   return (
     <>
       <div className="results-bar fav-bar">

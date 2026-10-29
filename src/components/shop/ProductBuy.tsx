@@ -217,7 +217,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
       </a>
       <HintButton
         title={product.name}
-        text={`Thinking of this one… 😉 The ${product.name}, in ${colors[color].label}. Consider this a hint.`}
+        text={`Picture me in this — the ${product.name}, in ${colors[color].label}. Now picture peeling it off me. Consider this a hint.`}
         url={hintUrl}
         copy={hintUrl}
         source="product"

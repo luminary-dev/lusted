@@ -223,7 +223,7 @@ test.describe("drop a hint, without a share sheet", () => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.addInitScript(() => delete (Navigator.prototype as { share?: unknown }).share);
     await go(page, `/products/${slug}`);
-    const hint = page.getByRole("button", { name: "Drop a hint" });
+    const hint = page.getByRole("button", { name: "Drop a naughty hint" });
     await expect(hint).toHaveAttribute("aria-expanded", "false");
     await page.locator(".buy-colors").getByRole("button", { name: "Wine" }).click();
     await hint.click();
@@ -237,10 +237,11 @@ test.describe("drop a hint, without a share sheet", () => {
     expect(href).not.toContain(CATALOG.whatsapp);
     const link = `${new URL(page.url()).origin}/products/${slug}?colour=wine`;
     const text = decodeURIComponent(href.split("text=")[1]);
-    expect(text).toContain(`${name}, in Wine`);
+    expect(text).toContain(`Picture me in this — the ${name}, in Wine. Now picture peeling it off me. Consider this a hint.`);
+    expect(text).not.toMatch(/\p{Extended_Pictographic}/u); // something she'd send: no emoji
     expect(text.endsWith(`\n${link}`)).toBe(true);
     await pop.getByRole("button", { name: "Copy link" }).click();
-    await expect(pop.getByRole("button", { name: "Copied" })).toBeVisible();
+    await expect(pop.getByRole("button", { name: "Copied — now go tempt them" })).toBeVisible();
     await expect(pop.getByRole("status")).toHaveText("Copied to the clipboard");
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(link);
     await page.keyboard.press("Escape");

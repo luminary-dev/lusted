@@ -179,13 +179,14 @@ test.describe("favourites", () => {
       localStorage.setItem("lusted-favourites", JSON.stringify(["siren-chainmail-mini", s]));
     }, slug);
     await go(page, "/favourites");
-    await main(page).getByRole("button", { name: "Drop a hint" }).click();
+    await main(page).getByRole("button", { name: "Drop a naughty hint" }).click();
     const pop = main(page).getByRole("group", { name: "Drop a hint" });
     const href = (await pop.getByRole("link", { name: "Send on WhatsApp" }).getAttribute("href"))!;
     expect(href.startsWith("https://wa.me/?text=")).toBe(true);
     const text = decodeURIComponent(href.split("text=")[1]);
     const origin = new URL(page.url()).origin;
-    expect(text).toMatch(/^Thinking of these… .+ Consider this a hint\.\n\n/);
+    expect(text).toMatch(/^Picture me in these — then picture peeling them off me\. Consider this a hint\.\n\n/);
+    expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
     expect(text).toContain(`• ${name}\n${origin}/products/${slug}`);
     expect(text).toContain(`${origin}/products/siren-chainmail-mini`);
     await expect(pop.getByRole("button", { name: "Copy the list" })).toBeVisible();

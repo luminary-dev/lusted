@@ -111,7 +111,7 @@ export default function HintButton({
         aria-controls={open ? id : undefined}
         onClick={hint}
       >
-        Drop a hint
+        Drop a naughty hint
       </button>
       {open && (
         <div className={`hint-pop is-${align}`} id={id} role="group" aria-label="Drop a hint">
@@ -128,7 +128,7 @@ export default function HintButton({
             <WhatsApp /> Send on WhatsApp
           </a>
           <button type="button" onClick={copyIt}>
-            {copied === "yes" ? "Copied" : copyLabel}
+            {copied === "yes" ? "Copied — now go tempt them" : copyLabel}
           </button>
           <p className="sr-only" role="status">
             {copied === "yes" ? "Copied to the clipboard" : copied === "no" ? "Couldn’t copy — try WhatsApp instead" : ""}
