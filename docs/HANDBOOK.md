@@ -182,7 +182,9 @@ deployed — the deploy job looks for the merge commit.
 
 CI needs three repository secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account →
 Tokens; a token scoped to the team is fine), `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `.vercel/project.json`
-after `vercel link`).
+after `vercel link`). The deploys run the Vercel CLI at the exact version in `VERCEL_CLI` at the top of `ci.yml`, never
+`@latest` — it is handed the token and the dev deploy reads the preview's URL from its output — so a bump is that one
+line, to a release at least two weeks old.
 
 GitHub's own rulesets aren't available to this private repository on the organisation's free plan, so the rules above
 are enforced by the workflow (red checks, no deploy) rather than blocked by GitHub. The rulesets GitHub should enforce
