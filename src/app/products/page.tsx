@@ -18,7 +18,11 @@ export default function ProductsPage() {
           <h1 className="h2">
             Every piece, <em>waiting to come off.</em>
           </h1>
-          <p className="lede">{products.length} pieces across lingerie, swim and after dark — filter by size, colour and price, then pick what you want to be found in.</p>
+          {/* the second half is how-to the toolbar below already shows, so a phone — where it cost two lines above the
+              first piece — leaves it out */}
+          <p className="lede">
+            {products.length} pieces across lingerie, swim and after dark<span className="shop-lede-more"> — filter by size, colour and price, then pick what you want to be found in</span>.
+          </p>
         </header>
         {/* useSearchParams needs a Suspense boundary; the fallback is the unfiltered grid skeleton. */}
         <Suspense fallback={<div className="shop-loading" />}>
