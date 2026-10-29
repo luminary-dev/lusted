@@ -46,7 +46,6 @@ jobs:
       # no `set -e`: every check runs and is reported, and the step fails at the end if any of them did
       - name: Check the site
         run: |
-          # shellcheck disable=SC2317,SC2329 # the check functions are called by name, through check()
           set -uo pipefail
           base="https://$SITE_HOST"
           failed=0
@@ -59,6 +58,7 @@ jobs:
 
           # fetch <url> <curl write-out>: prints the write-out, and the first line of curl's own message if it failed
           curl_error="$(mktemp)"
+          # shellcheck disable=SC2329 # called from the checks below, which check() calls by name
           fetch() {
             local out
             out="$(curl --silent --show-error --output /dev/null --connect-timeout 10 --max-time 30 \
@@ -82,6 +82,7 @@ jobs:
             fi
           }
 
+          # shellcheck disable=SC2329 # called by name, through check()
           home() {
             local got
             got="$(fetch "$base/" '%{http_code}')"
@@ -89,6 +90,7 @@ jobs:
             [[ $got =~ ^2[0-9][0-9]$ ]]
           }
 
+          # shellcheck disable=SC2329 # called by name, through check()
           www() {
             local got
             if [[ $SITE_HOST == *.vercel.app ]]; then
@@ -103,6 +105,7 @@ jobs:
           # the version and a path are read from the code, so a bump of IMAGE_VERSION or a renamed photo is followed
           version="$(sed -nE 's/^const IMAGE_VERSION = ([0-9]+);.*/\1/p' src/lib/cdn.ts)"
           photo_path="$(jq -r '.images | keys[0] // empty' src/lib/image-manifest.json)"
+          # shellcheck disable=SC2329 # called by name, through check()
           photo() {
             local got
             if [[ -z $version || -z $photo_path ]]; then
@@ -114,6 +117,7 @@ jobs:
             [[ $got =~ ^200\ image/ ]]
           }
 
+          # shellcheck disable=SC2329 # called by name, through check()
           certificate() {
             local pem end expires
             pem="$(echo | timeout 20 openssl s_client -connect "$SITE_HOST:443" -servername "$SITE_HOST" 2>/dev/null \
