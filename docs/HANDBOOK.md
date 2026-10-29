@@ -8,7 +8,7 @@ Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or a
 
 ## What it is
 
-A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece.
+A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece. Under it, "Drop a hint" (`src/components/shop/HintButton.tsx`) lets a shopper send the piece to someone else — a partner who might buy it: a phone opens its own share sheet with a short line and the piece's link (with `?colour=` for the colourway on screen); a browser without one gets a small popover with "Send on WhatsApp" (a `wa.me` link with no number, so the shopper picks the contact) and "Copy link". `/favourites` offers the same for the whole list, each piece with its link. Nothing about the shopper goes in the message.
 
 ## Run it
 
@@ -214,7 +214,10 @@ Custom events (Vercel → Analytics → Events), sent through `src/lib/analytics
 - `whatsapp_click` — any tap on a WhatsApp link; `source` says which: `nav`, `nav-menu`, `hero`, `bag` (Send order),
   `product` (Order now — only once a size is chosen), `favourites`, `contact`, `footer`, `how-it-works`, `about`,
   `about-page`, `size-guide`, `revealing-soon`, `error-page`, otherwise the page's path (`/help`, `/privacy`…). A new
-  WhatsApp link is counted on its own; give it a `data-wa-source` (on the link or around it) to name it.
+  WhatsApp link to the shop's number is counted on its own; give it a `data-wa-source` (on the link or around it) to
+  name it. "Drop a hint"'s numberless `wa.me` link is not a lead for the shop, so it isn't counted here.
+- `hint` — a hint sent: `source` (`product` or `favourites`) and `via` (`share` — the phone's share sheet, counted once
+  it's sent, not when it's dismissed; `whatsapp`; or `copy`).
 - `add_to_bag` and `favourite` (saving only) — with the piece's `slug`.
 - `search_no_results` — a search that found nothing, the `query` cut to 40 characters, from the search dialog
   (`source: dialog`) or the shop (`source: shop`, only when nothing in the catalogue matches, not when filters emptied it).

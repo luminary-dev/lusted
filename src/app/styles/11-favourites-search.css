@@ -68,6 +68,11 @@
   height: 18px;
 }
 
+/* the count to the left, the two ways to send the list together on the right */
+.fav-bar > p {
+  margin-right: auto;
+}
+
 .fav-empty {
   margin-top: 36px;
 }

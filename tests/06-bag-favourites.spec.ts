@@ -173,6 +173,24 @@ test.describe("favourites", () => {
     expect(await page.evaluate(() => localStorage.getItem("lusted-favourites"))).toBe("[]");
   });
 
+  test("the whole list can be sent as a hint, each piece with its link, never to the shop", async ({ prepared: page }) => {
+    await page.addInitScript((s) => {
+      delete (Navigator.prototype as { share?: unknown }).share;
+      localStorage.setItem("lusted-favourites", JSON.stringify(["siren-chainmail-mini", s]));
+    }, slug);
+    await go(page, "/favourites");
+    await main(page).getByRole("button", { name: "Drop a hint" }).click();
+    const pop = main(page).getByRole("group", { name: "Drop a hint" });
+    const href = (await pop.getByRole("link", { name: "Send on WhatsApp" }).getAttribute("href"))!;
+    expect(href.startsWith("https://wa.me/?text=")).toBe(true);
+    const text = decodeURIComponent(href.split("text=")[1]);
+    const origin = new URL(page.url()).origin;
+    expect(text).toMatch(/^Thinking of these… .+ Consider this a hint\.\n\n/);
+    expect(text).toContain(`• ${name}\n${origin}/products/${slug}`);
+    expect(text).toContain(`${origin}/products/siren-chainmail-mini`);
+    await expect(pop.getByRole("button", { name: "Copy the list" })).toBeVisible();
+  });
+
   test("favourites persist across reloads and the nav heart highlights on the page", async ({ prepared: page }) => {
     await page.addInitScript(() => localStorage.setItem("lusted-favourites", JSON.stringify(["siren-chainmail-mini", "ghost-piece"])));
     await go(page, "/favourites");
