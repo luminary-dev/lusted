@@ -21,7 +21,7 @@ npm run lint
 
 ## Where things live
 
-- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos").
+- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos"; a photo the console put in the bucket has a short revision in its name, see "The owner console").
 - **Contact details** — `src/lib/site.ts`: WhatsApp number, Instagram, email, hours. Every button and link reads from here.
 - **Collection names and taglines** — `categories` in `src/lib/products.ts`.
 - **Search** — `matchesQuery` in `src/lib/products.ts`, for the search dialog and the shop: every word must start a word of the piece (case and accents ignored, plurals folded), and `searchSynonyms` beside it turns shoppers' words ("panties", "white", "swimwear") into the catalogue's — add one there when shoppers search for something the catalogue calls by another name.
@@ -119,8 +119,8 @@ published to be read, not reused — see `LICENSE`.
 
 **/admin** — unlinked, kept out of search, never cached — is where the owner runs the catalogue without opening the
 repository, in four rooms on four pages (`/admin/fitting`, `/admin/offers`, `/admin/ledger`, `/admin/daybook`, each
-under the same header): add a piece, change a name, collection, price, offer price or best-seller rank, remove a piece, or put a
-percentage off a whole collection (the home page's sale band then names that collection and links to its sale pieces —
+under the same header): add a piece, change a name, collection, price, offer price or best-seller rank, change a piece's
+photos, remove a piece, or put a percentage off a whole collection (the home page's sale band then names that collection and links to its sale pieces —
 `src/lib/sale-band.ts` holds its words). It is modelled on the Luvana console, with two differences: the photos are the
 owner's own (front, back and side — nothing is generated or retouched; each is cropped to the catalogue's 9:16 frame
 and given the wordmark, `scripts/lib/wordmark.mjs`), and the words are Claude's to start with. "Write it with AI"
@@ -142,12 +142,37 @@ way — a percentage off its collection, say — isn't undone by the older value
 workflow would refuse opens no pull request, so the console would wait on it for ever: an offer price at or above the
 full price, of nothing or of part of a rupee, or a percentage off outside whole numbers 1–90, is said beside the field
 and can't be saved, and the dispatch route refuses it with a 400 before anything is queued (both read
-`src/lib/admin/offers.ts`; the workflow keeps its own check as the last line of defence). The console reads the catalogue off the `dev` branch, watches its pull requests and
+`src/lib/admin/offers.ts`; the workflow keeps its own check as the last line of defence). The console reads the catalogue (and which product photos the manifest lists) off the `dev` branch, watches its pull requests and
 says "done" the moment a change lands; `console-refresh.yml` keeps a queued console pull request up to date when
 another merges first. Live changes still go out by the usual release (`dev → main`). The tests read the catalogue
 facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece added or changed from the console
 doesn't fail them — the home page's hero piece, `rose-lace-balconette-bra`, is the one piece the suite and Lighthouse
 name directly, so it shouldn't be removed from the console.
+
+**A piece's photos.** "Photos" on a ledger row opens the piece's photos under it, as thumbnails: front, back and side
+for the piece itself and for each of its other colours. Any of them can be replaced, an empty one filled, and any but
+the piece's own front taken off — a piece always keeps a front photo, so that one can only be replaced. A colour's back
+and side show only with its front (`sync-product-images.mjs`), so they need it, and taking off a colour's front takes
+them too. "Another colour…" photographs the piece in a colour it doesn't list yet: the colour's front photo adds it to
+the end of the piece's colours, so shoppers can pick it — the choice was between that and refusing, and refusing
+would leave the owner no way to do it, since the ledger can't change a piece's colours. The changes on a piece are
+gathered and saved as one (the `product-photo` dispatch, applied by `apply-update.mjs`), so its photos are never in two
+pull requests at once — both would rewrite the same lines of the manifest and the second would conflict; the row
+says "on its way" until the change is on `dev`. New photos are finished exactly as the fitting's are (`finishPhoto` in
+`scripts/admin/lib.mjs`, shared with `add-product.mjs`: cropped to 9:16, the wordmark). The console says what's wrong
+beside Save, and the dispatch route refuses a change the workflow would refuse with a 400 before it's queued (both read
+`src/lib/admin/photos.ts`; the script keeps its own check).
+
+**Why a new photo gets a new name.** The live site reads the same bucket as dev and serves every photo immutable for
+a year, so a photo written over an old key would change the live site before a release — and, behind those caches,
+not even everywhere at once. So the console never writes over a key: every photo it puts in the bucket, a new piece's
+from the fitting too, is `products/<base>.<rev>.webp`, where `<base>` is the usual `<slug>[--<colour>][-back|-side]`
+and `<rev>` eight hex characters of the upload it came from (`scripts/lib/photo-keys.mjs`; `src/lib/admin/photos.ts` for
+the console and the tests). Replacing a photo puts the new key in the manifest and takes the old one out; the old file
+stays in the bucket — as a removed piece's do — so the live site keeps showing it until the next release, which then
+shows the new one at its own address, with no `IMAGE_VERSION` bump. `sync-product-images.mjs` reads either name (the
+plain one wins if both are listed), so photos added on a laptop keep their plain names. Unlisted photos can be cleared
+from the bucket by hand later.
 
 The sign-in page shows one of the photos under `assets/images/admin/back-room-*.webp`, a different one each time the
 door is opened (the prompts are in `about-wall/admin-login-prompt.txt`, outside the repo; drop a new one in, watermark

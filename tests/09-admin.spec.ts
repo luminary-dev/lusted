@@ -1,5 +1,6 @@
 import { test, expect } from "./fixtures";
 import { offerProblem, percentProblem } from "../src/lib/admin/offers";
+import { photoChangesProblem, photoKey, type PhotoChange } from "../src/lib/admin/photos";
 
 // The owner console (src/app/admin): reachable in front of the reveal gate, never cached or indexed, and nothing in
 // it answers without a session. The server the suite runs against has no ADMIN_* environment, so the form is shown
@@ -71,5 +72,36 @@ test.describe("owner console", () => {
     expect(offerProblem(4990)).toBeNull(); // with no full price to hand, only the offer itself is checked
     for (const ok of [1, 20, 90]) expect(percentProblem(ok), String(ok)).toBeNull();
     for (const bad of [0, 91, 100, -5, 12.5, Number.NaN]) expect(percentProblem(bad), String(bad)).toMatch(/1 to 90/);
+  });
+
+  // A piece's photos, changed from its row in the ledger: the same rules the console checks before Save and the
+  // dispatch route checks before queuing (src/lib/admin/photos.ts), on a piece in ivory and blush with a front, a back
+  // and a blush front and back, one of them put there by the console under a key of its own.
+  test("a photo change the Console workflow would refuse is caught before it is queued", () => {
+    const piece = { slug: "camille", colors: ["ivory", "blush"] };
+    const keys = ["products/camille.0a1b2c3d.webp", "products/camille-back.webp", "products/camille--blush.webp", "products/camille--blush-back.webp", "products/camilleo.webp"];
+    const change = (colour: string | null, view: PhotoChange["view"], remove = false): PhotoChange => ({ colour, view, remove });
+    // the console's new key is found as the view's photo; a piece whose slug merely starts the same is not
+    expect(photoKey(keys, "camille", null, "front")).toBe("products/camille.0a1b2c3d.webp");
+    expect(photoKey(keys, "camille", null, "side")).toBeNull();
+    expect(photoKey(["products/camille.webp", "products/camille.0a1b2c3d.webp"], "camille", null, "front")).toBe("products/camille.webp");
+    expect(photoKey(["products/camille.not-a-rev.webp"], "camille", null, "front")).toBeNull();
+
+    // replacing, adding, taking off, a new colourway (its front adds the colour), a colour's front taking its back along
+    expect(photoChangesProblem(piece, keys, [change(null, "front"), change(null, "side"), change(null, "back", true)])).toBeNull();
+    expect(photoChangesProblem(piece, keys, [change("blush", "side"), change("blush", "back", true)])).toBeNull();
+    expect(photoChangesProblem(piece, keys, [change("lilac", "front"), change("lilac", "back")])).toBeNull();
+    expect(photoChangesProblem(piece, keys, [change("blush", "front", true)])).toBeNull();
+
+    expect(photoChangesProblem(piece, keys, [])).toMatch(/nothing/i);
+    expect(photoChangesProblem(piece, keys, [change(null, "front", true)])).toMatch(/keeps its front/);
+    expect(photoChangesProblem(piece, keys, [change(null, "side", true)])).toMatch(/no side photo/);
+    expect(photoChangesProblem(piece, keys, [change("ivory", "back")])).toMatch(/piece’s own/);
+    expect(photoChangesProblem(piece, keys, [change(null, "back"), change(null, "back", true)])).toMatch(/one change per photo/i);
+    // a colour's back and side show only with its front
+    expect(photoChangesProblem(piece, keys, [change("lilac", "back")])).toMatch(/lilac front/);
+    expect(photoChangesProblem(piece, keys, [change("blush", "front", true), change("blush", "side")])).toMatch(/blush front/);
+    expect(photoChangesProblem(piece, keys, [change("Blush!", "front")])).toMatch(/colours/);
+    expect(photoChangesProblem(piece, keys, Array.from({ length: 25 }, (_, i) => change(null, "back", i % 2 === 0)))).toMatch(/too many/i);
   });
 });

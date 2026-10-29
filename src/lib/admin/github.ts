@@ -22,7 +22,7 @@ function headers(accept = "application/vnd.github+json"): Record<string, string>
   return { Authorization: `Bearer ${token}`, Accept: accept, "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "lusted-owner-console" };
 }
 
-export type DispatchAction = "add-product" | "update-product" | "remove-product" | "bulk-offer";
+export type DispatchAction = "add-product" | "update-product" | "remove-product" | "bulk-offer" | "product-photo";
 
 export async function dispatch(action: DispatchAction, payload: Record<string, unknown>): Promise<void> {
   const response = await fetch(`${API}/repos/${repo()}/dispatches`, {

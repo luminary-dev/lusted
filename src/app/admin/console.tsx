@@ -7,6 +7,7 @@ import { useCallback, useEffect, useId, useState } from "react";
 import wordmarkDark from "@/assets/brand/wordmark-dark.png";
 import wordmarkLight from "@/assets/brand/wordmark-light.png";
 import { offerProblem, percentProblem } from "@/lib/admin/offers";
+import { PHOTO_VIEWS, photoChangesProblem, photoKey, type PhotoView } from "@/lib/admin/photos";
 import { IMAGE_VERSION } from "@/lib/cdn";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
@@ -17,8 +18,8 @@ import { categories, colors, fitLabels, sizes as SIZES, type Category, type Colo
 // Everything here changes the DEV site: each change is queued as a GitHub workflow that opens a pull request into
 // dev, which merges itself once the checks pass (ten minutes or so) — the same road as every other change, so nothing
 // skips the tests. The console doesn't trust the catalogue baked into its own deploy: it polls /api/admin/state (the
-// dev branch's catalogue and the console's pull requests in flight) and confirms every queued change the moment it
-// lands, as a ticket in the corner and fresh figures in the header.
+// dev branch's catalogue, its product photos and the console's pull requests in flight) and confirms every queued
+// change the moment it lands, as a ticket in the corner and fresh figures in the header.
 
 export type CatalogEntry = {
   slug: string;
@@ -42,7 +43,8 @@ import { SECTIONS, type Section } from "./sections";
 import { Select } from "./select";
 
 type Pull = { number: number; title: string; url: string; createdAt: string; branch: string; fromConsole: boolean; stage: "checks" | "failed" | "ready" };
-type LiveState = { products: CatalogEntry[]; pulls: Pull[] };
+// photos: the manifest's products/ keys (src/lib/admin/photos.ts says which view each one is)
+type LiveState = { products: CatalogEntry[]; photos: string[]; pulls: Pull[] };
 type Pending = { key: string; doneText: string; startedAt: number; check: (state: LiveState) => boolean; slowMinutes: number };
 type Toast = { key: string; text: string; phase: "applying" | "done" | "late" };
 type ActivityItem = { text: string; at: string };
@@ -53,8 +55,10 @@ const REPO = "https://github.com/luminary-dev/lusted";
 const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
 const COLOR_KEYS = Object.keys(colors) as ColorKey[];
-// the photo route serves only the current version, so the thumbnails follow it
-const IMG = (slug: string) => `/img/v${IMAGE_VERSION}/products/${slug}.webp`;
+// the photo route serves only the current version, so the thumbnails follow it; a piece's front photo has a key of
+// its own once the console has replaced it, so it is looked up rather than assumed
+const IMG = (key: string) => `/img/v${IMAGE_VERSION}/${key}`;
+const FRONT = (photos: string[], slug: string) => IMG(photoKey(photos, slug, null, "front") ?? `products/${slug}.webp`);
 const COLLECTION_OPTIONS = COLLECTIONS.map((c) => ({ value: c.key, label: c.name }));
 // the home page and the search show six best sellers, so six is the limit
 const BEST_LIMIT = 6;
@@ -62,8 +66,8 @@ const bestCount = (products: CatalogEntry[]) => products.filter((p) => p.bestSel
 
 /* ───────── live state, pending changes, tickets ───────── */
 
-function useLiveState(initial: CatalogEntry[]) {
-  const [live, setLive] = useState<LiveState>({ products: initial, pulls: [] });
+function useLiveState(initial: CatalogEntry[], photos: string[]) {
+  const [live, setLive] = useState<LiveState>({ products: initial, photos, pulls: [] });
   const [failed, setFailed] = useState(false);
   const [pending, setPending] = useState<Pending[]>([]);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -75,11 +79,11 @@ function useLiveState(initial: CatalogEntry[]) {
   const refresh = useCallback(async () => {
     const response = await fetch("/api/admin/state").catch(() => null);
     const body = await response?.json().catch(() => null);
-    if (!response?.ok || !body?.ok || !Array.isArray(body.products)) {
+    if (!response?.ok || !body?.ok || !Array.isArray(body.products) || !Array.isArray(body.photos)) {
       setFailed(true);
       return;
     }
-    const state: LiveState = { products: body.products, pulls: body.pulls ?? [] };
+    const state: LiveState = { products: body.products, photos: body.photos, pulls: body.pulls ?? [] };
     setLive(state);
     setFailed(false);
     setPending((current) => {
@@ -193,6 +197,16 @@ async function shrink(file: File, max = 1600): Promise<Blob> {
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("could not shrink the photo"))), "image/jpeg", 0.86));
 }
 
+// one photo straight into the bucket on a signed address, under incoming/<upload>/<view>: the upload id is minted with
+// the first photo and passed back for the rest of the same piece, or left out for a photo of its own
+async function sendPhoto(file: File, view: PhotoView, upload?: string): Promise<{ upload: string; key: string }> {
+  const signed = await post("/api/admin/upload-url", { upload, view, type: file.type });
+  if (!signed.ok) throw new Error(signed.body?.error ?? "Could not sign the upload");
+  const put = await fetch(signed.body.url, { method: "PUT", headers: { "content-type": file.type }, body: file }).catch(() => null);
+  if (!put?.ok) throw new Error(`The ${view} photo didn’t upload (${put?.status ?? "no answer"}) — is the bucket's CORS set for this site?`);
+  return { upload: signed.body.upload, key: signed.body.key };
+}
+
 const slugify = (name: string) =>
   name
     .toLowerCase()
@@ -205,8 +219,8 @@ const lkr = (n: number) => n.toLocaleString("en-LK");
 
 /* ───────── i · the fitting (add a piece) ───────── */
 
-type View = "front" | "back" | "side";
-const VIEWS: View[] = ["front", "back", "side"];
+type View = PhotoView;
+const VIEWS: View[] = [...PHOTO_VIEWS];
 
 function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }) {
   const bestFull = bestCount(existing) >= BEST_LIMIT;
@@ -287,12 +301,9 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
         const file = files[view];
         if (!file) continue;
         setAdding(`Sending the ${view} photo…`);
-        const signed = await post("/api/admin/upload-url", { upload, view, type: file.type });
-        if (!signed.ok) throw new Error(signed.body?.error ?? "Could not sign the upload");
-        upload = signed.body.upload;
-        const put = await fetch(signed.body.url, { method: "PUT", headers: { "content-type": file.type }, body: file }).catch(() => null);
-        if (!put?.ok) throw new Error(`The ${view} photo didn’t upload (${put?.status ?? "no answer"}) — is the bucket's CORS set for this site?`);
-        keys[view] = signed.body.key;
+        const sent = await sendPhoto(file, view, upload);
+        upload = sent.upload;
+        keys[view] = sent.key;
       }
       // 2 · the piece itself
       setAdding("Queuing the piece…");
@@ -501,7 +512,7 @@ function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }
 
 /* ───────── ii · offers ───────── */
 
-function Offers({ products, track }: { products: CatalogEntry[]; track: Track }) {
+function Offers({ products, photos, track }: { products: CatalogEntry[]; photos: string[]; track: Track }) {
   const [category, setCategory] = useState<string>("swim");
   const [percent, setPercent] = useState("20");
   const [busy, setBusy] = useState(false);
@@ -579,7 +590,7 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
           {onOffer.map((p) => (
             <li key={p.slug}>
               {/* eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size */}
-              <img src={IMG(p.slug)} alt="" className="adm-thumb" loading="lazy" />
+              <img src={FRONT(photos, p.slug)} alt="" className="adm-thumb" loading="lazy" />
               <span className="adm-offer-name">
                 {p.name}
                 <span className="adm-aside">{COLLECTIONS.find((c) => c.key === p.category)?.name}</span>
@@ -600,13 +611,15 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
 
 /* ───────── iii · the ledger ───────── */
 
-function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track: Track; bestTaken: number }) {
+function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntry; photos: string[]; track: Track; bestTaken: number }) {
   const [name, setName] = useState(product.name);
   const [category, setCategory] = useState<string>(product.category);
   const [price, setPrice] = useState(String(product.price));
   const [sale, setSale] = useState(product.salePrice ? String(product.salePrice) : "");
   const [rank, setRank] = useState(product.bestSeller ? String(product.bestSeller) : "");
   const [waiting, setWaiting] = useState(false);
+  const [showPhotos, setShowPhotos] = useState(false);
+  const photosId = useId();
 
   // Only the fields changed in this row, against its values when editing began: the change lands minutes later, so
   // sending the rest would put back whatever this row last saw — undoing an offer still on its way, say. A cleared
@@ -648,76 +661,276 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
   }
 
   return (
-    <tr className={`adm-tr ${dirty ? "is-dirty" : ""} ${waiting ? "is-waiting" : ""}`}>
-      <td className="adm-td-piece">
-        <span className="adm-thumb-wrap">
-          {/* eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size */}
-          <img src={IMG(product.slug)} alt="" className="adm-thumb" loading="lazy" />
-        </span>
-        <span className="adm-piece">
-          <input className="adm-input adm-input-row adm-input-name" type="text" maxLength={60} value={name} aria-label="Name" onChange={(e) => setName(e.currentTarget.value)} />
-          <Select label="Collection" size="dim" value={category} options={COLLECTION_OPTIONS} onChange={setCategory} />
-        </span>
-      </td>
-      <td className="adm-td-num">
-        <input className="adm-input adm-input-row adm-num-in" type="number" min={1} value={price} aria-label="Price" onChange={(e) => setPrice(e.currentTarget.value)} />
-      </td>
-      <td className="adm-td-num">
-        <span className="adm-offer-cell">
-          <input
-            className={`adm-input adm-input-row adm-num-in ${offerWrong ? "is-wrong" : ""}`}
-            type="number"
-            min={1}
-            placeholder="—"
-            value={sale}
-            aria-label="Offer price"
-            aria-invalid={!!offerWrong}
-            aria-describedby={offerWrong ? offerNote : undefined}
-            onChange={(e) => setSale(e.currentTarget.value)}
-          />
-          {offerWrong ? (
-            <span className="adm-off adm-wrong" id={offerNote} role="alert">
-              {offerWrong.toLowerCase()}
+    <>
+      <tr className={`adm-tr ${dirty ? "is-dirty" : ""} ${waiting ? "is-waiting" : ""}`}>
+        <td className="adm-td-piece">
+          <span className="adm-thumb-wrap">
+            {/* eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size */}
+            <img src={FRONT(photos, product.slug)} alt="" className="adm-thumb" loading="lazy" />
+          </span>
+          <span className="adm-piece">
+            <input className="adm-input adm-input-row adm-input-name" type="text" maxLength={60} value={name} aria-label="Name" onChange={(e) => setName(e.currentTarget.value)} />
+            <Select label="Collection" size="dim" value={category} options={COLLECTION_OPTIONS} onChange={setCategory} />
+          </span>
+        </td>
+        <td className="adm-td-num">
+          <input className="adm-input adm-input-row adm-num-in" type="number" min={1} value={price} aria-label="Price" onChange={(e) => setPrice(e.currentTarget.value)} />
+        </td>
+        <td className="adm-td-num">
+          <span className="adm-offer-cell">
+            <input
+              className={`adm-input adm-input-row adm-num-in ${offerWrong ? "is-wrong" : ""}`}
+              type="number"
+              min={1}
+              placeholder="—"
+              value={sale}
+              aria-label="Offer price"
+              aria-invalid={!!offerWrong}
+              aria-describedby={offerWrong ? offerNote : undefined}
+              onChange={(e) => setSale(e.currentTarget.value)}
+            />
+            {offerWrong ? (
+              <span className="adm-off adm-wrong" id={offerNote} role="alert">
+                {offerWrong.toLowerCase()}
+              </span>
+            ) : (
+              pct > 0 && <span className="adm-off">−{pct}%</span>
+            )}
+            <Select
+              label="Set the offer by percent"
+              size="dim"
+              className="adm-pct-pick"
+              value=""
+              options={[{ value: "", label: "% off…" }, ...[10, 15, 20, 25, 30, 40, 50].map((p) => ({ value: String(p), label: `${p}% off` }))]}
+              onChange={(v) => {
+                const p = Number(v);
+                if (!p) return;
+                const full = Number(price) || product.price;
+                setSale(String(Math.min(Math.max(10, Math.round((full * (1 - p / 100)) / 10) * 10), full - 10)));
+              }}
+            />
+          </span>
+        </td>
+        <td className="adm-td-num">
+          <input className={`adm-input adm-input-row adm-num-in adm-rank-in ${seventh ? "is-wrong" : ""}`} type="number" min={1} max={BEST_LIMIT} placeholder="—" title={seventh ? "Six best sellers already — clear one first." : "A number makes it a best seller: 1 shows first, six at most. Clear it to take it out."} value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
+          {seventh && <span className="adm-off adm-wrong">six already</span>}
+        </td>
+        <td className="adm-td-actions">
+          {waiting ? (
+            <span className="adm-applying">
+              <span className="adm-dot" aria-hidden="true" /> on its way
             </span>
           ) : (
-            pct > 0 && <span className="adm-off">−{pct}%</span>
+            <>
+              <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh || !!offerWrong} onClick={save}>
+                Save
+              </button>
+              <button type="button" className="adm-quiet" aria-expanded={showPhotos} aria-controls={photosId} onClick={() => setShowPhotos((open) => !open)}>
+                Photos
+              </button>
+              <button type="button" className="adm-quiet is-danger" onClick={remove}>
+                Remove
+              </button>
+            </>
           )}
+        </td>
+      </tr>
+      {showPhotos && (
+        <tr className="adm-tr-photos" id={photosId}>
+          <td colSpan={5}>
+            <PiecePhotos product={product} photos={photos} track={track} />
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+// A piece's photos, opened under its row: front, back and side for the piece itself and for each of its other colours.
+// Each one can be replaced or taken off (all but the piece's own front, which can only be replaced), an empty one
+// filled, and the piece photographed in a colour it doesn't list yet — its front photo adds the colour to the piece.
+// The changes are gathered here and go as one, so a piece's photos are only ever on their way in one pull request
+// (two at once would both rewrite the same lines of the manifest). A new photo gets a key of its own and the old one
+// only leaves the manifest (src/lib/admin/photos.ts): the live site reads the same bucket and keeps showing it until
+// the next release.
+type Staged = { file: File; preview: string } | "remove";
+type Sent = { changes: Array<{ colour: string | null; view: View; photo: string | null }>; before: Array<string | null> };
+
+const slotOf = (colour: string | null, view: View) => `${colour ?? ""}/${view}`;
+// done when every new photo is in under a new key and every one taken off is gone
+const landed = (sent: Sent, photos: string[], slug: string) =>
+  sent.changes.every(({ colour, view, photo }, i) => {
+    const now = photoKey(photos, slug, colour, view);
+    return photo === null ? !now : !!now && now !== sent.before[i];
+  });
+
+function PiecePhotos({ product, photos, track }: { product: CatalogEntry; photos: string[]; track: Track }) {
+  const [staged, setStaged] = useState<Record<string, Staged>>({});
+  // colours the piece doesn't list yet that the owner is photographing it in
+  const [more, setMore] = useState<ColorKey[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState<Sent | null>(null);
+  const problemNote = useId();
+  const onItsWay = !!sent && !landed(sent, photos, product.slug);
+
+  const groups: Array<ColorKey | null> = [null, ...product.colors.slice(1), ...more.filter((c) => !product.colors.includes(c))];
+  const others = COLOR_KEYS.filter((c) => !product.colors.includes(c) && !more.includes(c));
+  const changes = Object.entries(staged).map(([slot, s]) => {
+    const [colour, view] = slot.split("/");
+    return { colour: colour || null, view: view as View, staged: s };
+  });
+  const problem = changes.length ? photoChangesProblem(product, photos, changes.map(({ colour, view, staged: s }) => ({ colour, view, remove: s === "remove" }))) : null;
+
+  const stage = (colour: string | null, view: View, next: Staged | null) =>
+    setStaged((all) => {
+      const slot = slotOf(colour, view);
+      const was = all[slot];
+      if (was && was !== "remove") URL.revokeObjectURL(was.preview);
+      const rest = { ...all };
+      delete rest[slot];
+      return next ? { ...rest, [slot]: next } : rest;
+    });
+
+  async function save() {
+    if (!changes.length || problem || busy) return;
+    setError(null);
+    try {
+      const out: Sent["changes"] = [];
+      for (const { colour, view, staged: s } of changes) {
+        if (s === "remove") {
+          out.push({ colour, view, photo: null });
+          continue;
+        }
+        setBusy(`Sending the ${colour ? `${colour} ` : ""}${view} photo…`);
+        // each photo is an upload of its own, so its new key is too
+        out.push({ colour, view, photo: (await sendPhoto(s.file, view)).key });
+      }
+      setBusy("Queuing the change…");
+      const result = await post("/api/admin/dispatch", { action: "product-photo", slug: product.slug, changes: out });
+      if (!result.ok) throw new Error(result.body?.error ?? "Something went wrong — try again");
+      const mine: Sent = { changes: out, before: out.map(({ colour, view }) => photoKey(photos, product.slug, colour, view)) };
+      track(`Changing the photos of “${product.name}”`, `“${product.name}” has its new photos. The dev site follows in a couple of minutes.`, (state) => landed(mine, state.photos, product.slug), 25);
+      setSent(mine);
+      Object.values(staged).forEach((s) => s !== "remove" && URL.revokeObjectURL(s.preview));
+      setStaged({});
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong — try again");
+    }
+    setBusy(null);
+  }
+
+  return (
+    <div className="adm-photos">
+      {groups.map((colour) => {
+        const listed = colour === null || product.colors.includes(colour);
+        const main = colors[product.colors[0]]?.label ?? product.colors[0];
+        return (
+          <div key={colour ?? ""} className="adm-photo-group">
+            <span className="adm-photo-colour">
+              <span className="adm-swatch" style={{ background: colors[colour ?? product.colors[0]]?.hex }} aria-hidden="true" />
+              <span>
+                {colour === null ? main : colors[colour].label}
+                <span className="adm-aside">{colour === null ? "the piece’s own" : listed ? "colourway" : "adds the colour"}</span>
+              </span>
+            </span>
+            {VIEWS.map((view) => {
+              const current = photoKey(photos, product.slug, colour, view);
+              const s = staged[slotOf(colour, view)];
+              const fixed = colour === null && view === "front";
+              const what = `${colour ? `${colors[colour].label} ` : ""}${view}`;
+              return (
+                <figure key={view} className={`adm-shot ${s === "remove" ? "is-off" : s ? "is-new" : ""}`}>
+                  <span className="adm-shot-frame">
+                    {s && s !== "remove" ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- a local preview of the file just chosen
+                      <img src={s.preview} alt="" />
+                    ) : current ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- the site's own photo route, at thumbnail size
+                      <img src={IMG(current)} alt="" loading="lazy" />
+                    ) : (
+                      <span className="adm-pin-empty">
+                        <span className="adm-pin-plus" aria-hidden="true">
+                          +
+                        </span>
+                        <span>none</span>
+                      </span>
+                    )}
+                  </span>
+                  <figcaption>
+                    {view}
+                    {s === "remove" ? " · comes off" : s ? (current ? " · replaces" : " · new") : ""}
+                  </figcaption>
+                  <span className="adm-shot-actions">
+                    {s ? (
+                      <button type="button" className="adm-quiet" disabled={!!busy || onItsWay} onClick={() => stage(colour, view, null)}>
+                        Undo
+                      </button>
+                    ) : (
+                      <>
+                        <label className={`adm-quiet adm-shot-pick ${busy || onItsWay ? "is-off" : ""}`}>
+                          {current ? "Replace" : "Add"}
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            aria-label={`${current ? "Replace" : "Add"} the ${what} photo`}
+                            disabled={!!busy || onItsWay}
+                            onChange={(e) => {
+                              const file = e.currentTarget.files?.[0];
+                              if (file) stage(colour, view, { file, preview: URL.createObjectURL(file) });
+                              e.currentTarget.value = "";
+                            }}
+                          />
+                        </label>
+                        {current && !fixed && (
+                          <button type="button" className="adm-quiet is-danger" aria-label={`Take off the ${what} photo`} disabled={!!busy || onItsWay} onClick={() => stage(colour, view, "remove")}>
+                            Take off
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </span>
+                </figure>
+              );
+            })}
+          </div>
+        );
+      })}
+      <div className="adm-row adm-row-tight">
+        {others.length > 0 && (
           <Select
-            label="Set the offer by percent"
+            label="Photograph it in another colour"
             size="dim"
-            className="adm-pct-pick"
             value=""
-            options={[{ value: "", label: "% off…" }, ...[10, 15, 20, 25, 30, 40, 50].map((p) => ({ value: String(p), label: `${p}% off` }))]}
-            onChange={(v) => {
-              const p = Number(v);
-              if (!p) return;
-              const full = Number(price) || product.price;
-              setSale(String(Math.min(Math.max(10, Math.round((full * (1 - p / 100)) / 10) * 10), full - 10)));
-            }}
+            options={[{ value: "", label: "Another colour…" }, ...others.map((c) => ({ value: c, label: colors[c].label }))]}
+            onChange={(v) => v && setMore((all) => [...all, v as ColorKey])}
           />
-        </span>
-      </td>
-      <td className="adm-td-num">
-        <input className={`adm-input adm-input-row adm-num-in adm-rank-in ${seventh ? "is-wrong" : ""}`} type="number" min={1} max={BEST_LIMIT} placeholder="—" title={seventh ? "Six best sellers already — clear one first." : "A number makes it a best seller: 1 shows first, six at most. Clear it to take it out."} value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
-        {seventh && <span className="adm-off adm-wrong">six already</span>}
-      </td>
-      <td className="adm-td-actions">
-        {waiting ? (
+        )}
+        {onItsWay ? (
           <span className="adm-applying">
             <span className="adm-dot" aria-hidden="true" /> on its way
           </span>
         ) : (
-          <>
-            <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh || !!offerWrong} onClick={save}>
-              Save
-            </button>
-            <button type="button" className="adm-quiet is-danger" onClick={remove}>
-              Remove
-            </button>
-          </>
+          <button type="button" className="adm-btn" disabled={!changes.length || !!problem || !!busy} aria-describedby={problem ? problemNote : undefined} onClick={save}>
+            {busy ?? `Save the photos${changes.length ? ` (${changes.length})` : ""}`}
+          </button>
         )}
-      </td>
-    </tr>
+        {problem && (
+          <span className="adm-wrong" id={problemNote} role="alert">
+            {problem}.
+          </span>
+        )}
+        <span className="adm-help">
+          Each photo is cropped to 9:16 and signed with the wordmark, like the fitting’s. Front is the card photo and back shows on hover; a colour’s back
+          and side show only with its front, and taking off a colour’s front takes them too. Taken-off photos stay on the live site until the next release.
+        </span>
+      </div>
+      {error && (
+        <p className="adm-alert" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -729,7 +942,7 @@ const FLAGS: Array<{ key: Flag; label: string }> = [
   { key: "full", label: "Full price" },
 ];
 
-function Ledger({ products, track }: { products: CatalogEntry[]; track: Track }) {
+function Ledger({ products, photos, track }: { products: CatalogEntry[]; photos: string[]; track: Track }) {
   const [query, setQuery] = useState("");
   const [collection, setCollection] = useState("*");
   const [flags, setFlags] = useState<Flag[]>([]);
@@ -819,7 +1032,7 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
           <tbody>
             {rows.map((p) => (
               // content-keyed: when the live state confirms a change the row remounts with the fresh values
-              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} track={track} bestTaken={bestCount(products)} />
+              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} photos={photos} track={track} bestTaken={bestCount(products)} />
             ))}
           </tbody>
         </table>
@@ -827,8 +1040,8 @@ function Ledger({ products, track }: { products: CatalogEntry[]; track: Track })
       </div>
       <p className="adm-help">
         <strong>Best sellers:</strong> give a piece a number in the Best seller column — 1 shows first — and Save. Six at most, the six the home page
-        and the search show; to make room, clear another piece’s number. <strong>Offers:</strong> clear the offer price to end one. Descriptions and photos change in the
-        repo, or take the piece off and add it again.
+        and the search show; to make room, clear another piece’s number. <strong>Offers:</strong> clear the offer price to end one. <strong>Photos:</strong> open a
+        piece’s photos to add, replace or take one off, for the piece and for each of its colours. Descriptions change in the repo, or take the piece off and add it again.
       </p>
     </>
   );
@@ -896,9 +1109,9 @@ function useLights() {
 
 /* ───────── the room ───────── */
 
-export function Console({ section, initial }: { section: Section; initial: CatalogEntry[] }) {
+export function Console({ section, initial, photos }: { section: Section; initial: CatalogEntry[]; photos: string[] }) {
   const router = useRouter();
-  const { live, failed, track, toasts } = useLiveState(initial);
+  const { live, failed, track, toasts } = useLiveState(initial, photos);
   const lights = useLights();
   const activity = useActivity(section === "daybook", `${live.products.length}|${live.pulls.map((p) => `${p.number}${p.stage}`).join(",")}`);
 
@@ -983,8 +1196,8 @@ export function Console({ section, initial }: { section: Section; initial: Catal
             {room.name}
           </h2>
           {section === "fitting" && <Fitting track={track} existing={live.products} />}
-          {section === "offers" && <Offers products={live.products} track={track} />}
-          {section === "ledger" && <Ledger products={live.products} track={track} />}
+          {section === "offers" && <Offers products={live.products} photos={live.photos} track={track} />}
+          {section === "ledger" && <Ledger products={live.products} photos={live.photos} track={track} />}
           {section === "daybook" && <DayBook pulls={live.pulls} items={activity} />}
         </section>
       </div>

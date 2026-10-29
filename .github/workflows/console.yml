@@ -1,11 +1,11 @@
 # Console — fired by the owner console (src/app/admin) through repository_dispatch (src/lib/admin/github.ts).
 #
 # One run per change. It applies the change on a fresh branch off dev (scripts/admin/add-product.mjs for a new piece —
-# the photos are finished and put in the bucket here — or scripts/admin/apply-update.mjs for everything else), commits
-# it as "admin: <what changed>", opens a pull request into dev and waits for the checks; when they're green it merges
-# the pull request, which deploys the dev site like any other merge. So a console change takes the same road as every
-# other change and no rule is bypassed. If a check fails the run fails and the pull request stays open for a look; the
-# console shows both under Activity.
+# the photos are finished and put in the bucket here — or scripts/admin/apply-update.mjs for everything else, new
+# photos for a piece included), commits it as "admin: <what changed>", opens a pull request into dev and waits for the
+# checks; when they're green it merges the pull request, which deploys the dev site like any other merge. So a console
+# change takes the same road as every other change and no rule is bypassed. If a check fails the run fails and the pull
+# request stays open for a look; the console shows both under Activity.
 #
 # Needs the repository secrets R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY (the photos) and
 # CONSOLE_TOKEN: a fine-grained personal access token for this repository with Contents and Pull requests read/write.
@@ -15,7 +15,7 @@ name: Console
 
 on:
   repository_dispatch:
-    types: [add-product, update-product, remove-product, bulk-offer]
+    types: [add-product, update-product, remove-product, bulk-offer, product-photo]
 
 permissions:
   contents: read

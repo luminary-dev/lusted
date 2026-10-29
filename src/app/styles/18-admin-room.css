@@ -890,6 +890,123 @@ select.adm-input-big {
   color: var(--a-blush);
 }
 
+/* ─ a piece's photos, opened under its row in the ledger: a line of small prints for the piece and each colour ─ */
+.adm-ledger tr.adm-tr-photos td {
+  padding: 4px 0 28px;
+}
+
+.adm-ledger tbody tr.adm-tr-photos:hover {
+  background: none;
+}
+
+.adm-photos {
+  display: grid;
+  gap: 22px;
+}
+
+.adm-photo-group {
+  display: grid;
+  grid-template-columns: 150px repeat(3, 92px);
+  gap: 18px;
+  align-items: start;
+}
+
+.adm-photo-colour {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 4px;
+  font-size: 13.5px;
+  color: var(--a-ink-2);
+}
+
+.adm-photo-colour .adm-swatch {
+  flex: none;
+  margin-top: 3px;
+}
+
+.adm-photo-colour .adm-aside {
+  display: block;
+}
+
+.adm-shot {
+  margin: 0;
+  display: grid;
+  gap: 7px;
+  justify-items: start;
+}
+
+.adm-shot-frame {
+  position: relative;
+  display: block;
+  width: 92px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #2a1216;
+}
+
+.adm-shot-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.2s;
+}
+
+.adm-shot-frame .adm-pin-empty {
+  margin: 4px;
+  font-size: 11px;
+}
+
+.adm-shot.is-new .adm-shot-frame {
+  outline: 1px solid var(--a-rose);
+  outline-offset: 2px;
+}
+
+.adm-shot.is-off .adm-shot-frame img {
+  opacity: 0.3;
+}
+
+.adm-shot figcaption {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+}
+
+.adm-shot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.adm-shot-pick {
+  position: relative;
+}
+
+.adm-shot-pick.is-off {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.adm-shot-pick input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.adm-shot-pick:focus-within {
+  color: var(--a-ink);
+  border-bottom-color: var(--a-ink);
+}
+
+:root[data-theme="light"] .adm-room .adm-shot-frame {
+  background: #e8dcd4;
+}
+
 /* ─ the day book ─ */
 .adm-pulls,
 .adm-feed {
@@ -988,6 +1105,12 @@ select.adm-input-big {
   .adm-ledger tr:hover .adm-thumb {
     transform: none;
     box-shadow: none;
+  }
+  .adm-photo-group {
+    grid-template-columns: repeat(3, 92px);
+  }
+  .adm-photo-colour {
+    grid-column: 1 / -1;
   }
   .adm-wordmark {
     width: 110px;
