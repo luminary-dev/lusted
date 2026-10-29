@@ -6,6 +6,7 @@ import { emailLink, site, whatsappLink } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Privacy Policy — Lusted",
   description: "How Lusted collects, uses and protects your personal information — discreetly, and only to fulfil your order.",
+  alternates: { canonical: "/privacy" },
 };
 
 // Template policy — have it reviewed against your actual practices before launch.

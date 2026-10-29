@@ -11,6 +11,7 @@ import { img } from "@/lib/cdn";
 export const metadata: Metadata = {
   title: "About us — Lusted",
   description: "Lusted is lingerie made to be looked at and cut to be taken off — designed for the moment someone notices, made to last past it, and delivered so no one knows.",
+  alternates: { canonical: "/about" },
 };
 
 const values = [

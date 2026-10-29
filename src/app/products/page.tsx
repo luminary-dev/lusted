@@ -4,7 +4,7 @@ import ProductBrowser from "@/components/shop/ProductBrowser";
 import { products } from "@/lib/products";
 
 export const metadata: Metadata = {
-  title: "Shop all — Lusted",
+  title: "Shop all — Lusted Sri Lanka",
   description: "Every Lusted piece — lingerie, swim and after dark, all of it made to come off. Search, filter by size, colour and price, and order so quietly on WhatsApp that no one knows.",
   alternates: { canonical: "/products" }, // every filtered, searched or paged view is the same shop
 };

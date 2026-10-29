@@ -6,6 +6,7 @@ import { emailLink, site, whatsappLink } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Terms & Conditions — Lusted",
   description: "The terms for ordering from Lusted — pricing in LKR, payment, discreet delivery, exchanges and returns.",
+  alternates: { canonical: "/terms" },
 };
 
 // Template terms — have them reviewed for your business before launch.

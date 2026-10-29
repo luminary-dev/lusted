@@ -93,6 +93,53 @@ test.describe("routes", () => {
     expect(card.headers()["content-type"]).toBe("image/png");
   });
 
+  test("search engines: every indexable page names its canonical address, and favourites asks not to be indexed", async ({ prepared: page }) => {
+    for (const path of ["/", "/about", "/privacy", "/terms"]) {
+      await go(page, path);
+      const href = await page.locator('link[rel="canonical"]').getAttribute("href");
+      expect(href, `canonical on ${path}`).toBeTruthy();
+      expect(new URL(href!).pathname, `canonical on ${path}`).toBe(path);
+      await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+    }
+    await go(page, "/");
+    await expect(page).toHaveTitle(/Sri Lanka/);
+    await go(page, "/favourites");
+    expect(await page.locator('meta[name="robots"]').getAttribute("content")).toMatch(/noindex/);
+  });
+
+  test("structured data: the piece, its price in rupees and its breadcrumbs; the shop; the FAQ", async ({ prepared: page }) => {
+    // every JSON-LD block on the page, parsed — a block that isn't valid JSON fails here
+    const blocks = async () =>
+      (await page.locator('script[type="application/ld+json"]').allTextContents()).map((t) => JSON.parse(t) as Record<string, unknown> & { "@type": string });
+    const { slug, name } = CATALOG.hero;
+    await go(page, `/products/${slug}`);
+    await expect(page).toHaveTitle(`${name} — Lusted Sri Lanka`);
+    const ld = await blocks();
+    const product = ld.find((b) => b["@type"] === "Product") as unknown as { name: string; image: string[]; offers: { price: number; priceCurrency: string; availability: string; url: string } };
+    expect(product, "Product JSON-LD").toBeTruthy();
+    expect(product.name).toBe(name);
+    expect(product.image.length).toBeGreaterThan(0);
+    for (const src of product.image) expect(src).toMatch(/^https?:\/\//);
+    expect(product.offers.priceCurrency).toBe("LKR");
+    expect(product.offers.price).toBe(CATALOG.sale.includes(slug) ? CATALOG.salePriceOf(slug) : CATALOG.priceOf(slug));
+    expect(product.offers.availability).toBe("https://schema.org/InStock");
+    expect(new URL(product.offers.url).pathname).toBe(`/products/${slug}`);
+    // the breadcrumbs match the trail on the page
+    const crumbs = ld.find((b) => b["@type"] === "BreadcrumbList") as unknown as { itemListElement: { name: string }[] };
+    expect(crumbs.itemListElement.map((c) => c.name)).toEqual(await page.locator(".crumbs a").allTextContents());
+
+    await go(page, "/");
+    const store = (await blocks()).find((b) => b["@type"] === "OnlineStore") as unknown as { sameAs: string[]; contactPoint: { telephone: string; areaServed: string } };
+    expect(store.sameAs.some((u) => u.includes(CATALOG.instagram))).toBe(true);
+    expect(store.contactPoint.telephone).toBe(`+${CATALOG.whatsapp}`);
+    expect(store.contactPoint.areaServed).toBe("LK");
+
+    await go(page, "/help");
+    const faq = (await blocks()).find((b) => b["@type"] === "FAQPage") as unknown as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] };
+    expect(faq.mainEntity.map((q) => q.name)).toEqual(await page.locator(".help-qa dt").allTextContents());
+    for (const q of faq.mainEntity) expect(q.acceptedAnswer.text.length, q.name).toBeGreaterThan(10);
+  });
+
   test("metadata: description, theme-color per scheme, open graph, viewport", async ({ prepared: page }) => {
     await go(page, "/");
     expect(await page.locator('meta[name="description"]').getAttribute("content")).toMatch(/lingerie/i);
