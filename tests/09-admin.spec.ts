@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures";
 import { offerProblem, percentProblem } from "../src/lib/admin/offers";
-import { photoChangesProblem, photoKey, type PhotoChange } from "../src/lib/admin/photos";
+import { PHOTO_CHANGES_MAX, photoChangesProblem, photoKey, photoNamesClash, type PhotoChange } from "../src/lib/admin/photos";
 
 // The owner console (src/app/admin): reachable in front of the reveal gate, never cached or indexed, and nothing in
 // it answers without a session. The server the suite runs against has no ADMIN_* environment, so the form is shown
@@ -86,22 +86,36 @@ test.describe("owner console", () => {
     expect(photoKey(keys, "camille", null, "side")).toBeNull();
     expect(photoKey(["products/camille.webp", "products/camille.0a1b2c3d.webp"], "camille", null, "front")).toBe("products/camille.webp");
     expect(photoKey(["products/camille.not-a-rev.webp"], "camille", null, "front")).toBeNull();
+    // the three optional photos are <slug>-4, -5 and -6, and the same after a colour
+    expect(photoKey(["products/camille-4.webp", "products/camille--blush-6.0a1b2c3d.webp"], "camille", null, "extra1")).toBe("products/camille-4.webp");
+    expect(photoKey(["products/camille-4.webp", "products/camille--blush-6.0a1b2c3d.webp"], "camille", "blush", "extra3")).toBe("products/camille--blush-6.0a1b2c3d.webp");
+    expect(photoKey(["products/camille-4.webp"], "camille", null, "extra2")).toBeNull();
+    // a new piece whose name would read as another's photo is refused in the fitting
+    expect(photoNamesClash("camille-4", ["camille"])).toBe(true);
+    expect(photoNamesClash("camille", ["camille-back"])).toBe(true);
+    expect(photoNamesClash("camille--x", [])).toBe(true);
+    expect(photoNamesClash("camille-14", ["camille"])).toBe(false);
+    expect(photoNamesClash("rose-lace", ["rose"])).toBe(false);
 
     // replacing, adding, taking off, a new colourway (its front adds the colour), a colour's front taking its back along
     expect(photoChangesProblem(piece, keys, [change(null, "front"), change(null, "side"), change(null, "back", true)])).toBeNull();
     expect(photoChangesProblem(piece, keys, [change("blush", "side"), change("blush", "back", true)])).toBeNull();
     expect(photoChangesProblem(piece, keys, [change("lilac", "front"), change("lilac", "back")])).toBeNull();
     expect(photoChangesProblem(piece, keys, [change("blush", "front", true)])).toBeNull();
+    expect(photoChangesProblem(piece, keys, [change(null, "extra1"), change(null, "extra3"), change("blush", "extra2")])).toBeNull();
+    expect(photoChangesProblem(piece, keys, [change("lilac", "front"), change("lilac", "extra1")])).toBeNull();
 
     expect(photoChangesProblem(piece, keys, [])).toMatch(/nothing/i);
     expect(photoChangesProblem(piece, keys, [change(null, "front", true)])).toMatch(/keeps its front/);
     expect(photoChangesProblem(piece, keys, [change(null, "side", true)])).toMatch(/no side photo/);
+    expect(photoChangesProblem(piece, keys, [change(null, "extra2", true)])).toMatch(/no extra 2 photo/);
+    expect(photoChangesProblem(piece, keys, [change("lilac", "extra3")])).toMatch(/lilac front/);
     expect(photoChangesProblem(piece, keys, [change("ivory", "back")])).toMatch(/piece’s own/);
     expect(photoChangesProblem(piece, keys, [change(null, "back"), change(null, "back", true)])).toMatch(/one change per photo/i);
     // a colour's back and side show only with its front
     expect(photoChangesProblem(piece, keys, [change("lilac", "back")])).toMatch(/lilac front/);
     expect(photoChangesProblem(piece, keys, [change("blush", "front", true), change("blush", "side")])).toMatch(/blush front/);
     expect(photoChangesProblem(piece, keys, [change("Blush!", "front")])).toMatch(/colours/);
-    expect(photoChangesProblem(piece, keys, Array.from({ length: 25 }, (_, i) => change(null, "back", i % 2 === 0)))).toMatch(/too many/i);
+    expect(photoChangesProblem(piece, keys, Array.from({ length: PHOTO_CHANGES_MAX + 1 }, (_, i) => change(null, "back", i % 2 === 0)))).toMatch(/too many/i);
   });
 });

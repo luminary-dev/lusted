@@ -21,7 +21,7 @@ npm run lint
 
 ## Where things live
 
-- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos"; a photo the console put in the bucket has a short revision in its name, see "The owner console").
+- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views and up to three more, `-4`, `-5` and `-6`, which the product page shows after them as "Photo 4" and on (see "Photos"; a photo the console put in the bucket has a short revision in its name, see "The owner console"). A slug that is another's plus one of those endings (`rose` and `rose-4`), or that holds `--` (the colour separator), would make the names read two ways: `sync-product-images.mjs` stops on it and the fitting refuses such a name.
 - **Contact details** — `src/lib/site.ts`: WhatsApp number, Instagram, email, hours. Every button and link reads from here.
 - **Collection names and taglines** — `categories` in `src/lib/products.ts`.
 - **Search** — `matchesQuery` in `src/lib/products.ts`, for the search dialog and the shop: every word must start a word of the piece (case and accents ignored, plurals folded), and `searchSynonyms` beside it turns shoppers' words ("panties", "white", "swimwear") into the catalogue's — add one there when shoppers search for something the catalogue calls by another name.
@@ -149,11 +149,12 @@ facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece ad
 doesn't fail them — the home page's hero piece, `rose-lace-balconette-bra`, is the one piece the suite and Lighthouse
 name directly, so it shouldn't be removed from the console.
 
-**A piece's photos.** "Photos" on a ledger row opens the piece's photos under it, as thumbnails: front, back and side
-for the piece itself and for each of its other colours. Any of them can be replaced, an empty one filled, and any but
-the piece's own front taken off — a piece always keeps a front photo, so that one can only be replaced. A colour's back
-and side show only with its front (`sync-product-images.mjs`), so they need it, and taking off a colour's front takes
-them too. "Another colour…" photographs the piece in a colour it doesn't list yet: the colour's front photo adds it to
+**A piece's photos.** "Photos" on a ledger row opens the piece's photos under it, as thumbnails: front, back, side and
+three optional extras for the piece itself and for each of its other colours. Any of them can be replaced, an empty one
+filled, and any but the piece's own front taken off — a piece always keeps a front photo, so that one can only be
+replaced. The extras show on the product page after side, in their slots' order, for the colour picked; taking off
+extra 1 while extra 2 stays just closes the gap there — nothing is renamed in the bucket. A colour's other photos show
+only with its front (`sync-product-images.mjs`), so they need it, and taking off a colour's front takes them too. "Another colour…" photographs the piece in a colour it doesn't list yet: the colour's front photo adds it to
 the end of the piece's colours, so shoppers can pick it — the choice was between that and refusing, and refusing
 would leave the owner no way to do it, since the ledger can't change a piece's colours. The changes on a piece are
 gathered and saved as one (the `product-photo` dispatch, applied by `apply-update.mjs`), so its photos are never in two
@@ -166,7 +167,7 @@ beside Save, and the dispatch route refuses a change the workflow would refuse w
 **Why a new photo gets a new name.** The live site reads the same bucket as dev and serves every photo immutable for
 a year, so a photo written over an old key would change the live site before a release — and, behind those caches,
 not even everywhere at once. So the console never writes over a key: every photo it puts in the bucket, a new piece's
-from the fitting too, is `products/<base>.<rev>.webp`, where `<base>` is the usual `<slug>[--<colour>][-back|-side]`
+from the fitting too, is `products/<base>.<rev>.webp`, where `<base>` is the usual `<slug>[--<colour>][-back|-side|-4|-5|-6]`
 and `<rev>` eight hex characters of the upload it came from (`scripts/lib/photo-keys.mjs`; `src/lib/admin/photos.ts` for
 the console and the tests). Replacing a photo puts the new key in the manifest and takes the old one out; the old file
 stays in the bucket — as a removed piece's do — so the live site keeps showing it until the next release, which then

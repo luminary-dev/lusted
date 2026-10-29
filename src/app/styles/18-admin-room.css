@@ -906,7 +906,7 @@ select.adm-input-big {
 
 .adm-photo-group {
   display: grid;
-  grid-template-columns: 150px repeat(3, 92px);
+  grid-template-columns: 150px repeat(6, 92px);
   gap: 18px;
   align-items: start;
 }

@@ -7,7 +7,7 @@ import { useCallback, useEffect, useId, useState } from "react";
 import wordmarkDark from "@/assets/brand/wordmark-dark.png";
 import wordmarkLight from "@/assets/brand/wordmark-light.png";
 import { offerProblem, percentProblem } from "@/lib/admin/offers";
-import { PHOTO_VIEWS, photoChangesProblem, photoKey, type PhotoView } from "@/lib/admin/photos";
+import { PHOTO_VIEWS, PHOTO_VIEW_NAMES, photoChangesProblem, photoKey, type PhotoView } from "@/lib/admin/photos";
 import { IMAGE_VERSION } from "@/lib/cdn";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
@@ -203,7 +203,7 @@ async function sendPhoto(file: File, view: PhotoView, upload?: string): Promise<
   const signed = await post("/api/admin/upload-url", { upload, view, type: file.type });
   if (!signed.ok) throw new Error(signed.body?.error ?? "Could not sign the upload");
   const put = await fetch(signed.body.url, { method: "PUT", headers: { "content-type": file.type }, body: file }).catch(() => null);
-  if (!put?.ok) throw new Error(`The ${view} photo didn’t upload (${put?.status ?? "no answer"}) — is the bucket's CORS set for this site?`);
+  if (!put?.ok) throw new Error(`The ${PHOTO_VIEW_NAMES[view]} photo didn’t upload (${put?.status ?? "no answer"}) — is the bucket's CORS set for this site?`);
   return { upload: signed.body.upload, key: signed.body.key };
 }
 
@@ -220,7 +220,8 @@ const lkr = (n: number) => n.toLocaleString("en-LK");
 /* ───────── i · the fitting (add a piece) ───────── */
 
 type View = PhotoView;
-const VIEWS: View[] = [...PHOTO_VIEWS];
+// a new piece starts with the three named views; the optional extras are added from its row in the ledger
+const VIEWS: View[] = ["front", "back", "side"];
 
 function Fitting({ track, existing }: { track: Track; existing: CatalogEntry[] }) {
   const bestFull = bestCount(existing) >= BEST_LIMIT;
@@ -746,7 +747,8 @@ function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntr
   );
 }
 
-// A piece's photos, opened under its row: front, back and side for the piece itself and for each of its other colours.
+// A piece's photos, opened under its row: front, back, side and three optional extras for the piece itself and for
+// each of its other colours.
 // Each one can be replaced or taken off (all but the piece's own front, which can only be replaced), an empty one
 // filled, and the piece photographed in a colour it doesn't list yet — its front photo adds the colour to the piece.
 // The changes are gathered here and go as one, so a piece's photos are only ever on their way in one pull request
@@ -802,7 +804,7 @@ function PiecePhotos({ product, photos, track }: { product: CatalogEntry; photos
           out.push({ colour, view, photo: null });
           continue;
         }
-        setBusy(`Sending the ${colour ? `${colour} ` : ""}${view} photo…`);
+        setBusy(`Sending the ${colour ? `${colour} ` : ""}${PHOTO_VIEW_NAMES[view]} photo…`);
         // each photo is an upload of its own, so its new key is too
         out.push({ colour, view, photo: (await sendPhoto(s.file, view)).key });
       }
@@ -834,11 +836,11 @@ function PiecePhotos({ product, photos, track }: { product: CatalogEntry; photos
                 <span className="adm-aside">{colour === null ? "the piece’s own" : listed ? "colourway" : "adds the colour"}</span>
               </span>
             </span>
-            {VIEWS.map((view) => {
+            {PHOTO_VIEWS.map((view) => {
               const current = photoKey(photos, product.slug, colour, view);
               const s = staged[slotOf(colour, view)];
               const fixed = colour === null && view === "front";
-              const what = `${colour ? `${colors[colour].label} ` : ""}${view}`;
+              const what = `${colour ? `${colors[colour].label} ` : ""}${PHOTO_VIEW_NAMES[view]}`;
               return (
                 <figure key={view} className={`adm-shot ${s === "remove" ? "is-off" : s ? "is-new" : ""}`}>
                   <span className="adm-shot-frame">
@@ -853,12 +855,12 @@ function PiecePhotos({ product, photos, track }: { product: CatalogEntry; photos
                         <span className="adm-pin-plus" aria-hidden="true">
                           +
                         </span>
-                        <span>none</span>
+                        <span>{view.startsWith("extra") ? "optional" : "none"}</span>
                       </span>
                     )}
                   </span>
                   <figcaption>
-                    {view}
+                    {PHOTO_VIEW_NAMES[view]}
                     {s === "remove" ? " · comes off" : s ? (current ? " · replaces" : " · new") : ""}
                   </figcaption>
                   <span className="adm-shot-actions">
@@ -921,8 +923,9 @@ function PiecePhotos({ product, photos, track }: { product: CatalogEntry; photos
           </span>
         )}
         <span className="adm-help">
-          Each photo is cropped to 9:16 and signed with the wordmark, like the fitting’s. Front is the card photo and back shows on hover; a colour’s back
-          and side show only with its front, and taking off a colour’s front takes them too. Taken-off photos stay on the live site until the next release.
+          Each photo is cropped to 9:16 and signed with the wordmark, like the fitting’s. Front is the card photo and back shows on hover; the three
+          extras, if you want them, come after side on the piece’s page. A colour’s other photos show only with its front, and taking off a colour’s
+          front takes them too. Taken-off photos stay on the live site until the next release.
         </span>
       </div>
       {error && (

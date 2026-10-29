@@ -1,33 +1,34 @@
 // Rewrites src/lib/product-images.ts (one img() per photographed piece, so next/image gets dimensions + blur
 // placeholders) to match src/lib/catalog.json: a main photo per product (products/<slug>.webp) plus any extra views —
-// <slug>-back.webp and <slug>-side.webp — and colourways (<slug>--<colour>.webp, + -back / -side); a photo the console
-// put there carries a short revision before .webp (scripts/lib/photo-keys.mjs). Which photos exist is read from
+// <slug>-back.webp, <slug>-side.webp and up to three more, <slug>-4/-5/-6.webp — and colourways (<slug>--<colour>.webp,
+// + the same views); a photo the console put there carries a short revision before .webp (scripts/lib/photo-keys.mjs). Which photos exist is read from
 // src/lib/image-manifest.json, the record of the bucket (scripts/images.mjs), not from the laptop's assets/, so it
 // gives the same answer on a fresh clone and on a CI runner. No API key needed.
 // Usage: node scripts/sync-product-images.mjs (import-krea-products.mjs and the console's scripts also run it).
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { photoKey } from "./lib/photo-keys.mjs";
+import { VIEWS as ALL_VIEWS, assertNamesApart, photoBase, photoKey } from "./lib/photo-keys.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const manifest = JSON.parse(await readFile(path.join(ROOT, "src/lib/image-manifest.json"), "utf8"));
 const key = (base) => photoKey(manifest.images, base);
 // only products whose main photo exists — new pieces appear in the shop as soon as their front shot lands
 const all = JSON.parse(await readFile(path.join(ROOT, "src/lib/catalog.json"), "utf8"));
+assertNamesApart(all.map((p) => p.slug));
 const catalog = all.filter((p) => key(p.slug));
 const id = (s) => s.replace(/-([a-z])/g, (_, x) => x.toUpperCase());
-const VIEWS = ["back", "side"];
+const VIEWS = ALL_VIEWS.filter((v) => v !== "front"); // back, side, extra1–3, in the gallery's order
 
 const extra = []; // [slug, view, key]
-for (const p of catalog) for (const v of VIEWS) if (key(`${p.slug}-${v}`)) extra.push([p.slug, v, key(`${p.slug}-${v}`)]);
+for (const p of catalog) for (const v of VIEWS) if (key(photoBase(p.slug, null, v))) extra.push([p.slug, v, key(photoBase(p.slug, null, v))]);
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 // colourways: <slug>--<colour>.webp (+ -back / -side) — the same piece photographed in its other colours
 const ways = []; // [slug, colour, view | "", key]
 for (const p of catalog)
   for (const c of p.colors)
-    if (c !== p.colors[0] && key(`${p.slug}--${c}`))
-      for (const v of ["", ...VIEWS]) if (key(`${p.slug}--${c}${v ? `-${v}` : ""}`)) ways.push([p.slug, c, v, key(`${p.slug}--${c}${v ? `-${v}` : ""}`)]);
+    if (c !== p.colors[0] && key(photoBase(p.slug, c, "front")))
+      for (const v of ["", ...VIEWS]) if (key(photoBase(p.slug, c, v || "front"))) ways.push([p.slug, c, v, key(photoBase(p.slug, c, v || "front"))]);
 const wayId = (s, c, v) => `${id(s)}${cap(c)}${v ? cap(v) : ""}`;
 
 await writeFile(
@@ -44,7 +45,7 @@ await writeFile(
     "\n\nexport const productImages = {\n" +
     catalog.map((p) => `  "${p.slug}": ${id(p.slug)},`).join("\n") +
     "\n};\n\n" +
-    "export type ProductView = \"back\" | \"side\";\n" +
+    `export type ProductView = ${VIEWS.map((v) => `"${v}"`).join(" | ")};\n` +
     "export const productViews: Partial<Record<keyof typeof productImages, Partial<Record<ProductView, StaticImageData>>>> = {\n" +
     catalog
       .filter((p) => extra.some(([s]) => s === p.slug))

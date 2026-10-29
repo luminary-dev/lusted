@@ -1,4 +1,5 @@
 import { test, expect, go, main, CATALOG, bagDialog, parsePrice } from "./fixtures";
+import { toViews, viewName } from "../src/lib/products";
 
 const { slug, name, price } = CATALOG.hero;
 const fmt = (n: number) => `LKR ${n.toLocaleString("en-LK")}`;
@@ -213,4 +214,17 @@ test.describe("product page on a phone", () => {
     const box = await page.locator(".drawer").boundingBox();
     expect(box!.width).toBeLessThanOrEqual(390);
   });
+});
+
+// Up to three optional photos per colour, after front, back and side (src/lib/products.ts). No piece has them yet, so
+// the order and names the gallery gets are checked on stand-in photos rather than on a page.
+test("gallery views: the optional photos follow front, back and side, named by where they show", () => {
+  const photo = (src: string) => ({ src, width: 900, height: 1600, blurDataURL: "" });
+  const views = toViews({ front: photo("f"), side: photo("s"), extra1: photo("4"), extra3: photo("6") });
+  expect(views.map((v) => v.label)).toEqual(["Front", "Side", "Photo 3", "Photo 4"]);
+  expect(views.map((v) => v.src.src)).toEqual(["f", "s", "4", "6"]); // a gap left by one taken off closes up
+  expect(toViews({ front: photo("f"), back: photo("b") }).map((v) => v.label)).toEqual(["Front", "Back"]);
+  // the alt text and the thumbnail's name: "front view", but "photo 3"
+  expect(viewName("Front")).toBe("front view");
+  expect(viewName("Photo 3")).toBe("photo 3");
 });

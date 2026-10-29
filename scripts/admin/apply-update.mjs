@@ -6,7 +6,7 @@
 // under a key of its own (scripts/lib/photo-keys.mjs); a photo it replaces or removes leaves the manifest but stays in
 // the bucket, for the same reason a removed piece's do. The workflow commits what changed, with the summary written
 // here as the message.
-import { photoBase, photoKey, revKey } from "../lib/photo-keys.mjs";
+import { VIEWS, photoBase, photoKey, revKey } from "../lib/photo-keys.mjs";
 import { CATALOG, COLLECTIONS, INCOMING, MANIFEST, SLUG, bucket, finishPhoto, lkr, normalise, payload, quote, readJson, sortManifest, summarise, writeJson } from "./lib.mjs";
 
 const action = process.env.ADMIN_ACTION;
@@ -127,14 +127,15 @@ if (action === "update-product") {
   const product = catalog[i];
   const manifest = await readJson(MANIFEST);
   const has = (colour, view) => photoKey(manifest.images, photoBase(product.slug, colour, view));
-  // each change is a photo (an incoming/ address) for one view of the piece, or of one of its other colours, or null to
+  // each change is a photo (an incoming/ address) for one view of the piece (front, back, side or one of the three
+  // extras), or of one of its other colours, or null to
   // remove that view's photo. The console and the dispatch route refuse anything else before it is queued
   // (src/lib/admin/photos.ts); this is the last line of defence.
   const changes = (Array.isArray(payload.changes) ? payload.changes : []).map(({ colour = null, view, photo = null } = {}) => ({ colour, view, photo }));
-  if (changes.length === 0 || changes.length > 24) throw new Error("product-photo: one to 24 changes");
+  if (changes.length === 0 || changes.length > 48) throw new Error("product-photo: one to 48 changes");
   const seen = new Set();
   for (const { colour, view, photo } of changes) {
-    if (!["front", "back", "side"].includes(view)) throw new Error("product-photo: front, back or side");
+    if (!VIEWS.includes(view)) throw new Error("product-photo: front, back, side or an extra");
     if (colour !== null && !/^[a-z]{1,20}$/.test(colour)) throw new Error("product-photo: not a colour");
     if (colour === product.colors[0]) throw new Error(`product-photo: the ${colour} photos are the piece's own`);
     if (seen.has(`${colour}/${view}`)) throw new Error("product-photo: one change per photo");
@@ -142,7 +143,7 @@ if (action === "update-product") {
     if (photo === null && colour === null && view === "front") throw new Error("product-photo: a piece keeps its front photo");
     if (photo !== null && (!INCOMING.test(photo) || !photo.includes(`/${view}.`))) throw new Error(`product-photo: the ${view} photo's address is wrong`);
   }
-  // a colour's back and side show only with its front (sync-product-images.mjs)
+  // a colour's other photos show only with its front (sync-product-images.mjs)
   for (const colour of new Set(changes.filter((c) => c.colour !== null && c.photo !== null).map((c) => c.colour))) {
     const front = changes.find((c) => c.colour === colour && c.view === "front");
     if (!(front ? front.photo !== null : has(colour, "front"))) throw new Error(`product-photo: the ${colour} photos need a front`);
@@ -153,12 +154,12 @@ if (action === "update-product") {
   let kept = 0; // photos out of the manifest, still in the bucket
   for (const { colour, view, photo } of changes) {
     const was = has(colour, view);
-    const label = `${colour ? `${colour} ` : ""}${view}`;
+    const label = `${colour ? `${colour} ` : ""}${view.replace(/^extra/, "extra ")}`;
     if (photo === null) {
       // already gone: a second run of the same change, or the colour's front took it along just before
       if (!was) continue;
-      // a colour's back and side go with its front, since they never show without it
-      const gone = [was, ...(colour && view === "front" ? ["back", "side"].map((v) => has(colour, v)).filter(Boolean) : [])];
+      // a colour's other photos go with its front, since they never show without it
+      const gone = [was, ...(colour && view === "front" ? VIEWS.filter((v) => v !== "front").map((v) => has(colour, v)).filter(Boolean) : [])];
       for (const key of gone) {
         delete manifest.images[key];
         console.log(`  – ${key}`);

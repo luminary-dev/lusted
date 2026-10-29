@@ -15,7 +15,7 @@ export const SUMMARY = path.join(ROOT, ".admin-summary");
 
 export const SLUG = /^[a-z0-9-]{1,64}$/;
 // where the console's upload-url route puts the owner's photos (src/app/api/admin/upload-url/route.ts)
-export const INCOMING = /^incoming\/[a-f0-9]{24}\/(front|back|side)\.(jpg|png|webp)$/;
+export const INCOMING = /^incoming\/[a-f0-9]{24}\/(front|back|side|extra[123])\.(jpg|png|webp)$/;
 export const COLLECTIONS = { lingerie: "Lace Secrets", swim: "Sun Kissed", "after-dark": "Midnight Sins" };
 export const lkr = (n) => `LKR ${Number(n).toLocaleString("en-US")}`;
 export const quote = (s) => `“${s}”`;
