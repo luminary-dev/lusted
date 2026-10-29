@@ -553,13 +553,22 @@
   pointer-events: none;
 }
 
+/* The size is set in the script, whose letters run some 1.2em wide each: at one size for all, XXL (and XS on a
+   narrow tag) ran past the card's edge and was cut off. Each face is measured, and the size shrinks to the face's
+   width by its own length (--len, set per tag), up to the size everything was before. */
+.tag3d-face {
+  container-type: inline-size;
+}
+
 .tag3d-front strong,
 .tag3d-back strong {
-  display: block;
+  display: grid;
   font-family: var(--headline);
   font-weight: 400;
-  font-size: clamp(45px, 3.9vw, 60px);
+  font-size: min(clamp(45px, 3.9vw, 60px), 100cqi / (var(--len, 2) * 1.25));
   line-height: 1.1;
+  min-height: calc(clamp(45px, 3.9vw, 60px) * 1.1); /* a smaller size keeps the line's height, so the row stays even */
+  align-content: center;
   color: var(--wine);
 }
 

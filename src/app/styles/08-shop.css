@@ -148,7 +148,7 @@
   height: 18px;
 }
 
-.filters-btn span {
+.filters-btn .filters-count {
   display: grid;
   place-items: center;
   min-width: 20px;
