@@ -8,7 +8,7 @@ Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or a
 
 ## What it is
 
-A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece.
+A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece. When the size picked (or, before one is picked, every size) is sold out, the product page's button becomes "Message me when it's back": a WhatsApp message naming the piece, its colour and size and its link, asking to be told when it's back in that size (`backInStockText` in `src/lib/order.ts`).
 
 ## Run it
 
@@ -21,7 +21,7 @@ npm run lint
 
 ## Where things live
 
-- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views and up to three more, `-4`, `-5` and `-6`, which the product page shows after them as "Photo 4" and on (see "Photos"; a photo the console put in the bucket has a short revision in its name, see "The owner console"). A slug that is another's plus one of those endings (`rose` and `rose-4`), or that holds `--` (the colour separator), would make the names read two ways: `sync-product-images.mjs` stops on it and the fitting refuses such a name.
+- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, `soldOut` (the sizes it's out of — marked from the console's ledger; absent means all in), colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views and up to three more, `-4`, `-5` and `-6`, which the product page shows after them as "Photo 4" and on (see "Photos"; a photo the console put in the bucket has a short revision in its name, see "The owner console"). A slug that is another's plus one of those endings (`rose` and `rose-4`), or that holds `--` (the colour separator), would make the names read two ways: `sync-product-images.mjs` stops on it and the fitting refuses such a name.
 - **Contact details** — `src/lib/site.ts`: WhatsApp number, Instagram, email, hours. Every button and link reads from here.
 - **Collection names and taglines** — `categories` in `src/lib/products.ts`.
 - **Search** — `matchesQuery` in `src/lib/products.ts`, for the search dialog and the shop: every word must start a word of the piece (case and accents ignored, plurals folded), and `searchSynonyms` beside it turns shoppers' words ("panties", "white", "swimwear") into the catalogue's — add one there when shoppers search for something the catalogue calls by another name.
@@ -47,7 +47,7 @@ npm run lint
 
 ## Tests
 
-End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section (and, in Node, the sale band's wording for every kind of sale), the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag and favourites, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1.
+End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section (and, in Node, the sale band's wording for every kind of sale), the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag and favourites, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1. Nothing in the catalogue is sold out, so the sold-out product page is tested by answering the script that carries the catalogue with two best sellers marked sold out (`05-product.spec.ts`) — the real catalogue is never changed.
 
 ```bash
 npm run test:build   # production build, then the whole suite (about 10 minutes)
@@ -119,7 +119,7 @@ published to be read, not reused — see `LICENSE`.
 
 **/admin** — unlinked, kept out of search, never cached — is where the owner runs the catalogue without opening the
 repository, in four rooms on four pages (`/admin/fitting`, `/admin/offers`, `/admin/ledger`, `/admin/daybook`, each
-under the same header): add a piece, change a name, collection, price, offer price or best-seller rank, change a piece's
+under the same header): add a piece, change a name, collection, price, offer price, best-seller rank or sold-out sizes, change a piece's
 photos, remove a piece, or put a percentage off a whole collection (the home page's sale band then names that collection and links to its sale pieces —
 `src/lib/sale-band.ts` holds its words). It is modelled on the Luvana console, with two differences: the photos are the
 owner's own (front, back and side — nothing is generated or retouched; each is cropped to the catalogue's 9:16 frame
@@ -148,6 +148,15 @@ another merges first. Live changes still go out by the usual release (`dev → m
 facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece added or changed from the console
 doesn't fail them — the home page's hero piece, `rose-lace-balconette-bra`, is the one piece the suite and Lighthouse
 name directly, so it shouldn't be removed from the console.
+
+**Sold-out sizes.** The ledger's "Sold out" column has a tag for each of a piece's sizes: press the ones it's out of
+and Save, press one again when it's back (all of them pressed is the whole piece sold out). The row sends the whole
+list, kept in the piece's size order, as `soldOut` in the `update-product` dispatch; the dispatch route refuses a list
+that isn't one, or names a size the piece isn't made in on `dev`, with a 400 before anything is queued (both read
+`src/lib/admin/stock.ts`), and `apply-update.mjs` keeps its own check. On the site a sold-out size stays on the
+product page, struck through and named "sold out" to screen readers, and can still be picked — that's how a shopper
+asks for it back on WhatsApp — but it can't be bagged: the cards' quick add, the bag's size switch and `bag.add`
+itself all refuse it. A piece sold out in every size shows "Sold out" on its card and loses its quick add.
 
 **A piece's photos.** "Photos" on a ledger row opens the piece's photos under it, as thumbnails: front, back, side and
 three optional extras for the piece itself and for each of its other colours. Any of them can be replaced, an empty one
@@ -212,10 +221,12 @@ while developing, and under `next start` their scripts are an expected 404 that 
 Custom events (Vercel → Analytics → Events), sent through `src/lib/analytics.ts`:
 
 - `whatsapp_click` — any tap on a WhatsApp link; `source` says which: `nav`, `nav-menu`, `hero`, `bag` (Send order),
-  `product` (Order now — only once a size is chosen), `favourites`, `contact`, `footer`, `how-it-works`, `about`,
+  `product` (Order now — only once a size is chosen), `back-in-stock` (Message me when it's back), `favourites`, `contact`, `footer`, `how-it-works`, `about`,
   `about-page`, `size-guide`, `revealing-soon`, `error-page`, otherwise the page's path (`/help`, `/privacy`…). A new
   WhatsApp link is counted on its own; give it a `data-wa-source` (on the link or around it) to name it.
 - `add_to_bag` and `favourite` (saving only) — with the piece's `slug`.
+- `back_in_stock_ask` — a tap on "Message me when it's back", with the piece's `slug` and the `size` asked for (`any`
+  when none was picked): which sold-out sizes shoppers want back.
 - `search_no_results` — a search that found nothing, the `query` cut to 40 characters, from the search dialog
   (`source: dialog`) or the shop (`source: shop`, only when nothing in the catalogue matches, not when filters emptied it).
 

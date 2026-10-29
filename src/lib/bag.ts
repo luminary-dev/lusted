@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { trackEvent } from "./analytics";
-import { getProduct, priceOf, type ColorKey } from "./products";
+import { getProduct, inStock, priceOf, type ColorKey } from "./products";
 
 // Shopping bag kept in localStorage. Orders are sent to the shop as a WhatsApp message.
 
@@ -70,6 +70,10 @@ export const bag = {
   // `quiet` is how a product card adds: opening the drawer over the grid interrupts anyone building a set, so the
   // card only announces the line (BagToast) and leaves them browsing. The product page and the nav keep the drawer.
   add(item: BagItem, opts: { quiet?: boolean } = {}) {
+    // a sold-out size is asked for on WhatsApp, never bagged — the product page and the cards don't offer it, and
+    // this is the last word on it
+    const p = getProduct(item.slug);
+    if (!p || !inStock(p, item.size)) return;
     load();
     const existing = items.find((i) => same(i, item));
     save(existing ? items.map((i) => (same(i, item) ? { ...i, qty: Math.min(i.qty + item.qty, 10) } : i)) : [...items, item]);
@@ -88,7 +92,8 @@ export const bag = {
   // Changing a size in the bag, rather than removing the line and starting again. If that size is already in the
   // bag the two lines become one, capped like any other add.
   changeSize(item: BagItem, size: string) {
-    if (size === item.size) return;
+    const p = getProduct(item.slug);
+    if (size === item.size || !p || !inStock(p, size)) return;
     const merged = items.find((i) => same(i, { ...item, size }));
     const rest = items.filter((i) => !same(i, item));
     save(

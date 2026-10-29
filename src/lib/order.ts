@@ -3,7 +3,8 @@
 import { useSyncExternalStore } from "react";
 
 // Pieces shared by the two WhatsApp order messages (the bag's and the product page's "Order now"), so the shop can
-// quote delivery from the first message and match a chat to the pieces in it.
+// quote delivery from the first message and match a chat to the pieces in it — and the product page's ask for a
+// sold-out size.
 
 // A short reference for a bag order, e.g. "LST-7K3QF" — random, so it carries nothing about the shopper. Letters and
 // digits that read alike (0/O, 1/I/L) are left out so it can be read back over the phone.
@@ -44,3 +45,15 @@ export const productUrl = (origin: string, slug: string) => `${origin}/products/
 
 // Left blank at the end of the message for the shopper to fill in; the address and payment are settled in the chat.
 export const fillIn = ["", "Name:", "City / town:"];
+
+// The message from a product page when the size picked, or the whole piece, is sold out: the piece, its colour and
+// size and its link, so the shop knows exactly what to come back with. No name or town to fill in — nothing is being
+// ordered yet, and the chat itself is how the shop finds the shopper again. `size` is null for a one-size piece, or
+// when every size is gone and none was picked.
+export function backInStockText({ name, colour, size, url }: { name: string; colour: string; size: string | null; url: string }) {
+  return [
+    `Hi Lusted! The ${name} — ${colour}${size ? `, size ${size}` : ""} — is sold out just now.`,
+    url,
+    `Please message me when it's back${size ? ` in ${size}` : ""}.`,
+  ].join("\n");
+}

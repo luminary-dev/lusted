@@ -1,6 +1,7 @@
 import { test, expect } from "./fixtures";
 import { offerProblem, percentProblem } from "../src/lib/admin/offers";
 import { PHOTO_CHANGES_MAX, photoChangesProblem, photoKey, photoNamesClash, type PhotoChange } from "../src/lib/admin/photos";
+import { inSizeOrder, soldOutProblem } from "../src/lib/admin/stock";
 
 // The owner console (src/app/admin): reachable in front of the reveal gate, never cached or indexed, and nothing in
 // it answers without a session. The server the suite runs against has no ADMIN_* environment, so the form is shown
@@ -117,5 +118,22 @@ test.describe("owner console", () => {
     expect(photoChangesProblem(piece, keys, [change("blush", "front", true), change("blush", "side")])).toMatch(/blush front/);
     expect(photoChangesProblem(piece, keys, [change("Blush!", "front")])).toMatch(/colours/);
     expect(photoChangesProblem(piece, keys, Array.from({ length: PHOTO_CHANGES_MAX + 1 }, (_, i) => change(null, "back", i % 2 === 0)))).toMatch(/too many/i);
+  });
+
+  // The sizes a piece is out of, marked from its row in the ledger: the rule the dispatch route checks before queuing
+  // (src/lib/admin/stock.ts) — first the shape of the list, then against the piece's own sizes as they are on dev.
+  test("sold-out sizes the Console workflow would refuse are caught before they are queued", () => {
+    const sizes = ["XS", "S", "M", "L"];
+    expect(soldOutProblem(["M"], sizes)).toBeNull();
+    expect(soldOutProblem(["XS", "L"], sizes)).toBeNull();
+    expect(soldOutProblem(sizes, sizes)).toBeNull(); // every size: the whole piece is sold out
+    expect(soldOutProblem([], sizes)).toBeNull(); // an empty list puts every size back
+    expect(soldOutProblem(["XL"], sizes)).toBe("XL isn’t one of its sizes");
+    expect(soldOutProblem(["m"], sizes)).toMatch(/isn’t one of its sizes/);
+    expect(soldOutProblem(["M", "M"], sizes)).toMatch(/each size once/);
+    for (const bad of ["M", null, {}, [3], [""], ["M", null], Array.from({ length: 21 }, (_, i) => `S${i}`)]) expect(soldOutProblem(bad), JSON.stringify(bad)).toMatch(/a list of sizes/);
+    expect(soldOutProblem(["XL"])).toBeNull(); // with no sizes to hand, only the shape is checked
+    // kept in the piece's own size order, however the sizes were pressed
+    expect(inSizeOrder(["L", "XS"], sizes)).toEqual(["XS", "L"]);
   });
 });

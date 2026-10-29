@@ -26,7 +26,7 @@ export const readJson = async (file) => JSON.parse(await readFile(file, "utf8"))
 export const writeJson = (file, value) => writeFile(file, JSON.stringify(value, null, 2) + "\n");
 
 // a catalogue entry's keys in the order every entry has them (a key not listed here is kept, after these)
-const ORDER = ["slug", "name", "category", "price", "salePrice", "colors", "sizes", "bestSeller", "added", "description", "blurb", "details", "fit", "fitNote", "moments", "mainView", "pairsWith"];
+const ORDER = ["slug", "name", "category", "price", "salePrice", "colors", "sizes", "soldOut", "bestSeller", "added", "description", "blurb", "details", "fit", "fitNote", "moments", "mainView", "pairsWith"];
 export function normalise(entry) {
   const out = {};
   for (const key of ORDER) if (entry[key] !== undefined) out[key] = entry[key];

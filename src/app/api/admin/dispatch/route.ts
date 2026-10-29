@@ -4,17 +4,19 @@ import { dispatch, getFile } from "@/lib/admin/github";
 import { offerProblem, percentProblem } from "@/lib/admin/offers";
 import { INCOMING, PHOTO_CHANGES_MAX, PHOTO_VIEWS, photoChangesProblem, type PhotoView } from "@/lib/admin/photos";
 import { bucket } from "@/lib/admin/r2";
+import { inSizeOrder, soldOutProblem } from "@/lib/admin/stock";
 import { categories, colors } from "@/lib/products";
 
-// Small catalogue changes from the console: a piece's name, collection, price, offer price or best-seller rank, a
-// removal, an offer across a whole collection, or a piece's photos. Each fires one repository_dispatch; the
+// Small catalogue changes from the console: a piece's name, collection, price, offer price, best-seller rank or sold-out
+// sizes, a removal, an offer across a whole collection, or a piece's photos. Each fires one repository_dispatch; the
 // console-apply workflow makes the change on a branch and opens the pull request that carries it into dev.
 
 const CATEGORIES = new Set(categories.map((c) => c.key));
 const SLUG = /^[a-z0-9-]{1,64}$/;
 
 // An update carries only the fields the owner changed in the ledger row, so any of them may be missing — a missing one
-// stays as it is, and a null offer price or rank ends it; at least one has to come through.
+// stays as it is, a null offer price or rank ends it, and an empty list of sold-out sizes puts every size back; at
+// least one has to come through.
 function sanitizeUpdate(raw: Record<string, unknown>) {
   const data: Record<string, unknown> = {};
   if (typeof raw.name === "string" && raw.name.trim()) data.name = raw.name.trim().slice(0, 60);
@@ -24,6 +26,7 @@ function sanitizeUpdate(raw: Record<string, unknown>) {
   if (typeof raw.salePrice === "number" && Number.isFinite(raw.salePrice) && raw.salePrice > 0) data.salePrice = Math.round(raw.salePrice);
   if (raw.bestSeller === null) data.bestSeller = null;
   if (typeof raw.bestSeller === "number" && Number.isInteger(raw.bestSeller) && raw.bestSeller >= 1 && raw.bestSeller <= 99) data.bestSeller = raw.bestSeller;
+  if (raw.soldOut !== undefined && !soldOutProblem(raw.soldOut)) data.soldOut = raw.soldOut;
   return data;
 }
 
@@ -47,13 +50,24 @@ export async function POST(request: Request) {
         const problem = typeof rawSale === "number" ? offerProblem(rawSale) : "Whole rupees only";
         if (problem) return NextResponse.json({ ok: false, error: `Offer price: ${problem.toLowerCase()}` }, { status: 400 });
       }
+      // so is a list of sold-out sizes that isn't one — it's checked against the piece's own sizes further down
+      if (body.data.soldOut !== undefined) {
+        const problem = soldOutProblem(body.data.soldOut);
+        if (problem) return NextResponse.json({ ok: false, error: `Sold out: ${problem}` }, { status: 400 });
+      }
       const data = sanitizeUpdate(body.data);
       if (Object.keys(data).length === 0) return NextResponse.json({ ok: false }, { status: 400 });
       const pricing = typeof data.price === "number" || typeof data.salePrice === "number";
-      if (typeof data.bestSeller === "number" || pricing) {
+      if (typeof data.bestSeller === "number" || pricing || data.soldOut) {
         const file = await getFile("src/lib/catalog.json");
-        const catalog = file ? (JSON.parse(file.toString("utf8")) as Array<{ slug: string; price: number; salePrice?: number; bestSeller?: number }>) : [];
+        const catalog = file ? (JSON.parse(file.toString("utf8")) as Array<{ slug: string; price: number; salePrice?: number; bestSeller?: number; sizes: string[] }>) : [];
         const me = catalog.find((p) => p.slug === body.slug);
+        // only the piece's own sizes can be sold out — the workflow refuses any other, and then no pull request comes
+        if (data.soldOut) {
+          const problem = me ? soldOutProblem(data.soldOut, me.sizes) : "that piece isn’t in the catalogue";
+          if (problem) return NextResponse.json({ ok: false, error: `Sold out: ${problem}` }, { status: 400 });
+          data.soldOut = inSizeOrder(data.soldOut as string[], me!.sizes);
+        }
         // six best sellers at most: a piece that isn't one yet can't become the seventh
         if (typeof data.bestSeller === "number" && me && !me.bestSeller && catalog.filter((p) => p.bestSeller).length >= 6) return NextResponse.json({ ok: false, error: "Six best sellers already — clear one first" }, { status: 409 });
         // the offer, new or standing, has to stay under the full price, new or standing — the workflow refuses an

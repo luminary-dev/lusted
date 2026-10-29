@@ -1,5 +1,6 @@
-import { test, expect, go, main, CATALOG, bagDialog, parsePrice } from "./fixtures";
-import { toViews, viewName } from "../src/lib/products";
+import { test, expect, go, main, CATALOG, bagDialog, parsePrice, searchDialog } from "./fixtures";
+import { getProduct, inStock, soldOutPick, toViews, viewName, type Product } from "../src/lib/products";
+import { backInStockText } from "../src/lib/order";
 
 const { slug, name, price } = CATALOG.hero;
 const fmt = (n: number) => `LKR ${n.toLocaleString("en-LK")}`;
@@ -227,4 +228,111 @@ test("gallery views: the optional photos follow front, back and side, named by w
   // the alt text and the thumbnail's name: "front view", but "photo 3"
   expect(viewName("Front")).toBe("front view");
   expect(viewName("Photo 3")).toBe("photo 3");
+});
+
+// Sold-out sizes (`soldOut` in the catalogue, marked from the console's ledger). Nothing in the catalogue is sold out,
+// and the catalogue is built into the page's script, so the page is shown it through the browser instead: the script
+// that carries the catalogue is answered with two best sellers marked sold out — one in a single size, one in every
+// size — and the real catalogue is never touched. The pieces are reached by a client-side link (the search dialog,
+// from a page that shows neither), so the page draws them in the browser from that catalogue rather than hydrating
+// the server's HTML, which was drawn from the real one.
+test.describe("sold-out sizes", () => {
+  const [partly, wholly] = CATALOG.bestSellers.map((s) => getProduct(s)!);
+  const goneSize = partly.sizes.includes("M") ? "M" : partly.sizes[1];
+  const inSize = partly.sizes.find((s) => s !== goneSize)!;
+
+  test.beforeEach(async ({ prepared: page }) => {
+    const marked = new Set<string>();
+    await page.route(/\/_next\/static\/chunks\/.+\.js(\?.*)?$/, async (route) => {
+      const res = await route.fetch();
+      const body = await res.text();
+      const mark = (text: string, slug: string, sizes: string[]) =>
+        text.replace(`"slug":"${slug}",`, () => (marked.add(slug), `"slug":"${slug}","soldOut":${JSON.stringify(sizes)},`));
+      await route.fulfill({ response: res, body: mark(mark(body, partly.slug, [goneSize]), wholly.slug, wholly.sizes) });
+    });
+    await go(page, "/about");
+    await page.keyboard.press("/");
+    await expect(searchDialog(page).locator(".search-results")).toBeVisible();
+    expect(marked.size, "the catalogue's script was found and both pieces marked").toBe(2);
+  });
+
+  const open = async (page: import("@playwright/test").Page, slug: string) => {
+    await searchDialog(page).locator(`a[href="/products/${slug}"]`).click();
+    await expect(page).toHaveURL(new RegExp(`/products/${slug}$`));
+    await expect(page.locator(".pdp-info .size-chips")).toBeVisible();
+  };
+
+  test("a sold-out size stays pickable, struck through, and turns the button into a WhatsApp ask for that size", async ({ prepared: page }) => {
+    await open(page, partly.slug);
+    const chips = page.locator(".pdp-info .size-chips");
+    const gone = chips.getByRole("button", { name: `${goneSize} — sold out` });
+    await expect(gone).toBeEnabled();
+    await expect(gone).toHaveClass(/is-gone/);
+    await expect(gone).toHaveCSS("text-decoration-line", "line-through");
+    await expect(chips.getByRole("button", { name: inSize, exact: true })).not.toHaveClass(/is-gone/);
+    // until a size is picked, the piece can still be bagged in the others
+    await expect(page.getByRole("button", { name: /Add to bag/ })).toBeVisible();
+
+    await gone.click();
+    await expect(gone).toHaveAttribute("aria-pressed", "true");
+    const ask = page.locator(".buy-actions").getByRole("link", { name: "Message me when it’s back" });
+    await expect(ask).toBeVisible();
+    await expect(ask).toHaveAttribute("data-wa-source", "back-in-stock");
+    await expect(ask).toHaveAttribute("target", "_blank");
+    const href = (await ask.getAttribute("href"))!;
+    expect(href).toContain(`wa.me/${CATALOG.whatsapp}`);
+    const colour = CATALOG.colours[partly.colors[0] as keyof typeof CATALOG.colours];
+    expect(decodeURIComponent(href.split("text=")[1])).toBe(
+      `Hi Lusted! The ${partly.name} — ${colour}, size ${goneSize} — is sold out just now.\n${new URL(page.url()).origin}/products/${partly.slug}\nPlease message me when it's back in ${goneSize}.`,
+    );
+    // nothing to bag, no quantity, and no second WhatsApp link that would order what's gone
+    await expect(page.getByRole("button", { name: /Add to bag/ })).toHaveCount(0);
+    await expect(page.locator(".buy-actions .stepper")).toHaveCount(0);
+    await expect(page.locator(".buy-whatsapp")).toHaveCount(0);
+
+    // a size that's in brings the bag back, and the bag won't switch the line to the one that's gone
+    await chips.getByRole("button", { name: inSize, exact: true }).click();
+    await page.getByRole("button", { name: /Add to bag/ }).click();
+    const bag = bagDialog(page);
+    await expect(bag).toBeVisible();
+    await expect(bag.getByRole("option", { name: `${goneSize} — sold out` })).toHaveJSProperty("disabled", true);
+    await expect(bag.getByRole("option", { name: inSize, exact: true })).toHaveJSProperty("disabled", false);
+  });
+
+  test("a piece gone in every size asks without a size, or for the one picked", async ({ prepared: page }) => {
+    await open(page, wholly.slug);
+    const chips = page.locator(".pdp-info .size-chips").getByRole("button");
+    await expect(chips).toHaveCount(wholly.sizes.length);
+    for (const i of wholly.sizes.keys()) await expect(chips.nth(i)).toHaveClass(/is-gone/);
+    const ask = page.locator(".buy-actions").getByRole("link", { name: "Message me when it’s back" });
+    const text = async () => decodeURIComponent((await ask.getAttribute("href"))!.split("text=")[1]);
+    expect(await text()).toMatch(/is sold out just now\.\n.+\nPlease message me when it's back\.$/);
+    await page.locator(".pdp-info .size-chips").getByRole("button", { name: `${wholly.sizes[0]} — sold out` }).click();
+    expect(await text()).toMatch(new RegExp(`size ${wholly.sizes[0]} — is sold out just now\\.[\\s\\S]+back in ${wholly.sizes[0]}\\.$`));
+    await expect(page.getByRole("button", { name: /Add to bag|Sold out/ })).toHaveCount(0);
+  });
+});
+
+// The rules behind the sold-out UI, on made-up pieces (no page needed).
+test("sold-out sizes: what can be bagged, when the page asks instead, and what the ask says", () => {
+  const piece = (sizes: string[], soldOut?: string[]) => ({ sizes, soldOut }) as Product;
+  const some = piece(["S", "M", "L"], ["M"]);
+  expect(inStock(some, "S")).toBe(true);
+  expect(inStock(some, "M")).toBe(false);
+  expect(soldOutPick(some, null)).toBe(false); // nothing picked yet, and other sizes are in
+  expect(soldOutPick(some, "S")).toBe(false);
+  expect(soldOutPick(some, "M")).toBe(true);
+  const none = piece(["S", "M"], ["S", "M"]);
+  expect(soldOutPick(none, null)).toBe(true);
+  expect(soldOutPick(none, "S")).toBe(true);
+  expect(soldOutPick(piece(["S", "M"]), null)).toBe(false);
+  expect(soldOutPick(piece(["S", "M"], []), "M")).toBe(false);
+
+  const url = "https://lusted.lk/products/rose";
+  expect(backInStockText({ name: "Rosé Bra", colour: "Wine", size: "M", url })).toBe(
+    `Hi Lusted! The Rosé Bra — Wine, size M — is sold out just now.\n${url}\nPlease message me when it's back in M.`,
+  );
+  expect(backInStockText({ name: "Rosé Bra", colour: "Wine", size: null, url })).toBe(
+    `Hi Lusted! The Rosé Bra — Wine — is sold out just now.\n${url}\nPlease message me when it's back.`,
+  );
 });
