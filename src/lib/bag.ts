@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { trackEvent } from "./analytics";
 import { getProduct, priceOf, type ColorKey } from "./products";
 
 // Shopping bag kept in localStorage. Orders are sent to the shop as a WhatsApp message.
@@ -67,6 +68,7 @@ export const bag = {
     const existing = items.find((i) => same(i, item));
     save(existing ? items.map((i) => (same(i, item) ? { ...i, qty: Math.min(i.qty + item.qty, 10) } : i)) : [...items, item]);
     bag.setOpen(true);
+    trackEvent("add_to_bag", { slug: item.slug });
   },
   setQty(item: BagItem, qty: number) {
     save(qty <= 0 ? items.filter((i) => !same(i, item)) : items.map((i) => (same(i, item) ? { ...i, qty: Math.min(qty, 10) } : i)));

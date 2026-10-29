@@ -3,11 +3,12 @@ import { SECTIONS } from "@/app/admin/sections";
 import catalog from "@/lib/catalog.json";
 import { site } from "@/lib/site";
 
-// With site.revealGate on, every page shows /revealing-soon in place until reveal day (site.revealAt) — the address
-// bar keeps the real URL. To see the actual site before then, open any page with ?preview=1 once: it sets a cookie
-// that lets you through for 30 days. The gate never applies where REVEAL_GATE=off is set in the environment (Vercel's
+// With site.revealGate on, every page but the privacy policy shows /revealing-soon in place until reveal day
+// (site.revealAt) — the address bar keeps the real URL. To see the actual site before then, open any page with
+// ?preview=1 once: it sets a cookie that lets you through for 30 days. The gate never applies where REVEAL_GATE=off is set in the environment (Vercel's
 // Preview environment carries it, so lusted-dev.vercel.app shows the real site while production shows the reveal
-// page) or on a host beginning with "dev."; after the moment passes it is simply gone, no deploy needed.
+// page) or on a host beginning with "dev."; after the moment passes it is simply gone, no deploy needed, and
+// /revealing-soon itself sends anyone who still asks for it to the home page.
 const REVEAL_AT = Date.parse(site.revealAt);
 const PREVIEW_COOKIE = "lusted-preview";
 
@@ -28,6 +29,13 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // once the reveal has happened the teaser has nothing left to count down to: a bookmark, a shared link or the
+  // countdown's own reload of this address lands on the home page instead. A temporary (307) redirect rather than a
+  // permanent one, because browsers keep a 308 with no expiry — if revealAt were ever moved later, or the page reused
+  // for the next drop, those visitors would never see it again — and the page is noindex, so a 308 would carry nothing
+  // to search.
+  if (pathname === "/revealing-soon" && Date.now() >= REVEAL_AT) return NextResponse.redirect(new URL("/", request.url), 307);
+
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? ""; // the public domain on Vercel
   const devHost = host.startsWith("dev.");
   if (site.revealGate && !devHost && Date.now() < REVEAL_AT && process.env.REVEAL_GATE !== "off") {
@@ -38,7 +46,8 @@ export function proxy(request: NextRequest) {
       res.cookies.set(PREVIEW_COOKIE, "1", { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
       return res;
     }
-    if (!request.cookies.has(PREVIEW_COOKIE) && pathname !== "/revealing-soon") {
+    // the privacy policy stays readable: the reveal page's newsletter form links to it, and sign-ups need it seen
+    if (!request.cookies.has(PREVIEW_COOKIE) && pathname !== "/revealing-soon" && pathname !== "/privacy") {
       return NextResponse.rewrite(new URL("/revealing-soon", request.url));
     }
   }
@@ -48,5 +57,6 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// every page, but not the API, Next's own files or anything with a file extension (images, icons, fonts)
-export const config = { matcher: ["/((?!api|_next|.*\\..*).*)"] };
+// every page (/revealing-soon included), but not the API, Next's own files, Vercel's analytics (/_vercel/*: its beacons
+// would otherwise meet the reveal page) or anything with a file extension (images, icons, fonts)
+export const config = { matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"] };

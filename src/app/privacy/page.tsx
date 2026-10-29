@@ -6,6 +6,7 @@ import { emailLink, site, whatsappLink } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Privacy Policy — Lusted",
   description: "How Lusted collects, uses and protects your personal information — discreetly, and only to fulfil your order.",
+  alternates: { canonical: "/privacy" },
 };
 
 // Template policy — have it reviewed against your actual practices before launch.
@@ -45,6 +46,10 @@ const sections: LegalSection[] = [
           Your bag, favourites and light/dark preference are stored only in your own browser (local storage) — they are never sent to us until you
           choose to send an order.
         </p>
+        <p>
+          To see how the site is used and how quickly it loads, we use Vercel Web Analytics and Speed Insights, which count visits without cookies or
+          personal identifiers.
+        </p>
       </>
     ),
   },
@@ -77,11 +82,31 @@ const sections: LegalSection[] = [
       <>
         <p>We never sell your personal information. We share only what’s necessary with:</p>
         <ul>
-          <li>Delivery partners — your name, phone number and address, so they can deliver your parcel.</li>
-          <li>Payment providers — to process your payment securely. We don’t store full card details.</li>
-          <li>Messaging and email services (such as WhatsApp) that carry our conversations with you.</li>
+          <li>Couriers and delivery partners — your name, phone number and address, so they can deliver your parcel.</li>
+          <li>
+            The bank or payment method you choose — we agree how you’ll pay when we confirm your order. There is no online checkout, so we never
+            take or store card details on this site.
+          </li>
+          <li>
+            WhatsApp (Meta) — it carries your orders and our chats with you, as does Instagram (also Meta) or our email provider if you contact us
+            there.
+          </li>
+          <li>Vercel, in the USA — it hosts this website, so it handles your visit and anything you send through the site.</li>
+          <li>Cloudflare — it runs the lusted.lk domain name (DNS) and stores the shop’s product photos, not your personal information.</li>
+          <li>Our email newsletter provider — your email address, only if you subscribe.</li>
         </ul>
       </>
+    ),
+  },
+  {
+    id: "international-transfers",
+    title: "International transfers",
+    body: (
+      <p>
+        Some of these providers, such as Meta and Vercel, process your information outside Sri Lanka. We only use established services that protect
+        it with appropriate safeguards, in line with the Personal Data Protection Act. If you have questions about where your information goes,
+        message us on <a href={whatsappLink("Hi Lusted, I have a privacy question.")}>WhatsApp</a> or email <a href={emailLink}>{site.email}</a>.
+      </p>
     ),
   },
   {
@@ -108,7 +133,7 @@ const sections: LegalSection[] = [
   {
     id: "security",
     title: "Security",
-    body: <p>We use reputable, encrypted services for messaging, payment and storage, and limit access to your information to the team members handling your order.</p>,
+    body: <p>We use reputable, encrypted services for messaging, hosting and storage, and limit access to your information to the team members handling your order.</p>,
   },
   {
     id: "changes",
@@ -131,7 +156,7 @@ export default function PrivacyPage() {
           What’s in the box <em>stays in the box.</em>
         </>
       }
-      updated="16 October 2026"
+      updated="29 October 2026"
       intro={<p>Lingerie is personal. So is what we know about you. Here’s exactly how we keep it quiet — in plain language.</p>}
       sections={sections}
     />

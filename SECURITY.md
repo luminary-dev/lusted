@@ -11,7 +11,8 @@ reproduce it.
 **What to expect:** an acknowledgement within 3 working days, and a fix or a mitigation before anything is disclosed.
 We'll credit you in the advisory if you'd like.
 
-**In scope:** this repository and the site it builds (lusted.vercel.app, lusted-dev.vercel.app). The photos the site
-shows are not a vulnerability; the keys to the store they come from would be.
+**In scope:** this repository and the site it builds (lusted.lk, dev.lusted.lk, and their Vercel addresses
+lusted.vercel.app and lusted-dev.vercel.app). The photos the site shows are not a vulnerability; the keys to the store
+they come from would be.
 
 **Supported version:** the `main` branch, as deployed.

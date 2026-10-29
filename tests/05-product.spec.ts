@@ -19,6 +19,14 @@ test.describe("product page", () => {
     await expect(page.locator(".pdp-info .eyebrow")).toHaveText("Lace Secrets");
   });
 
+  test("'Details & care' lists the piece's fabric, construction and care lines from the catalogue", async ({ prepared: page }) => {
+    const details = page.getByRole("region", { name: "Details & care" });
+    await expect(details.getByRole("heading", { level: 2 })).toHaveText("Details & care");
+    const items = details.getByRole("listitem");
+    await expect(items).toHaveCount(CATALOG.hero.details.length);
+    await expect(items).toHaveText(CATALOG.hero.details);
+  });
+
   test("gallery: front large, back and side thumbnails, choosing one swaps the main view and its label", async ({ prepared: page }) => {
     const main = page.locator(".pdp-main img.is-active");
     await expect(main).toHaveAttribute("alt", `${name} — front view`);
@@ -73,6 +81,21 @@ test.describe("product page", () => {
     expect(text).toContain(fmt(price));
   });
 
+  test("a trust strip under the WhatsApp button promises only what the terms do and leads to delivery, returns & FAQ", async ({ prepared: page }) => {
+    const promises = ["Plain, unbranded box", "Delivery across Sri Lanka", "7-day exchange", "Sizing help from a real person"];
+    const strip = main(page).locator(".buy").getByRole("list", { name: "Ordering with Lusted" });
+    await expect(strip.getByRole("listitem")).toHaveText(promises);
+    await expect(main(page).locator(".buy").getByRole("link", { name: "Delivery, returns & FAQ" })).toHaveAttribute("href", "/help");
+    // the bag carries the same strip beside its send button, and following its link closes the bag
+    await page.locator(".pdp-info .size-chips").getByRole("button", { name: "M", exact: true }).click();
+    await page.getByRole("button", { name: /Add to bag/ }).click();
+    const bag = bagDialog(page);
+    await expect(bag.getByRole("list", { name: "Ordering with Lusted" }).getByRole("listitem")).toHaveText(promises);
+    await bag.getByRole("link", { name: "Delivery, returns & FAQ" }).click();
+    await expect(page).toHaveURL(/\/help$/);
+    await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
+  });
+
   test("quantity stepper stays within 1–10 and the button price multiplies", async ({ prepared: page }) => {
     const stepper = page.locator(".buy-actions .stepper");
     const minus = stepper.getByRole("button", { name: "Decrease quantity" });
@@ -119,6 +142,20 @@ test.describe("product page", () => {
     await related.first().locator(".product-info").click();
     await expect(page).toHaveURL(/\/products\/[a-z-]+$/);
     await expect(main(page).locator(".pdp-info .eyebrow")).toHaveText("Lace Secrets");
+  });
+
+  test("'Complete the set' shows the pieces made to go with it, and the related row leaves them out", async ({ prepared: page }) => {
+    const pairs = CATALOG.pairsOf(slug);
+    test.skip(pairs.length === 0, `${slug} is paired with nothing in the catalogue`);
+    const set = page.locator(".pairs");
+    await expect(set.locator(".eyebrow")).toHaveText("Complete the set");
+    await expect(set.locator("h2")).toContainText(name);
+    const hrefsOf = (cards: import("@playwright/test").Locator) =>
+      cards.locator(".product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
+    await expect(set.locator(".product-card")).toHaveCount(pairs.length);
+    expect(await hrefsOf(set.locator(".product-card"))).toEqual(pairs.map((s) => `/products/${s}`));
+    const related = await hrefsOf(page.locator(".related .product-card"));
+    for (const s of pairs) expect(related, `${s} shows once, under "Complete the set"`).not.toContain(`/products/${s}`);
   });
 });
 

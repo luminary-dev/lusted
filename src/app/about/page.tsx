@@ -11,6 +11,7 @@ import { img } from "@/lib/cdn";
 export const metadata: Metadata = {
   title: "About us — Lusted",
   description: "Lusted is lingerie made to be looked at and cut to be taken off — designed for the moment someone notices, made to last past it, and delivered so no one knows.",
+  alternates: { canonical: "/about" },
 };
 
 const values = [
@@ -167,7 +168,7 @@ export default function AboutPage() {
             <Link href="/products" className="btn btn-wine">
               Show me everything <ArrowRight className="arrow" />
             </Link>
-            <a href={whatsappLink("Hi Lusted! I'd love some styling advice.")} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+            <a href={whatsappLink("Hi Lusted! I'd love some styling advice.")} target="_blank" rel="noopener noreferrer" className="btn btn-ghost" data-wa-source="about-page">
               Whisper to us
             </a>
           </div>

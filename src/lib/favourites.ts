@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { trackEvent } from "./analytics";
 import { getProduct } from "./products";
 
 // Favourites (wishlist) kept in localStorage, as a list of product slugs.
@@ -40,11 +41,13 @@ const subscribe = (l: () => void) => {
 
 export function toggleFavourite(slug: string) {
   load();
-  slugs = slugs.includes(slug) ? slugs.filter((s) => s !== slug) : [slug, ...slugs];
+  const adding = !slugs.includes(slug);
+  slugs = adding ? [slug, ...slugs] : slugs.filter((s) => s !== slug);
   try {
     localStorage.setItem(KEY, JSON.stringify(slugs));
   } catch {}
   emit();
+  if (adding) trackEvent("favourite", { slug }); // saves only; taking one off isn't counted
 }
 
 export const useFavourites = () =>
