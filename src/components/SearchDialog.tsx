@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useTrackNoResults } from "@/lib/analytics";
 import { bestSellers, collectionName, matchesQuery, products } from "@/lib/products";
 import { Price } from "./shop/ProductCard";
 import { ArrowRight, Close, Search } from "./icons";
@@ -62,6 +63,7 @@ export default function SearchDialog() {
 
   const q = query.trim();
   const results = q ? products.filter((p) => matchesQuery(p, q) || (q.toLowerCase() === "sale" && p.salePrice)) : bestSellers;
+  useTrackNoResults(q, !results.length, "dialog");
 
   function close() {
     setSearchOpen(false);

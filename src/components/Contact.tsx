@@ -26,7 +26,7 @@ function WhatsAppQr() {
 
 export default function Contact() {
   return (
-    <section id="contact" className="section contact">
+    <section id="contact" className="section contact" data-wa-source="contact">
       <div className="container contact-wrap">
         <div className="contact-copy" data-reveal>
           <p className="eyebrow">Say it out loud</p>

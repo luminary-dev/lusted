@@ -9,7 +9,7 @@ import { AwsClient } from "aws4fetch";
 
 const { R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, CLOUDFLARE_API_TOKEN } = process.env;
 if (!R2_ACCOUNT_ID || !R2_BUCKET) throw new Error("set R2_ACCOUNT_ID and R2_BUCKET (see .env.local)");
-const origins = ["https://lusted.vercel.app", "https://lusted-dev.vercel.app", "http://localhost:3000", "http://localhost:3177", "http://localhost:4010", ...process.argv.slice(2)];
+const origins = ["https://lusted.lk", "https://dev.lusted.lk", "https://lusted.vercel.app", "https://lusted-dev.vercel.app", "http://localhost:3000", "http://localhost:3177", "http://localhost:4010", ...process.argv.slice(2)];
 const rules = [{ allowed: { origins, methods: ["PUT"], headers: ["content-type"] }, maxAgeSeconds: 3600 }];
 const dashboard = JSON.stringify(rules.map((r) => ({ AllowedOrigins: r.allowed.origins, AllowedMethods: r.allowed.methods, AllowedHeaders: r.allowed.headers, MaxAgeSeconds: r.maxAgeSeconds })), null, 2);
 
