@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import SaleSection from "@/components/SaleSection";
 import Collections from "@/components/Collections";
 import BestSellers from "@/components/BestSellers";
+import NewArrivals from "@/components/NewArrivals";
 import AfterDark from "@/components/AfterDark";
 import About from "@/components/About";
 import SizeGuide from "@/components/SizeGuide";
@@ -45,6 +46,7 @@ export default function Home() {
       <SaleSection />
       <Collections />
       <BestSellers />
+      <NewArrivals />
       <AfterDark />
       <SizeGuide />
       <About />
