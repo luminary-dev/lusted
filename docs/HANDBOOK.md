@@ -10,6 +10,8 @@ Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or a
 
 A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, new in, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift — lucky them" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece.
 
+A product page also remembers that it was opened: the last eight pieces a shopper looked at, newest first, are kept in their browser alone (`lusted-recently-viewed` in localStorage, `src/lib/recently-viewed.ts` — never sent to the shop or to analytics, and a piece that leaves the catalogue drops out). The product page shows up to four of the others as a "Recently viewed" row at its foot, with a "Clear the evidence" button that forgets the list, and an empty bag offers the last three, with prices, as "Still aching for these?" before falling back to the shopper's favourites or the best sellers. The row is drawn only after hydration (the server has no history to draw), below the related rows, so it doesn't shift what's on screen.
+
 ## Run it
 
 ```bash
@@ -65,7 +67,7 @@ sent back) and the scripts' console output (plain "done" and "warning:"):
 
 ## Tests
 
-End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section (and, in Node, the sale band's wording for every kind of sale), the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag and favourites, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1.
+End-to-end tests in `tests/` (Playwright, Chromium) cover every route and API response, the header, search, theme switch, mobile menu, every home-page section (and, in Node, the sale band's wording for every kind of sale), the shop's tabs, search, sort, filters, pagination and quick add, product pages, the bag, favourites and recently viewed, accessibility (axe, keyboard, tap targets) and responsiveness at every viewport in `tests/fixtures.ts` — phones, foldables, tablets, laptops, desktops and every breakpoint at −1 / 0 / +1.
 
 ```bash
 npm run test:build   # production build, then the whole suite (about 10 minutes)

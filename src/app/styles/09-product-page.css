@@ -494,6 +494,30 @@
   grid-template-columns: repeat(4, 1fr);
 }
 
+/* the shopper's own row, after the shop's: set apart the same way as the two above it */
+.recent {
+  margin-top: var(--section);
+  padding-top: var(--section);
+  border-top: 1px solid var(--hair);
+}
+
+.recent-clear {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.recent-clear:hover {
+  color: var(--ink);
+}
+
 /* ───────── the product page in the dark ─────────
    The fit meter is a graphic carrying meaning, so it needs 3:1 against its surface. Dark --wine (#8c2340) on the
    dark paper (#1b0e11) doesn't reach it; the lifted rose does. */

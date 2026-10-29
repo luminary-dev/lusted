@@ -1,4 +1,4 @@
-import { test, expect, go, main, CATALOG, bagDialog, openBag } from "./fixtures";
+import { test, expect, go, main, CATALOG, bagDialog, openBag, photographed } from "./fixtures";
 
 const fmt = (n: number) => `LKR ${n.toLocaleString("en-LK")}`;
 const { slug, name, price } = CATALOG.hero;
@@ -180,5 +180,53 @@ test.describe("favourites", () => {
     await expect(page.getByRole("link", { name: /Favourites, 1 saved/ })).toHaveClass(/is-active/);
     await page.reload();
     await expect(main(page).locator(".fav-grid .product-card")).toHaveCount(1);
+  });
+});
+
+test.describe("recently viewed", () => {
+  // any other photographed piece will do: the row is the shopper's history, not the catalogue's pairings
+  const other = photographed.find((p) => p.slug !== slug)!;
+  const recentRow = (page: import("@playwright/test").Page) => main(page).getByRole("region", { name: "Recently viewed" });
+
+  test("the second piece shows the first, an empty bag offers both, and Clear forgets them", async ({ prepared: page, errors }) => {
+    await go(page, `/products/${other.slug}`);
+    await expect(main(page).locator(".recent")).toHaveCount(0); // the only piece seen so far is this one
+    await go(page, `/products/${slug}`);
+    await expect(recentRow(page).locator(".product-card h3")).toHaveText([other.name]);
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lusted-recently-viewed")!))).toEqual([slug, other.slug]);
+
+    await openBag(page).click();
+    const bag = bagDialog(page);
+    await expect(bag.getByText("Your bag is empty.")).toBeVisible();
+    await expect(bag.locator(".drawer-suggest-head")).toHaveText("Still aching for these?");
+    await expect(bag.locator(".drawer-suggest-name")).toHaveText([name, other.name]); // newest first
+    await expect(bag.locator(".drawer-suggest-price").first()).toHaveText(fmt(price));
+    await bag.locator(".drawer-suggest a").nth(1).click();
+    await expect(page).toHaveURL(new RegExp(`/products/${other.slug}$`));
+    await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
+
+    await expect(recentRow(page).locator(".product-card h3")).toHaveText([name]);
+    await recentRow(page).getByRole("button", { name: "Clear the evidence of recently viewed pieces" }).click();
+    await expect(main(page).locator(".recent")).toHaveCount(0);
+    expect(await page.evaluate(() => localStorage.getItem("lusted-recently-viewed"))).toBe("[]");
+    await openBag(page).click();
+    await expect(bag.locator(".drawer-suggest-head")).toHaveText("What everyone’s getting into"); // back to the usual empty bag
+    expect(errors).toEqual([]);
+  });
+
+  test("a piece that has left the catalogue, or storage that isn't a list, is ignored", async ({ prepared: page, errors }) => {
+    // seeded once per tab: an init script runs on every load, and the second load below needs what the page left
+    await page.addInitScript((s) => {
+      if (sessionStorage.getItem("seeded")) return;
+      sessionStorage.setItem("seeded", "1");
+      localStorage.setItem("lusted-recently-viewed", JSON.stringify(["ghost-piece", s, s]));
+    }, other.slug);
+    await go(page, `/products/${slug}`);
+    await expect(recentRow(page).locator(".product-card")).toHaveCount(1);
+    await page.evaluate(() => localStorage.setItem("lusted-recently-viewed", "{not json"));
+    await go(page, `/products/${slug}`);
+    await expect(main(page).locator(".pdp-info h1")).toHaveText(name);
+    await expect(main(page).locator(".recent")).toHaveCount(0);
+    expect(errors).toEqual([]);
   });
 });
