@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { maxDiscount, onSale, type ColorKey } from "@/lib/products";
+import { collectionName, discountPct, onSale, type ColorKey } from "@/lib/products";
+import { saleBand } from "@/lib/sale-band";
 import { ArrowRight } from "./icons";
 import SaleCard from "./SaleCard";
 
@@ -17,24 +18,22 @@ const TINT: Record<ColorKey, string> = {
 
 export default function SaleSection() {
   // nothing on sale: no band (rather than "Now -Infinity% off")
-  if (!onSale.length) return null;
+  const band = saleBand(onSale.map((p) => ({ category: p.category, discount: discountPct(p) })), collectionName);
+  if (!band) return null;
   return (
     <section id="sale" className="section sale">
       <div className="container">
         <header className="head">
           <div data-reveal>
-            <p className="eyebrow">The Bikini Sale</p>
+            <p className="eyebrow">{band.eyebrow}</p>
             <h2 className="h2">
-              Barely there. <em>Now {maxDiscount}% off.</em>
+              {band.lead} <em>{band.offer}</em>
             </h2>
           </div>
           <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            <p>
-              Less fabric, less to pay, nothing left to hide behind. Consider it permission to show them everything —
-              while your size lasts.
-            </p>
-            <Link className="btn btn-wine" href="/products?sale=1">
-              Shop the bikini sale <ArrowRight className="arrow" />
+            <p>{band.body}</p>
+            <Link className="btn btn-wine" href={band.href}>
+              {band.cta} <ArrowRight className="arrow" />
             </Link>
           </div>
         </header>

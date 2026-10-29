@@ -1,6 +1,7 @@
 import { test as base, expect, type Page, type Locator } from "@playwright/test";
 import catalogJson from "../src/lib/catalog.json";
 import manifest from "../src/lib/image-manifest.json";
+import { saleBand } from "../src/lib/sale-band";
 
 /* ───────── the viewport matrix (responsive-dimensions-oct-2026.txt) ───────── */
 export type Viewport = { name: string; w: number; h: number; kind: "phone" | "foldable" | "tablet" | "laptop" | "desktop" | "boundary" | "landscape"; dpr?: number };
@@ -142,6 +143,8 @@ export const CATALOG = {
   /** the photographed pieces a piece is paired with — its "Complete the set" row on the product page */
   pairsOf: (slug: string) => (bySlug[slug]?.pairsWith ?? []).filter((s) => s !== slug && s in bySlug),
   maxDiscount: Math.max(0, ...onSale.map((p) => Math.round((1 - p.salePrice! / p.price) * 100))),
+  /** the home page's sale band for what is on sale (its wording is checked in 11-sale-band.spec.ts) */
+  saleBand: saleBand(onSale.map((p) => ({ category: p.category, discount: Math.round((1 - p.salePrice! / p.price) * 100) })), (c) => COLLECTIONS[c]),
   sampleSale: { slug: sampleSale?.slug ?? "", singleColour: (sampleSale?.colors.length ?? 1) === 1, collection: sampleSale ? COLLECTIONS[sampleSale.category] : "" },
   bagSale: { slug: bagSale?.slug ?? "", color: bagSale?.colors.includes("wine") ? "wine" : (bagSale?.colors[0] ?? "wine") },
   // every ranked piece, in rank order; the home page, the search dialog and the shop's "best" sort show the first six
