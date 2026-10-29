@@ -19,9 +19,9 @@ export default function FavouritesList() {
     return (
       <div className="empty fav-empty">
         <h2 className="h3">No favourites yet.</h2>
-        <p>Tap the heart on any piece to save it here for later.</p>
+        <p>Tap the heart on any piece that gets your pulse going, and it’ll be waiting for you here.</p>
         <Link href="/products" className="btn btn-wine">
-          Browse the shop <ArrowRight className="arrow" />
+          Browse the shop, go on <ArrowRight className="arrow" />
         </Link>
       </div>
     );

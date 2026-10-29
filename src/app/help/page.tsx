@@ -11,7 +11,7 @@ import { emailLink, instagramLink, site, whatsappLink } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Pillow talk — delivery, returns & FAQ — Lusted",
   description:
-    "How ordering on WhatsApp works, paying, the plain box at your door, 7-day exchanges and finding your size — every question you'd ask after, answered before.",
+    "How ordering on WhatsApp works, paying, the plain box at your door, 7-day exchanges and finding your size — every question you'd murmur afterwards, answered before.",
   alternates: { canonical: "/help" },
 };
 
@@ -61,7 +61,7 @@ const chapters: Chapter[] = [
         How to <em>have us</em>
       </>
     ),
-    tease: "No checkout. No forms. Just you, one message, and someone on the other end who wants you to have it.",
+    tease: "No checkout, no forms, no foreplay required. Just one message, and someone on the other end who can’t wait to give you what you want.",
     layout: "right",
     paper: "#f8f1ec",
     photo: {
@@ -74,7 +74,7 @@ const chapters: Chapter[] = [
         a: (
           <p>
             Fill your bag with everything you want and tap <strong>Send order on WhatsApp</strong> — or tap <strong>Order now on WhatsApp</strong> on
-            the one piece you can’t stop looking at. It reaches us as a single message. A real person reads it, checks the piece is here and the size
+            the one piece you can’t stop thinking about. It lands with us as a single message. A real person reads it, checks the piece is here and the size
             is right for you, and your order is confirmed the moment that’s done and payment is in.
           </p>
         ),
@@ -92,7 +92,7 @@ const chapters: Chapter[] = [
         q: "How fast will you come back to me?",
         a: (
           <p>
-            {site.responseTime} We’re around {site.hours}, and we don’t like keeping anyone waiting.
+            {site.responseTime} We’re up {site.hours}, and we hate keeping anyone waiting.
           </p>
         ),
       },
@@ -100,7 +100,7 @@ const chapters: Chapter[] = [
         q: "What if the one I want is already taken?",
         a: (
           <p>
-            We’ll tell you before anything is confirmed, and help you find the next thing to want. If we ever have to cancel an order, every rupee
+            We’ll tell you before anything is confirmed, and help you find something new to want. If we ever have to cancel an order, every rupee
             comes straight back to you.
           </p>
         ),
@@ -111,10 +111,10 @@ const chapters: Chapter[] = [
     id: "payment",
     title: (
       <>
-        Settling <em>up</em>
+        The <em>damage</em>
       </>
     ),
-    tease: "The one unsexy moment of the whole affair. We keep it quick, so you can get back to the rest.",
+    tease: "The only unsexy part of the whole affair. We keep it quick, so you can get back to the good bit.",
     layout: "left",
     paper: "#f5ead9",
     photo: {
@@ -123,20 +123,20 @@ const chapters: Chapter[] = [
     },
     items: [
       {
-        q: "How do I pay you?",
-        a: <p>When we confirm your order on WhatsApp we share secure ways to pay. Pick one, and it’s done.</p>,
+        q: "How do I pay for my sins?",
+        a: <p>When we confirm your order on WhatsApp we share secure ways to pay. Pick one, and the hard part’s over.</p>,
       },
       {
         q: "What currency are the prices in?",
-        a: <p>Sri Lankan rupees (LKR), with applicable taxes included unless we say otherwise. Nothing is added at the end.</p>,
+        a: <p>Sri Lankan rupees (LKR), with applicable taxes included unless we say otherwise. Nothing sneaky gets added at the end.</p>,
       },
       {
         q: "Is there a delivery charge?",
-        a: <p>Sometimes, depending on where you are — and you’ll always know before you pay, never after.</p>,
+        a: <p>Sometimes, depending on where you are — and you’ll always know before you pay, never after. The only surprises we do are the good kind.</p>,
       },
       {
-        q: "Do sale prices last?",
-        a: <p>Only while stocks last. They can’t be put on an order that’s already placed — so if you want it, say so.</p>,
+        q: "How long do sale prices last?",
+        a: <p>Only while stocks last, and they can’t be put on an order that’s already placed — so if you want it, don’t play hard to get.</p>,
       },
     ],
   },
@@ -144,10 +144,10 @@ const chapters: Chapter[] = [
     id: "delivery",
     title: (
       <>
-        The plain <em>box</em>
+        Special <em>delivery</em>
       </>
     ),
-    tease: "It arrives looking like nothing at all. Then you open it.",
+    tease: "It turns up looking like nothing at all. Then you open it, and the whole evening changes.",
     layout: "split",
     paper: "#f3e1da",
     splitAt: 4,
@@ -158,18 +158,18 @@ const chapters: Chapter[] = [
     items: [
       {
         q: "Where will you come to?",
-        a: <p>Anywhere in Sri Lanka.</p>,
+        a: <p>Anywhere in Sri Lanka. We get around.</p>,
       },
       {
         q: "How long will you make me wait?",
-        a: <p>That depends on where you are. We confirm your estimated delivery time with your order — and we’re as impatient about it as you are.</p>,
+        a: <p>That depends on where you are. We confirm your estimated delivery time with your order — and we’re every bit as impatient as you are.</p>,
       },
       {
         q: "Will anyone know what’s inside?",
         a: (
           <p>
             No. Every order goes out in a plain, unbranded box — tissue and ribbon inside, nothing on the outside that gives it away. Whoever signs
-            for it will think it’s something dull. It isn’t. It stays our little secret.
+            for it will think it’s something dull. It isn’t. It stays our secret.
           </p>
         ),
       },
@@ -192,7 +192,7 @@ const chapters: Chapter[] = [
         ),
       },
       {
-        q: "What if I’m not in?",
+        q: "What if I’m not home?",
         a: (
           <p>
             The courier calls the number you gave us. If you’d rather it went to a neighbour, your office or a different day, tell us when you
@@ -213,11 +213,11 @@ const chapters: Chapter[] = [
         ),
       },
       {
-        q: "Can I collect it instead?",
+        q: "Can I come and get it myself?",
         a: <p>Ask us. Tell us when you order that you’d rather collect, and we’ll see what’s possible where you are.</p>,
       },
       {
-        q: "What if the box arrives damaged?",
+        q: "What if the box turns up roughed up?",
         a: (
           <p>
             Message us with a photo straight away. If anything inside is the worse for it, we replace it or refund you in full — everything under{" "}
@@ -234,7 +234,7 @@ const chapters: Chapter[] = [
         Second <em>thoughts</em>
       </>
     ),
-    tease: "Changed your mind? Didn’t fit the way you pictured it? Tell us. We don’t sulk.",
+    tease: "Changed your mind? Not the fit you fantasised about? Tell us. We don’t sulk, and we don’t judge.",
     layout: "corner",
     paper: "#efe6e0",
     photo: {
@@ -279,10 +279,10 @@ const chapters: Chapter[] = [
     id: "sizing",
     title: (
       <>
-        Fitted <em>to you</em>
+        Size <em>matters</em>
       </>
     ),
-    tease: "Measure once. Then let us worry about where everything goes.",
+    tease: "Measure once, slowly. Then let us worry about where everything goes.",
     layout: "left-low",
     paper: "#f6e4e4",
     photo: {
@@ -296,25 +296,25 @@ const chapters: Chapter[] = [
           <p>
             Our <Link href="/#size-guide">size guide</Link> has the charts for bras and tops, bodysuits and dresses, and bottoms — and shows exactly
             where to hold the tape. Caught between two sizes? <a href={ask("Can you help me with sizing?")}>Message us</a> before you order with
-            your measurements and what you want the piece to do for you, and we’ll choose the one that does it.
+            your measurements and what you want the piece to do for you, and we’ll choose the one that does it best.
           </p>
         ),
       },
       {
-        q: "Can you help me choose a style for my shape?",
+        q: "Can you help me choose a style for my body?",
         a: (
           <p>
-            Yes. Tell us what you’d like a piece to do — lift, hold, show, hide, all four — and we’ll point you to the ones that do it, and the sizes
-            that do it best.
+            Yes. Tell us what you’d like a piece to do — lift, hold, show off, hide, all four — and we’ll point you to the ones that do it, and the
+            sizes that do it best.
           </p>
         ),
       },
       {
-        q: "Will it look like the photos?",
+        q: "Will it look as good as the photos?",
         a: (
           <p>
-            We do our best to show every colour and detail as it really is, but every screen is a little different. Want a closer look at something?
-            Ask, and we’ll send you one.
+            We do our best to show every colour and detail as it really is, but every screen shows colour slightly differently. Want a closer look
+            at something? Ask, and we’ll send you one. On you, it’ll look even better.
           </p>
         ),
       },
@@ -323,7 +323,7 @@ const chapters: Chapter[] = [
         a: (
           <p>
             Then it goes back for the right size: within 7 days of delivery, unworn, tags on — everything under <a href="#returns">Second thoughts</a>.
-            No lecture.
+            No lecture, no sulking.
           </p>
         ),
       },
@@ -336,7 +336,7 @@ const chapters: Chapter[] = [
         Between <em>us</em>
       </>
     ),
-    tease: "What you wear, and for whom, is nobody’s business. We’re very good at keeping quiet.",
+    tease: "What you wear, and who gets to see it, is nobody’s business. We’re very, very good at keeping our mouths shut.",
     layout: "right-high",
     paper: "#f2e9df",
     photo: {
@@ -464,11 +464,11 @@ export default function HelpPage() {
               Pillow talk · delivery, returns &amp; FAQ
             </p>
             <h1 className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-              Ask us anything. <em>We don’t blush.</em>
+              Ask us anything. <em>We’ve heard worse.</em>
             </h1>
             <p className="help-lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
               The questions you’d murmur afterwards — how to have us, how we slip through your door, what happens if it doesn’t fit — answered now,
-              so later can be about something else.
+              so later can be about something far more fun.
             </p>
           </div>
         </header>
@@ -487,15 +487,15 @@ export default function HelpPage() {
               Still wondering?
             </p>
             <h2 id="help-cta-title" className="h1" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-              Say it <em>however you like.</em>
+              Go on, <em>ask the naughty one.</em>
             </h2>
             <p className="help-lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
-              A real person answers on WhatsApp or by email — about a size, a piece, a delivery, or the thing you’re not sure you should ask. The
+              A real person answers on WhatsApp or by email — about a size, a piece, a delivery, or the thing you’ve been too shy to ask. The
               fine print behind every answer is in our <Link href="/terms">terms</Link>.
             </p>
             <div className="help-cta-actions" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
               <a className="btn btn-light" href={ask("I have a question.")} target="_blank" rel="noopener noreferrer">
-                Message us on WhatsApp <ArrowRight className="arrow" />
+                Ask us on WhatsApp <ArrowRight className="arrow" />
               </a>
               <a className="help-email" href={emailLink}>
                 {site.email}

@@ -313,7 +313,7 @@ test.describe("the shop", () => {
     await expect(toast).toContainText("Blush · L");
     await expect(page.getByRole("button", { name: "Open bag, 1 items" })).toBeVisible();
     // and the line really is in the bag, not just announced
-    await toast.getByRole("button", { name: "View bag" }).click();
+    await toast.getByRole("button", { name: "Peek in the bag" }).click();
     const bag = bagDialog(page);
     await expect(bag.locator(".bag-item")).toHaveCount(1);
     await expect(bag.locator(".bag-item")).toContainText(CATALOG.hero.name);

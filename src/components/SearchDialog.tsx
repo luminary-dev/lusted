@@ -86,7 +86,7 @@ export default function SearchDialog() {
           }}
         >
           <Search />
-          <input ref={input} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="What do you want to be caught in?" aria-label="Search products" />
+          <input ref={input} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="What are you in the mood for?" aria-label="Search products" />
           <kbd>esc</kbd>
           <button type="button" className="icon-btn" aria-label="Close search" onClick={close}>
             <Close />
@@ -95,7 +95,7 @@ export default function SearchDialog() {
 
         {!q && (
           <div className="search-suggest">
-            <span>Everyone’s after</span>
+            <span>Tonight’s cravings</span>
             {suggestions.map((s) => (
               <button key={s} type="button" className="chip" onClick={() => setQuery(s)}>
                 {s}
@@ -123,7 +123,7 @@ export default function SearchDialog() {
             ))}
           </ul>
         ) : (
-          <p className="search-empty">Nothing’s wearing “{q}” tonight. Try “lace”, “silk” or “bikini”.</p>
+          <p className="search-empty">Nobody’s wearing “{q}” tonight — or much of anything. Try “lace”, “silk” or “bikini”.</p>
         )}
 
         {q && results.length > 0 && (

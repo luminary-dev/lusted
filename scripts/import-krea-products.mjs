@@ -39,7 +39,7 @@ function findEsrgan() {
   return null;
 }
 const ESRGAN = findEsrgan();
-if (!ESRGAN) console.warn("⚠ realesrgan-ncnn-vulkan not found (set ESRGAN_BIN) — importing without enhancement");
+if (!ESRGAN) console.warn("warning: realesrgan-ncnn-vulkan not found (set ESRGAN_BIN) — importing without enhancement");
 
 async function finish(src, dest) {
   const { width, height } = await sharp(src).metadata();
@@ -84,7 +84,7 @@ for (const dir of ["refs/krea/products", "refs/krea/bikini"]) {
     if (!ALL && d && d.mtimeMs >= s.mtimeMs) continue; // already imported
     await finish(src, dest);
     n++;
-    console.log(`✓ ${path.basename(dest)}`);
+    console.log(`done ${path.basename(dest)}`);
   }
 }
 console.log(`imported ${n} photo(s)${ESRGAN ? " (enhanced 2×)" : ""}`);
