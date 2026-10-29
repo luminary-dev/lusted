@@ -44,7 +44,8 @@ const sections: LegalSection[] = [
         </ul>
         <p>
           Your bag, favourites and light/dark preference are stored only in your own browser (local storage) — they are never sent to us until you
-          choose to send an order.
+          choose to send an order. The pieces you’ve recently looked at are kept there too, only to show them back to you, and never leave your
+          browser — “Clear” beside them on a product page forgets them.
         </p>
         <p>
           To see how the site is used and how quickly it loads, we use Vercel Web Analytics and Speed Insights, which count visits without cookies or

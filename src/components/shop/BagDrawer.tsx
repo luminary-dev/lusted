@@ -9,6 +9,7 @@ import { fillIn, newOrderRef, productUrl, useOrderRef, useOrigin } from "@/lib/o
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Close, WhatsApp } from "../icons";
 import { useFavourites } from "@/lib/favourites";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 import TrustStrip from "./TrustStrip";
 
 export default function BagDrawer() {
@@ -26,6 +27,7 @@ export default function BagDrawer() {
   // "Clear bag" sits under the send button with nothing between a thumb and an empty bag, so it asks once
   const [confirmClear, setConfirmClear] = useState(false);
   const saved = useFavourites();
+  const viewed = useRecentlyViewed();
 
   useEffect(() => {
     if (!open) return;
@@ -78,20 +80,26 @@ export default function BagDrawer() {
               Browse the shop <ArrowRight className="arrow" />
             </Link>
             {(() => {
-              // the pieces they already said yes to come first; failing that, what everyone else is buying
-              const suggestions = (saved.length ? saved.map(getProduct).filter((p) => !!p) : bestSellers).slice(0, 4);
+              // what they were looking at a moment ago comes first — the last three, with their prices, since the price
+              // is often what they went away to think about; then the pieces they already said yes to; failing that,
+              // what everyone else is buying
+              const recent = viewed.map(getProduct).filter((p) => !!p).slice(0, 3);
+              const suggestions = recent.length ? recent : (saved.length ? saved.map(getProduct).filter((p) => !!p) : bestSellers).slice(0, 4);
               if (!suggestions.length) return null;
               return (
-                <div className="drawer-suggest">
-                  <p className="drawer-suggest-head">{saved.length ? "You saved these" : "What's being bought"}</p>
+                <div className={`drawer-suggest ${recent.length ? "is-recent" : ""}`}>
+                  <p className="drawer-suggest-head">
+                    {recent.length ? "Still thinking about these?" : saved.length ? "You saved these" : "What's being bought"}
+                  </p>
                   <ul>
                     {suggestions.map((p) => (
                       <li key={p.slug}>
                         <Link href={`/products/${p.slug}`} onClick={() => bag.setOpen(false)}>
                           <span className="drawer-suggest-media">
-                            <Image src={p.image} alt="" fill sizes="80px" />
+                            <Image src={p.image} alt="" fill sizes={recent.length ? "120px" : "80px"} />
                           </span>
                           <span className="drawer-suggest-name">{p.name}</span>
+                          {recent.length > 0 && <span className="drawer-suggest-price">{formatPrice(priceOf(p))}</span>}
                         </Link>
                       </li>
                     ))}

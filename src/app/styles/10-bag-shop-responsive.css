@@ -621,3 +621,15 @@
   font-size: var(--step--2);
   line-height: 1.3;
 }
+
+/* what they were just looking at: three, a little larger, with the price they went away to think about */
+.drawer-suggest.is-recent ul {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.drawer-suggest-price {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--step--2);
+  color: var(--muted);
+}
