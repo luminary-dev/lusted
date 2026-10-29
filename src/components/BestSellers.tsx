@@ -9,15 +9,15 @@ export default function BestSellers() {
       <div className="container">
         <header className="head">
           <div data-reveal>
-            <p className="eyebrow">Best sellers</p>
+            <p className="eyebrow">Most wanted</p>
             <h2 className="h2">
-              Most wanted, <em>most taken off.</em>
+              Everyone’s <em>favourite mistake.</em>
             </h2>
           </div>
           <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            <p>The six pieces that get ordered twice — once for you, once for whoever tore the first one off.</p>
+            <p>The six pieces that keep selling out for the same reason: nobody who wears them gets much sleep. Some get ordered twice — once to wear, once to replace the one that didn’t survive the night.</p>
             <Link className="btn btn-wine" href="/products?best=1&sort=best">
-              Shop all best sellers <ArrowRight className="arrow" />
+              Shop the usual suspects <ArrowRight className="arrow" />
             </Link>
           </div>
         </header>
