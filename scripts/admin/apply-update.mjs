@@ -1,8 +1,8 @@
 // Applies one small console change to the catalogue: runs in the Console workflow (.github/workflows/console.yml) with
 //   ADMIN_ACTION   update-product | remove-product | bulk-offer
 //   ADMIN_PAYLOAD  the dispatch's client_payload as JSON (shaped and checked by src/app/api/admin/dispatch/route.ts)
-// A removal also deletes the piece's photos from the bucket and the manifest. The workflow commits what changed, with
-// the summary written here as the message.
+// A removal also deletes the piece's photos from the bucket and the manifest, and drops it from any other piece's
+// pairsWith. The workflow commits what changed, with the summary written here as the message.
 import { CATALOG, COLLECTIONS, MANIFEST, SLUG, bucket, lkr, normalise, payload, quote, readJson, summarise, writeJson } from "./lib.mjs";
 
 const action = process.env.ADMIN_ACTION;
@@ -63,6 +63,15 @@ if (action === "update-product") {
 } else if (action === "remove-product") {
   const i = find(payload.slug);
   const [product] = catalog.splice(i, 1);
+  // the pieces it was paired with forget it too, so no "Complete the set" points at a piece that's gone
+  const unpaired = [];
+  catalog.forEach((p, j) => {
+    if (!p.pairsWith?.includes(product.slug)) return;
+    p.pairsWith = p.pairsWith.filter((s) => s !== product.slug);
+    if (p.pairsWith.length === 0) delete p.pairsWith;
+    catalog[j] = normalise(p);
+    unpaired.push(quote(p.name));
+  });
   await writeJson(CATALOG, catalog);
   // its photos: the front, the back and side views and any colourways (products/<slug>--<colour>…)
   const manifest = await readJson(MANIFEST);
@@ -75,7 +84,7 @@ if (action === "update-product") {
   }
   await writeJson(MANIFEST, manifest);
   await import("../sync-product-images.mjs");
-  await summarise(`removed ${quote(product.name)} (${mine.length} photo${mine.length === 1 ? "" : "s"})`);
+  await summarise(`removed ${quote(product.name)} (${mine.length} photo${mine.length === 1 ? "" : "s"})${unpaired.length ? `, unpaired from ${unpaired.join(", ")}` : ""}`);
 } else if (action === "bulk-offer") {
   const { category, percentOff } = payload;
   if (category !== "*" && !(category in COLLECTIONS)) throw new Error("bulk-offer: unknown collection");

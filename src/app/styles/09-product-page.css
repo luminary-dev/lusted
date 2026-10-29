@@ -364,7 +364,8 @@
   background: var(--wine);
 }
 
-.related {
+.related,
+.pairs {
   margin-top: var(--section);
 }
 
