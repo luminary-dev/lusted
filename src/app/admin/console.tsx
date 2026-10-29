@@ -618,7 +618,7 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
   }
 
   async function remove() {
-    if (!window.confirm(`Take “${product.name}” off the site, photos and all? It comes back only by adding it again.`)) return;
+    if (!window.confirm(`Take “${product.name}” off the site? It comes back only by adding it again.`)) return;
     setWaiting(true);
     const result = await post("/api/admin/dispatch", { action: "remove-product", slug: product.slug });
     if (result.ok) track(`Removing “${product.name}”`, `“${product.name}” is out of the ledger.`, (state) => !state.products.some((p) => p.slug === product.slug));
