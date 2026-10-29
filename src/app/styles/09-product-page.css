@@ -364,6 +364,37 @@
   background: var(--wine);
 }
 
+/* "Details & care" under the buy box: fabric, construction and care, a short list set like the buy labels. The
+   bullets are the browser's own markers (the base reset takes them away), so the list keeps its list semantics. */
+.pdp-details {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--hair);
+}
+
+.pdp-details-title {
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pdp-details ul {
+  display: grid;
+  gap: 6px;
+  padding-left: 1.1em;
+  list-style: disc;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.pdp-details li::marker {
+  color: var(--rose);
+}
+
 .related {
   margin-top: var(--section);
 }

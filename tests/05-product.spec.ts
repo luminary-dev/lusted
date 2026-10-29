@@ -19,6 +19,14 @@ test.describe("product page", () => {
     await expect(page.locator(".pdp-info .eyebrow")).toHaveText("Lace Secrets");
   });
 
+  test("'Details & care' lists the piece's fabric, construction and care lines from the catalogue", async ({ prepared: page }) => {
+    const details = page.getByRole("region", { name: "Details & care" });
+    await expect(details.getByRole("heading", { level: 2 })).toHaveText("Details & care");
+    const items = details.getByRole("listitem");
+    await expect(items).toHaveCount(CATALOG.hero.details.length);
+    await expect(items).toHaveText(CATALOG.hero.details);
+  });
+
   test("gallery: front large, back and side thumbnails, choosing one swaps the main view and its label", async ({ prepared: page }) => {
     const main = page.locator(".pdp-main img.is-active");
     await expect(main).toHaveAttribute("alt", `${name} — front view`);

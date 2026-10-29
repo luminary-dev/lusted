@@ -157,7 +157,8 @@ export const CATALOG = {
   whatsapp: "6581234567",
   email: "support@lusted.lk",
   instagram: "lusted.lk",
-  hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"] },
+  // the hero piece's details (fabric, construction, care) come from the catalogue like everything above
+  hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"], details: bySlug["rose-lace-balconette-bra"]?.details ?? [] },
 };
 export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/help", "/favourites", "/privacy", "/terms"];
 
