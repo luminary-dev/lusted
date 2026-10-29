@@ -102,7 +102,7 @@ export default function BagDrawer() {
                 <strong>{formatPrice(subtotal)}</strong>
               </div>
               <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp. Always shipped in plain packaging.</p>
-              <a className="btn btn-wine" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
+              <a className="btn btn-wine" data-wa-source="bag" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
                 <WhatsApp /> Send order on WhatsApp
               </a>
               <button className="drawer-clear" onClick={() => bag.clear()}>

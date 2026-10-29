@@ -225,6 +225,10 @@ export const test = base.extend<{ errors: string[]; prepared: Page }>({
       if (m.type() !== "error") return;
       const t = m.text();
       if (/favicon|ERR_ABORTED|net::ERR_|Download the React DevTools/i.test(t)) return;
+      // Vercel's analytics scripts (/_vercel/insights, /_vercel/speed-insights — src/components/SiteAnalytics.tsx) only
+      // exist once the site is deployed there, so under `next start` asking for them is an expected 404 (and the browser
+      // then refuses the 404 page as a script, a second error naming the same address)
+      if (t.includes("/_vercel/") || m.location().url.includes("/_vercel/")) return;
       errors.push(t);
     });
     page.on("response", (r) => {
