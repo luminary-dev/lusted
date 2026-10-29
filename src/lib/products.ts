@@ -39,6 +39,10 @@ export interface Product {
   colors: ColorKey[];
   sizes: string[];
   bestSeller?: number;
+  /** sizes this piece is out of. Absent or empty means everything in `sizes` can be ordered. Kept as the exception
+   *  rather than a count per size: the shop is small and a size is either there or it isn't, and a shopper finding
+   *  out in the WhatsApp chat — after they've committed — is the worst moment to learn it. */
+  soldOut?: string[];
   added: string;
   description: string;
   /** a one-line description for compact cards (the sale section) */
@@ -49,6 +53,10 @@ export interface Product {
   fit: -1 | 0 | 1;
   /** a line on how the piece sits — the product page's fit panel */
   fitNote: string;
+  /** what the photographs are showing: the model's height and the size she has on ("She's 5'7\" and wears S").
+   *  The shots are on a model already, and this is the line that makes them useful for judging a size. Optional —
+   *  a piece without it simply doesn't show the line. */
+  modelNote?: string;
   /** three short moments it's made for — the product page's "Made for…" line */
   moments: string[];
   /** what the main photo shows when it isn't the front (e.g. "Side") — labels it in the product gallery */
@@ -101,6 +109,11 @@ export const discountPct = (p: Product) => (p.salePrice ? Math.round((1 - p.sale
 export const formatPrice = (n: number) => `LKR ${n.toLocaleString("en-LK")}`;
 
 export const bestSellers = products.filter((p) => p.bestSeller).sort((a, b) => a.bestSeller! - b.bestSeller!);
+
+/** Can this size be ordered right now? */
+export const inStock = (p: Product, size: string) => !(p.soldOut ?? []).includes(size);
+/** Every size gone — the piece can still be looked at, but not added. */
+export const allSoldOut = (p: Product) => p.sizes.every((s) => !inStock(p, s));
 export const onSale = products.filter((p) => p.salePrice);
 export const maxDiscount = Math.max(...onSale.map(discountPct));
 

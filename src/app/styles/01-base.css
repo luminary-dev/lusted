@@ -26,15 +26,10 @@
   --shadow: rgba(90, 30, 40, 0.08);
   color-scheme: light;
 
-  --script: var(--font-script), "Corinthia", cursive;
-  --serif: var(--font-serif), "Playfair Display", Georgia, serif;
-  --fraunces: var(--font-fraunces), "Fraunces", Georgia, serif;
-  --formal: var(--font-formal), "Petit Formal Script", cursive;
+  --script: var(--font-script), "Corinthia", cursive; /* the signature lines on /about and the legal pages */
   --parisienne: var(--font-parisienne), "Parisienne", cursive;
-  /* Headline font: Parisienne (set ~1.5× the Petit Formal Script sizes — its x-height is small and it runs narrow).
-     Alternatives: var(--formal) = Petit Formal Script (use the sizes noted under .h1/.h2), var(--fraunces) = Fraunces,
-     var(--serif) = Playfair Display (logo-style serif) — for those serifs use the serif sizes and italic accents —
-     or var(--script) = Corinthia. */
+  /* Headline face. Parisienne runs narrow with a small x-height, so .h1/.h2 below are set about 1.5× what a serif
+     would need. Changing it means resizing those two rules to match the new face's x-height. */
   --headline: var(--parisienne);
   --sans: var(--font-sans), "Montserrat", "Helvetica Neue", Arial, sans-serif;
   --display: var(--sans); /* titles, product names and prices use Montserrat */
@@ -45,6 +40,44 @@
   --radius: 22px;
   --radius-sm: 14px;
   --ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+
+  /* Type scale. A 1.2 ratio off a 16px body, fluid between a phone and --container. --step--1 is the floor for
+     running text and --step--2 for uppercase labels, which carry tracking and so read smaller than their size. */
+  --step--2: 11px;
+  --step--1: 12.5px;
+  --step-0: clamp(15px, 0.3vw + 14px, 16px);
+  --step-1: clamp(17px, 0.5vw + 16px, 19px);
+  --step-2: clamp(20px, 0.9vw + 18px, 23px);
+  --step-3: clamp(24px, 1.4vw + 20px, 28px);
+  --step-4: clamp(28px, 2.2vw + 22px, 34px);
+  --step-5: clamp(33px, 3.4vw + 24px, 41px);
+
+  /* Spacing. A 4px base doubling to a section's rhythm; --space-5 and up are fluid so a phone isn't padded like a
+     desktop. Use these for gaps and padding; --gutter and --section stay the page-level pair. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: clamp(20px, 2vw, 24px);
+  --space-6: clamp(28px, 3vw, 36px);
+  --space-7: clamp(40px, 4.5vw, 56px);
+  --space-8: clamp(56px, 6vw, 80px);
+
+  /* Motion. --dur-1 for a state that follows a finger, --dur-2 for most things that open or move, --dur-3 for a
+     surface entering, --dur-4 for the deliberately slow brand moments (the curtain, the theme bloom). */
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 380ms;
+  --dur-4: 720ms;
+
+  /* Depth. One ladder, so nothing has to guess a number: content sits below the sticky buy bar, which sits below
+     the nav, then overlays, then anything that must sit over an open overlay. */
+  --z-raised: 1;
+  --z-sticky: 20;
+  --z-nav: 40;
+  --z-scrim: 60;
+  --z-overlay: 70;
+  --z-toast: 90;
 }
 
 *,
@@ -304,20 +337,17 @@ svg {
   opacity: 0.6;
 }
 
-/* Headlines use --headline (Playfair Display, matching the logo); smaller titles use Montserrat. */
+/* Headlines use --headline (Parisienne); smaller titles use Montserrat. */
 .h1,
 .h2 {
   font-family: var(--headline);
   font-weight: 400;
   font-synthesis: none;
-  font-variation-settings: "SOFT" 100; /* Fraunces: rounded, softer letter edges */
   letter-spacing: 0;
   line-height: 1.15;
   text-wrap: balance;
 }
 
-/* Parisienne sizes (Petit Formal Script: h1 clamp(36px, 4.6vw, 68px), h2 clamp(30px, 3.4vw, 48px);
-   serif headline fonts: h1 clamp(44px, 5.8vw, 88px), h2 clamp(36px, 4.2vw, 60px)) */
 .h1 {
   font-size: clamp(54px, 6.9vw, 102px);
   line-height: 1.1;
@@ -327,10 +357,6 @@ svg {
   font-size: clamp(45px, 5.1vw, 72px);
   line-height: 1.12;
 }
-
-/* cursive headline sizes — use these instead when --headline is var(--script):
-   .h1 { font-size: clamp(60px, 8vw, 122px); line-height: 0.98; letter-spacing: 0; font-weight: 400; }
-   .h2 { font-size: clamp(52px, 5.8vw, 86px); line-height: 1.02; letter-spacing: 0; font-weight: 400; } */
 
 .h3 {
   font-family: var(--display);
@@ -388,7 +414,7 @@ svg {
 
 .btn:disabled {
   opacity: 0.6;
-  cursor: progress;
+  cursor: not-allowed;
 }
 
 .btn-wine {

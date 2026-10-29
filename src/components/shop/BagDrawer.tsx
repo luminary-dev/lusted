@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { bag, useBag, useBagOpen } from "@/lib/bag";
-import { colors, formatPrice, getProduct, priceOf } from "@/lib/products";
+import { bestSellers, colors, formatPrice, getProduct, priceOf } from "@/lib/products";
 import { fillIn, newOrderRef, productUrl, useOrderRef, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Close, WhatsApp } from "../icons";
+import { useFavourites } from "@/lib/favourites";
 import TrustStrip from "./TrustStrip";
 
 export default function BagDrawer() {
@@ -22,6 +23,9 @@ export default function BagDrawer() {
   // the gift option only shapes this message — it isn't saved with the bag
   const [gift, setGift] = useState(false);
   const [note, setNote] = useState("");
+  // "Clear bag" sits under the send button with nothing between a thumb and an empty bag, so it asks once
+  const [confirmClear, setConfirmClear] = useState(false);
+  const saved = useFavourites();
 
   useEffect(() => {
     if (!open) return;
@@ -73,6 +77,28 @@ export default function BagDrawer() {
             <Link href="/products" className="btn btn-wine" onClick={() => bag.setOpen(false)}>
               Browse the shop <ArrowRight className="arrow" />
             </Link>
+            {(() => {
+              // the pieces they already said yes to come first; failing that, what everyone else is buying
+              const suggestions = (saved.length ? saved.map(getProduct).filter((p) => !!p) : bestSellers).slice(0, 4);
+              if (!suggestions.length) return null;
+              return (
+                <div className="drawer-suggest">
+                  <p className="drawer-suggest-head">{saved.length ? "You saved these" : "What's being bought"}</p>
+                  <ul>
+                    {suggestions.map((p) => (
+                      <li key={p.slug}>
+                        <Link href={`/products/${p.slug}`} onClick={() => bag.setOpen(false)}>
+                          <span className="drawer-suggest-media">
+                            <Image src={p.image} alt="" fill sizes="80px" />
+                          </span>
+                          <span className="drawer-suggest-name">{p.name}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
           </div>
         ) : (
           <>
@@ -82,14 +108,31 @@ export default function BagDrawer() {
                 return (
                   <li key={`${i.slug}-${i.size}-${i.color}`} className="bag-item">
                     <Link href={`/products/${p.slug}`} className="bag-thumb" onClick={() => bag.setOpen(false)}>
-                      <Image src={p.image} alt={p.name} fill sizes="88px" />
+                      <Image src={p.colorViews[i.color]?.[0]?.src ?? p.image} alt={p.name} fill sizes="88px" />
                     </Link>
                     <div className="bag-body">
                       <Link href={`/products/${p.slug}`} onClick={() => bag.setOpen(false)}>
                         {p.name}
                       </Link>
-                      <span>
-                        {colors[i.color].label} · {i.size}
+                      <span className="bag-meta">
+                        {colors[i.color].label}
+                        {p.sizes.length > 1 ? (
+                          <label className="bag-size">
+                            <span className="sr-only">Size for {p.name}</span>
+                            <select
+                              value={i.size}
+                              onChange={(e) => bag.changeSize(i, e.currentTarget.value)}
+                            >
+                              {p.sizes.map((sz) => (
+                                <option key={sz} value={sz}>
+                                  {sz}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        ) : (
+                          <> · {i.size}</>
+                        )}
                       </span>
                       <div className="bag-row">
                         <div className="stepper" aria-label="Quantity">
@@ -101,7 +144,12 @@ export default function BagDrawer() {
                             +
                           </button>
                         </div>
-                        <strong>{formatPrice(priceOf(p) * i.qty)}</strong>
+                        <strong className="bag-price">
+                          {/* the price paid stays its own element: the struck-through one sits beside it, and
+                              nothing reading this line should have to guess which number is which */}
+                          <span className="bag-price-now">{formatPrice(priceOf(p) * i.qty)}</span>
+                          {p.salePrice && <s>{formatPrice(p.price * i.qty)}</s>}
+                        </strong>
                       </div>
                     </div>
                     <button className="bag-remove" aria-label={`Remove ${p.name}`} onClick={() => bag.remove(i)}>
@@ -134,15 +182,21 @@ export default function BagDrawer() {
               </a>
               <TrustStrip onNavigate={() => bag.setOpen(false)} />
               <button
-                className="drawer-clear"
+                className={`drawer-clear ${confirmClear ? "is-confirming" : ""}`}
                 onClick={() => {
+                  if (!confirmClear) {
+                    setConfirmClear(true);
+                    return;
+                  }
                   bag.clear();
                   newOrderRef();
                   setGift(false);
                   setNote("");
+                  setConfirmClear(false);
                 }}
+                onBlur={() => setConfirmClear(false)}
               >
-                Clear bag
+                {confirmClear ? "Tap again to empty the bag" : "Clear bag"}
               </button>
             </footer>
           </>
