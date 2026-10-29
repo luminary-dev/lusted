@@ -3,9 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import wordmarkDark from "@/assets/brand/wordmark-dark.png";
 import wordmarkLight from "@/assets/brand/wordmark-light.png";
+import { offerProblem, percentProblem } from "@/lib/admin/offers";
+import { IMAGE_VERSION } from "@/lib/cdn";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
 // The back room — the owner console, four rooms on four pages: the fitting (add a piece), the offers, the ledger
@@ -51,7 +53,8 @@ const REPO = "https://github.com/luminary-dev/lusted";
 const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
 const COLOR_KEYS = Object.keys(colors) as ColorKey[];
-const IMG = (slug: string) => `/img/v2/products/${slug}.webp`;
+// the photo route serves only the current version, so the thumbnails follow it
+const IMG = (slug: string) => `/img/v${IMAGE_VERSION}/products/${slug}.webp`;
 const COLLECTION_OPTIONS = COLLECTIONS.map((c) => ({ value: c.key, label: c.name }));
 // the home page and the search show six best sellers, so six is the limit
 const BEST_LIMIT = 6;
@@ -502,6 +505,9 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
   const [category, setCategory] = useState<string>("swim");
   const [percent, setPercent] = useState("20");
   const [busy, setBusy] = useState(false);
+  // only a percentage the workflow will take can be sent: anything else is said here, not lost in the workflow
+  const percentWrong = percent === "" ? null : percentProblem(Number(percent));
+  const percentNote = useId();
   const matching = products.filter((p) => category === "*" || p.category === category);
   const scope = category === "*" ? "the whole catalogue" : `every ${COLLECTIONS.find((c) => c.key === category)?.name ?? category} piece`;
   const on = matching.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
@@ -533,19 +539,34 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
         <div className="adm-offer-line">
           <span className="adm-offer-word">Take</span>
           <span className="adm-offer-pct">
-            <input className="adm-input adm-input-big" type="number" min={1} max={90} value={percent} aria-label="Percent off" onChange={(e) => setPercent(e.currentTarget.value)} />
+            <input
+              className={`adm-input adm-input-big ${percentWrong ? "is-wrong" : ""}`}
+              type="number"
+              min={1}
+              max={90}
+              value={percent}
+              aria-label="Percent off"
+              aria-invalid={!!percentWrong}
+              aria-describedby={percentWrong ? percentNote : undefined}
+              onChange={(e) => setPercent(e.currentTarget.value)}
+            />
             <span aria-hidden="true">%</span>
           </span>
           <span className="adm-offer-word">off</span>
           <Select label="Collection" size="big" value={category} options={[...COLLECTION_OPTIONS, { value: "*", label: "everything" }]} onChange={setCategory} />
         </div>
         <div className="adm-row adm-row-tight">
-          <button type="button" className="adm-btn" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
+          <button type="button" className="adm-btn" disabled={busy || percent === "" || !!percentWrong} onClick={() => send(Math.round(Number(percent)))}>
             Put it on {matching.length} pieces
           </button>
           <button type="button" className="adm-quiet" disabled={busy || on === 0} onClick={() => send(null)}>
             Clear the {on} on offer
           </button>
+          {percentWrong && (
+            <span className="adm-wrong" id={percentNote} role="alert">
+              {percentWrong}.
+            </span>
+          )}
           <span className="adm-help">Offer prices land on a round ten rupees, always under the full price. For one piece, use its row in the ledger.</span>
         </div>
       </div>
@@ -587,38 +608,39 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
   const [rank, setRank] = useState(product.bestSeller ? String(product.bestSeller) : "");
   const [waiting, setWaiting] = useState(false);
 
-  const dirty =
-    name.trim() !== product.name ||
-    category !== product.category ||
-    Number(price) !== product.price ||
-    (sale === "" ? null : Number(sale)) !== (product.salePrice ?? null) ||
-    (rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null);
+  // Only the fields changed in this row, against its values when editing began: the change lands minutes later, so
+  // sending the rest would put back whatever this row last saw — undoing an offer still on its way, say. A cleared
+  // offer price or rank is sent as null, which ends it; a field that isn't sent is left alone.
+  const changes: Partial<{ name: string; category: string; price: number; salePrice: number | null; bestSeller: number | null }> = {};
+  if (name.trim() !== product.name) changes.name = name.trim();
+  if (category !== product.category) changes.category = category;
+  if (Number(price) !== product.price) changes.price = Number(price);
+  if ((sale === "" ? null : Number(sale)) !== (product.salePrice ?? null)) changes.salePrice = sale === "" ? null : Number(sale);
+  if ((rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null)) changes.bestSeller = rank === "" ? null : Number(rank);
+  const dirty = Object.keys(changes).length > 0;
   const pct = sale && Number(sale) < Number(price) ? Math.round((1 - Number(sale) / Number(price)) * 100) : 0;
   // a seventh best seller: the six are already taken by other pieces
   const seventh = rank !== "" && !product.bestSeller && bestTaken >= BEST_LIMIT;
+  // an offer the workflow would refuse (at or above the price, nothing, or part of a rupee) is said here, before Save
+  const offerWrong = sale === "" ? null : offerProblem(Number(sale), Number(price));
+  const offerNote = useId();
 
   async function save() {
-    if (seventh) return;
+    if (seventh || offerWrong) return;
     setWaiting(true);
-    const data = { name: name.trim(), category, price: Number(price), salePrice: sale === "" ? null : Number(sale), bestSeller: rank === "" ? null : Number(rank) };
+    const data = changes;
     const result = await post("/api/admin/dispatch", { action: "update-product", slug: product.slug, data });
     if (result.ok) {
       track(`Saving “${product.name}”`, `“${product.name}” is updated. The dev site follows in a couple of minutes.`, (state) => {
         const now = state.products.find((p) => p.slug === product.slug);
-        return (
-          !!now &&
-          now.name === data.name &&
-          now.category === data.category &&
-          now.price === data.price &&
-          (now.salePrice ?? null) === data.salePrice &&
-          (now.bestSeller ?? null) === data.bestSeller
-        );
+        // done when what was sent has landed; the fields not sent may have moved on in the meantime
+        return !!now && (Object.keys(data) as Array<keyof typeof data>).every((key) => (now[key] ?? null) === data[key]);
       });
     } else setWaiting(false);
   }
 
   async function remove() {
-    if (!window.confirm(`Take “${product.name}” off the site, photos and all? It comes back only by adding it again.`)) return;
+    if (!window.confirm(`Take “${product.name}” off the site? It comes back only by adding it again.`)) return;
     setWaiting(true);
     const result = await post("/api/admin/dispatch", { action: "remove-product", slug: product.slug });
     if (result.ok) track(`Removing “${product.name}”`, `“${product.name}” is out of the ledger.`, (state) => !state.products.some((p) => p.slug === product.slug));
@@ -642,8 +664,24 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
       </td>
       <td className="adm-td-num">
         <span className="adm-offer-cell">
-          <input className="adm-input adm-input-row adm-num-in" type="number" min={1} placeholder="—" value={sale} aria-label="Offer price" onChange={(e) => setSale(e.currentTarget.value)} />
-          {pct > 0 && <span className="adm-off">−{pct}%</span>}
+          <input
+            className={`adm-input adm-input-row adm-num-in ${offerWrong ? "is-wrong" : ""}`}
+            type="number"
+            min={1}
+            placeholder="—"
+            value={sale}
+            aria-label="Offer price"
+            aria-invalid={!!offerWrong}
+            aria-describedby={offerWrong ? offerNote : undefined}
+            onChange={(e) => setSale(e.currentTarget.value)}
+          />
+          {offerWrong ? (
+            <span className="adm-off adm-wrong" id={offerNote} role="alert">
+              {offerWrong.toLowerCase()}
+            </span>
+          ) : (
+            pct > 0 && <span className="adm-off">−{pct}%</span>
+          )}
           <Select
             label="Set the offer by percent"
             size="dim"
@@ -670,7 +708,7 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
           </span>
         ) : (
           <>
-            <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh} onClick={save}>
+            <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh || !!offerWrong} onClick={save}>
               Save
             </button>
             <button type="button" className="adm-quiet is-danger" onClick={remove}>
