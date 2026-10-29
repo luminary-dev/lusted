@@ -11,6 +11,8 @@ import { categories } from "@/lib/products";
 const CATEGORIES = new Set(categories.map((c) => c.key));
 const SLUG = /^[a-z0-9-]{1,64}$/;
 
+// An update carries only the fields the owner changed in the ledger row, so any of them may be missing — a missing one
+// stays as it is, and a null offer price or rank ends it; at least one has to come through.
 function sanitizeUpdate(raw: Record<string, unknown>) {
   const data: Record<string, unknown> = {};
   if (typeof raw.name === "string" && raw.name.trim()) data.name = raw.name.trim().slice(0, 60);

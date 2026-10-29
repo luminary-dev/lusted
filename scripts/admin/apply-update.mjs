@@ -19,6 +19,8 @@ const offer = (price, pct) => Math.max(10, Math.min(Math.round((price * (1 - pct
 if (action === "update-product") {
   const i = find(payload.slug);
   const product = catalog[i];
+  // only the fields the owner changed are sent; one that's absent is left as the catalogue has it now (another change
+  // may have moved it since the console last looked), and a null offer price or rank ends it
   const data = payload.data ?? {};
   const was = product.name;
   const parts = [];
@@ -39,14 +41,15 @@ if (action === "update-product") {
     delete product.salePrice;
   } else if (typeof data.salePrice === "number" && data.salePrice > 0) {
     const sale = Math.round(data.salePrice);
-    // the console and the dispatch route refuse this before it is queued (src/lib/admin/offers.ts); this stays as the
-    // last line of defence
-    if (sale >= product.price) throw new Error("update-product: the offer price must be below the full price");
     if (sale !== product.salePrice) {
       parts.push(`${product.salePrice ? "offer" : "on offer at"} ${lkr(sale)}`);
       product.salePrice = sale;
     }
   }
+  // checked on the piece as it ends up, since a new price may come without the offer it sits above (or the other way);
+  // the console and the dispatch route refuse this before it is queued (src/lib/admin/offers.ts), so this is the last
+  // line of defence
+  if (("price" in data || "salePrice" in data) && product.salePrice !== undefined && product.salePrice >= product.price) throw new Error("update-product: the offer price must be below the full price");
   if (data.bestSeller === null && product.bestSeller !== undefined) {
     parts.push("no longer a best seller");
     delete product.bestSeller;
