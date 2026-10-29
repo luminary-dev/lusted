@@ -8,8 +8,8 @@ import { ArrowRight, Box, ChatDouble, Lock, Tag } from "../icons";
 const promises = [
   { icon: Lock, text: "Plain, unbranded box" },
   { icon: Box, text: "Delivery across Sri Lanka" },
-  { icon: Tag, text: "7-day exchange" },
-  { icon: ChatDouble, text: "Sizing help from a real person" },
+  { icon: Tag, text: "7-day exchange, no sulking" },
+  { icon: ChatDouble, text: "A real person to size you up" },
 ];
 
 // onNavigate: the bag closes itself when the help link is followed

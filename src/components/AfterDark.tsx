@@ -14,16 +14,16 @@ const ROWS = [afterDarkSlides.slice(0, HALF), afterDarkSlides.slice(HALF)];
 // What the reel says under each row once it is opened (AfterDarkReel.tsx)
 const LINES: ReelLine[] = [
   {
-    eyebrow: "You’ve been staring. Good.",
-    title: "Imagine it on. Now imagine it coming off.",
-    lead: "Every piece in this reel was cut to be peeled off slowly, by someone who was told to wait and didn’t. Tonight you decide who kneels first.",
-    cta: "Undress the whole collection",
+    eyebrow: "Staring is encouraged",
+    title: "Picture it on you. Now picture it on the floor.",
+    lead: "Every frame here is a piece made for an audience of one — sheer where it counts, loose where it needs to be, and very quick to lose. You set the pace tonight. They’ll keep up.",
+    cta: "Raid the whole collection",
   },
   {
-    eyebrow: "Pick what you’ll be stripped out of",
-    title: "Nothing here stays on past midnight.",
-    lead: "Sheer, slit and held on by a single bow that’s begging to be pulled. Choose what you want to be unwrapped from, and let the rest of the night do what it likes with you.",
-    cta: "Watch every piece",
+    eyebrow: "Choose your undoing",
+    title: "None of this survives the night.",
+    lead: "Sheer panels, thigh-high slits and single bows that are one tug from giving up. Pick the one you want to be peeled out of, then let the night get as greedy as you like.",
+    cta: "Browse every bad idea",
   },
 ];
 
@@ -36,18 +36,18 @@ export default function AfterDark() {
             After dark
           </p>
           <h2 id="after-dark-title" className="h2" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            The night <em>has plans.</em>
+            Lights off, <em>hems up.</em>
           </h2>
           <p className="lede" data-reveal style={{ "--d": "0.2s" } as React.CSSProperties}>
-            Forty looks for after midnight — sheer, slit and tied with a single bow. Pick the one you&rsquo;ll be
-            remembered in.
+            Forty looks for the hours nobody posts — sheer, slit to there, one bow from falling. Pick the one
+            they&rsquo;ll replay at breakfast.
           </p>
           <div className="after-dark-actions" data-reveal style={{ "--d": "0.3s" } as React.CSSProperties}>
             <Link href="/products?cat=after-dark" className="btn btn-light">
-              Steal the night <ArrowRight className="arrow" />
+              Shop for trouble <ArrowRight className="arrow" />
             </Link>
             <Link href="/products" className="after-dark-all">
-              See everything
+              Or see it all
             </Link>
           </div>
         </div>

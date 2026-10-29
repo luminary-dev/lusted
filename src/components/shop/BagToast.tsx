@@ -47,7 +47,7 @@ export default function BagToast() {
             bag.setOpen(true);
           }}
         >
-          View bag
+          Peek in the bag
         </button>
       )}
       <button

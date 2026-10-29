@@ -19,5 +19,5 @@ let n = Math.max(
 for (const src of inputs) {
   const dest = path.join(OUT, `${band}-${String(++n).padStart(2, "0")}.webp`);
   const info = await sharp(src).webp({ quality: 88, effort: 6, smartSubsample: true }).toFile(dest);
-  console.log(`✓ ${path.basename(dest)}  ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0)} KB  ← ${path.basename(src)}`);
+  console.log(`done ${path.basename(dest)}  ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0)} KB  ← ${path.basename(src)}`);
 }

@@ -7,11 +7,11 @@ import { ArrowRight } from "./icons";
 type Status = "idle" | "loading" | "done" | "unavailable" | "error";
 
 const messages: Record<Status, string> = {
-  idle: "No spam. Just the pretty, filthy things — first.",
-  loading: "Joining…",
-  done: "You’re in. We’ll whisper to you before anyone else hears.",
-  unavailable: "Sign-ups open soon — message us on WhatsApp in the meantime.",
-  error: "Something went wrong — please try again.",
+  idle: "No spam. Just the filthy stuff, first.",
+  loading: "Letting you in…",
+  done: "You’re in. Watch your inbox — we’ll be the one you open first.",
+  unavailable: "Sign-ups open soon — tease us on WhatsApp until then.",
+  error: "That didn’t go through — please try again.",
 };
 
 export default function Newsletter() {
@@ -40,7 +40,7 @@ export default function Newsletter() {
   return (
     <form className="news-form" onSubmit={onSubmit}>
       <div className="news-row">
-        <input type="email" name="email" required autoComplete="email" placeholder="Your email address" aria-label="Email address" aria-describedby={consentId} />
+        <input type="email" name="email" required autoComplete="email" placeholder="Your secret email" aria-label="Email address" aria-describedby={consentId} />
         <button type="submit" className="btn btn-light" disabled={status === "loading"}>
           Subscribe <ArrowRight className="arrow" />
         </button>

@@ -67,7 +67,7 @@ export default function BagDrawer() {
       <div className="drawer-scrim" onClick={() => bag.setOpen(false)} />
       <aside className="drawer" role="dialog" aria-modal="true" aria-label="Your bag">
         <header className="drawer-head">
-          <h2 className="h3">Your bag {count > 0 && <span>({count})</span>}</h2>
+          <h2 className="h3">Your bag of tricks {count > 0 && <span>({count})</span>}</h2>
           <button ref={closeBtn} className="icon-btn" aria-label="Close bag" onClick={() => bag.setOpen(false)}>
             <Close />
           </button>
@@ -75,9 +75,9 @@ export default function BagDrawer() {
 
         {items.length === 0 ? (
           <div className="drawer-empty">
-            <p>Your bag is empty.</p>
+            <p>Your bag is empty. Nothing to take off yet.</p>
             <Link href="/products" className="btn btn-wine" onClick={() => bag.setOpen(false)}>
-              Browse the shop <ArrowRight className="arrow" />
+              Shop, shamelessly <ArrowRight className="arrow" />
             </Link>
             {(() => {
               // what they were looking at a moment ago comes first — the last three, with their prices, since the price
@@ -89,7 +89,7 @@ export default function BagDrawer() {
               return (
                 <div className={`drawer-suggest ${recent.length ? "is-recent" : ""}`}>
                   <p className="drawer-suggest-head">
-                    {recent.length ? "Still aching for these?" : saved.length ? "You saved these" : "What's being bought"}
+                    {recent.length ? "Still aching for these?" : saved.length ? "Still wanting these?" : "What everyone’s getting into"}
                   </p>
                   <ul>
                     {suggestions.map((p) => (
@@ -175,7 +175,7 @@ export default function BagDrawer() {
               <div className="bag-gift">
                 <label className="check">
                   <input type="checkbox" checked={gift} onChange={(e) => setGift(e.currentTarget.checked)} />
-                  <span>This is a gift</span>
+                  <span>This is a gift — lucky them</span>
                 </label>
                 {gift && (
                   <label className="bag-gift-note">
@@ -184,7 +184,7 @@ export default function BagDrawer() {
                   </label>
                 )}
               </div>
-              <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp.</p>
+              <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp — discreetly, promise.</p>
               <a className="btn btn-wine" data-wa-source="bag" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
                 <WhatsApp /> Send order on WhatsApp
               </a>
@@ -204,7 +204,7 @@ export default function BagDrawer() {
                 }}
                 onBlur={() => setConfirmClear(false)}
               >
-                {confirmClear ? "Tap again to empty the bag" : "Clear bag"}
+                {confirmClear ? "Really? Tap again to empty the bag" : "Clear bag"}
               </button>
             </footer>
           </>

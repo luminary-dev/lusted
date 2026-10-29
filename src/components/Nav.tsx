@@ -67,7 +67,7 @@ export default function Nav() {
               <WhatsApp /> Message us on WhatsApp
             </a>
             <div className="nav-menu-theme">
-              <span>Dark mode</span>
+              <span>Lights off</span>
               <ThemeToggle />
             </div>
           </nav>

@@ -123,7 +123,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
           {oneSize ? "One size" : "Size"}{" "}
           {nudge && !size && (
             <span className="buy-warn" role="alert">
-              Please choose a size
+              Pick a size first, gorgeous
             </span>
           )}
           <button type="button" className="buy-guide" onClick={() => setGuideOpen(true)}>

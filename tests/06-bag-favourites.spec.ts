@@ -210,7 +210,7 @@ test.describe("recently viewed", () => {
     await expect(main(page).locator(".recent")).toHaveCount(0);
     expect(await page.evaluate(() => localStorage.getItem("lusted-recently-viewed"))).toBe("[]");
     await openBag(page).click();
-    await expect(bag.locator(".drawer-suggest-head")).toHaveText("What's being bought"); // back to the usual empty bag
+    await expect(bag.locator(".drawer-suggest-head")).toHaveText("What everyone’s getting into"); // back to the usual empty bag
     expect(errors).toEqual([]);
   });
 
