@@ -120,7 +120,10 @@ change on a branch off `dev` (`scripts/admin/add-product.mjs` finishes the photo
 the manifest, the catalogue and `product-images.ts`; `scripts/admin/apply-update.mjs` makes the smaller changes, and
 a removal deletes the photos too), commits it as `admin: <what changed>`, opens a pull request into `dev` and merges
 it once the checks are green — ten minutes or so, after which CI deploys the dev site. A console change takes the same
-road as every other change. The console reads the catalogue off the `dev` branch, watches its pull requests and
+road as every other change. A change the workflow would refuse opens no pull request, so the console would wait on it
+for ever: an offer price at or above the full price, of nothing or of part of a rupee, or a percentage off outside
+whole numbers 1–90, is said beside the field and can't be saved, and the dispatch route refuses it with a 400 before
+anything is queued (both read `src/lib/admin/offers.ts`; the workflow keeps its own check as the last line of defence). The console reads the catalogue off the `dev` branch, watches its pull requests and
 says "done" the moment a change lands; `console-refresh.yml` keeps a queued console pull request up to date when
 another merges first. Live changes still go out by the usual release (`dev → main`). The tests read the catalogue
 facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece added or changed from the console
