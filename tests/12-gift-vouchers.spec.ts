@@ -18,13 +18,13 @@ test.describe("gift vouchers", () => {
   test("the page renders: the card, every amount, the explainer and the terms", async ({ prepared: page, errors }) => {
     await go(page, "/gift-vouchers");
     await expect(page).toHaveTitle("Gift vouchers — Lusted Sri Lanka");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Give them something");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Give them something wicked.");
     await expect(card(page)).toBeVisible();
     await expect(card(page).getByRole("img", { name: "Lusted Lingerie" })).toBeVisible();
     const amounts = main(page).getByRole("group", { name: "Amount" });
     for (const a of giftVoucher.amounts) await expect(amounts.getByRole("radio", { name: lkr(a) })).toBeAttached();
     await expect(amounts.getByRole("radio", { name: "Another amount" })).toBeAttached();
-    await expect(main(page).getByRole("heading", { name: "How it works" })).toBeVisible();
+    await expect(main(page).getByRole("heading", { name: "How it happens" })).toBeVisible();
     await expect(main(page).locator(".gift-terms")).toContainText(`${giftVoucher.validMonths} months`);
     await expect(main(page).locator(".gift-terms").getByRole("link", { name: /terms/ })).toHaveAttribute("href", "/terms");
     await expect(send(page)).toHaveAttribute("data-wa-source", "gift-voucher");
@@ -117,7 +117,7 @@ test.describe("gift vouchers", () => {
     await expect(link).toBeVisible();
     await link.click();
     await expect(page).toHaveURL(/\/gift-vouchers$/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Give them something");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Give them something wicked.");
   });
 
   for (const [w, h] of [[375, 812], [1440, 900]] as const) {

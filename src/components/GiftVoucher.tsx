@@ -78,13 +78,13 @@ export default function GiftVoucher() {
           </div>
           <p className="gv-card-to">{name ? `For ${name}` : "For you"}</p>
           <p className="gv-card-amount">{amount ? formatPrice(amount) : "LKR —"}</p>
-          <p className={`gv-card-note ${words ? "" : "is-empty"}`}>{words || "Your message appears here."}</p>
+          <p className={`gv-card-note ${words ? "" : "is-empty"}`}>{words || "Your wicked words go here."}</p>
           <p className="gv-card-foot">
             <span>Valid {validMonths} months</span>
             <span className="gv-card-ref">{ref}</span>
           </p>
         </div>
-        <figcaption>A preview — we send the voucher itself on WhatsApp.</figcaption>
+        <figcaption>A sneak peek — we send the real thing on WhatsApp.</figcaption>
       </figure>
 
       <div className="gv-form">

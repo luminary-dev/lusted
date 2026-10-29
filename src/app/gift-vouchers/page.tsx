@@ -27,18 +27,18 @@ export const metadata: Metadata = {
 const steps = [
   {
     icon: Sparkle,
-    title: "Choose it",
-    text: "Pick an amount, add their name and a few words if you like, and send the request. It reaches us as one WhatsApp message, with its reference on top.",
+    title: "Pick your temptation",
+    text: "Pick an amount, add their name and a few wicked words if you like, and send the request. It reaches us as one WhatsApp message, with its reference on top.",
   },
   {
     icon: ChatDouble,
-    title: "We confirm it",
-    text: "A real person replies to confirm the voucher and share secure ways to pay — the same as any order.",
+    title: "We say yes",
+    text: "A real person replies, discreetly, to confirm the voucher and share secure ways to pay — the same as any order.",
   },
   {
     icon: Heart,
-    title: "It’s theirs",
-    text: `Once it’s paid, we send the voucher on WhatsApp: a card with its own code, to forward, print or keep for the right moment. It’s good for ${giftVoucher.validMonths} months on anything here.`,
+    title: "They get to be bad",
+    text: `Once it’s paid, we send the voucher on WhatsApp: a card with its own code, to forward, print or keep for the right moment. It’s good for ${giftVoucher.validMonths} months on anything here — they choose, you enjoy the view.`,
   },
 ];
 
@@ -54,11 +54,11 @@ export default function GiftVouchersPage() {
           </nav>
           <p className="eyebrow">Gift vouchers</p>
           <h1 className="h2">
-            Give them something <em>to unwrap.</em>
+            Give them <em>something wicked.</em>
           </h1>
           <p className="lede">
-            Can’t guess the size? Don’t. Give a voucher and let them choose what they’ll be found in — requested on WhatsApp, sent the same way, and
-            as discreet as everything else we do.
+            Can’t guess the size? Don’t. Give a voucher and let them choose exactly what they want to be peeled out of — requested on WhatsApp,
+            sent the same way, and as discreet as everything else we do.
           </p>
         </header>
 
@@ -66,7 +66,7 @@ export default function GiftVouchersPage() {
 
         <section className="gift-how" aria-labelledby="gift-how-title">
           <h2 id="gift-how-title" className="h2">
-            How it <em>works</em>
+            How it <em>happens</em>
           </h2>
           <ol className="gift-steps">
             {steps.map(({ icon: Icon, title, text }) => (
