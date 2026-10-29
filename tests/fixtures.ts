@@ -152,7 +152,11 @@ export const CATALOG = {
   bagSale: { slug: bagSale?.slug ?? "", color: bagSale?.colors.includes("wine") ? "wine" : (bagSale?.colors[0] ?? "wine") },
   // every ranked piece, in rank order; the home page, the search dialog and the shop's "best" sort show the first six
   bestSellers: photographed.filter((p) => p.bestSeller).sort((a, b) => a.bestSeller! - b.bestSeller!).map((p) => p.slug),
+  // the six pieces wearing the "New" badge, newest first (a day's pieces in catalogue order) — the shop's "New in" filter
+  // and the home page's "Just arrived" row show these, in this order
   newest: [...photographed].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug),
+  /** the day a piece was added (YYYY-MM-DD) */
+  addedOf: (slug: string) => bySlug[slug].added,
   // multi-colour pieces whose every colour is photographed
   multiColour: Object.fromEntries(
     photographed.filter((p) => p.colors.length > 1 && p.colors.slice(1).every((c) => photoKey(photoKeys, p.slug, c, "front"))).map((p) => [p.slug, p.colors]),
