@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
 import DeckSizer from "@/components/DeckSizer";
+import JsonLd from "@/components/JsonLd";
 import { ArrowRight } from "@/components/icons";
 import { img } from "@/lib/cdn";
 import { emailLink, instagramLink, site, whatsappLink } from "@/lib/site";
@@ -373,6 +374,30 @@ const chapters: Chapter[] = [
   },
 ];
 
+// The words of an answer without its markup (links keep their text) — the FAQ structured data carries plain text.
+function plainText(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(plainText).join("");
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    const text = plainText(node.props.children);
+    return node.type === "p" ? ` ${text} ` : text; // paragraphs are separate sentences
+  }
+  return "";
+}
+
+// Every question on the page and its answer, for search engines — built from the chapters, so the two never differ.
+const faq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: chapters.flatMap((c) =>
+    c.items.map(({ q, a }) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: plainText(a).replace(/\s+/g, " ").trim() },
+    })),
+  ),
+};
+
 // the questions and their answers, all open: the words fill the card
 function Qas({ items }: { items: Qa[] }) {
   return (
@@ -421,6 +446,7 @@ function ChapterCard({ c, i }: { c: Chapter; i: number }) {
 export default function HelpPage() {
   return (
     <main className="help">
+      <JsonLd data={faq} />
       <DeckSizer />
       <div className="container help-deck" style={{ "--n": chapters.length + 2 } as React.CSSProperties}>
         {/* the opener card: the wide photo, the words on its dark left */}

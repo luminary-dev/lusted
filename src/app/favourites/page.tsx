@@ -4,6 +4,9 @@ import FavouritesList from "@/components/shop/FavouritesList";
 export const metadata: Metadata = {
   title: "Favourites — Lusted",
   description: "The Lusted pieces you can’t stop thinking about.",
+  // each visitor's own list, kept in their browser — nothing for a search engine to index, so no canonical either
+  // (robots.txt keeps crawlers out; this covers a link to it found elsewhere)
+  robots: { index: false },
 };
 
 export default function FavouritesPage() {
