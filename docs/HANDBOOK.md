@@ -35,6 +35,7 @@ npm run lint
 
 - **Image `sizes` are measured, not guessed.** Each photo's `sizes` says how wide it is actually drawn — for `object-fit: cover` photos in tall boxes that is wider than the box (the hero is ~1.9× the screen height below 16:9, the size-guide photo ~900px on desktop). Too small and it looks soft on retina; too big and it wastes data. After a layout change, re-measure before editing.
 - **The 3D size tags build late.** `SizeTags3D.tsx` loads three.js and builds the scene only when the size guide is about a screen and a half away, in small steps, with shaders compiled in the background — on a phone that work used to block the page for seconds at load.
+- **The loading screen only greets a visit that begins on the home page**, once per tab. A visit that lands anywhere else — a product link opened from Instagram or WhatsApp, whose in-app browsers start a fresh session every time — goes straight to the page, and doesn't meet the curtain on the home page later either. The inline script in `src/app/layout.tsx` decides before first paint, so it never flashes.
 - **Nothing hidden competes with the first screen:** hero slides after the first load at low priority, search thumbnails only after search is first opened, and the filmstrip's looped copies carry no blur placeholder.
 
 ## Environment
