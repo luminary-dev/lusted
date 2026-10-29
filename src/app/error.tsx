@@ -15,15 +15,15 @@ export default function Error({ error, retry }: { error: unknown; retry: () => v
   return (
     <StatusPage
       code="Oh…"
-      eyebrow="Well, that was awkward"
+      eyebrow="Well, that killed the mood"
       title={
         <>
-          Something came undone, <em>just for a moment.</em>
+          We came undone <em>a bit too soon.</em>
         </>
       }
       lede={
         <>
-          <p>This page lost its nerve halfway through.</p>
+          <p>This page lost its nerve halfway through. It happens — it’s not you.</p>
           <p>Try again — and if it keeps misbehaving, message us and we’ll take your order by hand. We’re good with our hands.</p>
         </>
       }

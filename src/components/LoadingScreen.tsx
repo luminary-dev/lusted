@@ -74,7 +74,7 @@ export default function LoadingScreen() {
         </div>
         <span className="intro-line" />
         <p className="intro-tag">
-          undressing the site for you
+          slipping out of something comfortable
           <span className="intro-dots">
             <i>.</i>
             <i>.</i>

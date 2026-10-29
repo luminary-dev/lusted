@@ -173,7 +173,7 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
             <div>
               <p className="eyebrow">Complete the set</p>
               <h2 className="h2">
-                Made to be worn with the <em>{product.name}</em>
+                Lose it with the <em>{product.name}</em>
               </h2>
             </div>
           </header>
@@ -191,7 +191,7 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
             <div>
               <p className="eyebrow">More from {collectionName(product.category)}</p>
               <h2 className="h2">
-                If the <em>{product.name}</em> got under your skin…
+                If the <em>{product.name}</em> gave you ideas…
               </h2>
             </div>
           </header>

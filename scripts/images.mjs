@@ -75,7 +75,7 @@ async function upload() {
       if (!res.ok) throw new Error(`${rel}: HTTP ${res.status}`);
       state[rel] = hash;
       await writeFile(STATE, JSON.stringify(state, null, 2) + "\n");
-      console.log(`  ✓ ${rel} (${++n})`);
+      console.log(`  done ${rel} (${++n})`);
     }
   };
   await Promise.all(Array.from({ length: 6 }, worker));
