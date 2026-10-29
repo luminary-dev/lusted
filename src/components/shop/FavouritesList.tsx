@@ -31,7 +31,7 @@ export default function FavouritesList() {
         <p>
           {saved.length} saved {saved.length === 1 ? "piece" : "pieces"}
         </p>
-        <a className="btn btn-ghost" href={whatsappLink(ask)} target="_blank" rel="noopener noreferrer">
+        <a className="btn btn-ghost" data-wa-source="favourites" href={whatsappLink(ask)} target="_blank" rel="noopener noreferrer">
           <WhatsApp /> Ask about these on WhatsApp
         </a>
       </div>

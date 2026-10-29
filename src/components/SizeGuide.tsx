@@ -224,6 +224,7 @@ export default function SizeGuide() {
             All measurements in cm. Torn between two? Go up one —{" "}
             <a
               href={whatsappLink("Hi Lusted! Could you help me with sizing?")}
+              data-wa-source="size-guide"
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -167,7 +167,7 @@ export default function AboutPage() {
             <Link href="/products" className="btn btn-wine">
               Show me everything <ArrowRight className="arrow" />
             </Link>
-            <a href={whatsappLink("Hi Lusted! I'd love some styling advice.")} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+            <a href={whatsappLink("Hi Lusted! I'd love some styling advice.")} target="_blank" rel="noopener noreferrer" className="btn btn-ghost" data-wa-source="about-page">
               Whisper to us
             </a>
           </div>

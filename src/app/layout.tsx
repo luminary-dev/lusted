@@ -7,6 +7,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
 import SearchDialog from "@/components/SearchDialog";
+import SiteAnalytics from "@/components/SiteAnalytics";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -107,6 +108,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <BagDrawer />
         <SearchDialog />
+        <SiteAnalytics />
       </body>
     </html>
   );
