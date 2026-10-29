@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { bag, useBag, useBagOpen } from "@/lib/bag";
 import { colors, formatPrice, getProduct, priceOf } from "@/lib/products";
+import { fillIn, newOrderRef, productUrl, useOrderRef, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Close, WhatsApp } from "../icons";
 import TrustStrip from "./TrustStrip";
@@ -14,6 +15,13 @@ export default function BagDrawer() {
   const { items, count, subtotal } = useBag();
 
   const closeBtn = useRef<HTMLButtonElement>(null);
+  const origin = useOrigin();
+  // one reference for the visit, so an order sent again after a change still matches the first message; clearing the
+  // bag starts a new one
+  const ref = useOrderRef();
+  // the gift option only shapes this message — it isn't saved with the bag
+  const [gift, setGift] = useState(false);
+  const [note, setNote] = useState("");
 
   useEffect(() => {
     if (!open) return;
@@ -32,14 +40,20 @@ export default function BagDrawer() {
   }, [open]);
 
   const order = [
+    `Order ${ref}`,
     "Hi Lusted! I'd like to order:",
     "",
-    ...items.map((i) => {
+    ...items.flatMap((i) => {
       const p = getProduct(i.slug)!;
-      return `• ${p.name} — ${colors[i.color].label}, size ${i.size} × ${i.qty} (${formatPrice(priceOf(p) * i.qty)})`;
+      return [
+        `• ${p.name} — ${colors[i.color].label}, size ${i.size} × ${i.qty} (${formatPrice(priceOf(p) * i.qty)})`,
+        productUrl(origin, p.slug),
+      ];
     }),
     "",
     `Subtotal: ${formatPrice(subtotal)}`,
+    ...(gift ? [note.trim() ? `It's a gift — note: ${note.trim()}` : "It's a gift."] : []),
+    ...fillIn,
   ].join("\n");
 
   return (
@@ -102,12 +116,32 @@ export default function BagDrawer() {
                 <span>Subtotal</span>
                 <strong>{formatPrice(subtotal)}</strong>
               </div>
+              <div className="bag-gift">
+                <label className="check">
+                  <input type="checkbox" checked={gift} onChange={(e) => setGift(e.currentTarget.checked)} />
+                  <span>This is a gift</span>
+                </label>
+                {gift && (
+                  <label className="bag-gift-note">
+                    <span>Gift note (optional)</span>
+                    <input type="text" maxLength={120} value={note} onChange={(e) => setNote(e.currentTarget.value)} />
+                  </label>
+                )}
+              </div>
               <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp.</p>
               <a className="btn btn-wine" data-wa-source="bag" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
                 <WhatsApp /> Send order on WhatsApp
               </a>
               <TrustStrip onNavigate={() => bag.setOpen(false)} />
-              <button className="drawer-clear" onClick={() => bag.clear()}>
+              <button
+                className="drawer-clear"
+                onClick={() => {
+                  bag.clear();
+                  newOrderRef();
+                  setGift(false);
+                  setNote("");
+                }}
+              >
                 Clear bag
               </button>
             </footer>

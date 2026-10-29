@@ -12,6 +12,7 @@ import {
   priceOf,
   type ColorKey,
 } from "@/lib/products";
+import { fillIn, productUrl, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import FavouriteButton from "./FavouriteButton";
 import TrustStrip from "./TrustStrip";
@@ -34,7 +35,12 @@ export default function ProductBuy({ slug }: { slug: string }) {
     return false;
   }
 
-  const orderText = `Hi Lusted! I'd like to order the ${product.name} — ${colors[color].label}, size ${size}, qty ${qty} (${formatPrice(priceOf(product) * qty)}).`;
+  const origin = useOrigin();
+  const orderText = [
+    `Hi Lusted! I'd like to order the ${product.name} — ${colors[color].label}, size ${size}, qty ${qty} (${formatPrice(priceOf(product) * qty)}).`,
+    productUrl(origin, slug),
+    ...fillIn,
+  ].join("\n");
 
   return (
     <div className="buy">

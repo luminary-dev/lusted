@@ -79,6 +79,8 @@ test.describe("product page", () => {
     expect(text).toContain(name);
     expect(text).toContain("Blush, size M, qty 1");
     expect(text).toContain(fmt(price));
+    // the piece's link and blank lines for the shopper to fill in follow
+    expect(text).toContain(`).\n${new URL(page.url()).origin}/products/${slug}\n\nName:\nCity / town:`);
   });
 
   test("a trust strip under the WhatsApp button promises only what the terms do and leads to delivery, returns & FAQ", async ({ prepared: page }) => {

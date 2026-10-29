@@ -8,7 +8,7 @@ Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or a
 
 ## What it is
 
-A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop.
+A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece.
 
 ## Run it
 
