@@ -241,7 +241,7 @@ export default function ProductBrowser() {
             </div>
 
             <fieldset>
-              <legend>Shop by</legend>
+              <legend>Tempt me with</legend>
               {flags.map((f) => (
                 <label key={f.key} className="check">
                   <input type="checkbox" checked={selFlags.includes(f.key)} onChange={() => update({ [f.key]: selFlags.includes(f.key) ? null : "1" })} />
@@ -352,12 +352,12 @@ export default function ProductBrowser() {
                   ? `Nothing matched “${urlQuery}”.`
                   : urlQuery
                     ? `Nothing matched “${urlQuery}” with these filters.`
-                    : "No pieces match those filters."}
+                    : "Too picky, even for us — nothing matches those filters."}
               </h3>
               <p>
                 {urlQuery && !filterCount
-                  ? "Try a shorter word, or message us — we may have it in the back."
-                  : "Drop one of these and see, or message us — we may have it in the back."}
+                  ? "Try a shorter word, or message us — what you want might be hiding in the back."
+                  : "Loosen up and drop one of these, or message us — we may have it in the back."}
               </p>
               {/* dropping one filter is usually what's wanted, not losing the lot */}
               {chips.length > 1 && (
@@ -376,7 +376,7 @@ export default function ProductBrowser() {
               </button>
               {/* never a dead end: four pieces to carry on with */}
               <div className="empty-suggest">
-                <p className="empty-suggest-head">Best sellers</p>
+                <p className="empty-suggest-head">Meanwhile, these never disappoint</p>
                 <div className="empty-suggest-grid">
                   {bestSellers.slice(0, 4).map((p) => (
                     <ProductCard key={p.slug} product={p} sizes="(min-width: 901px) 20vw, 44vw" />

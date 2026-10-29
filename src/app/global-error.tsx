@@ -35,8 +35,8 @@ export default function GlobalError({ error, retry }: { error: unknown; retry: (
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <main>
           <p className="brand">Lusted</p>
-          <h1>Something came undone, just for a moment.</h1>
-          <p>The site didn’t load as it should. Try again — and if it keeps happening, message us and we’ll take your order by hand.</p>
+          <h1>We came undone a bit too soon.</h1>
+          <p>The site didn’t load as it should — it happens, and it’s not you. Try again, and if it keeps happening, message us on WhatsApp and we’ll take your order by hand.</p>
           <div className="actions">
             <button type="button" onClick={() => retry()}>
               Try again

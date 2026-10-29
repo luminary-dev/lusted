@@ -51,7 +51,7 @@ export default function RevealCountdown({ at }: { at: string }) {
     return () => clearTimeout(t);
   }, [done, at]);
 
-  if (done) return <p className="reveal-live">It’s time. Refresh, and come and get it.</p>;
+  if (done) return <p className="reveal-live">The wait’s over. Refresh, and come and get it.</p>;
 
   return (
     <ol className="reveal-count" aria-label="Time until the reveal">

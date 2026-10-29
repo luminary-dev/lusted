@@ -11,12 +11,12 @@ test.describe("sale band wording", () => {
     expect(band()).toBeNull();
   });
 
-  test("an all-swim sale keeps the bikini band word for word", () => {
+  test("an all-swim sale is the bikini band, word for word", () => {
     expect(band(["swim", 20], ["swim", 20])).toEqual({
       eyebrow: "The Bikini Sale",
-      lead: "Barely there.",
+      lead: "Strip down for less.",
       offer: "Now 20% off.",
-      body: "Less fabric, less to pay, nothing left to hide behind. Consider it permission to show them everything — while your size lasts.",
+      body: "Less fabric, less to pay and nothing left to hide behind. Show them everything and spend less doing it — while your size lasts.",
       cta: "Shop the bikini sale",
       href: "/products?sale=1&cat=swim",
     });
