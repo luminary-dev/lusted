@@ -130,6 +130,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
       </div>
       <a
         className="btn btn-ghost buy-whatsapp"
+        data-wa-source="product"
         // always a real link (crawlable, reachable by keyboard); without a size the click asks for one first
         href={whatsappLink(size ? orderText : `Hi Lusted! I'd like to order the ${product.name}.`)}
         target="_blank"

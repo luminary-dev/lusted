@@ -251,14 +251,33 @@ test.describe("bag drawer chrome", () => {
   });
 });
 
-test("the loading screen plays once per tab and is skipped afterwards", async ({ page }) => {
+test("the loading screen plays when a visit begins on the home page, once per tab, and is skipped afterwards", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const intro = page.locator(".intro");
   await expect(intro).toBeAttached();
+  await expect(page.locator("html")).not.toHaveClass(/intro-seen/);
   await expect(intro).toHaveClass(/is-gone/, { timeout: 12_000 });
   expect(await page.evaluate(() => sessionStorage.getItem("lusted-intro"))).toBe("1");
   await page.goto("/about");
+  await expect(page.locator("html")).toHaveClass(/intro-seen/);
+  await expect(intro).toBeHidden();
+});
+
+// A product link opened from Instagram or WhatsApp starts a fresh session in the in-app browser every time; the shopper
+// goes straight to the piece, and the curtain doesn't come down when they wander to the home page afterwards either.
+test("a visit that begins on any other page never shows the loading screen", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`/products/${CATALOG.hero.slug}`, { waitUntil: "domcontentloaded" });
+  const intro = page.locator(".intro");
+  await expect(page.locator("html")).toHaveClass(/intro-seen/);
+  await expect(intro).toBeHidden();
+  expect(await page.evaluate(() => sessionStorage.getItem("lusted-intro"))).toBe("1");
+  await go(page, `/products/${CATALOG.hero.slug}`);
+  await page.getByRole("link", { name: "Lusted — home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(intro).toBeHidden();
+  await page.reload();
   await expect(page.locator("html")).toHaveClass(/intro-seen/);
   await expect(intro).toBeHidden();
 });

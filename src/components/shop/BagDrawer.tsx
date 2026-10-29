@@ -103,7 +103,7 @@ export default function BagDrawer() {
                 <strong>{formatPrice(subtotal)}</strong>
               </div>
               <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp.</p>
-              <a className="btn btn-wine" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
+              <a className="btn btn-wine" data-wa-source="bag" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
                 <WhatsApp /> Send order on WhatsApp
               </a>
               <TrustStrip onNavigate={() => bag.setOpen(false)} />

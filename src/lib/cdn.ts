@@ -9,9 +9,11 @@ export type ImagePath = keyof typeof manifest.images;
 
 const base = (process.env.NEXT_PUBLIC_IMAGE_CDN || "/img").replace(/\/$/, "");
 // Bumped whenever the photos themselves change under the same paths (they're served immutable for a year, and the
-// image optimiser and browsers keep them that long): the version is a path segment the /img route ignores, so every
-// address changes and every cache refetches. 2: the wordmark on every photo.
-const IMAGE_VERSION = 2;
+// image optimiser and browsers keep them that long): the version is a path segment, so every address changes and every
+// cache refetches. The /img route and next/image's allowed sources (next.config.ts) accept only this version, so an
+// invented one can't make each request a fresh, uncached fetch and a billed transformation.
+// 2: the wordmark on every photo.
+export const IMAGE_VERSION = 2;
 
 export function img(path: ImagePath): StaticImageData {
   const m = manifest.images[path];
