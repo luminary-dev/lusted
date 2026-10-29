@@ -1,9 +1,9 @@
 // Applies one small console change to the catalogue: runs in the Console workflow (.github/workflows/console.yml) with
 //   ADMIN_ACTION   update-product | remove-product | bulk-offer
 //   ADMIN_PAYLOAD  the dispatch's client_payload as JSON (shaped and checked by src/app/api/admin/dispatch/route.ts)
-// A removal also deletes the piece's photos from the bucket and the manifest. The workflow commits what changed, with
-// the summary written here as the message.
-import { CATALOG, COLLECTIONS, MANIFEST, SLUG, bucket, lkr, normalise, payload, quote, readJson, summarise, writeJson } from "./lib.mjs";
+// A removal also takes the piece's photos out of the manifest, but leaves them in the bucket. The workflow commits what
+// changed, with the summary written here as the message.
+import { CATALOG, COLLECTIONS, MANIFEST, SLUG, lkr, normalise, payload, quote, readJson, summarise, writeJson } from "./lib.mjs";
 
 const action = process.env.ADMIN_ACTION;
 const catalog = await readJson(CATALOG);
@@ -64,18 +64,20 @@ if (action === "update-product") {
   const i = find(payload.slug);
   const [product] = catalog.splice(i, 1);
   await writeJson(CATALOG, catalog);
-  // its photos: the front, the back and side views and any colourways (products/<slug>--<colour>…)
+  // its photos: the front, the back and side views and any colourways (products/<slug>--<colour>…). They come out of
+  // the manifest but stay in the bucket. The live site reads the same bucket and keeps listing the piece until the next
+  // release from dev to main, so deleting them here would leave it showing broken images until then — and, if this
+  // change's pull request failed, would leave dev with the piece and no photos. Once nothing lists them they are never
+  // fetched, and unlisted photos can be cleared from the bucket by hand later.
   const manifest = await readJson(MANIFEST);
   const mine = Object.keys(manifest.images).filter((key) => key.startsWith(`products/${product.slug}.`) || key.startsWith(`products/${product.slug}-`));
-  const store = bucket();
   for (const key of mine) {
-    await store.del(key);
     delete manifest.images[key];
     console.log(`  – ${key}`);
   }
   await writeJson(MANIFEST, manifest);
   await import("../sync-product-images.mjs");
-  await summarise(`removed ${quote(product.name)} (${mine.length} photo${mine.length === 1 ? "" : "s"})`);
+  await summarise(`removed ${quote(product.name)} (${mine.length} photo${mine.length === 1 ? "" : "s"} kept in the bucket)`);
 } else if (action === "bulk-offer") {
   const { category, percentOff } = payload;
   if (category !== "*" && !(category in COLLECTIONS)) throw new Error("bulk-offer: unknown collection");
