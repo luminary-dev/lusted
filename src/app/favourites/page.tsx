@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import FavouritesList from "@/components/shop/FavouritesList";
+import { PageFade } from "@/components/shop/PhotoMorph";
 
 export const metadata: Metadata = {
   title: "Favourites — Lusted",
@@ -11,17 +12,19 @@ export const metadata: Metadata = {
 
 export default function FavouritesPage() {
   return (
-    <main className="shop">
-      <div className="container">
-        <header className="shop-head">
-          <p className="eyebrow">Can’t stop thinking about</p>
-          <h1 className="h2">
-            The ones you <em>keep coming back to.</em>
-          </h1>
-          <p className="lede">Saved on this device — tap the heart on any piece to keep it close, or let it go.</p>
-        </header>
-        <FavouritesList />
-      </div>
-    </main>
+    <PageFade>
+      <main className="shop">
+        <div className="container">
+          <header className="shop-head">
+            <p className="eyebrow">Can’t stop thinking about</p>
+            <h1 className="h2">
+              The ones you <em>keep coming back to.</em>
+            </h1>
+            <p className="lede">Saved on this device — tap the heart on any piece to keep it close, or let it go.</p>
+          </header>
+          <FavouritesList />
+        </div>
+      </main>
+    </PageFade>
   );
 }

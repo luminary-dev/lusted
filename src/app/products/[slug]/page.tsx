@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ProductBuy from "@/components/shop/ProductBuy";
 import PdpGallery from "@/components/shop/PdpGallery";
+import { PageFade } from "@/components/shop/PhotoMorph";
 import ProductCard, { Price } from "@/components/shop/ProductCard";
 import JsonLd from "@/components/JsonLd";
 import { collectionName, getProduct, priceOf, products, type Product } from "@/lib/products";
@@ -39,30 +40,32 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
   const product = getProduct((await params).slug);
   if (!product) notFound();
   return (
-    <main className="pdp">
-      <JsonLd data={productJsonLd(product)} />
-      <JsonLd data={breadcrumbJsonLd(product)} />
-      <div className="container">
-        {/* the shape of the page, not an empty block: the photo, the name, the price and the buttons all hold
-            their room, so nothing jumps when the detail arrives */}
-        <Suspense
-          fallback={
-            <div className="pdp-skeleton" aria-hidden="true">
-              <div className="pdp-skeleton-media" />
-              <div className="pdp-skeleton-info">
-                <span className="pdp-skeleton-line is-title" />
-                <span className="pdp-skeleton-line is-price" />
-                <span className="pdp-skeleton-line" />
-                <span className="pdp-skeleton-line is-short" />
-                <span className="pdp-skeleton-line is-cta" />
+    <PageFade>
+      <main className="pdp">
+        <JsonLd data={productJsonLd(product)} />
+        <JsonLd data={breadcrumbJsonLd(product)} />
+        <div className="container">
+          {/* the shape of the page, not an empty block: the photo, the name, the price and the buttons all hold
+              their room, so nothing jumps when the detail arrives */}
+          <Suspense
+            fallback={
+              <div className="pdp-skeleton" aria-hidden="true">
+                <div className="pdp-skeleton-media" />
+                <div className="pdp-skeleton-info">
+                  <span className="pdp-skeleton-line is-title" />
+                  <span className="pdp-skeleton-line is-price" />
+                  <span className="pdp-skeleton-line" />
+                  <span className="pdp-skeleton-line is-short" />
+                  <span className="pdp-skeleton-line is-cta" />
+                </div>
               </div>
-            </div>
-          }
-        >
-          <ProductDetails product={product} />
-        </Suspense>
-      </div>
-    </main>
+            }
+          >
+            <ProductDetails product={product} />
+          </Suspense>
+        </div>
+      </main>
+    </PageFade>
   );
 }
 

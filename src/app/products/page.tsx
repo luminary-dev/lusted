@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProductBrowser from "@/components/shop/ProductBrowser";
 import { products } from "@/lib/products";
+import { PageFade } from "@/components/shop/PhotoMorph";
 
 export const metadata: Metadata = {
   title: "Shop all — Lusted Sri Lanka",
@@ -11,20 +12,22 @@ export const metadata: Metadata = {
 
 export default function ProductsPage() {
   return (
-    <main className="shop">
-      <div className="container">
-        <header className="shop-head">
-          <p className="eyebrow">Everything, off the hanger</p>
-          <h1 className="h2">
-            Every piece, <em>waiting to come off.</em>
-          </h1>
-          <p className="lede">{products.length} pieces across lingerie, swim and after dark — filter by size, colour and price, then pick what you want to be found in.</p>
-        </header>
-        {/* useSearchParams needs a Suspense boundary; the fallback is the unfiltered grid skeleton. */}
-        <Suspense fallback={<div className="shop-loading" />}>
-          <ProductBrowser />
-        </Suspense>
-      </div>
-    </main>
+    <PageFade>
+      <main className="shop">
+        <div className="container">
+          <header className="shop-head">
+            <p className="eyebrow">Everything, off the hanger</p>
+            <h1 className="h2">
+              Every piece, <em>waiting to come off.</em>
+            </h1>
+            <p className="lede">{products.length} pieces across lingerie, swim and after dark — filter by size, colour and price, then pick what you want to be found in.</p>
+          </header>
+          {/* useSearchParams needs a Suspense boundary; the fallback is the unfiltered grid skeleton. */}
+          <Suspense fallback={<div className="shop-loading" />}>
+            <ProductBrowser />
+          </Suspense>
+        </div>
+      </main>
+    </PageFade>
   );
 }

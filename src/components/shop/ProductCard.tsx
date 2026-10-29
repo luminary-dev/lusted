@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, ViewTransition } from "react";
 import { bag } from "@/lib/bag";
 import FavouriteButton from "./FavouriteButton";
+import { photoName, photoShare, TRIP, usePhotoMorph } from "./PhotoMorph";
 import { allSoldOut, colors, discountPct, formatPrice, inStock, type ColorKey, type Product } from "@/lib/products";
 import { Bag } from "../icons";
 
@@ -104,19 +105,26 @@ export default function ProductCard({
   // grid at all — on a lingerie site the back is half the product, and favourites are reached only on touch.
   const [showBack, setShowBack] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
+  // Only the tapped card names its photo (PhotoMorph.tsx), so it alone glides into the product page's main photo, and
+  // this card is where that photo lands again on Back.
+  const morph = usePhotoMorph();
+  const inHand = morph.inHand === product.slug;
+  const tap = () => morph.tap(product.slug);
   return (
     <article className={`product-card ${back ? "has-back" : ""} ${showBack ? "shows-back" : ""} ${quickOpen ? "is-quick" : ""}`}>
       <div className="product-media">
-        <Link href={href} aria-label={product.name}>
-          <Image
-            quality={90}
-            key={`${color}-front`}
-            src={front}
-            alt={`${product.name} in ${colors[color].label.toLowerCase()}`}
-            fill
-            placeholder="blur"
-            sizes={sizes}
-          />
+        <Link href={href} aria-label={product.name} onNavigate={tap} transitionTypes={[TRIP]}>
+          <ViewTransition name={inHand ? photoName(product.slug) : undefined} share={photoShare} default="none">
+            <Image
+              quality={90}
+              key={`${color}-front`}
+              src={front}
+              alt={`${product.name} in ${colors[color].label.toLowerCase()}`}
+              fill
+              placeholder="blur"
+              sizes={sizes}
+            />
+          </ViewTransition>
           {back && (
             <Image
               key={`${color}-back`}
@@ -160,7 +168,7 @@ export default function ProductCard({
         />
         <QuickAdd product={product} color={color} />
       </div>
-      <Link href={href} className="product-info">
+      <Link href={href} className="product-info" onNavigate={tap} transitionTypes={[TRIP]}>
         <h3>{product.name}</h3>
         <Price product={product} />
       </Link>
