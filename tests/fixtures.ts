@@ -117,7 +117,7 @@ export const MINIMUM_SET: Viewport[] = [
    Read from the catalogue itself (src/lib/catalog.json, and the photo manifest for which pieces are photographed), the
    way src/lib/products.ts reads it, so a piece added, changed or removed from the owner console (/admin) doesn't fail
    the suite. */
-type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string };
+type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; details: string[] };
 const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
 const bySlug = Object.fromEntries(photographed.map((p) => [p.slug, p]));
 const priceOf = (p: Entry) => p.salePrice ?? p.price;
@@ -157,7 +157,8 @@ export const CATALOG = {
   whatsapp: "6581234567",
   email: "support@lusted.lk",
   instagram: "lusted.lk",
-  hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"] },
+  // the hero piece's details (fabric, construction, care) come from the catalogue like everything above
+  hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"], details: bySlug["rose-lace-balconette-bra"]?.details ?? [] },
 };
 export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/help", "/favourites", "/privacy", "/terms"];
 
