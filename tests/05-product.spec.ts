@@ -143,6 +143,20 @@ test.describe("product page", () => {
     await expect(page).toHaveURL(/\/products\/[a-z-]+$/);
     await expect(main(page).locator(".pdp-info .eyebrow")).toHaveText("Lace Secrets");
   });
+
+  test("'Complete the set' shows the pieces made to go with it, and the related row leaves them out", async ({ prepared: page }) => {
+    const pairs = CATALOG.pairsOf(slug);
+    test.skip(pairs.length === 0, `${slug} is paired with nothing in the catalogue`);
+    const set = page.locator(".pairs");
+    await expect(set.locator(".eyebrow")).toHaveText("Complete the set");
+    await expect(set.locator("h2")).toContainText(name);
+    const hrefsOf = (cards: import("@playwright/test").Locator) =>
+      cards.locator(".product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!));
+    await expect(set.locator(".product-card")).toHaveCount(pairs.length);
+    expect(await hrefsOf(set.locator(".product-card"))).toEqual(pairs.map((s) => `/products/${s}`));
+    const related = await hrefsOf(page.locator(".related .product-card"));
+    for (const s of pairs) expect(related, `${s} shows once, under "Complete the set"`).not.toContain(`/products/${s}`);
+  });
 });
 
 test.describe("other product shapes", () => {

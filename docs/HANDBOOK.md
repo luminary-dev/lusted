@@ -21,7 +21,7 @@ npm run lint
 
 ## Where things live
 
-- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos").
+- **Products** — `src/lib/catalog.json`: name, price (LKR), sale price, sizes, colours, best-seller rank (1–6), date added, description, and `pairsWith` — the slugs of the pieces made to be worn with it (the Rosé bra and brief), shown as "Complete the set" on its product page and left out of the related row below. Keep pairings symmetric (list each piece on the other); removing a piece from the console drops it from the others' `pairsWith`, and a slug that isn't a photographed piece is skipped. Photos are `assets/products/<slug>.webp` with optional `-back` and `-side` views (see "Photos").
 - **Contact details** — `src/lib/site.ts`: WhatsApp number, Instagram, email, hours. Every button and link reads from here.
 - **Collection names and taglines** — `categories` in `src/lib/products.ts`.
 - **Search** — `matchesQuery` in `src/lib/products.ts`, for the search dialog and the shop: every word must start a word of the piece (case and accents ignored, plurals folded), and `searchSynonyms` beside it turns shoppers' words ("panties", "white", "swimwear") into the catalogue's — add one there when shoppers search for something the catalogue calls by another name.

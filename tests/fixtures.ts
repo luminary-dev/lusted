@@ -117,7 +117,7 @@ export const MINIMUM_SET: Viewport[] = [
    Read from the catalogue itself (src/lib/catalog.json, and the photo manifest for which pieces are photographed), the
    way src/lib/products.ts reads it, so a piece added, changed or removed from the owner console (/admin) doesn't fail
    the suite. */
-type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; description: string; details: string[] };
+type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; description: string; details: string[]; pairsWith?: string[] };
 export const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
 const bySlug = Object.fromEntries(photographed.map((p) => [p.slug, p]));
 const priceOf = (p: Entry) => p.salePrice ?? p.price;
@@ -139,6 +139,8 @@ export const CATALOG = {
   discount: (slug: string) => Math.round((1 - bySlug[slug].salePrice! / bySlug[slug].price) * 100),
   salePriceOf: (slug: string) => bySlug[slug].salePrice!,
   priceOf: (slug: string) => bySlug[slug].price,
+  /** the photographed pieces a piece is paired with — its "Complete the set" row on the product page */
+  pairsOf: (slug: string) => (bySlug[slug]?.pairsWith ?? []).filter((s) => s !== slug && s in bySlug),
   maxDiscount: Math.max(0, ...onSale.map((p) => Math.round((1 - p.salePrice! / p.price) * 100))),
   sampleSale: { slug: sampleSale?.slug ?? "", singleColour: (sampleSale?.colors.length ?? 1) === 1, collection: sampleSale ? COLLECTIONS[sampleSale.category] : "" },
   bagSale: { slug: bagSale?.slug ?? "", color: bagSale?.colors.includes("wine") ? "wine" : (bagSale?.colors[0] ?? "wine") },

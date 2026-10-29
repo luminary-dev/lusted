@@ -455,7 +455,8 @@
   color: var(--rose);
 }
 
-.related {
+.related,
+.pairs {
   margin-top: var(--section);
 }
 

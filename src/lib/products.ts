@@ -53,6 +53,9 @@ export interface Product {
   moments: string[];
   /** what the main photo shows when it isn't the front (e.g. "Side") — labels it in the product gallery */
   mainView?: string;
+  /** the slugs of the pieces made to be worn with it (the Rosé bra and its brief) — the product page's "Complete the
+   *  set"; kept symmetric in the catalogue, and a slug that isn't (or is no longer) a photographed piece is skipped */
+  pairsWith?: string[];
   image: (typeof productImages)[keyof typeof productImages];
   /** model-shot pieces: the back view, shown on hover in cards */
   backImage?: StaticImageData;

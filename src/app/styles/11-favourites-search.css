@@ -301,7 +301,8 @@
   background: var(--paper);
 }
 
-.related {
+.related,
+.pairs {
   padding-top: var(--section);
   border-top: 1px solid var(--hair);
 }

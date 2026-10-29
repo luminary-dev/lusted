@@ -48,8 +48,15 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
 
 function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof getProduct>> }) {
 
+  // The pieces made to be worn with it. A slug the catalogue no longer has (or that isn't photographed yet) is skipped
+  // rather than trusted, so a stale pairing never breaks the page.
+  const pairs = [...new Set(product.pairsWith ?? [])]
+    .filter((slug) => slug !== product.slug)
+    .map(getProduct)
+    .filter((p) => p !== undefined);
+  // the set already has its own row, so its pieces are left out of the related one
   const related = products
-    .filter((p) => p.category === product.category && p.slug !== product.slug)
+    .filter((p) => p.category === product.category && p.slug !== product.slug && !pairs.includes(p))
     .slice(0, 4);
 
   return (
@@ -96,6 +103,24 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
           )}
         </div>
       </div>
+
+      {pairs.length > 0 && (
+        <section className="pairs">
+          <header className="head">
+            <div>
+              <p className="eyebrow">Complete the set</p>
+              <h2 className="h2">
+                Made to be worn with the <em>{product.name}</em>
+              </h2>
+            </div>
+          </header>
+          <div className="product-grid related-grid">
+            {pairs.map((p) => (
+              <ProductCard key={p.slug} product={p} sizes="(min-width: 1460px) 320px, (min-width: 1081px) 22vw, 44vw" />
+            ))}
+          </div>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section className="related">
