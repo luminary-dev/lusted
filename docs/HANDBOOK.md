@@ -168,7 +168,9 @@ Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed 
   site shows the real pages. (Preview deployments ask for a Vercel login unless Deployment Protection is relaxed in the
   project settings.)
 - **`main`** — production, **https://lusted.lk** (and lusted.vercel.app), which shows the "Revealing soon" page until reveal day. Only
-  merges of `dev` reach it.
+  merges of `dev` reach it. At the moment itself (`revealAt` in `src/lib/site.ts`) the gate in `src/proxy.ts` stops
+  without a deploy: the countdown reloads the page once for anyone waiting on it, so they are let straight in, and from
+  then on `/revealing-soon` redirects (307) to the home page.
 
 **Versions and releases.** Every release carries a version in `package.json` (the footer shows it as `v0.9.0`), and
 the pull request into `main` must bump it — the Branch rules check refuses one that doesn't. When the merge deploys

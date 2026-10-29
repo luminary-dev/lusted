@@ -158,4 +158,58 @@ test.describe("revealing soon", () => {
     const cookie = (await page.context().cookies()).find((c) => c.name === "lusted-preview");
     expect(cookie?.value).toBe("1");
   });
+
+  test("its own address shows it too until the moment, rather than sending anyone on", async ({ page }) => {
+    await page.context().clearCookies();
+    const res = await page.goto("/revealing-soon", { waitUntil: "domcontentloaded" });
+    expect(res?.status()).toBe(200);
+    expect(new URL(page.url()).pathname).toBe("/revealing-soon");
+    await expect(page.locator("h1")).toHaveText(/Revealing soon/);
+  });
+});
+
+// The countdown lets whoever is waiting in at zero by reloading the page — once. The browser's clock is moved to just
+// before the moment while the server's stays where it is, so the reload brings the reveal page back exactly as it would
+// for a device whose clock runs fast; it must then stay put and ask for a refresh. /revealing-soon answers directly
+// whether or not the gate is on, but only until the moment (afterwards it redirects), so this is skipped from then on.
+test.describe("the countdown at zero", () => {
+  test.skip(() => Date.now() >= Date.parse(site.revealAt), "reveal day has passed");
+
+  test("reloads the page once, and only once", async ({ prepared: page }) => {
+    const at = Date.parse(site.revealAt);
+    await page.clock.install({ time: at - 5 * 60_000 });
+    await go(page, "/revealing-soon");
+    await page.clock.pauseAt(at - 2_000);
+    await page.clock.runFor(2_000);
+    await expect(page.locator(".reveal-live")).toBeVisible();
+
+    const reloaded = page.waitForEvent("load");
+    await page.clock.runFor(1_500);
+    await reloaded;
+    await expect(page.locator(".reveal-live")).toBeVisible();
+    expect(await page.evaluate(() => sessionStorage.getItem("lusted-reveal-reloaded"))).toBe(site.revealAt);
+
+    // a second reload would replace the document and lose this mark
+    await page.evaluate(() => ((window as unknown as { stayed: boolean }).stayed = true));
+    await page.clock.runFor(5_000);
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => (window as unknown as { stayed?: boolean }).stayed)).toBe(true);
+  });
+});
+
+// From the moment itself the gate is gone and the teaser's own address sends visitors home. Skipped until then.
+test.describe("after the reveal", () => {
+  test.skip(() => Date.now() < Date.parse(site.revealAt), "reveal day hasn't come yet");
+
+  test("/revealing-soon redirects to the home page", async ({ request }) => {
+    const res = await request.get("/revealing-soon", { maxRedirects: 0 });
+    expect(res.status()).toBe(307);
+    expect(new URL(res.headers().location, "http://localhost").pathname).toBe("/");
+  });
+
+  test("without the preview cookie the home page is the real site", async ({ page }) => {
+    await page.context().clearCookies();
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("h1")).toHaveText(/Dressed to tempt/);
+  });
 });
