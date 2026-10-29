@@ -497,6 +497,29 @@
   color: rgba(255, 240, 235, 0.58);
 }
 
+/* the consent line under the status note: small, but a touch brighter so it stays readable — well over 4.5:1 on
+   the footer's wine, which is the same in both themes — and its link underlined so it reads as one. Scoped to the
+   form so the footer blurb's paragraph rule (.footer-brand p: its size, margins and width) doesn't take it over. */
+.news-form .news-consent {
+  max-width: none;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(255, 240, 235, 0.66);
+}
+
+.news-consent a {
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 240, 235, 0.4);
+  text-underline-offset: 2px;
+  transition: color 0.25s;
+}
+
+.news-consent a:hover {
+  color: #fff;
+}
+
 .footer-cols {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

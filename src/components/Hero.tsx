@@ -50,6 +50,7 @@ export default function Hero() {
               target="_blank"
               rel="noopener noreferrer"
               className="hero-story"
+              data-wa-source="hero"
             >
               <WhatsApp /> Whisper to us
             </a>

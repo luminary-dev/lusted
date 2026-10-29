@@ -1,4 +1,4 @@
-import { test, expect, go, CATALOG, parsePrice, slugs, bagDialog } from "./fixtures";
+import { test, expect, go, CATALOG, parsePrice, slugs, bagDialog, photographed } from "./fixtures";
 
 const cards = (page: import("@playwright/test").Page) => page.locator("main:visible .product-grid .product-card");
 const count = async (page: import("@playwright/test").Page) => Number((await page.locator("main:visible .results-bar p").textContent())!.match(/(?:of )?(\d+) pieces?$/)![1]);
@@ -102,6 +102,45 @@ test.describe("the shop", () => {
     await box.fill("midnight sins");
     await expect(page).toHaveURL(/q=midnight/);
     expect(await count(page)).toBe(CATALOG.byCategory["after-dark"]);
+  });
+
+  test("search: words match at word starts, without accents, plurals fold and shoppers' words find the catalogue's", async ({ prepared: page }) => {
+    // every piece a search finds, across all its pages
+    const found = async (q: string) => {
+      await go(page, `/products?q=${encodeURIComponent(q)}`);
+      const all = await slugs(cards(page));
+      const pages = Math.ceil((await count(page)) / CATALOG.perPage);
+      for (let n = 2; n <= pages; n++) {
+        await go(page, `/products?q=${encodeURIComponent(q)}&page=${n}`);
+        all.push(...(await slugs(cards(page))));
+      }
+      return all;
+    };
+    const fold = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const text = (p: (typeof photographed)[number]) => fold([p.name, p.description, ...p.details, ...p.colors].join(" "));
+    const words = (p: (typeof photographed)[number]) => text(p).split(/[^a-z0-9]+/);
+    const slugsOf = (ps: typeof photographed) => ps.map((p) => p.slug);
+
+    // a plural finds what its singular finds
+    const bikinis = await found("bikinis");
+    expect(bikinis).toEqual(expect.arrayContaining(slugsOf(photographed.filter((p) => /\bbikini\b/i.test(p.name)))));
+    expect(bikinis.length).toBe((await found("bikini")).length);
+
+    // "red" finds the wine pieces, but not a piece whose only "red" is inside a word ("underwired", "embroidered")
+    const red = await found("red");
+    expect(red).toEqual(expect.arrayContaining(slugsOf(photographed.filter((p) => p.colors.includes("wine")))));
+    const insideOnly = photographed.filter(
+      (p) => text(p).includes("red") && !p.colors.includes("wine") && !words(p).some((w) => w.startsWith("red") || ["scarlet", "rouge", "crimson"].includes(w)),
+    );
+    for (const p of insideOnly) expect(red).not.toContain(p.slug);
+
+    // shoppers' words: "white" finds the ivory pieces, "panties" the briefs and thongs
+    expect(await found("white")).toEqual(expect.arrayContaining(slugsOf(photographed.filter((p) => p.colors.includes("ivory")))));
+    const briefs = photographed.filter((p) => fold([p.name, ...p.details].join(" ")).split(/[^a-z0-9]+/).some((w) => /^(brief|thong)s?$/.test(w)));
+    expect(await found("panties")).toEqual(expect.arrayContaining(slugsOf(briefs)));
+
+    // accents don't matter: "rose" finds the Rosé pieces
+    expect(await found("rose")).toContain(CATALOG.hero.slug);
   });
 
   test("sort: price both ways really sorts, newest matches the dates, best selling leads with the ranked six", async ({ prepared: page }) => {

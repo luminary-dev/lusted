@@ -27,5 +27,6 @@ export const navLinks = [
   { href: "/#collections", label: "Collections" },
   { href: "/#size-guide", label: "Size Guide" },
   { href: "/#ordering", label: "Ordering" },
+  { href: "/help", label: "FAQ" },
   { href: "/#contact", label: "Contact" },
 ];

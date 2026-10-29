@@ -1,6 +1,7 @@
 import { test as base, expect, type Page, type Locator } from "@playwright/test";
 import catalogJson from "../src/lib/catalog.json";
 import manifest from "../src/lib/image-manifest.json";
+import { saleBand } from "../src/lib/sale-band";
 
 /* ───────── the viewport matrix (responsive-dimensions-oct-2026.txt) ───────── */
 export type Viewport = { name: string; w: number; h: number; kind: "phone" | "foldable" | "tablet" | "laptop" | "desktop" | "boundary" | "landscape"; dpr?: number };
@@ -117,8 +118,8 @@ export const MINIMUM_SET: Viewport[] = [
    Read from the catalogue itself (src/lib/catalog.json, and the photo manifest for which pieces are photographed), the
    way src/lib/products.ts reads it, so a piece added, changed or removed from the owner console (/admin) doesn't fail
    the suite. */
-type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string };
-const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
+type Entry = { slug: string; name: string; category: "lingerie" | "swim" | "after-dark"; price: number; salePrice?: number; colors: string[]; bestSeller?: number; added: string; description: string; details: string[]; pairsWith?: string[] };
+export const photographed = (catalogJson as Entry[]).filter((p) => `products/${p.slug}.webp` in manifest.images);
 const bySlug = Object.fromEntries(photographed.map((p) => [p.slug, p]));
 const priceOf = (p: Entry) => p.salePrice ?? p.price;
 const onSale = photographed.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price);
@@ -139,7 +140,11 @@ export const CATALOG = {
   discount: (slug: string) => Math.round((1 - bySlug[slug].salePrice! / bySlug[slug].price) * 100),
   salePriceOf: (slug: string) => bySlug[slug].salePrice!,
   priceOf: (slug: string) => bySlug[slug].price,
+  /** the photographed pieces a piece is paired with — its "Complete the set" row on the product page */
+  pairsOf: (slug: string) => (bySlug[slug]?.pairsWith ?? []).filter((s) => s !== slug && s in bySlug),
   maxDiscount: Math.max(0, ...onSale.map((p) => Math.round((1 - p.salePrice! / p.price) * 100))),
+  /** the home page's sale band for what is on sale (its wording is checked in 11-sale-band.spec.ts) */
+  saleBand: saleBand(onSale.map((p) => ({ category: p.category, discount: Math.round((1 - p.salePrice! / p.price) * 100) })), (c) => COLLECTIONS[c]),
   sampleSale: { slug: sampleSale?.slug ?? "", singleColour: (sampleSale?.colors.length ?? 1) === 1, collection: sampleSale ? COLLECTIONS[sampleSale.category] : "" },
   bagSale: { slug: bagSale?.slug ?? "", color: bagSale?.colors.includes("wine") ? "wine" : (bagSale?.colors[0] ?? "wine") },
   // every ranked piece, in rank order; the home page, the search dialog and the shop's "best" sort show the first six
@@ -157,7 +162,8 @@ export const CATALOG = {
   whatsapp: "6581234567",
   email: "support@lusted.lk",
   instagram: "lusted.lk",
-  hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"] },
+  // the hero piece's details (fabric, construction, care) come from the catalogue like everything above
+  hero: { slug: "rose-lace-balconette-bra", name: "Rosé Lace Balconette Bra", price: 4900, colours: ["blush", "wine"], details: bySlug["rose-lace-balconette-bra"]?.details ?? [] },
 };
 export const ROUTES = ["/", "/products", `/products/${CATALOG.hero.slug}`, "/about", "/help", "/favourites", "/privacy", "/terms"];
 
@@ -225,6 +231,10 @@ export const test = base.extend<{ errors: string[]; prepared: Page }>({
       if (m.type() !== "error") return;
       const t = m.text();
       if (/favicon|ERR_ABORTED|net::ERR_|Download the React DevTools/i.test(t)) return;
+      // Vercel's analytics scripts (/_vercel/insights, /_vercel/speed-insights — src/components/SiteAnalytics.tsx) only
+      // exist once the site is deployed there, so under `next start` asking for them is an expected 404 (and the browser
+      // then refuses the 404 page as a script, a second error naming the same address)
+      if (t.includes("/_vercel/") || m.location().url.includes("/_vercel/")) return;
       errors.push(t);
     });
     page.on("response", (r) => {

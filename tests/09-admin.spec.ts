@@ -1,4 +1,5 @@
 import { test, expect } from "./fixtures";
+import { offerProblem, percentProblem } from "../src/lib/admin/offers";
 
 // The owner console (src/app/admin): reachable in front of the reveal gate, never cached or indexed, and nothing in
 // it answers without a session. The server the suite runs against has no ADMIN_* environment, so the form is shown
@@ -54,5 +55,21 @@ test.describe("owner console", () => {
     const res = await page.request.post("/api/admin/login", { data: { email: "nobody@example.com", password: "wrong" }, headers: { origin } });
     expect(res.status()).toBe(401);
     expect(res.headers()["set-cookie"]).toBeUndefined();
+  });
+
+  // The rules the console checks before Save and the dispatch route checks before queuing a change. The route itself
+  // can't be reached here — the suite's server has no session to give — so its refusals are covered through the rules
+  // it shares with the console (src/lib/admin/offers.ts).
+  test("an offer the Console workflow would refuse is caught before it is queued", () => {
+    expect(offerProblem(4990, 5990)).toBeNull();
+    expect(offerProblem(5990, 5990)).toMatch(/under the full price/);
+    expect(offerProblem(6990, 5990)).toMatch(/under the full price/);
+    expect(offerProblem(0, 5990)).toMatch(/end the offer/);
+    expect(offerProblem(-10, 5990)).toMatch(/end the offer/);
+    expect(offerProblem(4990.5, 5990)).toMatch(/whole rupees/i);
+    expect(offerProblem(Number.NaN, 5990)).toMatch(/whole rupees/i);
+    expect(offerProblem(4990)).toBeNull(); // with no full price to hand, only the offer itself is checked
+    for (const ok of [1, 20, 90]) expect(percentProblem(ok), String(ok)).toBeNull();
+    for (const bad of [0, 91, 100, -5, 12.5, Number.NaN]) expect(percentProblem(bad), String(bad)).toMatch(/1 to 90/);
   });
 });

@@ -44,7 +44,7 @@ export default function HowItWorks() {
             ))}
           </ol>
 
-          <a className="btn btn-light" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
+          <a className="btn btn-light" data-wa-source="how-it-works" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
             Start your order <ArrowRight className="arrow" />
           </a>
         </div>

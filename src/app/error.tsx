@@ -37,6 +37,7 @@ export default function Error({ error, retry }: { error: unknown; retry: () => v
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost"
+            data-wa-source="error-page"
           >
             Message us on WhatsApp
           </a>

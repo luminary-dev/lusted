@@ -63,7 +63,7 @@ export default function Nav() {
                 {l.label}
               </Link>
             ))}
-            <a className="btn btn-wine nav-menu-whatsapp" href={whatsappLink("Hi Lusted! I'd love some help with an order.")} target="_blank" rel="noopener noreferrer">
+            <a className="btn btn-wine nav-menu-whatsapp" data-wa-source="nav-menu" href={whatsappLink("Hi Lusted! I'd love some help with an order.")} target="_blank" rel="noopener noreferrer">
               <WhatsApp /> Message us on WhatsApp
             </a>
             <div className="nav-menu-theme">
@@ -74,6 +74,7 @@ export default function Nav() {
           <div className="nav-actions">
             <a
               className="btn btn-wine nav-whatsapp"
+              data-wa-source="nav"
               href={whatsappLink("Hi Lusted! I'd love some help with an order.")}
               target="_blank"
               rel="noopener noreferrer"

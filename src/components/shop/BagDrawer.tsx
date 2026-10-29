@@ -8,6 +8,7 @@ import { colors, formatPrice, getProduct, priceOf } from "@/lib/products";
 import { fillIn, newOrderRef, productUrl, useOrderRef, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Close, WhatsApp } from "../icons";
+import TrustStrip from "./TrustStrip";
 
 export default function BagDrawer() {
   const open = useBagOpen();
@@ -127,10 +128,11 @@ export default function BagDrawer() {
                   </label>
                 )}
               </div>
-              <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp. Always shipped in plain packaging.</p>
-              <a className="btn btn-wine" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
+              <p>We’ll confirm sizes, delivery and secure payment with you on WhatsApp.</p>
+              <a className="btn btn-wine" data-wa-source="bag" href={whatsappLink(order)} target="_blank" rel="noopener noreferrer">
                 <WhatsApp /> Send order on WhatsApp
               </a>
+              <TrustStrip onNavigate={() => bag.setOpen(false)} />
               <button
                 className="drawer-clear"
                 onClick={() => {

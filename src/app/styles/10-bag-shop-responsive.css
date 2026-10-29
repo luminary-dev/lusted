@@ -379,6 +379,18 @@
   }
 }
 
+/* just above the phone menu, six links only fit between the logo and the icons when they're set a little smaller and
+   closer: at 901 that leaves ~15 px either side, where the sizes above would wrap "Size Guide" onto two lines */
+@media (max-width: 1080px) and (min-width: 901px) {
+  .nav-links {
+    gap: 12px;
+  }
+  .nav-links a {
+    font-size: 13px;
+    letter-spacing: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .nav-actions {
     gap: 4px;
