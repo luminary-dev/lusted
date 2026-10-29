@@ -83,8 +83,10 @@ test.describe("the shop", () => {
     await page.locator(".chips .chip", { hasText: "silk bikini" }).click();
     await expect(box).toHaveValue("");
     await box.fill("qqqqq");
-    await expect(page.locator(".empty")).toContainText("No pieces match");
-    await page.locator(".empty").getByRole("button", { name: "Clear filters" }).click();
+    // a search that found nothing says so about the word, not about "those filters" — and offers a way on
+    await expect(page.locator(".empty-title")).toContainText("Nothing matched “qqqqq”");
+    await expect(page.locator(".empty-suggest .product-card")).toHaveCount(4);
+    await page.locator(".empty").getByRole("button", { name: "Clear the search" }).click();
     await expect(page).not.toHaveURL(/q=/);
     expect(await count(page)).toBe(CATALOG.total);
     await expect(box).toHaveValue("");
@@ -261,7 +263,7 @@ test.describe("the shop", () => {
 
   test("product cards: name, price, hover shows the back view, swatches swap the colourway, the heart saves", async ({ prepared: page }) => {
     await go(page, "/products");
-    const card = cards(page).filter({ has: page.locator(`a[href="/products/${CATALOG.hero.slug}"]`) }).first();
+    const card = cards(page).filter({ has: page.locator(`a[href^="/products/${CATALOG.hero.slug}"]`) }).first();
     await expect(card.locator("h3")).toHaveText(CATALOG.hero.name);
     await expect(card.locator(".price-now")).toHaveText(`LKR ${CATALOG.hero.price.toLocaleString("en-LK")}`);
     await expect(card).toHaveClass(/has-back/);
@@ -281,13 +283,16 @@ test.describe("the shop", () => {
     await expect(card.getByRole("button", { name: `Remove ${CATALOG.hero.name} from favourites` })).toBeVisible();
     await expect(page.getByRole("link", { name: "Favourites, 1 saved" })).toBeVisible();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lusted-favourites")!))).toEqual([CATALOG.hero.slug]);
+    // the colourway on show follows the click: the link carries it and the piece opens on it, instead of the
+    // shopper picking Wine and landing on the first colour
     await card.locator(".product-info").click();
-    await expect(page).toHaveURL(new RegExp(`/products/${CATALOG.hero.slug}$`));
+    await expect(page).toHaveURL(new RegExp(`/products/${CATALOG.hero.slug}\\?colour=wine$`));
+    await expect(page.locator(".buy-label > span").first()).toHaveText("Wine");
   });
 
-  test("quick add on hover: pick a size, add, the bag opens with that line", async ({ prepared: page }) => {
+  test("quick add on hover: pick a size, add, the line lands in the bag without the drawer taking over", async ({ prepared: page }) => {
     await go(page, "/products");
-    const card = cards(page).filter({ has: page.locator(`a[href="/products/${CATALOG.hero.slug}"]`) }).first();
+    const card = cards(page).filter({ has: page.locator(`a[href^="/products/${CATALOG.hero.slug}"]`) }).first();
     await card.locator(".product-media").hover();
     const quick = card.getByRole("group", { name: `Quick add ${CATALOG.hero.name}` });
     await expect(quick).toBeVisible();
@@ -299,23 +304,36 @@ test.describe("the shop", () => {
     await expect(cta).toBeEnabled();
     await expect(cta).toHaveText(/Add to bag · L/);
     await cta.click();
+    // adding from the grid must not throw the drawer over the shop — it confirms itself and leaves the shopper
+    // browsing, which is the whole point of quick add when building a set
+    await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
+    const toast = page.locator(".bag-toast");
+    await expect(toast).toBeVisible();
+    await expect(toast).toContainText(CATALOG.hero.name);
+    await expect(toast).toContainText("Blush · L");
+    await expect(page.getByRole("button", { name: "Open bag, 1 items" })).toBeVisible();
+    // and the line really is in the bag, not just announced
+    await toast.getByRole("button", { name: "View bag" }).click();
     const bag = bagDialog(page);
-    await expect(page.locator(".drawer-root")).toHaveClass(/is-open/);
     await expect(bag.locator(".bag-item")).toHaveCount(1);
     await expect(bag.locator(".bag-item")).toContainText(CATALOG.hero.name);
-    await expect(bag.locator(".bag-item")).toContainText("Blush · L");
+    await expect(bag.locator(".bag-item .bag-meta")).toContainText("Blush");
+    // the size is a control now, so the line can be corrected without starting the piece again
+    await expect(bag.locator(".bag-item .bag-size select")).toHaveValue("L");
     await expect(bag.locator(".drawer-total strong")).toHaveText(`LKR ${CATALOG.hero.price.toLocaleString("en-LK")}`);
-    await expect(page.getByRole("button", { name: "Open bag, 1 items" })).toBeVisible();
   });
 
   test("a colour-filtered card quick-adds in that colour", async ({ prepared: page }) => {
     await go(page, "/products?color=wine");
-    const card = cards(page).filter({ has: page.locator(`a[href="/products/${CATALOG.hero.slug}"]`) }).first();
+    const card = cards(page).filter({ has: page.locator(`a[href^="/products/${CATALOG.hero.slug}"]`) }).first();
     await expect(card.locator(".product-media > a > img:not(.product-back)")).toHaveAttribute("alt", /in wine$/);
     await card.locator(".product-media").hover();
     await card.locator(".quick-add-sizes").getByRole("button", { name: "S", exact: true }).click();
     await card.locator(".quick-add-cta").click();
-    await expect(bagDialog(page).locator(".bag-item")).toContainText("Wine · S");
+    // quick add is quiet now, so the bag is opened to read the line
+    await page.getByRole("button", { name: /Open bag/ }).click();
+    await expect(bagDialog(page).locator(".bag-item .bag-meta")).toContainText("Wine");
+    await expect(bagDialog(page).locator(".bag-item .bag-size select")).toHaveValue("S");
   });
 });
 

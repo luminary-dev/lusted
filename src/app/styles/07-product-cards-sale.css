@@ -66,7 +66,7 @@
 .badges .badge {
   position: static;
   padding: 6px 11px;
-  font-size: 10px;
+  font-size: var(--step--2);
 }
 
 .badge-sale {
@@ -119,6 +119,11 @@
   font-size: 15px;
   font-weight: 600;
   line-height: 1.3;
+  /* three lines here pushed the size pills up over the photo */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   text-shadow: 0 1px 12px rgba(30, 8, 12, 0.35);
 }
 
@@ -241,8 +246,69 @@
   }
 }
 
+/* ───────── cards under a finger ─────────
+   Hover carries the back view and quick add on a mouse. A finger has neither, so on touch both get a control of
+   their own: the back of a piece is half of what's being bought, and favourites — which are mostly reached on a
+   phone — were a dead end that led only to WhatsApp. */
+
+.card-touch {
+  display: none;
+}
+
 @media (hover: none) {
+  /* hidden until asked for, then the same panel the mouse gets */
   .quick-add {
+    display: none;
+  }
+
+  .product-card.is-quick .quick-add {
+    display: grid;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .card-touch {
+    position: absolute;
+    z-index: var(--z-raised);
+    right: 8px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .card-flip,
+  .card-quick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: 999px;
+    background: var(--soft);
+    backdrop-filter: blur(10px);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step--2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .card-quick svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .product-card.shows-back .product-back {
+    opacity: 1;
+  }
+
+  /* with the panel open the controls would sit on top of it */
+  .product-card.is-quick .card-touch {
     display: none;
   }
 }
@@ -258,6 +324,11 @@
   font-weight: 500;
   font-size: 15.5px;
   line-height: 1.3;
+  /* a long name used to run to three lines and leave the grid ragged; the full name is on the piece's own page */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .price {
@@ -552,4 +623,32 @@
 
 .best {
   background: var(--paper);
+}
+
+/* ───────── cards in the dark ─────────
+   The tokens carry most of this, but a swatch and a sale badge are their own colours and don't follow them. */
+
+/* A Noir or Wine dot on a near-black card has no edge of its own: the inset black ring vanishes into the colour and
+   --hair is only 12% cream. A light ring gives every dark colourway a visible circle again. */
+:root[data-theme="dark"] .swatch {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 0 0 1px var(--hair);
+}
+
+/* the sale badge sits on photography in both themes, so it keeps its wine — but as a token, not an !important */
+:root[data-theme="dark"] .badge-sale {
+  background: var(--wine-2) !important;
+}
+
+/* a piece with nothing left still earns its place in the grid — it just says so */
+.badge-gone {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.quick-add-sizes button.is-gone {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
 }

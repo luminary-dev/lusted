@@ -45,7 +45,8 @@ test.describe("bag", () => {
     const minus = first.getByRole("button", { name: "Decrease quantity" });
     for (let i = 0; i < 10; i++) await minus.click();
     await expect(bag.locator(".bag-item")).toHaveCount(1); // M line dropped at 0
-    await expect(bag.locator(".bag-item")).toContainText("Blush · L");
+    await expect(bag.locator(".bag-item .bag-meta")).toContainText("Blush");
+    await expect(bag.locator(".bag-item .bag-size select")).toHaveValue("L");
     await bag.getByRole("button", { name: `Remove ${name}` }).click();
     await expect(bag.getByText("Your bag is empty.")).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("lusted-bag"))).toBe("[]");
@@ -60,7 +61,8 @@ test.describe("bag", () => {
     await openBag(page).click();
     const bag = bagDialog(page);
     await expect(bag.locator(".bag-item")).toHaveCount(2);
-    const salePrice = Number((await bag.locator(".bag-item").nth(1).locator("strong").textContent())!.replace(/\D/g, ""));
+    // .bag-price-now, not the whole strong: a discounted line also carries the struck-through old price
+    const salePrice = Number((await bag.locator(".bag-item").nth(1).locator(".bag-price-now").textContent())!.replace(/\D/g, ""));
     const href = decodeURIComponent((await bag.getByRole("link", { name: /Send order on WhatsApp/ }).getAttribute("href"))!);
     expect(href.startsWith(`https://wa.me/${CATALOG.whatsapp}?text=`)).toBe(true);
     const text = href.split("text=")[1];
@@ -72,7 +74,10 @@ test.describe("bag", () => {
     expect(text).not.toContain("gift");
     expect(text.endsWith("\n\nName:\nCity / town:")).toBe(true);
     await expect(bag.locator(".bag-item a.bag-thumb").first()).toHaveAttribute("href", `/products/${slug}`);
+    // emptying the bag asks once — it sits directly under the send button
     await bag.getByRole("button", { name: "Clear bag" }).click();
+    await expect(bag.locator(".bag-item")).toHaveCount(2);
+    await bag.getByRole("button", { name: "Tap again to empty the bag" }).click();
     await expect(bag.getByText("Your bag is empty.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Open bag, 0 items" })).toBeVisible();
   });
