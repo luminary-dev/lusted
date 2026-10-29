@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useTrackNoResults } from "@/lib/analytics";
 import { categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { Chevron, ChevronNext, Close, Search, Sliders } from "../icons";
@@ -130,6 +131,9 @@ export default function ProductBrowser() {
     };
     return by[sort] ? [...out].sort(by[sort]) : out;
   }, [cat, urlQuery, selSizes, selColors, selPrice, selFlags, sort]);
+  // a search that nothing in the whole catalogue matches — not one the other filters have emptied
+  const unmatched = useMemo(() => !products.some((p) => matchesQuery(p, urlQuery)), [urlQuery]);
+  useTrackNoResults(urlQuery, unmatched, "shop");
 
   // 15 pieces per page; the page lives in the URL (?page=2) like the filters
   const pages = Math.max(1, Math.ceil(results.length / PER_PAGE));

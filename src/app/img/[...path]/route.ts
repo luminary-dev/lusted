@@ -30,7 +30,12 @@ async function serve(request: Request, params: Promise<{ path: string[] }>, meth
   if (inm) headers["if-none-match"] = inm;
   const upstream = await bucket.client.fetch(`${bucket.base}/${key}`, { method, headers });
   if (upstream.status === 304) return new Response(null, { status: 304, headers: { "cache-control": "public, max-age=31536000, immutable" } });
-  if (!upstream.ok) return new Response("Not found", { status: upstream.status === 404 ? 404 : 502 });
+  if (!upstream.ok) {
+    // a photo in the manifest the bucket won't hand over (missing from it, a bad key, R2 down): say so in Vercel's
+    // runtime logs, which the browser's broken image never would
+    console.error(JSON.stringify({ event: "img_upstream_error", key, status: upstream.status }));
+    return new Response("Not found", { status: upstream.status === 404 ? 404 : 502 });
+  }
 
   const out = new Headers({
     "content-type": upstream.headers.get("content-type") ?? "application/octet-stream",

@@ -48,5 +48,6 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// every page, but not the API, Next's own files or anything with a file extension (images, icons, fonts)
-export const config = { matcher: ["/((?!api|_next|.*\\..*).*)"] };
+// every page, but not the API, Next's own files, Vercel's analytics (/_vercel/*: its beacons would otherwise meet the
+// reveal page) or anything with a file extension (images, icons, fonts)
+export const config = { matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"] };

@@ -151,6 +151,29 @@ node -e "const c=require('crypto');const s=c.randomBytes(16);const o={N:131072,r
 
 `src/app/not-found.tsx` (any unknown address or product, with a real 404 status) and `src/app/error.tsx` (anything that fails while a page renders — try again, or order on WhatsApp) share `components/StatusPage.tsx` and keep the site's nav and footer. `src/app/global-error.tsx` is the last resort when the layout itself fails: a self-contained page with its own few lines of CSS.
 
+## Analytics and errors
+
+Orders happen on WhatsApp, so the site counts what leads there. **Vercel Web Analytics** (visits, pages, referrers —
+cookieless, no personal identifiers) and **Speed Insights** (how fast pages load for real visitors) are mounted in
+`layout.tsx` by `components/SiteAnalytics.tsx`. Both must be **switched on once in the Vercel project** (Analytics and
+Speed Insights tabs → Enable); until then their scripts answer 404 and nothing is counted. They load from the site's own
+origin (`/_vercel/*`, which the proxy leaves alone), so the content security policy needed no change; they are off
+while developing, and under `next start` their scripts are an expected 404 that the tests' console check ignores.
+
+Custom events (Vercel → Analytics → Events), sent through `src/lib/analytics.ts`:
+
+- `whatsapp_click` — any tap on a WhatsApp link; `source` says which: `nav`, `nav-menu`, `hero`, `bag` (Send order),
+  `product` (Order now — only once a size is chosen), `favourites`, `contact`, `footer`, `how-it-works`, `about`,
+  `about-page`, `size-guide`, `revealing-soon`, `error-page`, otherwise the page's path (`/help`, `/privacy`…). A new
+  WhatsApp link is counted on its own; give it a `data-wa-source` (on the link or around it) to name it.
+- `add_to_bag` and `favourite` (saving only) — with the piece's `slug`.
+- `search_no_results` — a search that found nothing, the `query` cut to 40 characters, from the search dialog
+  (`source: dialog`) or the shop (`source: shop`, only when nothing in the catalogue matches, not when filters emptied it).
+
+Server errors land in Vercel → Logs as one JSON line each: `request_error` (from `src/instrumentation.ts` — the route,
+method, path, digest and message of anything that fails on the server) and `img_upstream_error` (the photo route
+couldn't get a photo from the bucket — its key and R2's status).
+
 ## Deploy
 
 **The domain.** `lusted.lk` is registered at the LK Domain Registry (rs.domains.lk), whose nameservers point to

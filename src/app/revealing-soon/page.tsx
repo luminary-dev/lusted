@@ -65,7 +65,7 @@ export default function RevealingSoon() {
         <p className="reveal-date">{revealDate}</p>
 
         <div className="reveal-actions">
-          <a className="btn btn-light" href={whatsappLink("Hi Lusted! Put me on the early-access list.")} target="_blank" rel="noopener noreferrer">
+          <a className="btn btn-light" data-wa-source="revealing-soon" href={whatsappLink("Hi Lusted! Put me on the early-access list.")} target="_blank" rel="noopener noreferrer">
             <WhatsApp /> Want it first? Message us <ArrowRight className="arrow" />
           </a>
           <a className="reveal-ig" href={instagramLink} target="_blank" rel="noopener noreferrer">
