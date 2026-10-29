@@ -6,6 +6,7 @@ import {
   ArrowRight as LArrowRight,
   ArrowUpRight as LArrowUpRight,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Clock as LClock,
   EyeOff as LEyeOff,
@@ -30,6 +31,8 @@ import {
   User as LUser,
   X,
   Zap,
+  ZoomIn as LZoomIn,
+  ZoomOut as LZoomOut,
 } from "lucide-react";
 import { IconBrandInstagram, IconBrandWhatsapp, type IconProps } from "@tabler/icons-react";
 import type { ComponentType } from "react";
@@ -44,6 +47,7 @@ export const ArrowRight = icon(LArrowRight);
 export const ArrowUpRight = icon(LArrowUpRight);
 export const Chevron = icon(ChevronDown);
 export const ChevronNext = icon(ChevronRight);
+export const ChevronPrev = icon(ChevronLeft);
 export const Clock = icon(LClock);
 export const EyeOff = icon(LEyeOff);
 export const Butterfly = icon(Feather);
@@ -67,6 +71,8 @@ export const Tag = icon(LTag);
 export const User = icon(LUser);
 export const Close = icon(X);
 export const Bolt = icon(Zap);
+export const ZoomIn = icon(LZoomIn);
+export const ZoomOut = icon(LZoomOut);
 
 const brand = (I: ComponentType<IconProps>) => {
   const Icon = (p: IconProps) => <I size="1em" stroke={1.6} aria-hidden {...p} />;

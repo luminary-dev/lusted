@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 // errors", lists them). Analytics is cookieless, and the properties stay small and never say anything about the
 // visitor. A call only queues the event for the analytics script, which sends it in the background, so it never holds
 // up a tap — and where the script isn't loaded (developing, an ad blocker, a build run outside Vercel) nothing happens.
-type Event = "whatsapp_click" | "add_to_bag" | "favourite" | "search_no_results" | "hint";
+type Event = "whatsapp_click" | "add_to_bag" | "favourite" | "search_no_results" | "hint" | "photo_zoom";
 
 export function trackEvent(name: Event, data: Record<string, string>) {
   try {
