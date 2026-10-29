@@ -1,5 +1,17 @@
 # Lusted — Design Review
 
+> **Status: worked through.** Everything in the ranked summary below is either done (see the `design/review-fixes`
+> branch) or was already in the repo by the time it was read — `pairsWith` ("complete the set"), the WhatsApp order
+> reference and fill-in lines, the gift note, and the trust strip on the product page all landed before this review
+> was written, so the entries claiming they're missing are stale.
+>
+> Two are mechanism-only, waiting on content rather than code: `soldOut` per piece (nothing is marked out of stock
+> yet) and `modelNote` ("She's 5'7\" and wears S"). Both are optional fields — a piece without them renders exactly
+> as before.
+>
+> Two were judged and left alone: the CSP keeps `script-src 'unsafe-inline'` because Next's hydration scripts are
+> inline, and the reveal gate stays soft because `?preview=1` is a documented public bypass.
+
 Scope: a report only. No source, test or config file was changed. This builds on the operator's CSS measurements (no type, spacing, duration or z-index tokens; 249 font sizes; 53 time values; 36 breakpoints) and doesn't repeat them. Each finding names the file, what's wrong and what to do instead. Findings are ranked by impact on conversion and trust.
 
 Files read: `ProductBrowser.tsx`, `ProductCard.tsx`, `ProductBuy.tsx`, `BagDrawer.tsx`, `PdpGallery.tsx`, `FavouritesList.tsx`, `Nav.tsx`, `lib/bag.ts`, `app/products/[slug]/page.tsx`, `layout.tsx` (font imports), and styles `01-base`, `07-product-cards-sale`, `09-product-page`, `10-bag-shop-responsive`. I didn't read home sections, search, help or legal pages in depth. Anything marked *(inferred)* needs a visual check in a browser.

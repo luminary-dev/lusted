@@ -204,6 +204,35 @@ export default function ProductBrowser() {
         <div className={`filters-root ${drawer ? "is-open" : ""}`} inert={sheet && !drawer}>
           <div className="filters-scrim" onClick={() => setDrawer(false)} />
           <aside className="filters" aria-label="Filters">
+            {/* a bottom sheet on a phone: the grabber is what a thumb reaches for first, and dragging it down is
+                what iOS users try before looking for a close button. Decorative — Close and Esc do the same. */}
+            <button
+              type="button"
+              className="filters-grab"
+              aria-label="Close filters"
+              tabIndex={-1}
+              onClick={() => setDrawer(false)}
+              onPointerDown={(e) => {
+                const startY = e.clientY;
+                const sheet = e.currentTarget.parentElement as HTMLElement;
+                const move = (ev: PointerEvent) => {
+                  const dy = Math.max(0, ev.clientY - startY);
+                  sheet.style.transform = `translateY(${dy}px)`;
+                  sheet.style.transition = "none";
+                };
+                const up = (ev: PointerEvent) => {
+                  sheet.style.transform = "";
+                  sheet.style.transition = "";
+                  if (ev.clientY - startY > 90) setDrawer(false); // far enough to mean it
+                  window.removeEventListener("pointermove", move);
+                  window.removeEventListener("pointerup", up);
+                };
+                window.addEventListener("pointermove", move);
+                window.addEventListener("pointerup", up);
+              }}
+            >
+              <span />
+            </button>
             <div className="filters-head">
               <h2 className="h3">Filters</h2>
               <button className="icon-btn" aria-label="Close filters" onClick={() => setDrawer(false)}>

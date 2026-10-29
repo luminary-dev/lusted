@@ -10,11 +10,13 @@ import { SIZES, TABS, finderFor, guides, sizeIndexFor, tabForCategory, type Guid
 export default function SizeGuideDialog({
   category,
   available,
+  soldOut = [],
   onPick,
   onClose,
 }: {
   category: Category;
   available: string[]; // the sizes this piece is actually made in
+  soldOut?: string[]; // ...of those, the ones it's out of
   onPick: (size: string) => void;
   onClose: () => void;
 }) {
@@ -25,7 +27,8 @@ export default function SizeGuideDialog({
   const finder = finderFor(tab);
   const match = cm.trim() ? sizeIndexFor(Number(cm), finder.ranges) : -1;
   const suggested = match >= 0 ? SIZES[match] : null;
-  const suggestedMade = suggested !== null && available.includes(suggested);
+  const suggestedMade = suggested !== null && available.includes(suggested) && !soldOut.includes(suggested);
+  const suggestedGone = suggested !== null && available.includes(suggested) && soldOut.includes(suggested);
 
   // showModal gives the top layer, the backdrop, focus trapping and Esc for free; Esc and the backdrop both close.
   useEffect(() => {
@@ -90,7 +93,9 @@ export default function SizeGuideDialog({
                 ? "That doesn't look like a measurement in centimetres."
                 : suggestedMade
                   ? `You're closest to ${suggested}.`
-                  : `You're closest to ${suggested} — this piece isn't made in that size.`}
+                  : suggestedGone
+                    ? `You're closest to ${suggested} — that size is sold out just now.`
+                    : `You're closest to ${suggested} — this piece isn't made in that size.`}
           </p>
           {suggested && suggestedMade && (
             <button type="button" className="btn btn-wine sg-pick" onClick={() => onPick(suggested)}>
@@ -113,12 +118,13 @@ export default function SizeGuideDialog({
           </thead>
           <tbody>
             {guides[tab].map((lines, i) => {
-              const made = available.includes(SIZES[i]);
+              const made = available.includes(SIZES[i]) && !soldOut.includes(SIZES[i]);
+              const out = soldOut.includes(SIZES[i]);
               return (
                 <tr key={SIZES[i]} className={`${suggested === SIZES[i] ? "is-match" : ""} ${made ? "" : "is-unmade"}`}>
                   <th scope="row">
                     {SIZES[i]}
-                    {!made && <span className="sg-unmade"> not in this piece</span>}
+                    {!made && <span className="sg-unmade">{out ? " sold out" : " not in this piece"}</span>}
                   </th>
                   {lines.map(([label, value]) => (
                     <td key={label}>{value}</td>

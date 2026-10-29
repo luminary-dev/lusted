@@ -4,10 +4,12 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { setColorChoice } from "@/lib/color-choice";
 import { bag } from "@/lib/bag";
 import {
+  allSoldOut,
   colors,
   fitLabels,
   formatPrice,
   getProduct,
+  inStock,
   priceOf,
   type ColorKey,
 } from "@/lib/products";
@@ -31,6 +33,7 @@ const useColourParam = () =>
 export default function ProductBuy({ slug }: { slug: string }) {
   const product = getProduct(slug)!;
   const oneSize = product.sizes.length === 1;
+  const gone = allSoldOut(product);
   // The shopper's own pick wins; until they make one the piece opens on the colourway its link asked for.
   const asked = useColourParam();
   const [picked, setPicked] = useState<ColorKey | null>(null);
@@ -39,7 +42,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
   const setColor = setPicked;
   useEffect(() => setColorChoice(slug, color), [slug, color]); // the gallery follows the picked colour
   const [size, setSize] = useState<string | null>(
-    oneSize ? product.sizes[0] : null,
+    oneSize && inStock(product, product.sizes[0]) ? product.sizes[0] : null,
   );
   const [qty, setQty] = useState(1);
   const [nudge, setNudge] = useState(false);
@@ -129,17 +132,24 @@ export default function ProductBuy({ slug }: { slug: string }) {
         </p>
         {!oneSize && (
           <div className="size-chips" ref={sizeGroup}>
-            {product.sizes.map((s) => (
-              <button
-                key={s}
-                type="button"
-                aria-pressed={size === s}
-                className={size === s ? "is-active" : ""}
-                onClick={() => pickSize(s)}
-              >
-                {s}
-              </button>
-            ))}
+            {product.sizes.map((s) => {
+              const had = inStock(product, s);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  aria-pressed={size === s}
+                  aria-disabled={!had}
+                  disabled={!had}
+                  title={had ? undefined : `${s} is sold out`}
+                  className={`${size === s ? "is-active" : ""} ${had ? "" : "is-gone"}`}
+                  onClick={() => pickSize(s)}
+                >
+                  {s}
+                  {!had && <span className="sr-only"> — sold out</span>}
+                </button>
+              );
+            })}
           </div>
         )}
         <p className="buy-fit">
@@ -150,6 +160,8 @@ export default function ProductBuy({ slug }: { slug: string }) {
           </span>
           <span>
             <strong>{fitLabels[product.fit]}.</strong> {product.fitNote}
+            {/* the photographs are on a model, and this is what makes them readable as a size */}
+            {product.modelNote && <span className="buy-model">{product.modelNote}</span>}
           </span>
         </p>
       </div>
@@ -172,11 +184,12 @@ export default function ProductBuy({ slug }: { slug: string }) {
         </div>
         <button
           className="btn btn-wine"
+          disabled={gone}
           onClick={() =>
             requireSize() && bag.add({ slug, size: size!, color, qty })
           }
         >
-          <Bag /> Add to bag — {formatPrice(priceOf(product) * qty)}
+          <Bag /> {gone ? "Sold out" : `Add to bag — ${formatPrice(priceOf(product) * qty)}`}
         </button>
         <FavouriteButton slug={slug} name={product.name} className="buy-fav" />
       </div>
@@ -184,14 +197,20 @@ export default function ProductBuy({ slug }: { slug: string }) {
         className="btn btn-ghost buy-whatsapp"
         data-wa-source="product"
         // always a real link (crawlable, reachable by keyboard); without a size the click asks for one first
-        href={whatsappLink(size ? orderText : `Hi Lusted! I'd like to order the ${product.name}.`)}
+        href={whatsappLink(
+          gone
+            ? `Hi Lusted! Is the ${product.name} coming back?`
+            : size
+              ? orderText
+              : `Hi Lusted! I'd like to order the ${product.name}.`,
+        )}
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => {
-          if (!requireSize()) e.preventDefault();
+          if (!gone && !requireSize()) e.preventDefault();
         }}
       >
-        <WhatsApp /> Order now on WhatsApp
+        <WhatsApp /> {gone ? "Ask when it's back" : "Order now on WhatsApp"}
       </a>
       <TrustStrip />
 
@@ -203,12 +222,13 @@ export default function ProductBuy({ slug }: { slug: string }) {
         </div>
         <button
           className="btn btn-wine"
+          disabled={gone}
           onClick={() => {
             if (!requireSize()) return;
             bag.add({ slug, size: size!, color, qty });
           }}
         >
-          <Bag /> {size ? "Add to bag" : "Pick a size"}
+          <Bag /> {gone ? "Sold out" : size ? "Add to bag" : "Pick a size"}
         </button>
       </div>
 
@@ -216,6 +236,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
         <SizeGuideDialog
           category={product.category}
           available={product.sizes}
+          soldOut={product.soldOut ?? []}
           onPick={(s) => {
             pickSize(s);
             setGuideOpen(false);

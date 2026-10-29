@@ -271,6 +271,30 @@
   .filters-root.is-open .filters-scrim {
     opacity: 1;
   }
+  /* the grabber: what a thumb reaches for, and what a drag downwards takes hold of */
+  .filters-grab {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-raised);
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 28px;
+    margin: 0 0 var(--space-2);
+    padding: 0;
+    border: 0;
+    background: var(--paper);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .filters-grab span {
+    width: 44px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--hair);
+  }
+
   .filters {
     position: absolute;
     top: auto;
@@ -343,6 +367,10 @@
 
 /* An empty 80vh block told the shopper nothing and let the page jump when the detail landed. This holds the real
    layout — a 9:16 photo beside the name, price and buttons — so the page settles into itself. */
+.filters-grab {
+  display: none;
+}
+
 .pdp-skeleton {
   min-height: 80vh;
   display: grid;
