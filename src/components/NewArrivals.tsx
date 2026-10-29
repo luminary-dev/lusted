@@ -15,15 +15,15 @@ export default function NewArrivals() {
       <div className="container">
         <header className="head">
           <div data-reveal>
-            <p className="eyebrow">Just arrived</p>
+            <p className="eyebrow">Just arrived. Misbehave.</p>
             <h2 className="h2">
-              New in, <em>not yet seen on you.</em>
+              New in, <em>not yet ruined.</em>
             </h2>
           </div>
           <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
-            <p>The latest pieces to land, newest first — be the first to be caught in them, and the first out of them.</p>
+            <p>The freshest pieces, newest first — wear them before anyone else does, then let someone peel them off you.</p>
             <Link className="btn btn-wine" href="/products?new=1&sort=new">
-              Shop everything new <ArrowRight className="arrow" />
+              Shop every new temptation <ArrowRight className="arrow" />
             </Link>
           </div>
         </header>
