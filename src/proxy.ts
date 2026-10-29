@@ -7,7 +7,8 @@ import { site } from "@/lib/site";
 // (site.revealAt) — the address bar keeps the real URL. To see the actual site before then, open any page with
 // ?preview=1 once: it sets a cookie that lets you through for 30 days. The gate never applies where REVEAL_GATE=off is set in the environment (Vercel's
 // Preview environment carries it, so lusted-dev.vercel.app shows the real site while production shows the reveal
-// page) or on a host beginning with "dev."; after the moment passes it is simply gone, no deploy needed.
+// page) or on a host beginning with "dev."; after the moment passes it is simply gone, no deploy needed, and
+// /revealing-soon itself sends anyone who still asks for it to the home page.
 const REVEAL_AT = Date.parse(site.revealAt);
 const PREVIEW_COOKIE = "lusted-preview";
 
@@ -27,6 +28,13 @@ export function proxy(request: NextRequest) {
     if (pathname !== "/admin" && !ROOMS.has(room)) return NextResponse.rewrite(new URL("/_not-found", request.url), { status: 404 });
     return NextResponse.next();
   }
+
+  // once the reveal has happened the teaser has nothing left to count down to: a bookmark, a shared link or the
+  // countdown's own reload of this address lands on the home page instead. A temporary (307) redirect rather than a
+  // permanent one, because browsers keep a 308 with no expiry — if revealAt were ever moved later, or the page reused
+  // for the next drop, those visitors would never see it again — and the page is noindex, so a 308 would carry nothing
+  // to search.
+  if (pathname === "/revealing-soon" && Date.now() >= REVEAL_AT) return NextResponse.redirect(new URL("/", request.url), 307);
 
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? ""; // the public domain on Vercel
   const devHost = host.startsWith("dev.");
@@ -49,5 +57,6 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// every page, but not the API, Next's own files or anything with a file extension (images, icons, fonts)
+// every page (/revealing-soon included), but not the API, Next's own files or anything with a file extension (images,
+// icons, fonts)
 export const config = { matcher: ["/((?!api|_next|.*\\..*).*)"] };
