@@ -145,6 +145,250 @@
   color: #2e1418;
 }
 
+/* the main photo is a button that opens it full screen (PdpViewer.tsx): it lies over the whole frame, clear, with a
+   small magnifier in the corner so a phone, which has no zoom cursor, still says the photo opens. Its focus ring is
+   drawn inside, since the frame clips anything outside it. */
+.pdp-zoom {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 12px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.pdp-zoom:focus-visible {
+  outline-offset: -4px;
+  border-radius: inherit;
+}
+
+.pdp-zoom svg {
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 8px;
+  border-radius: 50%;
+  background: rgba(255, 248, 245, 0.85);
+  backdrop-filter: blur(10px);
+  color: #2e1418;
+  transition: transform 0.4s var(--ease);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pdp-zoom:hover svg {
+    transform: scale(1.12);
+  }
+}
+
+/* ───────── the photos full screen (PdpViewer.tsx) ─────────
+   The whole window, on the page's own paper so it follows the theme, the photo contained in it; the bar, the arrows
+   and the counter float over it as frosted circles like the gallery's view label. */
+
+.pv-dialog {
+  z-index: var(--z-overlay);
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.pv-dialog::backdrop {
+  background: var(--paper);
+}
+
+.pv-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none; /* every gesture here is the viewer's: swipe, pinch and pan, never the page's own zoom */
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: zoom-in;
+}
+
+.pv-stage.is-zoomed {
+  cursor: grab;
+}
+
+.pv-stage.is-zoomed.is-held {
+  cursor: grabbing;
+}
+
+.pv-track {
+  display: flex;
+  height: 100%;
+  transition: transform var(--dur-3) var(--ease);
+}
+
+.pv-slide {
+  position: relative;
+  flex: 0 0 100%;
+  overflow: hidden;
+}
+
+.pv-frame {
+  position: absolute;
+  inset: 0;
+  transition: transform var(--dur-3) var(--ease);
+}
+
+/* a finger or the mouse moves the photo directly; easing would make it lag behind */
+.pv-stage.is-held .pv-track,
+.pv-stage.is-held .pv-frame {
+  transition: none;
+}
+
+.pv-img {
+  object-fit: contain;
+  -webkit-user-drag: none;
+}
+
+.pv-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: max(var(--space-3), env(safe-area-inset-top)) max(var(--space-3), env(safe-area-inset-right)) var(--space-3) max(var(--space-3), env(safe-area-inset-left));
+  pointer-events: none; /* only its buttons take taps; the photo under the rest of it can still be dragged */
+}
+
+.pv-count {
+  margin-right: auto;
+}
+
+.pv-count-n {
+  display: block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.pv-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  color: var(--ink);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background var(--dur-1) var(--ease), opacity var(--dur-2) var(--ease);
+}
+
+.pv-btn:hover {
+  background: var(--paper);
+}
+
+.pv-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pv-btn[aria-disabled="true"] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pv-prev,
+.pv-next {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.pv-prev {
+  left: max(var(--space-3), env(safe-area-inset-left));
+}
+
+.pv-next {
+  right: max(var(--space-3), env(safe-area-inset-right));
+}
+
+.pv-hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  translate: -50% 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* the gesture a shopper actually has: fingers on a phone, the mouse and keys on a desktop */
+.pv-hint-mouse {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pv-hint-touch {
+    display: none;
+  }
+
+  .pv-hint-mouse {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pv-dialog[open] {
+    animation: pv-in var(--dur-2) var(--ease);
+  }
+
+  .pv-hint {
+    animation: pv-hint-out var(--dur-2) var(--ease) 3s both; /* says it once, then gets out of the photo's way */
+  }
+}
+
+@keyframes pv-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pv-hint-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* without motion the photo still changes and zooms, just at once rather than sliding or growing */
+@media (prefers-reduced-motion: reduce) {
+  .pv-track,
+  .pv-frame,
+  .pdp-zoom svg {
+    transition: none;
+  }
+}
+
 /* product names stay in the serif for legibility */
 .pdp-info .h2 {
   margin-top: 14px;

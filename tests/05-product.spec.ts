@@ -59,6 +59,31 @@ test.describe("product page", () => {
     await expect(page.locator(".pdp-main img.is-active")).toHaveAttribute("alt", `${name} — front view`);
   });
 
+  test("the main photo opens the piece's photos full screen: next photo, zoom, Esc closes and focus comes back", async ({ prepared: page }) => {
+    // nothing of the viewer (its script or its large photos) is on the page until the photo is opened
+    await expect(page.locator(".pv-dialog")).toHaveCount(0);
+    await page.getByRole("button", { name: "Open the front view full screen" }).click();
+    const viewer = page.getByRole("dialog", { name: `Photos of ${name}` });
+    await expect(viewer).toBeVisible();
+    const count = viewer.locator(".pv-count");
+    await expect(count).toHaveText(/1 \/ 3$/);
+    await expect(viewer.getByRole("img")).toHaveAttribute("alt", `${name} — front view`);
+    await page.keyboard.press("ArrowRight");
+    await expect(count).toHaveText(/2 \/ 3$/);
+    await expect(viewer.getByRole("img")).toHaveAttribute("alt", `${name} — back view`);
+    await viewer.getByRole("button", { name: "Next photo" }).click();
+    await expect(count).toHaveText(/3 \/ 3$/);
+    await expect(viewer.getByRole("button", { name: "Next photo" })).toHaveAttribute("aria-disabled", "true");
+    // a double-click zooms in where it lands; the button then offers to zoom back out
+    await viewer.locator(".pv-stage").dblclick();
+    await expect(viewer.getByRole("button", { name: "Zoom out" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".pv-dialog")).toHaveCount(0);
+    // focus is back on the photo, which now shows the view the shopper ended on
+    await expect(page.getByRole("button", { name: "Open the side view full screen" })).toBeFocused();
+    await expect(page.locator(".pdp-view")).toHaveText("Side");
+  });
+
   test("size is required: add to bag and WhatsApp both nudge until one is picked, the fit note shows", async ({ prepared: page }) => {
     await expect(page.locator(".buy-fit")).toContainText(/True to size|Runs small|Runs large/);
     // the guide opens over the piece now instead of sending the shopper to the home page and losing their choices
