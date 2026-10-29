@@ -73,8 +73,8 @@ npm run test:report  # open the last HTML report
 GitHub's two-core runners are several times slower than a laptop, so the suite runs two workers per machine, waits for
 hydration before it interacts (`go()` in `tests/fixtures.ts`), runs the browser without WebGL (they have no GPU; Lighthouse
 does the same) and leaves the screens over 4 million pixels (ultrawide, 4K, 5K) to local runs. The test and Lighthouse
-reports are attached to each run. A push reaches the dev site in about seven minutes. On a private repository every job's
-minutes count against the GitHub Actions minutes in your plan.
+reports are attached to each run. A push reaches the dev site in about seven minutes. The repository is public, so
+GitHub's standard runners cost nothing against the plan's Actions minutes.
 
 ```bash
 REVEAL_GATE=off npx next start -p 3200 &   # then, with the server up:
@@ -144,8 +144,9 @@ token for this repository with Contents read/write and Pull requests read (it fi
 `ANTHROPIC_API_KEY` — for the copy; and the four `R2_*` keys it already has. The repository needs one more Actions
 secret, `CONSOLE_TOKEN` — a fine-grained token with Contents and Pull requests read/write, used by the workflow to push
 the branch and open and merge the pull request (the workflow's own token could push, but nothing it pushes runs CI).
-The bucket must allow the browser's uploads: `node --env-file=.env.local scripts/admin/bucket-cors.mjs` once sets
-its CORS rules for the site's addresses — through Cloudflare's API with `CLOUDFLARE_API_TOKEN` in `.env.local` (an API
+The bucket must allow the browser's uploads: `node --env-file=.env.local scripts/admin/bucket-cors.mjs` sets its
+CORS rules for the site's addresses (lusted.lk, dev.lusted.lk, the two vercel.app addresses and localhost; run it again
+whenever one is added) — through Cloudflare's API with `CLOUDFLARE_API_TOKEN` in `.env.local` (an API
 token with "Workers R2 Storage: Edit"), since the site's own R2 keys can't change bucket settings; without it the script
 prints the rules to paste into the dashboard. Sessions are a signed cookie for seven days; eight wrong passwords in ten
 minutes lock an address out for ten.
@@ -193,10 +194,11 @@ after `vercel link`). The deploys run the Vercel CLI at the exact version in `VE
 `@latest` — it is handed the token and the dev deploy reads the preview's URL from its output — so a bump is that one
 line, to a release at least two weeks old.
 
-GitHub's own rulesets aren't available to this private repository on the organisation's free plan, so the rules above
-are enforced by the workflow (red checks, no deploy) rather than blocked by GitHub. The rulesets GitHub should enforce
-are kept ready in `.github/rulesets/` (see its README); when the plan allows them, `scripts/apply-rulesets.sh` turns
-them on. To deploy by hand from a laptop:
+The repository is public, and GitHub enforces the rules above: the rulesets in `.github/rulesets/` (see its README) are
+active on `dev` and `main`, so a pull request can't be merged until it is up to date with its base and every required
+check has passed, and neither branch takes a force-push. The workflow enforces the same on its side (red checks, no
+deploy), and its Branch rules job is what keeps `main` to pull requests from `dev`. After editing a ruleset file,
+`scripts/apply-rulesets.sh` updates them on GitHub. To deploy by hand from a laptop:
 
 ```bash
 vercel deploy --prod   # production

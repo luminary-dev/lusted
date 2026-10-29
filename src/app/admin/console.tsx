@@ -47,8 +47,8 @@ type Pending = { key: string; doneText: string; startedAt: number; check: (state
 type Toast = { key: string; text: string; phase: "applying" | "done" | "late" };
 type ActivityItem = { text: string; at: string };
 
-const SITE_DEV = "https://lusted-dev.vercel.app";
-const SITE_LIVE = "https://lusted.vercel.app";
+const SITE_DEV = "https://dev.lusted.lk";
+const SITE_LIVE = "https://lusted.lk";
 const REPO = "https://github.com/luminary-dev/lusted";
 const VERCEL = "https://vercel.com/dhanikaas-projects/lusted";
 const COLLECTIONS = categories.map((c) => ({ key: c.key, name: c.name }));
