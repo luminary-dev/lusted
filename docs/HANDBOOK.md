@@ -81,6 +81,18 @@ REVEAL_GATE=off npx next start -p 3200 &   # then, with the server up:
 npx @lhci/cli@0.15.1 autorun               # the Lighthouse step locally, after npm run build
 ```
 
+## Monitoring
+
+**Uptime** (`.github/workflows/uptime.yml`) checks the live site every fifteen minutes (at 7, 22, 37 and 52 past the
+hour, and on demand from the Actions tab): `https://lusted.lk/` answers (the "Revealing soon" page counts), `www.lusted.lk`
+is a 308 redirect to it, one photo from the manifest answers as an image at the address the site gives it (the
+`IMAGE_VERSION` and the path are read from `src/lib` on every run, so a version bump doesn't break it), and the
+certificate is for `lusted.lk` and has more than 14 days left. A request that fails is tried again after 20 seconds
+before it counts. A failure shows as a red run in the Actions tab, with an error naming the check and what it got, and
+GitHub emails it to whoever added or last changed the schedule (Settings → Notifications → Actions, email on). Each run's
+summary lists the four results. The address is `SITE_HOST` at the top of the file. Scheduled runs only use the copy on
+`main` and are free on a public repository; to silence it, Actions → Uptime → ⋯ → Disable workflow.
+
 ## Security
 
 The repository is public, so GitHub's protections are all on: secret scanning with push protection (a commit carrying a

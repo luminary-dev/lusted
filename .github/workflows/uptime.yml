@@ -1,0 +1,145 @@
+# Uptime — every fifteen minutes, is the live site answering? Four checks against SITE_HOST:
+#   Home page      https://lusted.lk/ answers 2xx (the "Revealing soon" page counts — the content isn't checked)
+#   www            https://www.lusted.lk/ is a 308 redirect to https://lusted.lk/
+#   A photo        one photo from the manifest, at the address the site gives it (/img/v<IMAGE_VERSION>/<path>, read
+#                  from src/lib at run time, so bumping the version doesn't break the check), answers 200 with an image
+#   Certificate    the certificate lusted.lk serves is for lusted.lk and good for more than another 14 days
+#
+# A request that fails is tried once more after a pause before it counts, so one slow answer doesn't fail the run.
+# A failed run shows in the Actions tab with an error naming the check, and GitHub emails it to whoever added or last
+# changed the schedule (the owner, by merging it), when email is on for Actions in their notification settings.
+# Scheduled runs use the workflow file on the default branch (main), and cost nothing on a public repository.
+# To silence it: Actions → Uptime → ⋯ → Disable workflow. No secrets.
+name: Uptime
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *" # off the hour, when GitHub's scheduler is busiest and runs start late
+  workflow_dispatch:
+
+concurrency:
+  group: uptime
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SITE_HOST: lusted.lk
+
+jobs:
+  check:
+    name: Check the live site
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # only the two files that say where the photos are served
+      - name: Check out the photo manifest
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            src/lib/cdn.ts
+            src/lib/image-manifest.json
+          sparse-checkout-cone-mode: false
+
+      # no `set -e`: every check runs and is reported, and the step fails at the end if any of them did
+      - name: Check the site
+        run: |
+          # shellcheck disable=SC2317,SC2329 # the check functions are called by name, through check()
+          set -uo pipefail
+          base="https://$SITE_HOST"
+          failed=0
+          {
+            echo "### Uptime — $base"
+            echo
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # fetch <url> <curl write-out>: prints the write-out, and the first line of curl's own message if it failed
+          curl_error="$(mktemp)"
+          fetch() {
+            local out
+            out="$(curl --silent --show-error --output /dev/null --connect-timeout 10 --max-time 30 \
+              --write-out "$2" "$1" 2> "$curl_error")"
+            if [[ -s $curl_error ]]; then
+              printf '%s (%s)' "${out% }" "$(head -n 1 "$curl_error")"
+            else
+              printf '%s' "${out% }"
+            fi
+          }
+          # check <name> <function>: the function sets `why` and returns non-zero on failure; it gets a second try
+          check() {
+            why=""
+            if "$2" || { sleep 20; "$2"; }; then
+              echo "ok — $1: $why"
+              echo "| $1 | ok — $why |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::error title=Uptime: $1::$1 failed for $base — $why"
+              echo "| $1 | **failed** — $why |" >> "$GITHUB_STEP_SUMMARY"
+              failed=1
+            fi
+          }
+
+          home() {
+            local got
+            got="$(fetch "$base/" '%{http_code}')"
+            why="$base/ answered $got"
+            [[ $got =~ ^2[0-9][0-9]$ ]]
+          }
+
+          www() {
+            local got
+            if [[ $SITE_HOST == *.vercel.app ]]; then
+              why="skipped, $SITE_HOST has no www"
+              return 0
+            fi
+            got="$(fetch "https://www.$SITE_HOST/" '%{http_code} %{redirect_url}')"
+            why="https://www.$SITE_HOST/ answered $got (wanted 308 to $base/)"
+            [[ $got == "308 $base/" || $got == "308 $base" ]]
+          }
+
+          # the version and a path are read from the code, so a bump of IMAGE_VERSION or a renamed photo is followed
+          version="$(sed -nE 's/^const IMAGE_VERSION = ([0-9]+);.*/\1/p' src/lib/cdn.ts)"
+          photo_path="$(jq -r '.images | keys[0] // empty' src/lib/image-manifest.json)"
+          photo() {
+            local got
+            if [[ -z $version || -z $photo_path ]]; then
+              why="couldn't read IMAGE_VERSION from src/lib/cdn.ts or a photo from src/lib/image-manifest.json"
+              return 1
+            fi
+            got="$(fetch "$base/img/v$version/$photo_path" '%{http_code} %{content_type}')"
+            why="/img/v$version/$photo_path answered $got"
+            [[ $got =~ ^200\ image/ ]]
+          }
+
+          certificate() {
+            local pem end expires
+            pem="$(echo | timeout 20 openssl s_client -connect "$SITE_HOST:443" -servername "$SITE_HOST" 2>/dev/null \
+              | openssl x509 2>/dev/null)"
+            if [[ -z $pem ]]; then
+              why="no certificate from $SITE_HOST:443 (the TLS handshake failed or timed out)"
+              return 1
+            fi
+            # a certificate for some other name (a parked domain's, say) would otherwise pass on its date alone
+            if ! openssl x509 -noout -checkhost "$SITE_HOST" <<< "$pem" | grep -q " does match "; then
+              why="the certificate served isn't for $SITE_HOST ($(openssl x509 -noout -subject <<< "$pem"))"
+              return 1
+            fi
+            end="$(openssl x509 -noout -enddate <<< "$pem")"
+            end="${end#notAfter=}"
+            expires="$(date -u -d "$end" +%s 2> /dev/null)"
+            why="expires $end"
+            [[ $expires =~ ^[0-9]+$ ]] && why+=", in $(( (expires - $(date -u +%s)) / 86400 )) days"
+            if ! openssl x509 -noout -checkend $((14 * 86400)) <<< "$pem" > /dev/null; then
+              why+=" — under 14 days left: Vercel renews its certificates itself, so look at the domain in Vercel"
+              return 1
+            fi
+          }
+
+          check "Home page" home
+          check "www redirect" www
+          check "A photo" photo
+          check "Certificate" certificate
+          exit "$failed"
