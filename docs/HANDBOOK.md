@@ -27,8 +27,8 @@ npm run lint
 - **Colours, type and spacing** — CSS variables at the top of `src/app/globals.css`; dark mode is the `[data-theme="dark"]` block.
 - **Brand assets** — `brand/` (logo pack, icons, social images).
 - **Link previews and search engines** — `src/app/opengraph-image.png` is the brand card every shared link shows (product pages share their own front photo instead); `src/app/sitemap.ts` and `src/app/robots.ts` build `/sitemap.xml` and `/robots.txt`. Absolute URLs come from Vercel's production domain (`src/lib/site-url.ts`), so a custom domain is picked up without a code change. The reveal page is `noindex`.
-- **Photos** — every photo (products, hero, sections) lives outside git: in `assets/` on a laptop (git-ignored) and in the private Cloudflare R2 bucket `luminary-lusted`. The site serves them from its own origin, `/img/<path>` (`src/app/img/[...path]/route.ts` reads the bucket with a signed request and answers with a year-long immutable cache header, so Vercel's edge serves repeats), and `next/image` optimises them from there. The repository keeps `src/lib/image-manifest.json` — each photo's path, size and blur placeholder — and `img("images/hero/main/main-01.webp")` from `src/lib/cdn.ts` turns a path into what `next/image` needs; a path not in the manifest is never fetched. The bucket's keys are the four `R2_*` variables (`.env.local` locally; the Vercel project and the repository's Actions secrets hold the same). After adding or changing a photo: `node scripts/images.mjs manifest`, then `node scripts/images.mjs upload` (new and changed photos only) and `node scripts/images.mjs check`. On a fresh clone, `node scripts/images.mjs pull` fetches them all. Setting `NEXT_PUBLIC_IMAGE_CDN` to a public address serves them from there instead.
-- **The wordmark on every photo** — every photo under `assets/images/` carries the same mark the product photos do (white wordmark, bottom right, soft shadow). `node scripts/watermark-images.mjs` puts it on any photo that doesn’t have it yet, keeps the unmarked original outside the repo (`../images/unmarked/`) and remembers what it has done in `assets/.watermarked.json`; transparent cut-outs (the FAQ models) are left alone. Run it after new photos land, before the manifest and upload steps. Because photos are served immutable for a year, a change to the photos under the same paths needs `IMAGE_VERSION` in `src/lib/cdn.ts` bumped — it’s a path segment the `/img` route ignores, and every cache refetches.
+- **Photos** — every photo (products, hero, sections) lives outside git: in `assets/` on a laptop (git-ignored) and in the private Cloudflare R2 bucket `luminary-lusted`. The site serves them from its own origin, `/img/v<IMAGE_VERSION>/<path>` (`src/app/img/[...path]/route.ts` reads the bucket with a signed request and answers with a year-long immutable cache header, so Vercel's edge serves repeats), and `next/image` optimises them from there. The repository keeps `src/lib/image-manifest.json` — each photo's path, size and blur placeholder — and `img("images/hero/main/main-01.webp")` from `src/lib/cdn.ts` turns a path into what `next/image` needs; a path not in the manifest is never fetched. The bucket's keys are the four `R2_*` variables (`.env.local` locally; the Vercel project and the repository's Actions secrets hold the same). After adding or changing a photo: `node scripts/images.mjs manifest`, then `node scripts/images.mjs upload` (new and changed photos only) and `node scripts/images.mjs check`. On a fresh clone, `node scripts/images.mjs pull` fetches them all. Setting `NEXT_PUBLIC_IMAGE_CDN` to a public address serves them from there instead.
+- **The wordmark on every photo** — every photo under `assets/images/` carries the same mark the product photos do (white wordmark, bottom right, soft shadow). `node scripts/watermark-images.mjs` puts it on any photo that doesn’t have it yet, keeps the unmarked original outside the repo (`../images/unmarked/`) and remembers what it has done in `assets/.watermarked.json`; transparent cut-outs (the FAQ models) are left alone. Run it after new photos land, before the manifest and upload steps. Because photos are served immutable for a year, a change to the photos under the same paths needs `IMAGE_VERSION` in `src/lib/cdn.ts` bumped — it’s a path segment, so every address changes and every cache refetches. Only the current version is served: the `/img` route answers 404 for any other, and `next/image` optimises only `/img/v<IMAGE_VERSION>/…` with no query string (`images.localPatterns` in `next.config.ts`, which reads the same constant), so made-up versions can’t each cost a function run, a bucket read and a billed transformation.
 - **Adding product photos** — put the shots in `refs/krea/products/` as `<slug>-front|back|side.png` and run `node scripts/import-krea-products.mjs`: it enhances them (Real-ESRGAN, when the binary is in `.tools/realesrgan/`), crops to 9:16, watermarks them into `assets/products/` and refreshes `product-images.ts`; then the manifest and upload steps above. Neither folder is in git.
 
 ## Performance
@@ -117,11 +117,17 @@ Nothing in the console touches the repository directly. The browser puts the pho
 signed addresses (`src/lib/admin/r2.ts`, under `incoming/`), then every change fires a `repository_dispatch`
 (`src/lib/admin/github.ts`) that the **Console** workflow (`.github/workflows/console.yml`) picks up: it applies the
 change on a branch off `dev` (`scripts/admin/add-product.mjs` finishes the photos, puts them in the bucket, updates
-the manifest, the catalogue and `product-images.ts`; `scripts/admin/apply-update.mjs` makes the smaller changes, and
-a removal deletes the photos too), commits it as `admin: <what changed>`, opens a pull request into `dev` and merges
+the manifest, the catalogue and `product-images.ts`; `scripts/admin/apply-update.mjs` makes the smaller changes — a
+removal takes the piece's photos out of the manifest but leaves them in the bucket, which the live site reads too, so
+it is never left with broken images while it still lists the piece before the next release; unlisted photos can be
+cleared from the bucket by hand later), commits it as `admin: <what changed>`, opens a pull request into `dev` and merges
 it once the checks are green — ten minutes or so, after which CI deploys the dev site. A console change takes the same
 road as every other change. Saving a row in the ledger sends only the fields changed in it, so a change still on its
-way — a percentage off its collection, say — isn't undone by the older values the row was showing. The console reads the catalogue off the `dev` branch, watches its pull requests and
+way — a percentage off its collection, say — isn't undone by the older values the row was showing. A change the
+workflow would refuse opens no pull request, so the console would wait on it for ever: an offer price at or above the
+full price, of nothing or of part of a rupee, or a percentage off outside whole numbers 1–90, is said beside the field
+and can't be saved, and the dispatch route refuses it with a 400 before anything is queued (both read
+`src/lib/admin/offers.ts`; the workflow keeps its own check as the last line of defence). The console reads the catalogue off the `dev` branch, watches its pull requests and
 says "done" the moment a change lands; `console-refresh.yml` keeps a queued console pull request up to date when
 another merges first. Live changes still go out by the usual release (`dev → main`). The tests read the catalogue
 facts they check from `catalog.json` itself (`tests/fixtures.ts`), so a piece added or changed from the console
@@ -183,7 +189,9 @@ deployed — the deploy job looks for the merge commit.
 
 CI needs three repository secrets (Settings → Secrets and variables → Actions): `VERCEL_TOKEN` (vercel.com → Account →
 Tokens; a token scoped to the team is fine), `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `.vercel/project.json`
-after `vercel link`).
+after `vercel link`). The deploys run the Vercel CLI at the exact version in `VERCEL_CLI` at the top of `ci.yml`, never
+`@latest` — it is handed the token and the dev deploy reads the preview's URL from its output — so a bump is that one
+line, to a release at least two weeks old.
 
 GitHub's own rulesets aren't available to this private repository on the organisation's free plan, so the rules above
 are enforced by the workflow (red checks, no deploy) rather than blocked by GitHub. The rulesets GitHub should enforce
