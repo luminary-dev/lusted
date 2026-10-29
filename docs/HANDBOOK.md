@@ -40,7 +40,7 @@ npm run lint
 
 ## Environment
 
-- `NEWSLETTER_WEBHOOK_URL` — optional. Where the newsletter form posts sign-ups. Until it is set the form says sign-ups open soon.
+- `NEWSLETTER_WEBHOOK_URL` — optional. Where the newsletter form posts sign-ups (`src/app/api/subscribe/route.ts`). Until it is set the route answers 501, nothing is stored, and the form says sign-ups open soon. The route only takes sign-ups from the site's own pages: a browser request from anywhere else gets 403, so no other site can sign people up. Under each form a short line says what subscribers get, that they can unsubscribe any time, and links to `/privacy` — the consent the Personal Data Protection Act asks for. Double opt-in (a confirmation email before an address is added) is up to the provider behind the webhook.
 - `OPENAI_API_KEY` — only for the image-generation scripts, never at runtime.
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET`, `GITHUB_ADMIN_TOKEN`, `ANTHROPIC_API_KEY` — the owner console, see below.
 
@@ -176,7 +176,7 @@ Hosted on Vercel as the `lusted` project. Two branches, two addresses, deployed 
   **https://dev.lusted.lk** (and the older https://lusted-dev.vercel.app) is pointed at it. Vercel's Preview environment carries `REVEAL_GATE=off`, so the dev
   site shows the real pages. (Preview deployments ask for a Vercel login unless Deployment Protection is relaxed in the
   project settings.)
-- **`main`** — production, **https://lusted.lk** (and lusted.vercel.app), which shows the "Revealing soon" page until reveal day. Only
+- **`main`** — production, **https://lusted.lk** (and lusted.vercel.app), which shows the "Revealing soon" page until reveal day (`/privacy` stays readable, for the newsletter form's link). Only
   merges of `dev` reach it.
 
 **Versions and releases.** Every release carries a version in `package.json` (the footer shows it as `v0.9.0`), and

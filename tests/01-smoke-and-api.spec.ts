@@ -145,6 +145,20 @@ test.describe("newsletter API", () => {
     expect([200, 501, 502]).toContain(r.status());
     if (r.status() === 501) expect((await r.json()).error).toMatch(/not configured/i);
   });
+  test("refuses a sign-up posted from another site with 403", async ({ request, baseURL }) => {
+    // what a third-party page's cross-site POST looks like: text/plain (no preflight), its own Origin, and
+    // Sec-Fetch-Site from a current browser — each one alone is refused before the body is read
+    const data = JSON.stringify({ email: "someone@example.com" });
+    const plain = { "content-type": "text/plain" };
+    const foreign: Record<string, string>[] = [{ origin: "https://evil.example" }, { origin: "null" }, { "sec-fetch-site": "cross-site" }, { origin: "https://evil.example", "sec-fetch-site": "cross-site" }];
+    for (const headers of foreign) {
+      const r = await request.post("/api/subscribe", { data, headers: { ...plain, ...headers } });
+      expect(r.status(), JSON.stringify(headers)).toBe(403);
+    }
+    // the site's own origin (and a request with no Origin at all, as above) goes on to the usual answers
+    const own = await request.post("/api/subscribe", { data: { email: "someone@example.com" }, headers: { origin: baseURL!, "x-real-ip": `198.51.100.7-${Date.now()}` } });
+    expect([200, 501, 502]).toContain(own.status());
+  });
 });
 
 // With site.revealGate on, every page is replaced by /revealing-soon until reveal day (site.revealAt) unless the preview
@@ -163,6 +177,14 @@ test.describe("revealing soon", () => {
     await expect(page.locator("footer.footer")).toBeHidden();
     await expect(page.locator(".reveal-count li")).toHaveCount(4);
     await expect(page.locator(".reveal-count .reveal-num").first()).toHaveText(/\d\d/);
+  });
+
+  test("the privacy policy stays readable behind the gate (the newsletter form links to it)", async ({ page }) => {
+    await page.context().clearCookies();
+    const res = await page.goto("/privacy", { waitUntil: "domcontentloaded" });
+    expect(res?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Privacy Policy/);
+    await expect(page.locator(".reveal")).toHaveCount(0);
   });
 
   test("?preview=1 sets the cookie and lets the real site through", async ({ page }) => {

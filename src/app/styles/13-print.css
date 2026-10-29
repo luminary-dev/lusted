@@ -201,6 +201,12 @@ body:has(.reveal) > :is(.intro, .nav, .scroll-rail, .footer, .search-root, .draw
   color: rgba(255, 246, 242, 0.62);
 }
 
+.reveal-news .news-consent {
+  padding-left: 0;
+  text-align: center;
+  color: rgba(255, 246, 242, 0.68);
+}
+
 @media (max-width: 600px) {
   .reveal-bg {
     object-position: 50% 50%; /* the phone cut already frames the three */
