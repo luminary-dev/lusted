@@ -39,6 +39,8 @@ if (action === "update-product") {
     delete product.salePrice;
   } else if (typeof data.salePrice === "number" && data.salePrice > 0) {
     const sale = Math.round(data.salePrice);
+    // the console and the dispatch route refuse this before it is queued (src/lib/admin/offers.ts); this stays as the
+    // last line of defence
     if (sale >= product.price) throw new Error("update-product: the offer price must be below the full price");
     if (sale !== product.salePrice) {
       parts.push(`${product.salePrice ? "offer" : "on offer at"} ${lkr(sale)}`);

@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import wordmarkDark from "@/assets/brand/wordmark-dark.png";
 import wordmarkLight from "@/assets/brand/wordmark-light.png";
+import { offerProblem, percentProblem } from "@/lib/admin/offers";
 import { IMAGE_VERSION } from "@/lib/cdn";
 import { categories, colors, fitLabels, sizes as SIZES, type Category, type ColorKey } from "@/lib/products";
 
@@ -504,6 +505,9 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
   const [category, setCategory] = useState<string>("swim");
   const [percent, setPercent] = useState("20");
   const [busy, setBusy] = useState(false);
+  // only a percentage the workflow will take can be sent: anything else is said here, not lost in the workflow
+  const percentWrong = percent === "" ? null : percentProblem(Number(percent));
+  const percentNote = useId();
   const matching = products.filter((p) => category === "*" || p.category === category);
   const scope = category === "*" ? "the whole catalogue" : `every ${COLLECTIONS.find((c) => c.key === category)?.name ?? category} piece`;
   const on = matching.filter((p) => typeof p.salePrice === "number" && p.salePrice < p.price).length;
@@ -535,19 +539,34 @@ function Offers({ products, track }: { products: CatalogEntry[]; track: Track })
         <div className="adm-offer-line">
           <span className="adm-offer-word">Take</span>
           <span className="adm-offer-pct">
-            <input className="adm-input adm-input-big" type="number" min={1} max={90} value={percent} aria-label="Percent off" onChange={(e) => setPercent(e.currentTarget.value)} />
+            <input
+              className={`adm-input adm-input-big ${percentWrong ? "is-wrong" : ""}`}
+              type="number"
+              min={1}
+              max={90}
+              value={percent}
+              aria-label="Percent off"
+              aria-invalid={!!percentWrong}
+              aria-describedby={percentWrong ? percentNote : undefined}
+              onChange={(e) => setPercent(e.currentTarget.value)}
+            />
             <span aria-hidden="true">%</span>
           </span>
           <span className="adm-offer-word">off</span>
           <Select label="Collection" size="big" value={category} options={[...COLLECTION_OPTIONS, { value: "*", label: "everything" }]} onChange={setCategory} />
         </div>
         <div className="adm-row adm-row-tight">
-          <button type="button" className="adm-btn" disabled={busy || !Number(percent)} onClick={() => send(Math.round(Number(percent)))}>
+          <button type="button" className="adm-btn" disabled={busy || percent === "" || !!percentWrong} onClick={() => send(Math.round(Number(percent)))}>
             Put it on {matching.length} pieces
           </button>
           <button type="button" className="adm-quiet" disabled={busy || on === 0} onClick={() => send(null)}>
             Clear the {on} on offer
           </button>
+          {percentWrong && (
+            <span className="adm-wrong" id={percentNote} role="alert">
+              {percentWrong}.
+            </span>
+          )}
           <span className="adm-help">Offer prices land on a round ten rupees, always under the full price. For one piece, use its row in the ledger.</span>
         </div>
       </div>
@@ -598,9 +617,12 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
   const pct = sale && Number(sale) < Number(price) ? Math.round((1 - Number(sale) / Number(price)) * 100) : 0;
   // a seventh best seller: the six are already taken by other pieces
   const seventh = rank !== "" && !product.bestSeller && bestTaken >= BEST_LIMIT;
+  // an offer the workflow would refuse (at or above the price, nothing, or part of a rupee) is said here, before Save
+  const offerWrong = sale === "" ? null : offerProblem(Number(sale), Number(price));
+  const offerNote = useId();
 
   async function save() {
-    if (seventh) return;
+    if (seventh || offerWrong) return;
     setWaiting(true);
     const data = { name: name.trim(), category, price: Number(price), salePrice: sale === "" ? null : Number(sale), bestSeller: rank === "" ? null : Number(rank) };
     const result = await post("/api/admin/dispatch", { action: "update-product", slug: product.slug, data });
@@ -644,8 +666,24 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
       </td>
       <td className="adm-td-num">
         <span className="adm-offer-cell">
-          <input className="adm-input adm-input-row adm-num-in" type="number" min={1} placeholder="—" value={sale} aria-label="Offer price" onChange={(e) => setSale(e.currentTarget.value)} />
-          {pct > 0 && <span className="adm-off">−{pct}%</span>}
+          <input
+            className={`adm-input adm-input-row adm-num-in ${offerWrong ? "is-wrong" : ""}`}
+            type="number"
+            min={1}
+            placeholder="—"
+            value={sale}
+            aria-label="Offer price"
+            aria-invalid={!!offerWrong}
+            aria-describedby={offerWrong ? offerNote : undefined}
+            onChange={(e) => setSale(e.currentTarget.value)}
+          />
+          {offerWrong ? (
+            <span className="adm-off adm-wrong" id={offerNote} role="alert">
+              {offerWrong.toLowerCase()}
+            </span>
+          ) : (
+            pct > 0 && <span className="adm-off">−{pct}%</span>
+          )}
           <Select
             label="Set the offer by percent"
             size="dim"
@@ -672,7 +710,7 @@ function LedgerRow({ product, track, bestTaken }: { product: CatalogEntry; track
           </span>
         ) : (
           <>
-            <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh} onClick={save}>
+            <button type="button" className="adm-quiet adm-save" disabled={!dirty || seventh || !!offerWrong} onClick={save}>
               Save
             </button>
             <button type="button" className="adm-quiet is-danger" onClick={remove}>
