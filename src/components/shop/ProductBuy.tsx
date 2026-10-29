@@ -16,6 +16,7 @@ import {
 import { fillIn, productUrl, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import FavouriteButton from "./FavouriteButton";
+import HintButton from "./HintButton";
 import TrustStrip from "./TrustStrip";
 import SizeGuideDialog from "./SizeGuideDialog";
 import { Bag, WhatsApp } from "../icons";
@@ -81,6 +82,8 @@ export default function ProductBuy({ slug }: { slug: string }) {
     productUrl(origin, slug),
     ...fillIn,
   ].join("\n");
+  // the link opens on the colourway being looked at (the page reads ?colour=, above)
+  const hintUrl = `${productUrl(origin, slug)}?colour=${color}`;
 
   return (
     <div className="buy">
@@ -212,6 +215,13 @@ export default function ProductBuy({ slug }: { slug: string }) {
       >
         <WhatsApp /> {gone ? "Ask when it's back" : "Order now on WhatsApp"}
       </a>
+      <HintButton
+        title={product.name}
+        text={`Picture me in this — the ${product.name}, in ${colors[color].label}. Now picture peeling it off me. Consider this a hint.`}
+        url={hintUrl}
+        copy={hintUrl}
+        source="product"
+      />
       <TrustStrip />
 
       {/* aria-hidden while it's away so the same two controls aren't announced twice */}

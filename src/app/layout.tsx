@@ -7,6 +7,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
 import BagToast from "@/components/shop/BagToast";
+import PhotoMorphProvider from "@/components/shop/PhotoMorph";
 import SearchDialog from "@/components/SearchDialog";
 import SiteAnalytics from "@/components/SiteAnalytics";
 import { siteUrl } from "@/lib/site-url";
@@ -88,7 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Nav />
         <ScrollRail />
         <FluidCursor />
-        {children}
+        <PhotoMorphProvider>{children}</PhotoMorphProvider>
         <Footer />
         <BagDrawer />
         <BagToast />

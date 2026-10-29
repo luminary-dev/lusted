@@ -12,6 +12,7 @@ import Contact from "@/components/Contact";
 import JsonLd from "@/components/JsonLd";
 import { instagramLink, site } from "@/lib/site";
 import { siteUrl } from "@/lib/site-url";
+import { PageFade } from "@/components/shop/PhotoMorph";
 
 // The description and the share card come from the layout; the home page adds where it is, for local search.
 export const metadata: Metadata = {
@@ -40,18 +41,20 @@ const store = {
 
 export default function Home() {
   return (
-    <main>
-      <JsonLd data={store} />
-      <Hero />
-      <SaleSection />
-      <Collections />
-      <BestSellers />
-      <NewArrivals />
-      <AfterDark />
-      <SizeGuide />
-      <About />
-      <HowItWorks />
-      <Contact />
-    </main>
+    <PageFade>
+      <main>
+        <JsonLd data={store} />
+        <Hero />
+        <SaleSection />
+        <Collections />
+        <BestSellers />
+        <NewArrivals />
+        <AfterDark />
+        <SizeGuide />
+        <About />
+        <HowItWorks />
+        <Contact />
+      </main>
+    </PageFade>
   );
 }
