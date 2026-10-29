@@ -71,11 +71,20 @@ const setFont = (c: CanvasRenderingContext2D, weight: string, px: number, family
   c.font = `${weight} ${px}px ${family}`;
   (c as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${spacing}px`;
 };
+// The largest size up to `px` at which the text fits `max`. It measures the ink, not just the advance: a script's
+// swashes reach past the advance, and the size on a tag is set in the script.
 const fitFont = (c: CanvasRenderingContext2D, text: string, weight: string, px: number, family: string, max: number) => {
+  const wide = () => {
+    const m = c.measureText(text);
+    return Math.max(m.width, m.actualBoundingBoxLeft + m.actualBoundingBoxRight);
+  };
   let size = px;
   do setFont(c, weight, size, family);
-  while (c.measureText(text).width > max && --size > 16);
+  while (wide() > max && --size > 16);
 };
+// the widest a size may print on either face: the width of the dashed rules under it, less a margin each side, so even
+// XXL (at full size twice as wide as XS, and wider than the card on the back) sits on the card with air around it
+const SIZE_MAX = 440;
 
 export type Paint = (c: CanvasRenderingContext2D, tag: TagData, mode: Mode, w: number, h: number) => void;
 
@@ -100,7 +109,7 @@ export function makePainter({ script, sans, fibre }: { script: string; sans: str
     c.textAlign = "center";
     // size in script, then a short gold-foil rule
     c.fillStyle = ink("ink");
-    setFont(c, "400", 168, script);
+    fitFont(c, tag.size, "400", 168, script, SIZE_MAX);
     c.fillText(tag.size, 320, 350);
     c.fillStyle = INK.foil[mode];
     c.fillRect(270, 384, 100, 3);
@@ -162,7 +171,7 @@ export function makePainter({ script, sans, fibre }: { script: string; sans: str
     setFont(c, "600", 26, sans, 14);
     c.fillText("LUSTED", 327, 330);
     c.fillRect(250, 366, 140, 2.5);
-    setFont(c, "400", 236, script);
+    fitFont(c, tag.size, "400", 236, script, SIZE_MAX);
     c.fillText(tag.size, 320, 650);
     c.fillStyle = INK.blush[mode];
     setFont(c, "400", 52, script);

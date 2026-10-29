@@ -69,6 +69,32 @@
   font-size: var(--step--2);
 }
 
+/* On a card the badges share the photo's top edge with the heart, so they stop short of it: on a phone's two-up grid
+   "Best seller" ran under the button and read "BEST SELLE". A narrow card tightens the labels so they fit beside it,
+   and one that still can't (the narrowest phones) wraps onto a second line rather than hiding under the heart. The
+   card's own width decides, not the screen's — the same card is narrow in a phone grid and wide in a tablet's. */
+.product-media {
+  container-type: inline-size;
+}
+
+.product-media .badges {
+  right: 52px; /* the heart: 10px in, 38px wide, and a little air */
+}
+
+@container (max-width: 220px) {
+  .product-media .badges {
+    top: 10px;
+    left: 8px;
+    gap: 4px;
+  }
+
+  .product-media .badges .badge {
+    padding: 5px 8px;
+    letter-spacing: 0.08em;
+    line-height: 1.4; /* the body's 1.65 makes a two-line pill gape */
+  }
+}
+
 .badge-sale {
   background: #7a1b33 !important;
   color: #fff6f2 !important;

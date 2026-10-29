@@ -20,7 +20,11 @@ export default function ProductsPage() {
             <h1 className="h2">
               Nothing in here <em>is decent.</em>
             </h1>
-            <p className="lede">{products.length} pieces across lingerie, swim and after dark, all of them easy to lose — filter by size, colour and price, then take your pick.</p>
+            {/* the second half is how-to the toolbar below already shows, so a phone — where it cost two lines above the
+                first piece — leaves it out */}
+            <p className="lede">
+              {products.length} pieces across lingerie, swim and after dark, all of them easy to lose<span className="shop-lede-more"> — filter by size, colour and price, then take your pick</span>.
+            </p>
           </header>
           {/* useSearchParams needs a Suspense boundary; the fallback is the unfiltered grid skeleton. */}
           <Suspense fallback={<div className="shop-loading" />}>
