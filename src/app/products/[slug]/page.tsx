@@ -86,6 +86,21 @@ function ProductDetails({ product }: { product: NonNullable<ReturnType<typeof ge
           </p>
 
           <ProductBuy slug={product.slug} />
+
+          {/* the catalogue's fabric, construction and care lines, as written — rendered on the server, so they are
+              in the page's HTML for search engines as well as shoppers */}
+          {product.details.length > 0 && (
+            <section className="pdp-details" aria-labelledby="pdp-details-title">
+              <h2 id="pdp-details-title" className="pdp-details-title">
+                Details &amp; care
+              </h2>
+              <ul>
+                {product.details.map((d) => (
+                  <li key={d}>{d}</li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
 

@@ -53,7 +53,7 @@ export default function About() {
             ))}
           </ul>
           <div className="about-actions">
-            <a className="btn btn-wine" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
+            <a className="btn btn-wine" data-wa-source="about" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
               Tempt me <ArrowRight className="arrow" />
             </a>
             <Link href="/about" className="btn btn-ghost">

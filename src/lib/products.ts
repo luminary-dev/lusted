@@ -111,10 +111,51 @@ export const priceBuckets = [
   { key: "10000", label: "LKR 10,000+", test: (n: number) => n >= 10000 },
 ];
 
-// Every word must appear in the product's name, description, category, colours or details.
+// Shoppers' words the catalogue doesn't use, and the catalogue's words for them. Keys are singular (query words are
+// folded to the singular before the lookup), and every word on the right must really occur in a piece's name, details
+// or colours, or a collection's label or name — a word nobody wrote finds nothing.
+export const searchSynonyms: Record<string, string[]> = {
+  pink: ["blush", "rose"],
+  red: ["wine", "scarlet", "rouge", "crimson"],
+  burgundy: ["wine"],
+  white: ["ivory", "pearl"],
+  cream: ["ivory"],
+  purple: ["lilac"],
+  brown: ["mocha"],
+  blue: ["aqua"],
+  panty: ["brief", "thong"],
+  knicker: ["brief", "thong"],
+  underwear: ["brief", "thong"],
+  swimwear: ["swim", "bikini", "monokini", "swimsuit"],
+  swimsuit: ["swim", "bikini", "monokini", "swimsuit"],
+  lingerie: ["lace"],
+  nighty: ["slip", "babydoll", "teddy"],
+  nightie: ["slip", "babydoll", "teddy"],
+  nightdress: ["slip", "babydoll", "teddy"],
+  dress: ["gown", "mini", "cheongsam"],
+};
+
+// Lower case without accents, so "rose" finds "Rosé" and "elodie" finds "Élodie".
+const fold = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const wordsOf = (s: string) => fold(s).split(/[^a-z0-9]+/).filter(Boolean);
+// A rough singular — enough for "bikinis", "dresses" and "panties"; short words like "bra" and "set" are left alone.
+const singular = (w: string) =>
+  w.length > 4 && w.endsWith("ies") ? `${w.slice(0, -3)}y` : /(ss|sh|ch|x|z)es$/.test(w) ? w.slice(0, -2) : w.length > 3 && /[^s]s$/.test(w) ? w.slice(0, -1) : w;
+
+// Every word of the query must match (AND). A word matches when a word of the piece's name, description, details,
+// colours, category or collection starts with it — so a half-typed "biki" already finds the bikinis but "red" no longer
+// finds "underwired" — or when its singular does, or when one of its synonyms above is a whole word of the piece's name,
+// details, colours, category or collection. Synonyms skip the description and must match whole words, because the
+// prose uses words loosely: "Slip the straps back" isn't a slip, and "dress" → "mini" mustn't find "minimal".
 export function matchesQuery(p: Product, query: string) {
-  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const words = wordsOf(query);
   if (!words.length) return true;
-  const hay = [p.name, p.description, categoryLabel(p.category), collectionName(p.category), ...p.colors.map((c) => colors[c].label), ...p.details].join(" ").toLowerCase();
-  return words.every((w) => hay.includes(w));
+  const labels = wordsOf([p.name, categoryLabel(p.category), collectionName(p.category), ...p.colors.map((c) => colors[c].label), ...p.details].join(" "));
+  const hay = [...labels, ...wordsOf(p.description)];
+  const whole = new Set([...labels, ...labels.map(singular)]);
+  return words.every((w) => {
+    const one = singular(w);
+    if (hay.some((h) => h.startsWith(w) || h.startsWith(one))) return true;
+    return [...(searchSynonyms[w] ?? []), ...(searchSynonyms[one] ?? [])].some((s) => whole.has(s));
+  });
 }

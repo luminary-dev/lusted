@@ -1,12 +1,14 @@
 import { AwsClient } from "aws4fetch";
+import { IMAGE_VERSION } from "@/lib/cdn";
 import manifest from "@/lib/image-manifest.json";
 
 // The photos: served from the site's own origin, read from the private R2 bucket with a signed request. Only the
 // server holds the keys (R2_* in the environment), only paths in the manifest are ever fetched, and the answer is
 // cacheable for a year, so Vercel's edge serves repeats and the bucket sees a request per photo per region.
-// next/image points at /img/<path> (src/lib/cdn.ts) and optimises from here like any same-origin image.
+// next/image points at /img/v<IMAGE_VERSION>/<path> (src/lib/cdn.ts) and optimises from here like any same-origin image.
 
 const paths = new Set(Object.keys(manifest.images));
+const version = `v${IMAGE_VERSION}`;
 
 function r2() {
   const { R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY } = process.env;
@@ -19,7 +21,14 @@ function r2() {
 
 async function serve(request: Request, params: Promise<{ path: string[] }>, method: "GET" | "HEAD") {
   const segments = (await params).path;
-  if (/^v\d+$/.test(segments[0] ?? "")) segments.shift(); // the cache-busting version (src/lib/cdn.ts) isn't part of the key
+  // The cache-busting version (src/lib/cdn.ts) isn't part of the key, and only the current one is served: any other
+  // would be a fresh address for the same photo — no cache has it, so each one costs a function run and a bucket read,
+  // and through next/image a billed transformation too. A path with no version still answers as before: there's only
+  // one per photo, so it can't be multiplied (nothing on the site uses it, and next/image won't optimise it).
+  if (/^v\d+$/.test(segments[0] ?? "")) {
+    if (segments[0] !== version) return new Response("Not found", { status: 404 });
+    segments.shift();
+  }
   const key = segments.join("/");
   if (!paths.has(key)) return new Response("Not found", { status: 404 });
   const bucket = r2();
@@ -30,7 +39,12 @@ async function serve(request: Request, params: Promise<{ path: string[] }>, meth
   if (inm) headers["if-none-match"] = inm;
   const upstream = await bucket.client.fetch(`${bucket.base}/${key}`, { method, headers });
   if (upstream.status === 304) return new Response(null, { status: 304, headers: { "cache-control": "public, max-age=31536000, immutable" } });
-  if (!upstream.ok) return new Response("Not found", { status: upstream.status === 404 ? 404 : 502 });
+  if (!upstream.ok) {
+    // a photo in the manifest the bucket won't hand over (missing from it, a bad key, R2 down): say so in Vercel's
+    // runtime logs, which the browser's broken image never would
+    console.error(JSON.stringify({ event: "img_upstream_error", key, status: upstream.status }));
+    return new Response("Not found", { status: upstream.status === 404 ? 404 : 502 });
+  }
 
   const out = new Headers({
     "content-type": upstream.headers.get("content-type") ?? "application/octet-stream",
