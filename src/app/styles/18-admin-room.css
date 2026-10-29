@@ -758,7 +758,7 @@ select.adm-input-big {
 
 .adm-ledger {
   width: 100%;
-  min-width: 760px;
+  min-width: 940px; /* the sold-out sizes made it a column wider */
   border-collapse: collapse;
   text-align: left;
 }
@@ -853,6 +853,49 @@ select.adm-input-big {
 
 .adm-pct-pick {
   width: 76px;
+}
+
+/* ─ the sizes a piece is out of: a row of small tags, a pressed one struck through in rose ─ */
+.adm-td-gone {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.adm-gone {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.adm-gone-size {
+  min-width: 30px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--a-hair-2);
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--a-ink-2);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.adm-gone-size:hover {
+  border-color: var(--a-rose);
+}
+
+.adm-gone-size:focus-visible {
+  outline: 2px solid var(--a-blush);
+  outline-offset: 2px;
+}
+
+.adm-gone-size.is-on {
+  border-color: var(--a-rose);
+  background: rgba(160, 68, 89, 0.16);
+  color: var(--a-ink);
+  text-decoration: line-through;
 }
 
 :root[data-theme="light"] .adm-room .adm-select-list {

@@ -4,16 +4,17 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { setColorChoice } from "@/lib/color-choice";
 import { bag } from "@/lib/bag";
 import {
-  allSoldOut,
   colors,
   fitLabels,
   formatPrice,
   getProduct,
   inStock,
   priceOf,
+  soldOutPick,
   type ColorKey,
 } from "@/lib/products";
-import { fillIn, productUrl, useOrigin } from "@/lib/order";
+import { trackEvent } from "@/lib/analytics";
+import { backInStockText, fillIn, productUrl, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import FavouriteButton from "./FavouriteButton";
 import HintButton from "./HintButton";
@@ -34,7 +35,6 @@ const useColourParam = () =>
 export default function ProductBuy({ slug }: { slug: string }) {
   const product = getProduct(slug)!;
   const oneSize = product.sizes.length === 1;
-  const gone = allSoldOut(product);
   // The shopper's own pick wins; until they make one the piece opens on the colourway its link asked for.
   const asked = useColourParam();
   const [picked, setPicked] = useState<ColorKey | null>(null);
@@ -76,12 +76,34 @@ export default function ProductBuy({ slug }: { slug: string }) {
     setNudge(false);
   }
 
+  // the size picked is sold out (or the whole piece is, before one is picked): the button asks the shop to say when
+  // it's back instead of adding it
+  const asking = soldOutPick(product, size);
+
   const origin = useOrigin();
   const orderText = [
     `Hi Lusted! I'd like to order the ${product.name} — ${colors[color].label}, size ${size}, qty ${qty} (${formatPrice(priceOf(product) * qty)}).`,
     productUrl(origin, slug),
     ...fillIn,
   ].join("\n");
+  // One link, in two places (beside the price and in the phone's bar). `data-wa-source` names it in the WhatsApp
+  // count (SiteAnalytics.tsx); its own event says which piece and size were asked for, so the shop knows what to bring
+  // back first.
+  const askLink = (
+    <a
+      className="btn btn-wine buy-ask"
+      data-wa-source="back-in-stock"
+      href={whatsappLink(
+        backInStockText({ name: product.name, colour: colors[color].label, size: oneSize ? null : size, url: productUrl(origin, slug) }),
+      )}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => trackEvent("back_in_stock_ask", { slug, size: size ?? "any" })}
+    >
+      <WhatsApp /> Tell me the second it&rsquo;s back
+    </a>
+  );
+
   // the link opens on the colourway being looked at (the page reads ?colour=, above)
   const hintUrl = `${productUrl(origin, slug)}?colour=${color}`;
 
@@ -137,13 +159,13 @@ export default function ProductBuy({ slug }: { slug: string }) {
           <div className="size-chips" ref={sizeGroup}>
             {product.sizes.map((s) => {
               const had = inStock(product, s);
+              // a sold-out size stays pickable, so a shopper can ask for it back; it's struck through and named as
+              // sold out, and picking it turns the button into that ask
               return (
                 <button
                   key={s}
                   type="button"
                   aria-pressed={size === s}
-                  aria-disabled={!had}
-                  disabled={!had}
                   title={had ? undefined : `${s} is sold out`}
                   className={`${size === s ? "is-active" : ""} ${had ? "" : "is-gone"}`}
                   onClick={() => pickSize(s)}
@@ -170,51 +192,54 @@ export default function ProductBuy({ slug }: { slug: string }) {
       </div>
 
       <div className="buy-actions" ref={actions}>
-        <div className="stepper" aria-label="Quantity">
+        {/* nothing is being ordered while asking, so there's no quantity to choose */}
+        {!asking && (
+          <div className="stepper" aria-label="Quantity">
+            <button
+              aria-label="Decrease quantity"
+              onClick={() => setQty((q) => Math.max(1, q - 1))}
+            >
+              −
+            </button>
+            <span>{qty}</span>
+            <button
+              aria-label="Increase quantity"
+              onClick={() => setQty((q) => Math.min(10, q + 1))}
+            >
+              +
+            </button>
+          </div>
+        )}
+        {asking ? (
+          askLink
+        ) : (
           <button
-            aria-label="Decrease quantity"
-            onClick={() => setQty((q) => Math.max(1, q - 1))}
+            className="btn btn-wine"
+            onClick={() =>
+              requireSize() && bag.add({ slug, size: size!, color, qty })
+            }
           >
-            −
+            <Bag /> Add to bag — {formatPrice(priceOf(product) * qty)}
           </button>
-          <span>{qty}</span>
-          <button
-            aria-label="Increase quantity"
-            onClick={() => setQty((q) => Math.min(10, q + 1))}
-          >
-            +
-          </button>
-        </div>
-        <button
-          className="btn btn-wine"
-          disabled={gone}
-          onClick={() =>
-            requireSize() && bag.add({ slug, size: size!, color, qty })
-          }
-        >
-          <Bag /> {gone ? "Sold out" : `Add to bag — ${formatPrice(priceOf(product) * qty)}`}
-        </button>
+        )}
         <FavouriteButton slug={slug} name={product.name} className="buy-fav" />
       </div>
-      <a
-        className="btn btn-ghost buy-whatsapp"
-        data-wa-source="product"
-        // always a real link (crawlable, reachable by keyboard); without a size the click asks for one first
-        href={whatsappLink(
-          gone
-            ? `Hi Lusted! Is the ${product.name} coming back?`
-            : size
-              ? orderText
-              : `Hi Lusted! I'd like to order the ${product.name}.`,
-        )}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={(e) => {
-          if (!gone && !requireSize()) e.preventDefault();
-        }}
-      >
-        <WhatsApp /> {gone ? "Ask when it's back" : "Order now on WhatsApp"}
-      </a>
+      {/* while asking, the button above is already the WhatsApp link — a second one would only order what's gone */}
+      {!asking && (
+        <a
+          className="btn btn-ghost buy-whatsapp"
+          data-wa-source="product"
+          // always a real link (crawlable, reachable by keyboard); without a size the click asks for one first
+          href={whatsappLink(size ? orderText : `Hi Lusted! I'd like to order the ${product.name}.`)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => {
+            if (!requireSize()) e.preventDefault();
+          }}
+        >
+          <WhatsApp /> Order now on WhatsApp
+        </a>
+      )}
       <HintButton
         title={product.name}
         text={`Picture me in this — the ${product.name}, in ${colors[color].label}. Now picture peeling it off me. Consider this a hint.`}
@@ -225,21 +250,24 @@ export default function ProductBuy({ slug }: { slug: string }) {
       <TrustStrip />
 
       {/* aria-hidden while it's away so the same two controls aren't announced twice */}
-      <div className={`buy-bar ${barShown ? "is-shown" : ""}`} aria-hidden={!barShown} inert={!barShown}>
+      <div className={`buy-bar ${barShown ? "is-shown" : ""} ${asking ? "is-asking" : ""}`} aria-hidden={!barShown} inert={!barShown}>
         <div className="buy-bar-price">
           <span>{product.name}</span>
           <strong>{formatPrice(priceOf(product) * qty)}</strong>
         </div>
-        <button
-          className="btn btn-wine"
-          disabled={gone}
-          onClick={() => {
-            if (!requireSize()) return;
-            bag.add({ slug, size: size!, color, qty });
-          }}
-        >
-          <Bag /> {gone ? "Sold out" : size ? "Add to bag" : "Pick a size"}
-        </button>
+        {asking ? (
+          askLink
+        ) : (
+          <button
+            className="btn btn-wine"
+            onClick={() => {
+              if (!requireSize()) return;
+              bag.add({ slug, size: size!, color, qty });
+            }}
+          >
+            <Bag /> {size ? "Add to bag" : "Pick a size"}
+          </button>
+        )}
       </div>
 
       {guideOpen && (

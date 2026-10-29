@@ -62,6 +62,21 @@ if (action === "update-product") {
     parts.push(`best seller #${data.bestSeller}`);
     product.bestSeller = data.bestSeller;
   }
+  // the sizes it's out of, as the whole list: an empty one puts every size back. Only the piece's own sizes — the
+  // console and the dispatch route refuse anything else before it is queued (src/lib/admin/stock.ts), so this is the
+  // last line of defence
+  if (Array.isArray(data.soldOut)) {
+    if (data.soldOut.some((s) => !product.sizes.includes(s))) throw new Error("update-product: only the piece's own sizes can be sold out");
+    const before = product.soldOut ?? [];
+    const gone = product.sizes.filter((s) => data.soldOut.includes(s));
+    const out = gone.filter((s) => !before.includes(s));
+    const back = before.filter((s) => !gone.includes(s));
+    const oneSize = product.sizes.length === 1;
+    if (out.length) parts.push(oneSize ? "sold out" : gone.length === product.sizes.length ? "sold out in every size" : `${out.join(", ")} sold out`);
+    if (back.length) parts.push(oneSize ? "back in stock" : `${back.join(", ")} back in stock`);
+    if (gone.length) product.soldOut = gone;
+    else delete product.soldOut;
+  }
   if (parts.length === 0) {
     console.log("nothing changed");
     process.exit(0);

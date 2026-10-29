@@ -29,6 +29,7 @@ export type CatalogEntry = {
   salePrice?: number;
   colors: ColorKey[];
   sizes: string[];
+  soldOut?: string[];
   bestSeller?: number;
   added: string;
   description: string;
@@ -618,6 +619,7 @@ function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntr
   const [price, setPrice] = useState(String(product.price));
   const [sale, setSale] = useState(product.salePrice ? String(product.salePrice) : "");
   const [rank, setRank] = useState(product.bestSeller ? String(product.bestSeller) : "");
+  const [gone, setGone] = useState<string[]>(product.soldOut ?? []);
   const [waiting, setWaiting] = useState(false);
   const [showPhotos, setShowPhotos] = useState(false);
   const photosId = useId();
@@ -625,12 +627,14 @@ function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntr
   // Only the fields changed in this row, against its values when editing began: the change lands minutes later, so
   // sending the rest would put back whatever this row last saw — undoing an offer still on its way, say. A cleared
   // offer price or rank is sent as null, which ends it; a field that isn't sent is left alone.
-  const changes: Partial<{ name: string; category: string; price: number; salePrice: number | null; bestSeller: number | null }> = {};
+  // The sold-out sizes go as the whole list (in the piece's size order), and an empty one puts every size back.
+  const changes: Partial<{ name: string; category: string; price: number; salePrice: number | null; bestSeller: number | null; soldOut: string[] }> = {};
   if (name.trim() !== product.name) changes.name = name.trim();
   if (category !== product.category) changes.category = category;
   if (Number(price) !== product.price) changes.price = Number(price);
   if ((sale === "" ? null : Number(sale)) !== (product.salePrice ?? null)) changes.salePrice = sale === "" ? null : Number(sale);
   if ((rank === "" ? null : Number(rank)) !== (product.bestSeller ?? null)) changes.bestSeller = rank === "" ? null : Number(rank);
+  if (gone.join() !== (product.soldOut ?? []).join()) changes.soldOut = gone;
   const dirty = Object.keys(changes).length > 0;
   const pct = sale && Number(sale) < Number(price) ? Math.round((1 - Number(sale) / Number(price)) * 100) : 0;
   // a seventh best seller: the six are already taken by other pieces
@@ -648,7 +652,12 @@ function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntr
       track(`Saving “${product.name}”`, `“${product.name}” is updated. The dev site follows in a couple of minutes.`, (state) => {
         const now = state.products.find((p) => p.slug === product.slug);
         // done when what was sent has landed; the fields not sent may have moved on in the meantime
-        return !!now && (Object.keys(data) as Array<keyof typeof data>).every((key) => (now[key] ?? null) === data[key]);
+        return (
+          !!now &&
+          (Object.keys(data) as Array<keyof typeof data>).every((key) =>
+            key === "soldOut" ? (now.soldOut ?? []).join() === data.soldOut!.join() : (now[key] ?? null) === data[key],
+          )
+        );
       });
     } else setWaiting(false);
   }
@@ -716,6 +725,27 @@ function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntr
           <input className={`adm-input adm-input-row adm-num-in adm-rank-in ${seventh ? "is-wrong" : ""}`} type="number" min={1} max={BEST_LIMIT} placeholder="—" title={seventh ? "Six best sellers already — clear one first." : "A number makes it a best seller: 1 shows first, six at most. Clear it to take it out."} value={rank} aria-label="Best-seller rank" onChange={(e) => setRank(e.currentTarget.value)} />
           {seventh && <span className="adm-off adm-wrong">six already</span>}
         </td>
+        <td className="adm-td-gone">
+          {/* a pressed size is sold out: shoppers can still pick it, to ask on WhatsApp to hear when it's back, but
+              can't bag it */}
+          <span className="adm-gone" role="group" aria-label={`Sold-out sizes of ${product.name}`}>
+            {product.sizes.map((s) => {
+              const out = gone.includes(s);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  className={`adm-gone-size ${out ? "is-on" : ""}`}
+                  aria-pressed={out}
+                  title={out ? `${s} is sold out — press when it’s back` : `Press when ${s} sells out`}
+                  onClick={() => setGone((all) => product.sizes.filter((x) => (x === s ? !all.includes(x) : all.includes(x))))}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </span>
+        </td>
         <td className="adm-td-actions">
           {waiting ? (
             <span className="adm-applying">
@@ -738,7 +768,7 @@ function LedgerRow({ product, photos, track, bestTaken }: { product: CatalogEntr
       </tr>
       {showPhotos && (
         <tr className="adm-tr-photos" id={photosId}>
-          <td colSpan={5}>
+          <td colSpan={6}>
             <PiecePhotos product={product} photos={photos} track={track} />
           </td>
         </tr>
@@ -1027,6 +1057,7 @@ function Ledger({ products, photos, track }: { products: CatalogEntry[]; photos:
               <th scope="col" className="adm-th-num">
                 Best seller
               </th>
+              <th scope="col">Sold out</th>
               <th scope="col">
                 <span className="sr-only">Actions</span>
               </th>
@@ -1035,7 +1066,7 @@ function Ledger({ products, photos, track }: { products: CatalogEntry[]; photos:
           <tbody>
             {rows.map((p) => (
               // content-keyed: when the live state confirms a change the row remounts with the fresh values
-              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}`} product={p} photos={photos} track={track} bestTaken={bestCount(products)} />
+              <LedgerRow key={`${p.slug}|${p.name}|${p.category}|${p.price}|${p.salePrice ?? ""}|${p.bestSeller ?? ""}|${(p.soldOut ?? []).join()}`} product={p} photos={photos} track={track} bestTaken={bestCount(products)} />
             ))}
           </tbody>
         </table>
@@ -1043,7 +1074,8 @@ function Ledger({ products, photos, track }: { products: CatalogEntry[]; photos:
       </div>
       <p className="adm-help">
         <strong>Best sellers:</strong> give a piece a number in the Best seller column — 1 shows first — and Save. Six at most, the six the home page
-        and the search show; to make room, clear another piece’s number. <strong>Offers:</strong> clear the offer price to end one. <strong>Photos:</strong> open a
+        and the search show; to make room, clear another piece’s number. <strong>Offers:</strong> clear the offer price to end one. <strong>Sold out:</strong> press a size
+        when it sells out and Save — shoppers can still pick it, to ask on WhatsApp to be told when it’s back, but can’t bag it; press it again when it’s in. <strong>Photos:</strong> open a
         piece’s photos to add, replace or take one off, for the piece and for each of its colours. Descriptions change in the repo, or take the piece off and add it again.
       </p>
     </>

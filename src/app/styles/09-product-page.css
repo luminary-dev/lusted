@@ -919,6 +919,14 @@
     min-height: 48px;
   }
 
+  .buy-bar.is-asking .buy-bar-price {
+    display: none;
+  }
+
+  .buy-bar.is-asking .btn {
+    flex: 1;
+  }
+
   /* the bar would otherwise cover the last of the page */
   .pdp {
     padding-bottom: 88px;
@@ -932,18 +940,28 @@
 }
 
 /* ───────── a size that's gone ─────────
-   Struck through and dimmed, never removed: a shopper looking for their size needs to see that it exists and is
-   out, not be left wondering whether the piece is made in it at all. */
+   Struck through and quieter, never removed: a shopper looking for their size needs to see that it exists and is
+   out, not be left wondering whether the piece is made in it at all. It can still be picked — that's how a shopper
+   asks for it back — so it keeps a readable colour rather than fading like a control that does nothing. */
 
 .size-chips button.is-gone {
   position: relative;
-  opacity: 0.45;
-  cursor: not-allowed;
+  border-style: dashed;
+  color: var(--muted);
   text-decoration: line-through;
 }
 
-.size-chips button.is-gone:hover {
-  background: transparent;
+.size-chips button.is-gone.is-active {
+  border-style: solid;
+  color: var(--cream);
+}
+
+/* "Tell me the second it's back" is longer than "Add to bag": a little less padding keeps it on one line at 320px, and
+   it keeps the button's height where a phone stacks the buttons (10-bag-shop-responsive.css). In the phone's bar it
+   takes the whole width — nothing can be bought, so the price gives way to the ask (the media query above). */
+.buy-ask {
+  min-height: 52px;
+  padding: 0 18px;
 }
 
 /* what the photographs are showing — the line that turns a model shot into a size */

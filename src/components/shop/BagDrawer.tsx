@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { bag, useBag, useBagOpen } from "@/lib/bag";
-import { bestSellers, colors, formatPrice, getProduct, priceOf } from "@/lib/products";
+import { bestSellers, colors, formatPrice, getProduct, inStock, priceOf } from "@/lib/products";
 import { fillIn, newOrderRef, productUrl, useOrderRef, useOrigin } from "@/lib/order";
 import { whatsappLink } from "@/lib/site";
 import { ArrowRight, Close, WhatsApp } from "../icons";
@@ -131,9 +131,10 @@ export default function BagDrawer() {
                               value={i.size}
                               onChange={(e) => bag.changeSize(i, e.currentTarget.value)}
                             >
+                              {/* a sold-out size can't be switched to (the line's own stays, so the select still shows it) */}
                               {p.sizes.map((sz) => (
-                                <option key={sz} value={sz}>
-                                  {sz}
+                                <option key={sz} value={sz} disabled={sz !== i.size && !inStock(p, sz)}>
+                                  {inStock(p, sz) ? sz : `${sz} — sold out`}
                                 </option>
                               ))}
                             </select>

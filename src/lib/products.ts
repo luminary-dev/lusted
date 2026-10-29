@@ -125,6 +125,10 @@ export const newArrivals = products.filter((p) => p.isNew).sort((a, b) => b.adde
 export const inStock = (p: Product, size: string) => !(p.soldOut ?? []).includes(size);
 /** Every size gone — the piece can still be looked at, but not added. */
 export const allSoldOut = (p: Product) => p.sizes.every((s) => !inStock(p, s));
+/** The size picked — or, before one is, the piece itself — can't be ordered: the product page offers to tell the
+ *  shopper when it's back rather than add it. A sold-out size can still be picked for that, so a shopper can ask for
+ *  their own size and not just learn that it's gone. */
+export const soldOutPick = (p: Product, size: string | null) => (size === null ? allSoldOut(p) : !inStock(p, size));
 export const onSale = products.filter((p) => p.salePrice);
 export const maxDiscount = Math.max(...onSale.map(discountPct));
 

@@ -94,10 +94,11 @@ export default function SizeGuideDialog({
                 : suggestedMade
                   ? `You're closest to ${suggested}.`
                   : suggestedGone
-                    ? `You're closest to ${suggested} — that size is sold out just now.`
+                    ? `You're closest to ${suggested} — sold out just now, but choose it and we'll message you when it's back.`
                     : `You're closest to ${suggested} — this piece isn't made in that size.`}
           </p>
-          {suggested && suggestedMade && (
+          {/* a sold-out size can be chosen too: the product page then offers to say when it's back */}
+          {suggested && (suggestedMade || suggestedGone) && (
             <button type="button" className="btn btn-wine sg-pick" onClick={() => onPick(suggested)}>
               Choose {suggested}
             </button>
