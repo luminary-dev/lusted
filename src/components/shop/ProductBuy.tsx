@@ -14,6 +14,7 @@ import {
 } from "@/lib/products";
 import { whatsappLink } from "@/lib/site";
 import FavouriteButton from "./FavouriteButton";
+import TrustStrip from "./TrustStrip";
 import { Bag, WhatsApp } from "../icons";
 
 export default function ProductBuy({ slug }: { slug: string }) {
@@ -140,6 +141,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
       >
         <WhatsApp /> Order now on WhatsApp
       </a>
+      <TrustStrip />
     </div>
   );
 }
