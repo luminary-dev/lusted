@@ -191,6 +191,33 @@
   cursor: pointer;
 }
 
+.bag-gift {
+  display: grid;
+  gap: 8px;
+}
+
+.bag-gift .check {
+  padding: 0;
+}
+
+.bag-gift-note {
+  display: grid;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.bag-gift-note input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* under 16 px, iOS zooms the page when the field takes focus */
+}
+
 /* ───────── shop responsive ───────── */
 
 @media (max-width: 1080px) {

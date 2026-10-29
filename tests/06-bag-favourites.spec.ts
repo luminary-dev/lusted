@@ -51,7 +51,7 @@ test.describe("bag", () => {
     expect(await page.evaluate(() => localStorage.getItem("lusted-bag"))).toBe("[]");
   });
 
-  test("the WhatsApp order message lists every line and the subtotal; clear bag empties it", async ({ prepared: page }) => {
+  test("the WhatsApp order message has a reference, every line with its link, the subtotal and the fill-in lines; clear bag empties it", async ({ prepared: page }) => {
     await seed([
       { slug, size: "S", color: "wine", qty: 2 },
       { slug: CATALOG.bagSale.slug, size: "M", color: CATALOG.bagSale.color, qty: 1 },
@@ -63,14 +63,38 @@ test.describe("bag", () => {
     const salePrice = Number((await bag.locator(".bag-item").nth(1).locator("strong").textContent())!.replace(/\D/g, ""));
     const href = decodeURIComponent((await bag.getByRole("link", { name: /Send order on WhatsApp/ }).getAttribute("href"))!);
     expect(href.startsWith(`https://wa.me/${CATALOG.whatsapp}?text=`)).toBe(true);
-    expect(href).toContain("Hi Lusted! I'd like to order:");
-    expect(href).toContain(`• ${name} — Wine, size S × 2 (${fmt(price * 2)})`);
-    expect(href).toContain(`size M × 1 (${fmt(salePrice)})`);
-    expect(href).toContain(`Subtotal: ${fmt(price * 2 + salePrice)}`);
+    const text = href.split("text=")[1];
+    expect(text).toMatch(/^Order LST-[A-Z0-9]{5}\nHi Lusted! I'd like to order:\n/);
+    const origin = new URL(page.url()).origin;
+    expect(text).toContain(`• ${name} — Wine, size S × 2 (${fmt(price * 2)})\n${origin}/products/${slug}\n`);
+    expect(text).toContain(`size M × 1 (${fmt(salePrice)})\n${origin}/products/${CATALOG.bagSale.slug}\n`);
+    expect(text).toContain(`Subtotal: ${fmt(price * 2 + salePrice)}`);
+    expect(text).not.toContain("gift");
+    expect(text.endsWith("\n\nName:\nCity / town:")).toBe(true);
     await expect(bag.locator(".bag-item a.bag-thumb").first()).toHaveAttribute("href", `/products/${slug}`);
     await bag.getByRole("button", { name: "Clear bag" }).click();
     await expect(bag.getByText("Your bag is empty.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Open bag, 0 items" })).toBeVisible();
+  });
+
+  test("ticking \"This is a gift\" adds a line to the order, with the note when there is one", async ({ prepared: page }) => {
+    await seed([{ slug, size: "M", color: "blush", qty: 1 }])(page);
+    await go(page, "/");
+    await openBag(page).click();
+    const bag = bagDialog(page);
+    const order = async () => decodeURIComponent((await bag.getByRole("link", { name: /Send order on WhatsApp/ }).getAttribute("href"))!);
+    const ref = (await order()).match(/Order (LST-[A-Z0-9]{5})/)![1];
+    await expect(bag.getByLabel("Gift note (optional)")).toHaveCount(0);
+    await bag.getByLabel("This is a gift").check();
+    expect(await order()).toContain(`Subtotal: ${fmt(price)}\nIt's a gift.\n`);
+    const note = bag.getByLabel("Gift note (optional)");
+    await expect(note).toHaveAttribute("maxlength", "120");
+    await note.fill("  Happy birthday, love  ");
+    const text = await order();
+    expect(text).toContain("It's a gift — note: Happy birthday, love\n\nName:");
+    expect(text).toContain(`Order ${ref}`); // the reference holds while the order is edited
+    await bag.getByLabel("This is a gift").uncheck();
+    expect(await order()).not.toContain("gift");
   });
 
   test("a bag line for a piece that no longer exists is dropped quietly", async ({ prepared: page }) => {
