@@ -99,7 +99,7 @@ export default function ProductBuy({ slug }: { slug: string }) {
       rel="noopener noreferrer"
       onClick={() => trackEvent("back_in_stock_ask", { slug, size: size ?? "any" })}
     >
-      <WhatsApp /> Message me when it&rsquo;s back
+      <WhatsApp /> Tell me the second it&rsquo;s back
     </a>
   );
 

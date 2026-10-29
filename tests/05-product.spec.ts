@@ -275,7 +275,7 @@ test.describe("sold-out sizes", () => {
 
     await gone.click();
     await expect(gone).toHaveAttribute("aria-pressed", "true");
-    const ask = page.locator(".buy-actions").getByRole("link", { name: "Message me when it’s back" });
+    const ask = page.locator(".buy-actions").getByRole("link", { name: "Tell me the second it’s back" });
     await expect(ask).toBeVisible();
     await expect(ask).toHaveAttribute("data-wa-source", "back-in-stock");
     await expect(ask).toHaveAttribute("target", "_blank");
@@ -304,7 +304,7 @@ test.describe("sold-out sizes", () => {
     const chips = page.locator(".pdp-info .size-chips").getByRole("button");
     await expect(chips).toHaveCount(wholly.sizes.length);
     for (const i of wholly.sizes.keys()) await expect(chips.nth(i)).toHaveClass(/is-gone/);
-    const ask = page.locator(".buy-actions").getByRole("link", { name: "Message me when it’s back" });
+    const ask = page.locator(".buy-actions").getByRole("link", { name: "Tell me the second it’s back" });
     const text = async () => decodeURIComponent((await ask.getAttribute("href"))!.split("text=")[1]);
     expect(await text()).toMatch(/is sold out just now\.\n.+\nPlease message me when it's back\.$/);
     await page.locator(".pdp-info .size-chips").getByRole("button", { name: `${wholly.sizes[0]} — sold out` }).click();

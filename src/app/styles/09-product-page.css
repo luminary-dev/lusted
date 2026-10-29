@@ -590,7 +590,7 @@
   color: var(--cream);
 }
 
-/* "Message me when it's back" is longer than "Add to bag": a little less padding keeps it on one line at 320px, and
+/* "Tell me the second it's back" is longer than "Add to bag": a little less padding keeps it on one line at 320px, and
    it keeps the button's height where a phone stacks the buttons (10-bag-shop-responsive.css). In the phone's bar it
    takes the whole width — nothing can be bought, so the price gives way to the ask (the media query above). */
 .buy-ask {

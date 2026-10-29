@@ -8,7 +8,7 @@ Live at **https://lusted.lk** (www.lusted.lk and lusted.vercel.app redirect or a
 
 ## What it is
 
-A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece. When the size picked (or, before one is picked, every size) is sold out, the product page's button becomes "Message me when it's back": a WhatsApp message naming the piece, its colour and size and its link, asking to be told when it's back in that size (`backInStockText` in `src/lib/order.ts`).
+A Next.js 16 site: a single scrolling home page (hero slideshow, the sale, the three collections, best sellers, how ordering works, size guide, about, contact), a shop with search and filters, a page per product, favourites, an about page, a delivery, returns & FAQ page (`/help`), and the privacy policy and terms. There is no checkout — the bag and favourites live in the visitor's browser, and "Send order on WhatsApp" turns the bag into one message to the shop: a short order reference (LST- and five letters or digits, random, nothing about the shopper) on top, each piece with its link, the subtotal, a gift line if "This is a gift" is ticked (with the optional note), and blank "Name:" and "City / town:" lines for the shopper to fill in, so the shop can quote delivery from the first message (`src/lib/order.ts`). A product page's "Order now on WhatsApp" sends the same link and blank lines for its one piece. When the size picked (or, before one is picked, every size) is sold out, the product page's button becomes "Tell me the second it's back": a WhatsApp message naming the piece, its colour and size and its link, asking to be told when it's back in that size (`backInStockText` in `src/lib/order.ts`).
 
 ## Run it
 
@@ -221,11 +221,11 @@ while developing, and under `next start` their scripts are an expected 404 that 
 Custom events (Vercel → Analytics → Events), sent through `src/lib/analytics.ts`:
 
 - `whatsapp_click` — any tap on a WhatsApp link; `source` says which: `nav`, `nav-menu`, `hero`, `bag` (Send order),
-  `product` (Order now — only once a size is chosen), `back-in-stock` (Message me when it's back), `favourites`, `contact`, `footer`, `how-it-works`, `about`,
+  `product` (Order now — only once a size is chosen), `back-in-stock` (Tell me the second it's back), `favourites`, `contact`, `footer`, `how-it-works`, `about`,
   `about-page`, `size-guide`, `revealing-soon`, `error-page`, otherwise the page's path (`/help`, `/privacy`…). A new
   WhatsApp link is counted on its own; give it a `data-wa-source` (on the link or around it) to name it.
 - `add_to_bag` and `favourite` (saving only) — with the piece's `slug`.
-- `back_in_stock_ask` — a tap on "Message me when it's back", with the piece's `slug` and the `size` asked for (`any`
+- `back_in_stock_ask` — a tap on "Tell me the second it's back", with the piece's `slug` and the `size` asked for (`any`
   when none was picked): which sold-out sizes shoppers want back.
 - `search_no_results` — a search that found nothing, the `query` cut to 40 characters, from the search dialog
   (`source: dialog`) or the shop (`source: shop`, only when nothing in the catalogue matches, not when filters emptied it).
