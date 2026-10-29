@@ -119,6 +119,9 @@ test("hero slideshow advances when motion is allowed and holds with reduced moti
 test("sale: the four bikinis at exactly 20% off, prices struck through, each linking to its product", async ({ prepared: page }) => {
   const sale = page.locator("#sale");
   await expect(sale.locator("h2")).toContainText(`${CATALOG.maxDiscount}% off`);
+  // the band names what is on sale: the bikini sale while it is all swim
+  await expect(sale.locator(".eyebrow")).toHaveText(CATALOG.saleBand!.eyebrow);
+  await expect(sale.locator("h2")).toHaveText(`${CATALOG.saleBand!.lead} ${CATALOG.saleBand!.offer}`);
   const cards = sale.locator(".sale-card");
   const shown = Math.min(4, CATALOG.sale.length); // the band shows up to four
   await expect(cards).toHaveCount(shown);
@@ -134,7 +137,7 @@ test("sale: the four bikinis at exactly 20% off, prices struck through, each lin
     await expect(c.locator("h3")).not.toBeEmpty();
     await expect(c.locator(".sale-card-blurb")).not.toBeEmpty();
   }
-  await expect(sale.getByRole("link", { name: /Shop the sale|sale/i }).last()).toHaveAttribute("href", "/products?sale=1");
+  await expect(sale.getByRole("link", { name: /Shop the sale|sale/i }).last()).toHaveAttribute("href", CATALOG.saleBand!.href);
   await cards.first().click();
   await expect(page).toHaveURL(new RegExp(`/products/${hrefs[0]}$`));
 });
@@ -292,6 +295,11 @@ test("newsletter: the browser blocks a bad address, a good one reports the sign-
   const form = page.locator("form.news-form");
   const input = form.getByRole("textbox", { name: "Email address" });
   await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
+  // the consent line: what they get, the way out, the policy — and it is read out with the field
+  const consent = form.locator(".news-consent");
+  await expect(consent).toContainText("unsubscribe any time", { ignoreCase: true });
+  await expect(consent.getByRole("link", { name: "privacy policy" })).toHaveAttribute("href", "/privacy");
+  await expect(input).toHaveAccessibleDescription(/unsubscribe any time/i);
   await input.fill("not-an-email");
   await form.getByRole("button", { name: /Subscribe/ }).click();
   expect(await input.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false); // native validation stops the submit

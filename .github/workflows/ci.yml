@@ -35,6 +35,8 @@ permissions:
 
 env:
   NODE_VERSION: 24
+  # pinned, not @latest: it is handed the deploy token and its output is parsed — bump here, to a release two weeks old
+  VERCEL_CLI: vercel@64.2.0
 
 jobs:
   branch-rules:
@@ -349,7 +351,7 @@ jobs:
         run: |
           # the deployment's own address (lusted-<hash>-<team>.vercel.app) — never lusted-dev or lusted.vercel.app, which the
           # CLI also prints in its hints
-          url="$(npx --yes vercel@latest deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -oE 'https://lusted-[a-z0-9]{6,}-[a-z0-9-]+\.vercel\.app' | head -1)"
+          url="$(npx --yes "$VERCEL_CLI" deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -oE 'https://lusted-[a-z0-9]{6,}-[a-z0-9-]+\.vercel\.app' | head -1)"
           [ -n "$url" ] || { echo "::error::Could not read the preview deployment's URL from the Vercel CLI output."; exit 1; }
           host="${url#https://}"
           id="$(curl -sS "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" -H "Authorization: Bearer $VERCEL_TOKEN" | jq -r '.id // empty')"
@@ -383,7 +385,7 @@ jobs:
       - name: Deploy to production
         if: github.ref == 'refs/heads/main'
         run: |
-          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
+          npx --yes "$VERCEL_CLI" deploy --prod --yes --token "$VERCEL_TOKEN"
           echo "lusted.lk ← $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
 
       # the release: a tag v<version> on this commit and a GitHub release with the notes written from the pull requests

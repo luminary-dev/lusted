@@ -1,4 +1,5 @@
 import { test, expect, go, ROUTES, CATALOG } from "./fixtures";
+import { IMAGE_VERSION } from "../src/lib/cdn";
 import { site } from "../src/lib/site";
 
 test.describe("routes", () => {
@@ -157,6 +158,20 @@ test.describe("routes", () => {
       expect(r.headers()["content-type"]).toMatch(/image/);
     }
   });
+
+  test("photos answer only at the current version, and next/image optimises nothing else", async ({ request }) => {
+    // any other version would be a fresh, uncached address for the same photo (src/lib/cdn.ts, src/app/img)
+    const photo = "images/footer.webp";
+    const current = `/img/v${IMAGE_VERSION}/${photo}`;
+    expect((await request.get(current)).status(), current).toBe(200);
+    for (const v of [IMAGE_VERSION - 1, IMAGE_VERSION + 1, 987]) {
+      const res = await request.get(`/img/v${v}/${photo}`);
+      expect(res.status(), `v${v}`).toBe(404);
+    }
+    const optimise = (url: string) => request.get(`/_next/image?url=${encodeURIComponent(url)}&w=640&q=75`);
+    expect((await optimise(current)).status(), current).toBe(200);
+    for (const url of [`/img/v987/${photo}`, `/img/${photo}`, `${current}?bust=1`]) expect((await optimise(url)).status(), url).toBe(400);
+  });
 });
 
 test.describe("newsletter API", () => {
@@ -176,6 +191,20 @@ test.describe("newsletter API", () => {
     const r = await request.post("/api/subscribe", { data: { email: "someone@example.com" } });
     expect([200, 501, 502]).toContain(r.status());
     if (r.status() === 501) expect((await r.json()).error).toMatch(/not configured/i);
+  });
+  test("refuses a sign-up posted from another site with 403", async ({ request, baseURL }) => {
+    // what a third-party page's cross-site POST looks like: text/plain (no preflight), its own Origin, and
+    // Sec-Fetch-Site from a current browser — each one alone is refused before the body is read
+    const data = JSON.stringify({ email: "someone@example.com" });
+    const plain = { "content-type": "text/plain" };
+    const foreign: Record<string, string>[] = [{ origin: "https://evil.example" }, { origin: "null" }, { "sec-fetch-site": "cross-site" }, { origin: "https://evil.example", "sec-fetch-site": "cross-site" }];
+    for (const headers of foreign) {
+      const r = await request.post("/api/subscribe", { data, headers: { ...plain, ...headers } });
+      expect(r.status(), JSON.stringify(headers)).toBe(403);
+    }
+    // the site's own origin (and a request with no Origin at all, as above) goes on to the usual answers
+    const own = await request.post("/api/subscribe", { data: { email: "someone@example.com" }, headers: { origin: baseURL!, "x-real-ip": `198.51.100.7-${Date.now()}` } });
+    expect([200, 501, 502]).toContain(own.status());
   });
 });
 
@@ -197,6 +226,14 @@ test.describe("revealing soon", () => {
     await expect(page.locator(".reveal-count .reveal-num").first()).toHaveText(/\d\d/);
   });
 
+  test("the privacy policy stays readable behind the gate (the newsletter form links to it)", async ({ page }) => {
+    await page.context().clearCookies();
+    const res = await page.goto("/privacy", { waitUntil: "domcontentloaded" });
+    expect(res?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Privacy Policy/);
+    await expect(page.locator(".reveal")).toHaveCount(0);
+  });
+
   test("?preview=1 sets the cookie and lets the real site through", async ({ page }) => {
     await page.context().clearCookies();
     await page.goto("/?preview=1", { waitUntil: "domcontentloaded" });
@@ -204,5 +241,59 @@ test.describe("revealing soon", () => {
     await expect(page.locator("h1")).toHaveText(/Dressed to tempt/);
     const cookie = (await page.context().cookies()).find((c) => c.name === "lusted-preview");
     expect(cookie?.value).toBe("1");
+  });
+
+  test("its own address shows it too until the moment, rather than sending anyone on", async ({ page }) => {
+    await page.context().clearCookies();
+    const res = await page.goto("/revealing-soon", { waitUntil: "domcontentloaded" });
+    expect(res?.status()).toBe(200);
+    expect(new URL(page.url()).pathname).toBe("/revealing-soon");
+    await expect(page.locator("h1")).toHaveText(/Revealing soon/);
+  });
+});
+
+// The countdown lets whoever is waiting in at zero by reloading the page — once. The browser's clock is moved to just
+// before the moment while the server's stays where it is, so the reload brings the reveal page back exactly as it would
+// for a device whose clock runs fast; it must then stay put and ask for a refresh. /revealing-soon answers directly
+// whether or not the gate is on, but only until the moment (afterwards it redirects), so this is skipped from then on.
+test.describe("the countdown at zero", () => {
+  test.skip(() => Date.now() >= Date.parse(site.revealAt), "reveal day has passed");
+
+  test("reloads the page once, and only once", async ({ prepared: page }) => {
+    const at = Date.parse(site.revealAt);
+    await page.clock.install({ time: at - 5 * 60_000 });
+    await go(page, "/revealing-soon");
+    await page.clock.pauseAt(at - 2_000);
+    await page.clock.runFor(2_000);
+    await expect(page.locator(".reveal-live")).toBeVisible();
+
+    const reloaded = page.waitForEvent("load");
+    await page.clock.runFor(1_500);
+    await reloaded;
+    await expect(page.locator(".reveal-live")).toBeVisible();
+    expect(await page.evaluate(() => sessionStorage.getItem("lusted-reveal-reloaded"))).toBe(site.revealAt);
+
+    // a second reload would replace the document and lose this mark
+    await page.evaluate(() => ((window as unknown as { stayed: boolean }).stayed = true));
+    await page.clock.runFor(5_000);
+    await page.waitForTimeout(500);
+    expect(await page.evaluate(() => (window as unknown as { stayed?: boolean }).stayed)).toBe(true);
+  });
+});
+
+// From the moment itself the gate is gone and the teaser's own address sends visitors home. Skipped until then.
+test.describe("after the reveal", () => {
+  test.skip(() => Date.now() < Date.parse(site.revealAt), "reveal day hasn't come yet");
+
+  test("/revealing-soon redirects to the home page", async ({ request }) => {
+    const res = await request.get("/revealing-soon", { maxRedirects: 0 });
+    expect(res.status()).toBe(307);
+    expect(new URL(res.headers().location, "http://localhost").pathname).toBe("/");
+  });
+
+  test("without the preview cookie the home page is the real site", async ({ page }) => {
+    await page.context().clearCookies();
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("h1")).toHaveText(/Dressed to tempt/);
   });
 });
