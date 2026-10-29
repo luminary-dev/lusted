@@ -84,7 +84,7 @@ test.describe("routes", () => {
     expect(robots).toMatch(/Sitemap: https:\/\/[^\s]+\/sitemap\.xml/);
     const sitemap = await (await request.get("/sitemap.xml")).text();
     const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
-    for (const path of ["/", "/products", "/help", "/about", "/privacy", "/terms", `/products/${CATALOG.hero.slug}`]) expect(locs).toContain(path);
+    for (const path of ["/", "/products", "/help", "/gift-vouchers", "/about", "/privacy", "/terms", `/products/${CATALOG.hero.slug}`]) expect(locs).toContain(path);
     expect(locs.filter((l) => l.startsWith("/products/"))).toHaveLength(CATALOG.total);
     expect(locs).not.toContain("/favourites");
     await go(page, `/products/${CATALOG.hero.slug}`);
@@ -95,7 +95,7 @@ test.describe("routes", () => {
   });
 
   test("search engines: every indexable page names its canonical address, and favourites asks not to be indexed", async ({ prepared: page }) => {
-    for (const path of ["/", "/about", "/privacy", "/terms"]) {
+    for (const path of ["/", "/about", "/gift-vouchers", "/privacy", "/terms"]) {
       await go(page, path);
       const href = await page.locator('link[rel="canonical"]').getAttribute("href");
       expect(href, `canonical on ${path}`).toBeTruthy();

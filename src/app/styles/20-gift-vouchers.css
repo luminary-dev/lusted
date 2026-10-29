@@ -1,0 +1,430 @@
+/* ───────── gift vouchers (/gift-vouchers) ───────── */
+
+/* the phone menu's own links (site.ts navLinks, menuOnly): above 900 px the bar has room for six, and the footer
+   carries the rest */
+@media (min-width: 901px) {
+  .nav-links a.nav-menu-only {
+    display: none;
+  }
+}
+
+.gift-page {
+  padding-top: clamp(104px, 10vw, 136px);
+  padding-bottom: var(--section);
+}
+
+.gift-head {
+  max-width: 760px;
+}
+
+.gift-head .h2 {
+  margin-top: 16px;
+}
+
+.gift-head .lede {
+  margin-top: 14px;
+}
+
+.gv {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(36px, 6vw, 96px);
+  align-items: start;
+  margin-top: var(--space-7);
+}
+
+/* the card is drawn in units of its own width (cqi), so it is the same card on a phone and on a laptop — and
+   nothing typed into the form can change its size */
+.gv-preview {
+  position: sticky;
+  top: 120px;
+  container-type: inline-size;
+}
+
+.gv-preview figcaption {
+  margin-top: 14px;
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-align: center;
+}
+
+.gv-card {
+  --champagne: #f0c9b2;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1.6;
+  padding: 6cqi 7cqi 5.5cqi;
+  overflow: hidden;
+  border-radius: clamp(14px, 3.6cqi, 26px);
+  background:
+    radial-gradient(120% 90% at 88% 0%, rgba(240, 201, 178, 0.24), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgba(26, 4, 10, 0.5), transparent 62%),
+    linear-gradient(135deg, #8d2442 0%, #6b1430 48%, #470c1d 100%);
+  box-shadow:
+    0 34px 60px -24px rgba(74, 13, 31, 0.5),
+    0 2px 6px rgba(46, 20, 24, 0.14);
+  color: var(--champagne);
+}
+
+/* the foil line inset from the edge, and a soft sheen across the card */
+.gv-card::before,
+.gv-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.gv-card::before {
+  inset: 2.6cqi;
+  border: 1px solid rgba(240, 201, 178, 0.42);
+  border-radius: clamp(8px, 2cqi, 16px);
+}
+
+.gv-card::after {
+  inset: 0;
+  background: linear-gradient(112deg, transparent 32%, rgba(255, 238, 228, 0.1) 46%, transparent 60%);
+}
+
+.gv-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4cqi;
+}
+
+.gv-card-mark {
+  width: 26cqi;
+  height: auto;
+}
+
+.gv-card-kind {
+  margin-top: 1cqi;
+  font-size: max(9px, 2.1cqi);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.gv-card-to {
+  margin-top: auto;
+  overflow: hidden;
+  font-family: var(--headline);
+  font-synthesis: none;
+  font-size: 6.4cqi;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gv-card-amount {
+  font-size: 8.6cqi;
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  font-variant-numeric: lining-nums;
+  color: #fbe6da;
+}
+
+/* three lines are kept for the message whether it has one word or 120 characters */
+.gv-card-note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  height: calc(3 * 1.4em);
+  margin-top: 1.6cqi;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: max(10.5px, 3.3cqi);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.gv-card-note.is-empty {
+  opacity: 0.75;
+}
+
+.gv-card-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 4cqi;
+  margin-top: 2.4cqi;
+  font-size: max(9px, 2cqi);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.gv-card-ref {
+  letter-spacing: 0.14em;
+}
+
+:root[data-theme="dark"] .gv-card {
+  box-shadow:
+    0 34px 60px -24px rgba(0, 0, 0, 0.7),
+    0 0 0 1px var(--hair);
+}
+
+/* ───────── the form ───────── */
+
+.gv-form {
+  display: grid;
+  gap: 26px;
+}
+
+.gv-group {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* a legend won't take part in a grid, so the fieldset's first gap is its margin */
+fieldset.gv-group {
+  display: block;
+}
+
+fieldset.gv-group > * + * {
+  margin-top: 10px;
+}
+
+.gv-label {
+  padding: 0;
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.gv-label span {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.gv-amounts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 8px;
+}
+
+/* each amount is a real radio button, drawn as a pill: it stays in the tab order and answers the arrow keys */
+.gv-amount {
+  position: relative;
+  display: grid;
+}
+
+.gv-amount input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.gv-amount span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink-2);
+  transition:
+    background var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
+}
+
+.gv-amount:hover span {
+  border-color: var(--ink);
+}
+
+.gv-amount input:checked + span {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+}
+
+.gv-amount input:focus-visible + span {
+  outline: 2px solid var(--rose);
+  outline-offset: 3px;
+}
+
+.gv-other {
+  display: flex;
+  gap: 8px;
+}
+
+.gv-other .gv-amount {
+  flex: none;
+}
+
+.gv-other .gv-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.gv-field input,
+.gv-field textarea {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 16px; /* under 16 px, iOS zooms the page when the field takes focus */
+  line-height: 1.5;
+  transition: border-color var(--dur-2) var(--ease);
+}
+
+.gv-field textarea {
+  height: calc(3 * 1.5em + 24px); /* three lines, and it stays that size: the count below says how much is left */
+  resize: none;
+}
+
+.gv-field input:focus,
+.gv-field textarea:focus {
+  border-color: var(--ink);
+}
+
+.gv-field-lkr {
+  position: relative;
+}
+
+.gv-field-lkr > span {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.gv-field-lkr input {
+  height: 46px;
+  padding-left: 52px;
+  border-radius: 999px;
+}
+
+.gv-other.is-chosen .gv-field-lkr input {
+  border-color: var(--ink);
+}
+
+.gv-other .gv-field input[aria-invalid="true"] {
+  border-color: var(--rose-ink);
+}
+
+.gv-hint {
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.gv-error {
+  min-height: 1.6em;
+  font-size: var(--step--1);
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--rose-ink);
+}
+
+fieldset.gv-group > .gv-error {
+  margin-top: 2px;
+}
+
+.gv-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.gv-send {
+  width: 100%;
+}
+
+.gv-send-note {
+  margin-top: -14px;
+  text-align: center;
+}
+
+/* ───────── how it works ───────── */
+
+.gift-how {
+  margin-top: var(--space-8);
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--hair);
+}
+
+.gift-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 40px);
+  margin-top: var(--space-6);
+}
+
+.gift-step-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  color: var(--rose-ink);
+}
+
+.gift-step-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.gift-steps .h3 {
+  margin-top: 16px;
+}
+
+.gift-steps p {
+  margin-top: 8px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 34em;
+}
+
+.gift-terms {
+  margin-top: var(--space-6);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.gift-terms a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .gv {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gv-preview {
+    position: static;
+    max-width: 560px;
+  }
+  .gift-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
