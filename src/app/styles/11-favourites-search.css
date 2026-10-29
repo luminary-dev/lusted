@@ -289,6 +289,10 @@
   background: var(--blush-bg);
 }
 
+.new-in {
+  background: var(--paper);
+}
+
 .about {
   background: var(--paper);
 }
@@ -304,12 +308,6 @@
 /* product cards sitting on the blush best-sellers band need a slightly lifted image well */
 .best .product-media {
   background: var(--paper);
-}
-
-.related,
-.pairs {
-  padding-top: var(--section);
-  border-top: 1px solid var(--hair);
 }
 
 /* ───────── footer: trust row + credit ───────── */
