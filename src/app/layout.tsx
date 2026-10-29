@@ -81,8 +81,11 @@ export const viewport: Viewport = {
 
 // Applies the saved (or system) theme before first paint so there's no flash.
 const themeScript = `try{var t=localStorage.getItem("lusted-theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
-// Skips the loading screen if it has already played in this tab, before paint so it never flashes.
-const introScript = `try{if(sessionStorage.getItem("lusted-intro"))document.documentElement.classList.add("intro-seen")}catch(e){}`;
+// Skips the loading screen, before paint so it never flashes, unless the visit begins on the home page and it hasn't
+// played in this tab yet. A visit that lands on any other page — a product link opened from Instagram or WhatsApp, whose
+// in-app browsers start a fresh session every time — goes straight to it, and the tab is marked so that coming round
+// to the home page later (or reloading it) doesn't hold the shopper up either.
+const introScript = `try{if(location.pathname!=="/"||sessionStorage.getItem("lusted-intro"))document.documentElement.classList.add("intro-seen");if(location.pathname!=="/")sessionStorage.setItem("lusted-intro","1")}catch(e){}`;
 // Marks browsers that can draw the 3D size tags, before first paint, so the size guide holds their room from the start
 // (SizeGuide.tsx / .webgl in globals.css) and never changes height when they arrive.
 const webglScript = `if(window.WebGLRenderingContext)document.documentElement.classList.add("webgl")`;
