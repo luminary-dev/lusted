@@ -23,7 +23,7 @@ export default function NewArrivals() {
           <div className="head-side" data-reveal style={{ "--d": "0.1s" } as React.CSSProperties}>
             <p>The freshest pieces, newest first — wear them before anyone else does, then let someone peel them off you.</p>
             <Link className="btn btn-wine" href="/products?new=1&sort=new">
-              Shop every new temptation <ArrowRight className="arrow" />
+              Shop the new sins <ArrowRight className="arrow" />
             </Link>
           </div>
         </header>

@@ -188,7 +188,7 @@ test("new in: the pieces with the New badge, newest first, right after best sell
   const ids = await page.locator("main > section[id]").evaluateAll((els) => els.map((e) => e.id));
   expect(ids.indexOf("new-in")).toBe(ids.indexOf("best-sellers") + 1);
   await expect(sec.locator("h2")).toBeVisible();
-  const link = sec.getByRole("link", { name: "Shop every new temptation" });
+  const link = sec.getByRole("link", { name: "Shop the new sins" });
   await expect(link).toHaveAttribute("href", "/products?new=1&sort=new");
   await link.click();
   await expect(page).toHaveURL(/\/products\?new=1&sort=new$/);
