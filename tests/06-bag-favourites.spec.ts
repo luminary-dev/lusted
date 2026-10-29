@@ -198,7 +198,7 @@ test.describe("recently viewed", () => {
     await openBag(page).click();
     const bag = bagDialog(page);
     await expect(bag.getByText("Your bag is empty.")).toBeVisible();
-    await expect(bag.locator(".drawer-suggest-head")).toHaveText("Still thinking about these?");
+    await expect(bag.locator(".drawer-suggest-head")).toHaveText("Still aching for these?");
     await expect(bag.locator(".drawer-suggest-name")).toHaveText([name, other.name]); // newest first
     await expect(bag.locator(".drawer-suggest-price").first()).toHaveText(fmt(price));
     await bag.locator(".drawer-suggest a").nth(1).click();
@@ -206,7 +206,7 @@ test.describe("recently viewed", () => {
     await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
 
     await expect(recentRow(page).locator(".product-card h3")).toHaveText([name]);
-    await recentRow(page).getByRole("button", { name: "Clear recently viewed" }).click();
+    await recentRow(page).getByRole("button", { name: "Clear the evidence of recently viewed pieces" }).click();
     await expect(main(page).locator(".recent")).toHaveCount(0);
     expect(await page.evaluate(() => localStorage.getItem("lusted-recently-viewed"))).toBe("[]");
     await openBag(page).click();

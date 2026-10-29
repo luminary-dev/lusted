@@ -30,7 +30,7 @@ export default function RecentlyViewed({ slug }: { slug: string }) {
                 Recently viewed
               </p>
               <h2 className="h2">
-                Where your eyes <em>lingered</em>
+                You couldn’t keep <em>your eyes off these</em>
               </h2>
             </div>
             <button
@@ -41,7 +41,7 @@ export default function RecentlyViewed({ slug }: { slug: string }) {
                 setCleared(true);
               }}
             >
-              Clear<span className="sr-only"> recently viewed</span>
+              Clear the evidence<span className="sr-only"> of recently viewed pieces</span>
             </button>
           </header>
           <div className="product-grid related-grid">

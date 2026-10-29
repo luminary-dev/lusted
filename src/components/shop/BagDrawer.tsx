@@ -89,7 +89,7 @@ export default function BagDrawer() {
               return (
                 <div className={`drawer-suggest ${recent.length ? "is-recent" : ""}`}>
                   <p className="drawer-suggest-head">
-                    {recent.length ? "Still thinking about these?" : saved.length ? "You saved these" : "What's being bought"}
+                    {recent.length ? "Still aching for these?" : saved.length ? "You saved these" : "What's being bought"}
                   </p>
                   <ul>
                     {suggestions.map((p) => (
