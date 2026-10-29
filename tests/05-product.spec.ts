@@ -69,7 +69,7 @@ test.describe("product page", () => {
     await chart.getByRole("button", { name: "Close the size guide" }).click();
     await expect(chart).toBeHidden();
     await page.getByRole("button", { name: /Add to bag/ }).click();
-    await expect(page.locator(".buy-warn")).toHaveText("Please choose a size");
+    await expect(page.locator(".buy-warn")).toHaveText("Pick a size first, gorgeous");
     await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
     // the WhatsApp button is always a real link (crawlable, reachable by keyboard), but without a size a click only
     // asks for one — nothing opens
@@ -78,7 +78,7 @@ test.describe("product page", () => {
     const popup = page.context().waitForEvent("page", { timeout: 1500 }).catch(() => null);
     await wa.click();
     expect(await popup).toBeNull();
-    await expect(page.locator(".buy-warn")).toHaveText("Please choose a size");
+    await expect(page.locator(".buy-warn")).toHaveText("Pick a size first, gorgeous");
     await page.locator(".pdp-info .size-chips").getByRole("button", { name: "M", exact: true }).click();
     await expect(page.locator(".buy-warn")).toHaveCount(0);
     const href = (await wa.getAttribute("href"))!;
@@ -92,7 +92,7 @@ test.describe("product page", () => {
   });
 
   test("a trust strip under the WhatsApp button promises only what the terms do and leads to delivery, returns & FAQ", async ({ prepared: page }) => {
-    const promises = ["Plain, unbranded box", "Delivery across Sri Lanka", "7-day exchange", "Sizing help from a real person"];
+    const promises = ["Plain, unbranded box", "Delivery across Sri Lanka", "7-day exchange, no sulking", "A real person to size you up"];
     const strip = main(page).locator(".buy").getByRole("list", { name: "Ordering with Lusted" });
     await expect(strip.getByRole("listitem")).toHaveText(promises);
     await expect(main(page).locator(".buy").getByRole("link", { name: "Delivery, returns & FAQ" })).toHaveAttribute("href", "/help");

@@ -45,15 +45,15 @@ export async function writeCopy(brief: Brief): Promise<Copy> {
   const takenNames = catalog.map((p) => p.name);
   const fit = { [-1]: "runs small (size up)", 0: "true to size", 1: "runs large (size down)" }[brief.fit];
   const prompt =
-    `You write product copy for Lusted, a Sri Lankan lingerie, swim and after-dark boutique. The voice is sultry, direct and filthy with innuendo — the kind of line that makes the reader blush — but never crude or anatomical: every piece is written as something to be looked at, touched, and taken off by someone else. Second person, short sentences, no emoji, no hashtags, no invented fabric claims — describe only what the photo shows and what the owner says. Here are three pieces from the same collection ("${collection.name}") as the voice to match:\n${JSON.stringify(examples, null, 2)}\n\n` +
+    `You write product copy for Lusted, a Sri Lankan lingerie, swim and after-dark boutique. The voice is very naughty: hungry, shameless, teasing and confident, a bit of a bad influence — every line leans in and whispers something wicked, with dirty innuendo, double meanings, dares and breathless asides. Write in the second person to a grown woman who is in charge of her own pleasure and is being wicked by choice. Make the piece the star of the seduction: what it shows, what it barely hides, how fast it comes off, who gets to take it off and what happens after. Words like naughty, filthy, wicked, aching, greedy, shameless, tease, tug, untie, peel, slip off and bad decisions fit; "slutty" only rarely, as a proud word she uses about herself, never as an insult. Short punchy sentences, em dashes, British spelling. The rules, without exception: no emoji or decorative symbols of any kind, no hashtags; nothing that suggests youth (never "girl", "teen", "young", "little", "schoolgirl", "barely legal", "daddy", "innocent" in a youthful sense); desire is always mutual and she is in control — nothing coercive; innuendo and heat, never a graphic description of sex, genitals or bodily fluids, because the description is also the search-engine snippet and the link preview people share; body-positive, nothing about bodies needing fixing; no invented fabric claims — describe only what the photo shows and what the owner says. Here are three pieces from the same collection ("${collection.name}") as the voice to match:\n${JSON.stringify(examples, null, 2)}\n\n` +
     `The photo shows a new piece for the "${collection.name}" collection (${collection.label.toLowerCase()}). Colours it comes in: ${brief.colors.map((c) => colors[c].label).join(", ")}. Price: LKR ${brief.price.toLocaleString("en-LK")}. Fit: ${fit}. Owner's notes: ${brief.notes || "(none)"}.\n\n` +
     `Reply with ONLY a JSON object — no markdown fence, no text before or after it — with these keys:\n` +
     `"name": the best of three names, and "names": the other two. A name is two to four words: a tempting first word or two — a mood, a sin, a colour, a jewel, a temptress's name (Scarlet, Noir, Rouge, Siren, Vixen, Delilah, Nightshade, Velvet, Midnight, Wicked, Honey, Halo…) — then what the piece is. These are the ones the catalogue does best, match them: ${goodNames.join("; ")}. Never a place, a city or a country (no Galle, Colombo, Capri, Mykonos), never a plain description ("Black Lace Bodysuit"), never a brand, and not any of these, already taken: ${takenNames.join("; ")};\n` +
     `"description": two or three sentences like the examples — what it is, what it bares, how it comes off — ending with the care in a few words (e.g. "Hand wash cold.");\n` +
     `"blurb": one short line for a small card, under 70 characters;\n` +
-    `"details": an array of three to five short feature strings (fabric, lining, cut, fastening, care), like the examples;\n` +
-    `"fitNote": one sentence on how it sits and which size to take, consistent with the fit given;\n` +
-    `"moments": an array of exactly three short lowercase phrases it's made for, like the examples.`;
+    `"details": an array of three to five short feature strings (fabric, lining, cut, fastening, care), like the examples — facts first, a cheeky word at most;\n` +
+    `"fitNote": one sentence on how it sits and which size to take, consistent with the fit given — the sizing advice must stay exact;\n` +
+    `"moments": an array of exactly three short lowercase phrases it's made for, like the examples — the page reads them as "Wear it for <one>, <two> & <three>. Then don't."`;
 
   let lastError: Error | null = null;
   for (const model of MODELS) {
@@ -98,8 +98,11 @@ function parseCopy(raw: string): Copy {
   const end = text.lastIndexOf("}");
   if (start === -1 || end <= start) throw new Error(`Claude returned no JSON: ${raw.slice(0, 160)}`);
   const copy = JSON.parse(text.slice(start, end + 1).replace(/[\u0000-\u001f]+/g, " ")) as Partial<Copy>;
-  const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
-  const list = (v: unknown, max: number, n: number) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && x.trim()).map((x) => String(x).trim().slice(0, max)).slice(0, n) : []);
+  // the site never shows an emoji, so any that slip through the prompt are taken out here (with the joiners and
+  // variation selectors that build them), and the space they leave is closed up
+  const clean = (s: string) => s.replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u200D\uFE0F\u20E3]/gu, "").replace(/\s{2,}/g, " ").trim();
+  const str = (v: unknown, max: number) => (typeof v === "string" ? clean(v).slice(0, max) : "");
+  const list = (v: unknown, max: number, n: number) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && clean(x)).map((x) => clean(String(x)).slice(0, max)).slice(0, n) : []);
   const out: Copy = {
     name: str(copy.name, 60),
     names: list(copy.names, 60, 3).filter((n) => n !== str(copy.name, 60)),
