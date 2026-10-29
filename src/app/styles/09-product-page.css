@@ -525,6 +525,95 @@
   margin-top: -12px;
 }
 
+/* "Drop a hint" (HintButton.tsx): a quiet line under the order buttons, read as a link, and the small popover it opens
+   where there is no share sheet. Also on /favourites, beside "Ask about these". */
+.hint {
+  position: relative;
+}
+
+.buy .hint {
+  justify-self: center;
+  margin-block: -18px -8px; /* the button's 44px target, without the gap it would leave around a 20px line */
+}
+
+.hint-btn {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.hint-btn:hover,
+.hint-btn[aria-expanded="true"] {
+  color: var(--ink);
+}
+
+.hint-pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  z-index: var(--z-sticky);
+  display: grid;
+  width: 232px;
+  padding: 6px;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  box-shadow: 0 14px 36px var(--shadow);
+}
+
+.hint-pop.is-start {
+  left: 0;
+}
+
+.hint-pop.is-end {
+  right: 0;
+}
+
+.hint-pop.is-centre {
+  left: 50%;
+  translate: -50% 0;
+}
+
+.hint-pop a,
+.hint-pop button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hint-pop a:hover,
+.hint-pop button:hover {
+  background: var(--row-hover);
+}
+
+.hint-pop svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hint-note {
+  padding: 4px 12px 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
 /* the trust strip under the WhatsApp button (here and in the bag): four promises, two to a row, and the way to the
    help page — small and quiet, so it reassures without competing with the button above it. The columns are only as
    wide as their words, and give way (the words wrap) only when the room runs out. */

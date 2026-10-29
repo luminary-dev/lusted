@@ -250,6 +250,41 @@ test.describe("product page on a phone", () => {
   });
 });
 
+// "Drop a hint" sends the piece to someone else. Desktop Chromium may or may not have a share sheet, so it's taken away
+// here: the popover is what a browser without one gets.
+test.describe("drop a hint, without a share sheet", () => {
+  test("offers WhatsApp with no number and the clipboard; Esc closes it", async ({ prepared: page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.addInitScript(() => delete (Navigator.prototype as { share?: unknown }).share);
+    await go(page, `/products/${slug}`);
+    const hint = page.getByRole("button", { name: "Drop a naughty hint" });
+    await expect(hint).toHaveAttribute("aria-expanded", "false");
+    await page.locator(".buy-colors").getByRole("button", { name: "Wine" }).click();
+    await hint.click();
+    await expect(hint).toHaveAttribute("aria-expanded", "true");
+    const pop = page.getByRole("group", { name: "Drop a hint" });
+    const wa = pop.getByRole("link", { name: "Send on WhatsApp" });
+    await expect(wa).toBeFocused();
+    // a share, not an order: no number, so the shopper picks the contact — and never the shop's
+    const href = (await wa.getAttribute("href"))!;
+    expect(href.startsWith("https://wa.me/?text=")).toBe(true);
+    expect(href).not.toContain(CATALOG.whatsapp);
+    const link = `${new URL(page.url()).origin}/products/${slug}?colour=wine`;
+    const text = decodeURIComponent(href.split("text=")[1]);
+    expect(text).toContain(`Picture me in this — the ${name}, in Wine. Now picture peeling it off me. Consider this a hint.`);
+    expect(text).not.toMatch(/\p{Extended_Pictographic}/u); // something she'd send: no emoji
+    expect(text.endsWith(`\n${link}`)).toBe(true);
+    await pop.getByRole("button", { name: "Copy link" }).click();
+    await expect(pop.getByRole("button", { name: "Copied — now go tempt them" })).toBeVisible();
+    await expect(pop.getByRole("status")).toHaveText("Copied to the clipboard");
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(link);
+    await page.keyboard.press("Escape");
+    await expect(pop).toHaveCount(0);
+    await expect(hint).toBeFocused();
+    await expect(hint).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
 // Up to three optional photos per colour, after front, back and side (src/lib/products.ts). No piece has them yet, so
 // the order and names the gallery gets are checked on stand-in photos rather than on a page.
 test("gallery views: the optional photos follow front, back and side, named by where they show", () => {
