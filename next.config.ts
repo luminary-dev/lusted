@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { IMAGE_VERSION } from "./src/lib/cdn";
 
 // The photos are served from the site's own origin (/img, read from a private R2 bucket — src/app/img). Only when
 // NEXT_PUBLIC_IMAGE_CDN names a public address instead does next/image need that host allowed.
@@ -60,6 +61,10 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["172.20.10.3", "172.20.10.*"],
   images: {
     remotePatterns: imageCdn ? [{ protocol: imageCdn.protocol.replace(":", "") as "http" | "https", hostname: imageCdn.hostname, port: imageCdn.port }] : [],
+    // The only local images next/image will optimise: the photos at their current version (src/lib/cdn.ts), with no
+    // query string. Any other address would be a new, uncached source and a billed transformation per request. Next
+    // adds the static imports (/_next/static/media/**, the brand wordmarks) to this list itself.
+    localPatterns: [{ pathname: `/img/v${IMAGE_VERSION}/**`, search: "" }],
     // AVIF first (about a third smaller than WebP for these soft, diffused photos at the same look; Next lowers the
     // AVIF quality by 20 under the hood, so q90 is AVIF 70), WebP where a browser can't take it.
     formats: ["image/avif", "image/webp"],
