@@ -19,6 +19,7 @@ const columns = [
       { label: collectionName("swim"), href: "/products?cat=swim" },
       { label: collectionName("after-dark"), href: "/products?cat=after-dark" },
       { label: "Sale", href: "/products?sale=1" },
+      { label: "Gift vouchers", href: "/gift-vouchers" },
     ],
   },
   {
@@ -49,13 +50,13 @@ const social = [
 
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" data-wa-source="footer">
       <Image quality={90} src={footerImg} alt="" fill placeholder="blur" sizes="(max-width: 700px) 1500px, (max-width: 1100px) 1130px, 100vw" className="footer-img" />
       <div className="container">
         <div className="footer-main">
           <div className="footer-brand">
             <Image src={wordmark} alt="Lusted Lingerie" className="footer-logo" sizes="160px" />
-            <p>Lingerie that doesn’t stay on. Join the inner circle for new drops, private offers and the things we don’t post.</p>
+            <p>Lingerie that doesn’t stay on. Get on the list for new drops, private offers and the photos too hot for Instagram.</p>
             <Newsletter />
           </div>
           <div className="footer-cols">
@@ -88,7 +89,7 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <span>
-            © <Year /> Lusted. Designed for every version of you.
+            © <Year /> Lusted. Designed for every version of you — especially the bad one.
             <span className="footer-version" title={`Lusted ${version}`}>
               v{version}
             </span>

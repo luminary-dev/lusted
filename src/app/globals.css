@@ -18,3 +18,5 @@
 @import "./styles/16-help.css"; /* the help page (pillow talk) and the nav over it and the 404 */
 @import "./styles/17-admin.css"; /* the owner console (/admin): the door (sign-in) and the shared controls */
 @import "./styles/18-admin-room.css"; /* the owner console: the room itself */
+@import "./styles/19-dialog-toast.css"; /* the product page's size guide dialog and the bag toast */
+@import "./styles/20-gift-vouchers.css"; /* the gift vouchers page: the card preview and its form */

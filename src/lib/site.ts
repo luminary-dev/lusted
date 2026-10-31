@@ -16,6 +16,16 @@ export const site = {
   revealGate: true,
 };
 
+// Gift vouchers (/gift-vouchers), sold over WhatsApp like everything else. Placeholders until the shop decides: the
+// amounts offered, the smallest and largest "Another amount" (whole rupees), and how long a voucher lasts from the day
+// it's sent — the page, its card and its WhatsApp message all read them from here.
+export const giftVoucher = {
+  amounts: [5000, 10000, 15000, 25000],
+  min: 3000,
+  max: 100000,
+  validMonths: 12,
+};
+
 export const whatsappLink = (text?: string) =>
   `https://wa.me/${site.whatsappNumber}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 
@@ -27,5 +37,8 @@ export const navLinks = [
   { href: "/#collections", label: "Collections" },
   { href: "/#size-guide", label: "Size Guide" },
   { href: "/#ordering", label: "Ordering" },
+  { href: "/help", label: "FAQ" },
+  // the phone menu only: the bar above 900 px has no room for a seventh link, and the footer carries it there
+  { href: "/gift-vouchers", label: "Gift vouchers", menuOnly: true },
   { href: "/#contact", label: "Contact" },
 ];

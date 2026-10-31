@@ -1,6 +1,6 @@
 import catalog from "./catalog.json";
 import type { StaticImageData } from "next/image";
-import { colorImages, productImages, productViews } from "./product-images";
+import { colorImages, productImages, productViews, type ProductView } from "./product-images";
 
 // Product data lives in catalog.json (placeholder catalogue — replace with your real range).
 
@@ -10,9 +10,9 @@ export type ColorKey = keyof typeof colors;
 // `label` is the plain category (kept searchable, so "swim" still finds the bikinis); `name` is the collection name shown
 // to shoppers everywhere (product pages, shop tabs, search, footer) and `tagline` its line on the home-page cards.
 export const categories: { key: Category; label: string; name: string; tagline: string }[] = [
-  { key: "lingerie", label: "Lingerie", name: "Lace Secrets", tagline: "Lace that clings like a secret and comes off like a confession." },
-  { key: "swim", label: "Swim", name: "Sun Kissed", tagline: "Barely-there strings, wet skin, and every eye on what’s barely covered." },
-  { key: "after-dark", label: "After Dark", name: "Midnight Sins", tagline: "Plunges, slits and hems that give up long before the night does." },
+  { key: "lingerie", label: "Lingerie", name: "Lace Secrets", tagline: "Lace that clings like a secret and ends up on the floor like a confession." },
+  { key: "swim", label: "Swim", name: "Sun Kissed", tagline: "Strings begging to be tugged, wet skin, and every eye on what’s barely covered." },
+  { key: "after-dark", label: "After Dark", name: "Midnight Sins", tagline: "Plunges, slits and micro hems — dressed to go out, made to come off." },
 ];
 
 export const colors = {
@@ -39,6 +39,10 @@ export interface Product {
   colors: ColorKey[];
   sizes: string[];
   bestSeller?: number;
+  /** sizes this piece is out of. Absent or empty means everything in `sizes` can be ordered. Kept as the exception
+   *  rather than a count per size: the shop is small and a size is either there or it isn't, and a shopper finding
+   *  out in the WhatsApp chat — after they've committed — is the worst moment to learn it. */
+  soldOut?: string[];
   added: string;
   description: string;
   /** a one-line description for compact cards (the sale section) */
@@ -49,28 +53,44 @@ export interface Product {
   fit: -1 | 0 | 1;
   /** a line on how the piece sits — the product page's fit panel */
   fitNote: string;
+  /** what the photographs are showing: the model's height and the size she has on ("She's 5'7\" and wears S").
+   *  The shots are on a model already, and this is the line that makes them useful for judging a size. Optional —
+   *  a piece without it simply doesn't show the line. */
+  modelNote?: string;
   /** three short moments it's made for — the product page's "Made for…" line */
   moments: string[];
   /** what the main photo shows when it isn't the front (e.g. "Side") — labels it in the product gallery */
   mainView?: string;
+  /** the slugs of the pieces made to be worn with it (the Rosé bra and its brief) — the product page's "Complete the
+   *  set"; kept symmetric in the catalogue, and a slug that isn't (or is no longer) a photographed piece is skipped */
+  pairsWith?: string[];
   image: (typeof productImages)[keyof typeof productImages];
   /** model-shot pieces: the back view, shown on hover in cards */
   backImage?: StaticImageData;
-  /** every photo of the piece, front first (front, back and side where they exist) — the product page gallery */
+  /** every photo of the piece, front first (front, back, side and up to three more where they exist) — the product page gallery */
   views: { label: string; src: StaticImageData }[];
   /** the gallery per colour: the main colour (colors[0]) is `views`; other colours appear once they're photographed */
   colorViews: Partial<Record<ColorKey, { label: string; src: StaticImageData }[]>>;
   isNew: boolean;
 }
 
-type ViewSet = { front: StaticImageData; back?: StaticImageData; side?: StaticImageData };
-const toViews = (v: ViewSet, mainLabel = "Front") => [
-  { label: mainLabel, src: v.front },
-  ...(v.back ? [{ label: "Back", src: v.back }] : []),
-  ...(v.side ? [{ label: "Side", src: v.side }] : []),
-];
+type ViewSet = { front: StaticImageData } & Partial<Record<ProductView, StaticImageData>>;
+// The gallery's order: front, back, side, then the up to three optional photos in their slots' order. Those have no
+// name of their own, so each is called by where it shows ("Photo 4"); a gap left by one taken off just closes up.
+export const toViews = (v: ViewSet, mainLabel = "Front") => {
+  const views = [
+    { label: mainLabel, src: v.front },
+    ...(v.back ? [{ label: "Back", src: v.back }] : []),
+    ...(v.side ? [{ label: "Side", src: v.side }] : []),
+  ];
+  for (const extra of [v.extra1, v.extra2, v.extra3]) if (extra) views.push({ label: `Photo ${views.length + 1}`, src: extra });
+  return views;
+};
+// how the gallery speaks of a view: "the back view", but "photo 4" rather than "photo 4 view"
+export const viewName = (label: string) => (/^Photo \d$/.test(label) ? label.toLowerCase() : `${label.toLowerCase()} view`);
 
-// The six most recently added pieces are flagged "New".
+// The six most recently added pieces are flagged "New" — the badge, the shop's "New in" filter and the home page's
+// "Just arrived" row all go by this one rule, so they never disagree about what is new.
 const shot = catalog.filter((p) => p.slug in productImages); // pieces appear once they have a photo
 const newest = new Set([...shot].sort((a, b) => b.added.localeCompare(a.added)).slice(0, 6).map((p) => p.slug));
 
@@ -98,6 +118,17 @@ export const discountPct = (p: Product) => (p.salePrice ? Math.round((1 - p.sale
 export const formatPrice = (n: number) => `LKR ${n.toLocaleString("en-LK")}`;
 
 export const bestSellers = products.filter((p) => p.bestSeller).sort((a, b) => a.bestSeller! - b.bestSeller!);
+// The "New" pieces, newest first; pieces added on the same day keep their catalogue order, as the shop's "Newest" sort does.
+export const newArrivals = products.filter((p) => p.isNew).sort((a, b) => b.added.localeCompare(a.added));
+
+/** Can this size be ordered right now? */
+export const inStock = (p: Product, size: string) => !(p.soldOut ?? []).includes(size);
+/** Every size gone — the piece can still be looked at, but not added. */
+export const allSoldOut = (p: Product) => p.sizes.every((s) => !inStock(p, s));
+/** The size picked — or, before one is, the piece itself — can't be ordered: the product page offers to tell the
+ *  shopper when it's back rather than add it. A sold-out size can still be picked for that, so a shopper can ask for
+ *  their own size and not just learn that it's gone. */
+export const soldOutPick = (p: Product, size: string | null) => (size === null ? allSoldOut(p) : !inStock(p, size));
 export const onSale = products.filter((p) => p.salePrice);
 export const maxDiscount = Math.max(...onSale.map(discountPct));
 
@@ -108,10 +139,51 @@ export const priceBuckets = [
   { key: "10000", label: "LKR 10,000+", test: (n: number) => n >= 10000 },
 ];
 
-// Every word must appear in the product's name, description, category, colours or details.
+// Shoppers' words the catalogue doesn't use, and the catalogue's words for them. Keys are singular (query words are
+// folded to the singular before the lookup), and every word on the right must really occur in a piece's name, details
+// or colours, or a collection's label or name — a word nobody wrote finds nothing.
+export const searchSynonyms: Record<string, string[]> = {
+  pink: ["blush", "rose"],
+  red: ["wine", "scarlet", "rouge", "crimson"],
+  burgundy: ["wine"],
+  white: ["ivory", "pearl"],
+  cream: ["ivory"],
+  purple: ["lilac"],
+  brown: ["mocha"],
+  blue: ["aqua"],
+  panty: ["brief", "thong"],
+  knicker: ["brief", "thong"],
+  underwear: ["brief", "thong"],
+  swimwear: ["swim", "bikini", "monokini", "swimsuit"],
+  swimsuit: ["swim", "bikini", "monokini", "swimsuit"],
+  lingerie: ["lace"],
+  nighty: ["slip", "babydoll", "teddy"],
+  nightie: ["slip", "babydoll", "teddy"],
+  nightdress: ["slip", "babydoll", "teddy"],
+  dress: ["gown", "mini", "cheongsam"],
+};
+
+// Lower case without accents, so "rose" finds "Rosé" and "elodie" finds "Élodie".
+const fold = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const wordsOf = (s: string) => fold(s).split(/[^a-z0-9]+/).filter(Boolean);
+// A rough singular — enough for "bikinis", "dresses" and "panties"; short words like "bra" and "set" are left alone.
+const singular = (w: string) =>
+  w.length > 4 && w.endsWith("ies") ? `${w.slice(0, -3)}y` : /(ss|sh|ch|x|z)es$/.test(w) ? w.slice(0, -2) : w.length > 3 && /[^s]s$/.test(w) ? w.slice(0, -1) : w;
+
+// Every word of the query must match (AND). A word matches when a word of the piece's name, description, details,
+// colours, category or collection starts with it — so a half-typed "biki" already finds the bikinis but "red" no longer
+// finds "underwired" — or when its singular does, or when one of its synonyms above is a whole word of the piece's name,
+// details, colours, category or collection. Synonyms skip the description and must match whole words, because the
+// prose uses words loosely: "Slip the straps back" isn't a slip, and "dress" → "mini" mustn't find "minimal".
 export function matchesQuery(p: Product, query: string) {
-  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const words = wordsOf(query);
   if (!words.length) return true;
-  const hay = [p.name, p.description, categoryLabel(p.category), collectionName(p.category), ...p.colors.map((c) => colors[c].label), ...p.details].join(" ").toLowerCase();
-  return words.every((w) => hay.includes(w));
+  const labels = wordsOf([p.name, categoryLabel(p.category), collectionName(p.category), ...p.colors.map((c) => colors[c].label), ...p.details].join(" "));
+  const hay = [...labels, ...wordsOf(p.description)];
+  const whole = new Set([...labels, ...labels.map(singular)]);
+  return words.every((w) => {
+    const one = singular(w);
+    if (hay.some((h) => h.startsWith(w) || h.startsWith(one))) return true;
+    return [...(searchSynonyms[w] ?? []), ...(searchSynonyms[one] ?? [])].some((s) => whole.has(s));
+  });
 }

@@ -5,6 +5,7 @@ const NAV = [
   ["Collections", "/#collections"],
   ["Size Guide", "/#size-guide"],
   ["Ordering", "/#ordering"],
+  ["FAQ", "/help"],
   ["Contact", "/#contact"],
 ] as const;
 
@@ -35,6 +36,8 @@ test.describe("header", () => {
     await expect(nav.getByRole("link", { name: "Contact", exact: true })).toHaveClass(/is-active/);
     await go(page, "/products");
     await expect(nav.getByRole("link", { name: "Shop", exact: true })).toHaveClass(/is-active/);
+    await go(page, "/help");
+    await expect(nav.getByRole("link", { name: "FAQ", exact: true })).toHaveClass(/is-active/);
   });
 
   test("WhatsApp button opens wa.me with a prefilled message in a new tab", async ({ prepared: page }) => {
@@ -131,7 +134,7 @@ test.describe("search dialog", () => {
     await page.keyboard.press("/");
     const box = page.getByRole("searchbox", { name: "Search products" });
     await box.fill("qzxv");
-    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nothing’s wearing");
+    await expect(searchDialog(page).locator(".search-empty")).toContainText("Nobody’s wearing");
     await expect(searchDialog(page).getByRole("button", { name: /See all/ })).toHaveCount(0);
     await box.fill("sale");
     await expect(searchDialog(page).locator(".search-label")).toHaveText(`${CATALOG.sale.length} results`);
@@ -242,20 +245,39 @@ test.describe("bag drawer chrome", () => {
     await bagDialog(page).getByRole("button", { name: "Close bag" }).click();
     await expect(root).not.toHaveClass(/is-open/);
     await openBag(page).click();
-    await bagDialog(page).getByRole("link", { name: /Browse the shop/ }).click();
+    await bagDialog(page).getByRole("link", { name: /Shop, shamelessly/ }).click();
     await expect(page).toHaveURL(/\/products$/);
     await expect(root).not.toHaveClass(/is-open/);
   });
 });
 
-test("the loading screen plays once per tab and is skipped afterwards", async ({ page }) => {
+test("the loading screen plays when a visit begins on the home page, once per tab, and is skipped afterwards", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const intro = page.locator(".intro");
   await expect(intro).toBeAttached();
+  await expect(page.locator("html")).not.toHaveClass(/intro-seen/);
   await expect(intro).toHaveClass(/is-gone/, { timeout: 12_000 });
   expect(await page.evaluate(() => sessionStorage.getItem("lusted-intro"))).toBe("1");
   await page.goto("/about");
+  await expect(page.locator("html")).toHaveClass(/intro-seen/);
+  await expect(intro).toBeHidden();
+});
+
+// A product link opened from Instagram or WhatsApp starts a fresh session in the in-app browser every time; the shopper
+// goes straight to the piece, and the curtain doesn't come down when they wander to the home page afterwards either.
+test("a visit that begins on any other page never shows the loading screen", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`/products/${CATALOG.hero.slug}`, { waitUntil: "domcontentloaded" });
+  const intro = page.locator(".intro");
+  await expect(page.locator("html")).toHaveClass(/intro-seen/);
+  await expect(intro).toBeHidden();
+  expect(await page.evaluate(() => sessionStorage.getItem("lusted-intro"))).toBe("1");
+  await go(page, `/products/${CATALOG.hero.slug}`);
+  await page.getByRole("link", { name: "Lusted — home" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(intro).toBeHidden();
+  await page.reload();
   await expect(page.locator("html")).toHaveClass(/intro-seen/);
   await expect(intro).toBeHidden();
 });

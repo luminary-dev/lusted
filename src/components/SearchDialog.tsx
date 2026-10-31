@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useTrackNoResults } from "@/lib/analytics";
 import { bestSellers, collectionName, matchesQuery, products } from "@/lib/products";
 import { Price } from "./shop/ProductCard";
 import { ArrowRight, Close, Search } from "./icons";
@@ -62,6 +63,7 @@ export default function SearchDialog() {
 
   const q = query.trim();
   const results = q ? products.filter((p) => matchesQuery(p, q) || (q.toLowerCase() === "sale" && p.salePrice)) : bestSellers;
+  useTrackNoResults(q, !results.length, "dialog");
 
   function close() {
     setSearchOpen(false);
@@ -84,7 +86,7 @@ export default function SearchDialog() {
           }}
         >
           <Search />
-          <input ref={input} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="What do you want to be caught in?" aria-label="Search products" />
+          <input ref={input} type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="What are you in the mood for?" aria-label="Search products" />
           <kbd>esc</kbd>
           <button type="button" className="icon-btn" aria-label="Close search" onClick={close}>
             <Close />
@@ -93,7 +95,7 @@ export default function SearchDialog() {
 
         {!q && (
           <div className="search-suggest">
-            <span>Everyone’s after</span>
+            <span>Tonight’s cravings</span>
             {suggestions.map((s) => (
               <button key={s} type="button" className="chip" onClick={() => setQuery(s)}>
                 {s}
@@ -121,7 +123,7 @@ export default function SearchDialog() {
             ))}
           </ul>
         ) : (
-          <p className="search-empty">Nothing’s wearing “{q}” tonight. Try “lace”, “silk” or “bikini”.</p>
+          <p className="search-empty">Nobody’s wearing “{q}” tonight — or much of anything. Try “lace”, “silk” or “bikini”.</p>
         )}
 
         {q && results.length > 0 && (

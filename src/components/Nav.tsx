@@ -59,21 +59,27 @@ export default function Nav() {
           </Link>
           <nav className="nav-links" aria-label="Main">
             {navLinks.map((l) => (
-              <Link key={l.href} href={l.href} className={isActive(l.href) ? "is-active" : ""} onClick={() => setOpen(false)}>
+              <Link
+                key={l.href}
+                href={l.href}
+                className={[isActive(l.href) && "is-active", l.menuOnly && "nav-menu-only"].filter(Boolean).join(" ")}
+                onClick={() => setOpen(false)}
+              >
                 {l.label}
               </Link>
             ))}
-            <a className="btn btn-wine nav-menu-whatsapp" href={whatsappLink("Hi Lusted! I'd love some help with an order.")} target="_blank" rel="noopener noreferrer">
+            <a className="btn btn-wine nav-menu-whatsapp" data-wa-source="nav-menu" href={whatsappLink("Hi Lusted! I'd love some help with an order.")} target="_blank" rel="noopener noreferrer">
               <WhatsApp /> Message us on WhatsApp
             </a>
             <div className="nav-menu-theme">
-              <span>Dark mode</span>
+              <span>Lights off</span>
               <ThemeToggle />
             </div>
           </nav>
           <div className="nav-actions">
             <a
               className="btn btn-wine nav-whatsapp"
+              data-wa-source="nav"
               href={whatsappLink("Hi Lusted! I'd love some help with an order.")}
               target="_blank"
               rel="noopener noreferrer"

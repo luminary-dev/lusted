@@ -1,46 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Corinthia, Fraunces, Montserrat, Parisienne, Petit_Formal_Script, Playfair_Display } from "next/font/google";
+import { Corinthia, Montserrat, Parisienne } from "next/font/google";
 import Nav from "@/components/Nav";
 import ScrollRail from "@/components/ScrollRail";
 import FluidCursor from "@/components/FluidCursor";
 import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
+import BagToast from "@/components/shop/BagToast";
+import PhotoMorphProvider from "@/components/shop/PhotoMorph";
 import SearchDialog from "@/components/SearchDialog";
+import SiteAnalytics from "@/components/SiteAnalytics";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
-// Headlines: Parisienne (a casual connecting script — set ~1.5× the Petit Formal Script sizes, its x-height is small).
-// Alternatives kept unloaded until used — switch --headline in globals.css:
-// Petit Formal Script (formal copperplate), Fraunces (soft serif), Playfair Display (closest free match to the logo)
-// or Corinthia (fine script).
+// Headlines: Parisienne, a casual connecting script set large because its x-height is small (--headline in
+// 01-base.css). Corinthia is the finer script used for the signature lines on the about and legal pages (--script).
+// Montserrat carries everything else. Three faces, all of them used — alternates were tried and dropped.
 const parisienne = Parisienne({
   variable: "--font-parisienne",
   subsets: ["latin"],
   weight: "400",
 });
 
-const formal = Petit_Formal_Script({
-  variable: "--font-formal",
-  subsets: ["latin"],
-  weight: "400",
-  preload: false,
-});
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["SOFT", "opsz"],
-  preload: false,
-});
 
-const serif = Playfair_Display({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  preload: false,
-});
 
 const script = Corinthia({
   variable: "--font-script",
@@ -73,6 +56,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // The bag toast and the sticky buy bar sit at the bottom of the screen, so they have to clear a phone's home
+  // indicator. env(safe-area-inset-*) only reports a real inset once the page asks to draw into those areas.
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f8f1ec" },
     { media: "(prefers-color-scheme: dark)", color: "#140a0c" },
@@ -81,15 +67,18 @@ export const viewport: Viewport = {
 
 // Applies the saved (or system) theme before first paint so there's no flash.
 const themeScript = `try{var t=localStorage.getItem("lusted-theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
-// Skips the loading screen if it has already played in this tab, before paint so it never flashes.
-const introScript = `try{if(sessionStorage.getItem("lusted-intro"))document.documentElement.classList.add("intro-seen")}catch(e){}`;
+// Skips the loading screen, before paint so it never flashes, unless the visit begins on the home page and it hasn't
+// played in this tab yet. A visit that lands on any other page — a product link opened from Instagram or WhatsApp, whose
+// in-app browsers start a fresh session every time — goes straight to it, and the tab is marked so that coming round
+// to the home page later (or reloading it) doesn't hold the shopper up either.
+const introScript = `try{if(location.pathname!=="/"||sessionStorage.getItem("lusted-intro"))document.documentElement.classList.add("intro-seen");if(location.pathname!=="/")sessionStorage.setItem("lusted-intro","1")}catch(e){}`;
 // Marks browsers that can draw the 3D size tags, before first paint, so the size guide holds their room from the start
 // (SizeGuide.tsx / .webgl in globals.css) and never changes height when they arrive.
 const webglScript = `if(window.WebGLRenderingContext)document.documentElement.classList.add("webgl")`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${parisienne.variable} ${formal.variable} ${fraunces.variable} ${serif.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${parisienne.variable} ${script.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
@@ -100,10 +89,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Nav />
         <ScrollRail />
         <FluidCursor />
-        {children}
+        <PhotoMorphProvider>{children}</PhotoMorphProvider>
         <Footer />
         <BagDrawer />
+        <BagToast />
         <SearchDialog />
+        <SiteAnalytics />
       </body>
     </html>
   );

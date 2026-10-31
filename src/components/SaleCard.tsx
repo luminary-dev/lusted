@@ -53,7 +53,7 @@ export default function SaleCard({ product: p, tint, index }: { product: Product
           {formatPrice(priceOf(p))} <s>{formatPrice(p.price)}</s>
         </p>
         <span className="sale-card-cta">
-          Shop now <ChevronNext />
+          Get your hands on it <ChevronNext />
         </span>
       </div>
     </Link>

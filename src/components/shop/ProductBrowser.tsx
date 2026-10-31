@@ -2,7 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
+import { useTrackNoResults } from "@/lib/analytics";
+import { bestSellers, categories, colors, matchesQuery, priceBuckets, priceOf, products, sizes, type Category, type ColorKey, type Product } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { Chevron, ChevronNext, Close, Search, Sliders } from "../icons";
 
@@ -130,6 +131,9 @@ export default function ProductBrowser() {
     };
     return by[sort] ? [...out].sort(by[sort]) : out;
   }, [cat, urlQuery, selSizes, selColors, selPrice, selFlags, sort]);
+  // a search that nothing in the whole catalogue matches — not one the other filters have emptied
+  const unmatched = useMemo(() => !products.some((p) => matchesQuery(p, urlQuery)), [urlQuery]);
+  useTrackNoResults(urlQuery, unmatched, "shop");
 
   // 15 pieces per page; the page lives in the URL (?page=2) like the filters
   const pages = Math.max(1, Math.ceil(results.length / PER_PAGE));
@@ -181,7 +185,7 @@ export default function ProductBrowser() {
           )}
         </label>
         <button className="filters-btn" onClick={() => setDrawer(true)}>
-          <Sliders /> Filters {filterCount > 0 && <span>{filterCount}</span>}
+          <Sliders /> <span className="filters-label">Filters</span> {filterCount > 0 && <span className="filters-count">{filterCount}</span>}
         </button>
         <label className="sort">
           <span>Sort</span>
@@ -200,6 +204,35 @@ export default function ProductBrowser() {
         <div className={`filters-root ${drawer ? "is-open" : ""}`} inert={sheet && !drawer}>
           <div className="filters-scrim" onClick={() => setDrawer(false)} />
           <aside className="filters" aria-label="Filters">
+            {/* a bottom sheet on a phone: the grabber is what a thumb reaches for first, and dragging it down is
+                what iOS users try before looking for a close button. Decorative — Close and Esc do the same. */}
+            <button
+              type="button"
+              className="filters-grab"
+              aria-label="Close filters"
+              tabIndex={-1}
+              onClick={() => setDrawer(false)}
+              onPointerDown={(e) => {
+                const startY = e.clientY;
+                const sheet = e.currentTarget.parentElement as HTMLElement;
+                const move = (ev: PointerEvent) => {
+                  const dy = Math.max(0, ev.clientY - startY);
+                  sheet.style.transform = `translateY(${dy}px)`;
+                  sheet.style.transition = "none";
+                };
+                const up = (ev: PointerEvent) => {
+                  sheet.style.transform = "";
+                  sheet.style.transition = "";
+                  if (ev.clientY - startY > 90) setDrawer(false); // far enough to mean it
+                  window.removeEventListener("pointermove", move);
+                  window.removeEventListener("pointerup", up);
+                };
+                window.addEventListener("pointermove", move);
+                window.addEventListener("pointerup", up);
+              }}
+            >
+              <span />
+            </button>
             <div className="filters-head">
               <h2 className="h3">Filters</h2>
               <button className="icon-btn" aria-label="Close filters" onClick={() => setDrawer(false)}>
@@ -208,7 +241,7 @@ export default function ProductBrowser() {
             </div>
 
             <fieldset>
-              <legend>Shop by</legend>
+              <legend>Tempt me with</legend>
               {flags.map((f) => (
                 <label key={f.key} className="check">
                   <input type="checkbox" checked={selFlags.includes(f.key)} onChange={() => update({ [f.key]: selFlags.includes(f.key) ? null : "1" })} />
@@ -312,11 +345,44 @@ export default function ProductBrowser() {
             </>
           ) : (
             <div className="empty">
-              <h3 className="h3">No pieces match those filters.</h3>
-              <p>Try removing a filter, or message us — we may have it in the back.</p>
+              {/* a search that found nothing and a filter set that found nothing are different dead ends, and
+                  "those filters" is the wrong answer to a typed word. Each one is offered the way out it needs. */}
+              <h3 className="h3 empty-title">
+                {urlQuery && !filterCount
+                  ? `Nothing matched “${urlQuery}”.`
+                  : urlQuery
+                    ? `Nothing matched “${urlQuery}” with these filters.`
+                    : "Too picky, even for us — nothing matches those filters."}
+              </h3>
+              <p>
+                {urlQuery && !filterCount
+                  ? "Try a shorter word, or message us — what you want might be hiding in the back."
+                  : "Loosen up and drop one of these, or message us — we may have it in the back."}
+              </p>
+              {/* dropping one filter is usually what's wanted, not losing the lot */}
+              {chips.length > 1 && (
+                <ul className="empty-chips">
+                  {chips.map((c) => (
+                    <li key={c.label}>
+                      <button type="button" onClick={c.clear}>
+                        Remove {c.label} <Close />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <button className="btn btn-wine" onClick={clearAll}>
-                Clear filters
+                {urlQuery && !filterCount ? "Clear the search" : "Clear filters"}
               </button>
+              {/* never a dead end: four pieces to carry on with */}
+              <div className="empty-suggest">
+                <p className="empty-suggest-head">Meanwhile, these never disappoint</p>
+                <div className="empty-suggest-grid">
+                  {bestSellers.slice(0, 4).map((p) => (
+                    <ProductCard key={p.slug} product={p} sizes="(min-width: 901px) 20vw, 44vw" />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

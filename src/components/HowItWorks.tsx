@@ -8,12 +8,12 @@ import { ArrowRight } from "./icons";
 const slides = howSlides.map((s) => ({ ...s, phone: { ...s.phone, blurDataURL: undefined } }));
 
 const steps = [
-  { title: "Pick what you’ll be caught in", text: "Lingerie, swim, after dark — save everything that makes you want to be seen in it, and seen out of it." },
+  { title: "Pick your poison", text: "Lingerie, swim, after dark — heart everything you want to be seen in, and everything you’d rather be seen out of." },
   {
-    title: "Whisper us your picks",
-    text: "Send them on WhatsApp. A real person confirms your size, the price and that it’s here — and never asks who it’s for.",
+    title: "Message us your sins",
+    text: "Send us your bag in one message. A real person confirms your size, the price and that it’s here — and never asks who it’s for.",
   },
-  { title: "Arrives looking innocent", text: "Pay securely, and it turns up in a plain box with nothing on the outside. What’s inside is nobody’s business but yours." },
+  { title: "It turns up looking boring", text: "Pay securely, and it arrives in a plain box with nothing on the outside. What’s inside is between you and whoever you decide to show." },
 ];
 
 // Full-width 16:9 campaign photos (src/lib/how-slides.ts) with the models on the left, slowly changing over
@@ -26,11 +26,11 @@ export default function HowItWorks() {
       </div>
       <div className="container how-inner">
         <div className="how-copy" data-reveal>
-          <p className="eyebrow">How it happens</p>
+          <p className="eyebrow">How it goes down</p>
           <h2 className="h2">
-            From wanting it <em>to wearing it</em>
+            Easier than <em>undressing</em>
           </h2>
-          <p className="how-lede">Three private steps — no accounts, no forms, no one watching. Except us.</p>
+          <p className="how-lede">No accounts, no forms, no strangers watching — just three steps and a real person who keeps your secrets.</p>
 
           <ol className="how-steps">
             {steps.map((s, i) => (
@@ -44,8 +44,8 @@ export default function HowItWorks() {
             ))}
           </ol>
 
-          <a className="btn btn-light" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
-            Start your order <ArrowRight className="arrow" />
+          <a className="btn btn-light" data-wa-source="how-it-works" href={whatsappLink("Hi Lusted! I'd like to place an order.")} target="_blank" rel="noopener noreferrer">
+            Start your naughty order <ArrowRight className="arrow" />
           </a>
         </div>
       </div>

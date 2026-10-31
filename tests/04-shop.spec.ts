@@ -1,4 +1,4 @@
-import { test, expect, go, CATALOG, parsePrice, slugs, bagDialog } from "./fixtures";
+import { test, expect, go, CATALOG, parsePrice, slugs, bagDialog, photographed } from "./fixtures";
 
 const cards = (page: import("@playwright/test").Page) => page.locator("main:visible .product-grid .product-card");
 const count = async (page: import("@playwright/test").Page) => Number((await page.locator("main:visible .results-bar p").textContent())!.match(/(?:of )?(\d+) pieces?$/)![1]);
@@ -83,8 +83,10 @@ test.describe("the shop", () => {
     await page.locator(".chips .chip", { hasText: "silk bikini" }).click();
     await expect(box).toHaveValue("");
     await box.fill("qqqqq");
-    await expect(page.locator(".empty")).toContainText("No pieces match");
-    await page.locator(".empty").getByRole("button", { name: "Clear filters" }).click();
+    // a search that found nothing says so about the word, not about "those filters" — and offers a way on
+    await expect(page.locator(".empty-title")).toContainText("Nothing matched “qqqqq”");
+    await expect(page.locator(".empty-suggest .product-card")).toHaveCount(4);
+    await page.locator(".empty").getByRole("button", { name: "Clear the search" }).click();
     await expect(page).not.toHaveURL(/q=/);
     expect(await count(page)).toBe(CATALOG.total);
     await expect(box).toHaveValue("");
@@ -102,6 +104,45 @@ test.describe("the shop", () => {
     await box.fill("midnight sins");
     await expect(page).toHaveURL(/q=midnight/);
     expect(await count(page)).toBe(CATALOG.byCategory["after-dark"]);
+  });
+
+  test("search: words match at word starts, without accents, plurals fold and shoppers' words find the catalogue's", async ({ prepared: page }) => {
+    // every piece a search finds, across all its pages
+    const found = async (q: string) => {
+      await go(page, `/products?q=${encodeURIComponent(q)}`);
+      const all = await slugs(cards(page));
+      const pages = Math.ceil((await count(page)) / CATALOG.perPage);
+      for (let n = 2; n <= pages; n++) {
+        await go(page, `/products?q=${encodeURIComponent(q)}&page=${n}`);
+        all.push(...(await slugs(cards(page))));
+      }
+      return all;
+    };
+    const fold = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const text = (p: (typeof photographed)[number]) => fold([p.name, p.description, ...p.details, ...p.colors].join(" "));
+    const words = (p: (typeof photographed)[number]) => text(p).split(/[^a-z0-9]+/);
+    const slugsOf = (ps: typeof photographed) => ps.map((p) => p.slug);
+
+    // a plural finds what its singular finds
+    const bikinis = await found("bikinis");
+    expect(bikinis).toEqual(expect.arrayContaining(slugsOf(photographed.filter((p) => /\bbikini\b/i.test(p.name)))));
+    expect(bikinis.length).toBe((await found("bikini")).length);
+
+    // "red" finds the wine pieces, but not a piece whose only "red" is inside a word ("underwired", "embroidered")
+    const red = await found("red");
+    expect(red).toEqual(expect.arrayContaining(slugsOf(photographed.filter((p) => p.colors.includes("wine")))));
+    const insideOnly = photographed.filter(
+      (p) => text(p).includes("red") && !p.colors.includes("wine") && !words(p).some((w) => w.startsWith("red") || ["scarlet", "rouge", "crimson"].includes(w)),
+    );
+    for (const p of insideOnly) expect(red).not.toContain(p.slug);
+
+    // shoppers' words: "white" finds the ivory pieces, "panties" the briefs and thongs
+    expect(await found("white")).toEqual(expect.arrayContaining(slugsOf(photographed.filter((p) => p.colors.includes("ivory")))));
+    const briefs = photographed.filter((p) => fold([p.name, ...p.details].join(" ")).split(/[^a-z0-9]+/).some((w) => /^(brief|thong)s?$/.test(w)));
+    expect(await found("panties")).toEqual(expect.arrayContaining(slugsOf(briefs)));
+
+    // accents don't matter: "rose" finds the Rosé pieces
+    expect(await found("rose")).toContain(CATALOG.hero.slug);
   });
 
   test("sort: price both ways really sorts, newest matches the dates, best selling leads with the ranked six", async ({ prepared: page }) => {
@@ -222,7 +263,7 @@ test.describe("the shop", () => {
 
   test("product cards: name, price, hover shows the back view, swatches swap the colourway, the heart saves", async ({ prepared: page }) => {
     await go(page, "/products");
-    const card = cards(page).filter({ has: page.locator(`a[href="/products/${CATALOG.hero.slug}"]`) }).first();
+    const card = cards(page).filter({ has: page.locator(`a[href^="/products/${CATALOG.hero.slug}"]`) }).first();
     await expect(card.locator("h3")).toHaveText(CATALOG.hero.name);
     await expect(card.locator(".price-now")).toHaveText(`LKR ${CATALOG.hero.price.toLocaleString("en-LK")}`);
     await expect(card).toHaveClass(/has-back/);
@@ -242,13 +283,16 @@ test.describe("the shop", () => {
     await expect(card.getByRole("button", { name: `Remove ${CATALOG.hero.name} from favourites` })).toBeVisible();
     await expect(page.getByRole("link", { name: "Favourites, 1 saved" })).toBeVisible();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lusted-favourites")!))).toEqual([CATALOG.hero.slug]);
+    // the colourway on show follows the click: the link carries it and the piece opens on it, instead of the
+    // shopper picking Wine and landing on the first colour
     await card.locator(".product-info").click();
-    await expect(page).toHaveURL(new RegExp(`/products/${CATALOG.hero.slug}$`));
+    await expect(page).toHaveURL(new RegExp(`/products/${CATALOG.hero.slug}\\?colour=wine$`));
+    await expect(page.locator(".buy-label > span").first()).toHaveText("Wine");
   });
 
-  test("quick add on hover: pick a size, add, the bag opens with that line", async ({ prepared: page }) => {
+  test("quick add on hover: pick a size, add, the line lands in the bag without the drawer taking over", async ({ prepared: page }) => {
     await go(page, "/products");
-    const card = cards(page).filter({ has: page.locator(`a[href="/products/${CATALOG.hero.slug}"]`) }).first();
+    const card = cards(page).filter({ has: page.locator(`a[href^="/products/${CATALOG.hero.slug}"]`) }).first();
     await card.locator(".product-media").hover();
     const quick = card.getByRole("group", { name: `Quick add ${CATALOG.hero.name}` });
     await expect(quick).toBeVisible();
@@ -260,23 +304,36 @@ test.describe("the shop", () => {
     await expect(cta).toBeEnabled();
     await expect(cta).toHaveText(/Add to bag · L/);
     await cta.click();
+    // adding from the grid must not throw the drawer over the shop — it confirms itself and leaves the shopper
+    // browsing, which is the whole point of quick add when building a set
+    await expect(page.locator(".drawer-root")).not.toHaveClass(/is-open/);
+    const toast = page.locator(".bag-toast");
+    await expect(toast).toBeVisible();
+    await expect(toast).toContainText(CATALOG.hero.name);
+    await expect(toast).toContainText("Blush · L");
+    await expect(page.getByRole("button", { name: "Open bag, 1 items" })).toBeVisible();
+    // and the line really is in the bag, not just announced
+    await toast.getByRole("button", { name: "Peek in the bag" }).click();
     const bag = bagDialog(page);
-    await expect(page.locator(".drawer-root")).toHaveClass(/is-open/);
     await expect(bag.locator(".bag-item")).toHaveCount(1);
     await expect(bag.locator(".bag-item")).toContainText(CATALOG.hero.name);
-    await expect(bag.locator(".bag-item")).toContainText("Blush · L");
+    await expect(bag.locator(".bag-item .bag-meta")).toContainText("Blush");
+    // the size is a control now, so the line can be corrected without starting the piece again
+    await expect(bag.locator(".bag-item .bag-size select")).toHaveValue("L");
     await expect(bag.locator(".drawer-total strong")).toHaveText(`LKR ${CATALOG.hero.price.toLocaleString("en-LK")}`);
-    await expect(page.getByRole("button", { name: "Open bag, 1 items" })).toBeVisible();
   });
 
   test("a colour-filtered card quick-adds in that colour", async ({ prepared: page }) => {
     await go(page, "/products?color=wine");
-    const card = cards(page).filter({ has: page.locator(`a[href="/products/${CATALOG.hero.slug}"]`) }).first();
+    const card = cards(page).filter({ has: page.locator(`a[href^="/products/${CATALOG.hero.slug}"]`) }).first();
     await expect(card.locator(".product-media > a > img:not(.product-back)")).toHaveAttribute("alt", /in wine$/);
     await card.locator(".product-media").hover();
     await card.locator(".quick-add-sizes").getByRole("button", { name: "S", exact: true }).click();
     await card.locator(".quick-add-cta").click();
-    await expect(bagDialog(page).locator(".bag-item")).toContainText("Wine · S");
+    // quick add is quiet now, so the bag is opened to read the line
+    await page.getByRole("button", { name: /Open bag/ }).click();
+    await expect(bagDialog(page).locator(".bag-item .bag-meta")).toContainText("Wine");
+    await expect(bagDialog(page).locator(".bag-item .bag-size select")).toHaveValue("S");
   });
 });
 
@@ -311,5 +368,33 @@ test.describe("the shop on a phone", () => {
     // the grid is two across on a phone
     const xs = await cards(page).evaluateAll((els) => els.slice(0, 2).map((e) => Math.round(e.getBoundingClientRect().left)));
     expect(xs[0]).not.toBe(xs[1]);
+  });
+
+  test("the first pieces show on the first screen, and search, Filters and Sort stay in reach under the nav", async ({ prepared: page }) => {
+    await go(page, "/products");
+    const first = await cards(page).first().boundingBox();
+    expect(first!.y, "first card starts on the first screen").toBeLessThan(844 / 2 + 150);
+    // the collections are one row that scrolls sideways
+    const tabs = await page.getByRole("tab").evaluateAll((els) => [...new Set(els.map((e) => Math.round(e.getBoundingClientRect().top)))]);
+    expect(tabs).toHaveLength(1);
+    // search, Filters and Sort share a line, which sticks under the nav as the grid scrolls past
+    const toolbar = page.locator(".toolbar");
+    const row = await Promise.all([toolbar.locator(".search"), page.getByRole("button", { name: /Filters/ }), page.getByRole("combobox", { name: "Sort" })].map((l) => l.boundingBox()));
+    for (const b of row) expect(Math.abs(b!.y + b!.height / 2 - (row[0]!.y + row[0]!.height / 2))).toBeLessThan(2);
+    await page.evaluate(() => window.scrollTo(0, 1500));
+    const nav = await page.locator(".nav-bar").boundingBox();
+    await expect.poll(async () => Math.round((await toolbar.boundingBox())!.y)).toBeGreaterThanOrEqual(Math.floor(nav!.y + nav!.height));
+    expect((await toolbar.boundingBox())!.y).toBeLessThan(nav!.y + nav!.height + 20);
+  });
+
+  test("a card's badges stay clear of its heart", async ({ prepared: page }) => {
+    await go(page, "/products?best=1");
+    for (const card of await cards(page).all()) {
+      const heart = await card.locator(".card-fav").boundingBox();
+      for (const badge of await card.locator(".badge").all()) {
+        const b = await badge.boundingBox();
+        expect(b!.x + b!.width, `${await badge.textContent()} ends before the heart`).toBeLessThanOrEqual(heart!.x);
+      }
+    }
   });
 });

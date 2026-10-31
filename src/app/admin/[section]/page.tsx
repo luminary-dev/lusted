@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { ADMIN_COOKIE, configured, verifySessionToken } from "@/lib/admin/auth";
 import catalog from "@/lib/catalog.json";
+import manifest from "@/lib/image-manifest.json";
 import { Console, type CatalogEntry } from "../console";
 import { LoginForm } from "../login-form";
 import { tonight } from "../photos";
@@ -27,5 +28,7 @@ export default async function SectionPage({ params }: PageProps<"/admin/[section
   await connection(); // rendered per request: the sign-in photo is a fresh draw, the console reads live state
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
   if (!verifySessionToken(token)) return <LoginForm ready={configured()} photo={tonight()} />;
-  return <Console section={section as Section} initial={catalog as CatalogEntry[]} />;
+  // the product photos this deploy knows, until the console has read dev's (the manifest itself stays on the server)
+  const photos = Object.keys(manifest.images).filter((key) => key.startsWith("products/"));
+  return <Console section={section as Section} initial={catalog as CatalogEntry[]} photos={photos} />;
 }

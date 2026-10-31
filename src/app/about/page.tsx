@@ -10,21 +10,22 @@ import { img } from "@/lib/cdn";
 
 export const metadata: Metadata = {
   title: "About us — Lusted",
-  description: "Lusted is lingerie made to be looked at and cut to be taken off — designed for the moment someone notices, made to last past it, and delivered so no one knows.",
+  description: "Lusted is lingerie made to be stared at and cut to come off — designed for the moment someone notices, made to last long past it, and delivered so discreetly no one knows.",
+  alternates: { canonical: "/about" },
 };
 
 const values = [
-  { icon: Heart, title: "Every mood you’re in", text: "Lingerie, swim and after-dark pieces for the good girl, the bad one, and the one who can’t decide — never one idea of sexy." },
-  { icon: Butterfly, title: "Fabric that feels like skin", text: "Lined lace, satin and silk chosen for how they feel under a hand — made to be pulled at, and to survive it." },
-  { icon: Lock, title: "Nobody has to know", text: "A plain, unbranded box and private one-to-one ordering. What you wear, and for whom, stays between us." },
-  { icon: ChatDouble, title: "A real person, no blushing", text: "Every order and every sizing question is answered by our team on WhatsApp — never a bot, never a judgement." },
+  { icon: Heart, title: "Every mood, every sin", text: "Lingerie, swim and after-dark pieces for your soft moods, your filthy ones, and the nights you can’t decide — never one idea of sexy." },
+  { icon: Butterfly, title: "Fabric made for hands", text: "Lined lace, satin and silk, chosen for how they feel when someone can’t keep their hands off you — made to be tugged at, and to survive it." },
+  { icon: Lock, title: "Our lips are sealed", text: "A plain, unbranded box and private one-to-one ordering. What you wear, and who gets to see it, stays between us." },
+  { icon: ChatDouble, title: "A real person, zero judgement", text: "Every order and every sizing question is answered by our team on WhatsApp — never a bot, and never a raised eyebrow, whatever you’re into." },
 ];
 
 // how an order goes, start to doorstep
 const steps = [
-  { icon: Sparkle, title: "Pick what you’ll be found in", text: "Wander the collection, save what makes you want to be seen, and send us your picks when you’re ready — or when you can’t wait." },
-  { icon: ChatDouble, title: "Whisper it to us", text: "A real person helps with sizing and styling — measure once, and we’ll find the fit that makes it hard to look away." },
-  { icon: Box, title: "Arrives looking innocent", text: "Tissue, a ribbon, and a box that gives nothing away. Payment and delivery are confirmed with you directly, and quietly." },
+  { icon: Sparkle, title: "Fall for something", text: "Wander the collection, heart whatever makes your pulse jump, and send us your picks when you’re ready — or the second you can’t wait any longer." },
+  { icon: ChatDouble, title: "Tell us everything", text: "A real person helps with sizing and styling — measure once, and we’ll find the fit that makes jaws drop." },
+  { icon: Box, title: "Arrives looking harmless", text: "Tissue, a ribbon, and a box that gives absolutely nothing away. Payment and delivery are confirmed with you directly — and quietly." },
 ];
 
 export default function AboutPage() {
@@ -52,10 +53,10 @@ export default function AboutPage() {
           <div className="about-hero-copy">
             <p className="eyebrow">About us</p>
             <h1 className="h1">
-              Made to be looked at. <em>Cut to be taken off.</em>
+              Made to be stared at. <em>Cut to come off fast.</em>
             </h1>
             <p className="lede">
-              Lusted started with one filthy little truth: lingerie isn’t about what you wear. It’s about what happens once someone notices it. Every
+              Lusted started with one filthy truth: lingerie isn’t about what you wear. It’s about what happens once someone notices it. Every
               piece we make is for that moment — the slow look, the hand on the strap, the lights left on.
             </p>
           </div>
@@ -65,14 +66,14 @@ export default function AboutPage() {
           <div data-reveal>
             <p className="eyebrow">Our story</p>
             <h2 className="h2">
-              From the first sketch <em>to the last thing to come off.</em>
+              From the first sketch <em>to the last hook undone.</em>
             </h2>
             <blockquote className="about-quote">“Lingerie isn’t what you wear. It’s what you want done about it.”</blockquote>
           </div>
           <div className="about-story-copy" data-reveal>
             <p className="lede">
-              We design every piece around one question: what will it make them do? That means fabric that feels like skin, cuts that show exactly
-              what you decide to show, and the small details — a bow, a ring, a single hook — put precisely where fingers go first.
+              We design every piece around one dirty question: what will it make them do? That means fabric that feels like skin, cuts that show
+              exactly what you decide to show, and the small details — a bow, a ring, a single hook — put precisely where fingers go first.
             </p>
             <p className="lede">
               Buying it shouldn’t feel like a checkout. It should feel like telling someone what you like. So you talk to us: we find your size, we
@@ -117,7 +118,7 @@ export default function AboutPage() {
                   style={{ objectPosition: "50% 40%" }}
                 />
               </div>
-              <figcaption>the parcel</figcaption>
+              <figcaption>the unwrapping</figcaption>
             </figure>
             <figure className="about-print is-right">
               <span className="about-tape" aria-hidden />
@@ -138,7 +139,7 @@ export default function AboutPage() {
           <div className="about-how-copy" data-reveal>
             <p className="eyebrow">How we work</p>
             <h2 className="h2">
-              Personal, private, <em>and in no hurry at all.</em>
+              Personal, private, <em>and deliciously slow.</em>
             </h2>
             <ol className="about-steps">
               {steps.map(({ icon: Icon, title, text }) => (
@@ -158,17 +159,17 @@ export default function AboutPage() {
 
         <section className="about-cta" data-reveal>
           <div className="about-cta-copy">
-            <p className="eyebrow">Ready when you are</p>
+            <p className="eyebrow">Done reading?</p>
             <h2 className="h2">
-              Find your <em>next weakness.</em>
+              Now go and <em>misbehave.</em>
             </h2>
           </div>
           <div className="about-cta-actions">
             <Link href="/products" className="btn btn-wine">
               Show me everything <ArrowRight className="arrow" />
             </Link>
-            <a href={whatsappLink("Hi Lusted! I'd love some styling advice.")} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
-              Whisper to us
+            <a href={whatsappLink("Hi Lusted! I'd love some styling advice.")} target="_blank" rel="noopener noreferrer" className="btn btn-ghost" data-wa-source="about-page">
+              Get personal on WhatsApp
             </a>
           </div>
         </section>

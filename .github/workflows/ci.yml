@@ -8,7 +8,7 @@
 #   Lighthouse (…)   the home page, the shop, a product, about and /help, one machine each, so nothing quietly gets
 #                    slower, less accessible or worse for search
 #   Deploy (branch)  pushes only, after every job above has passed — nothing reaches Vercel before that:
-#                    dev → a Vercel preview, and lusted-dev.vercel.app is pointed at it (reveal gate off there)
+#                    dev → a Vercel preview, and dev.lusted.lk and lusted-dev.vercel.app are pointed at it (reveal gate off there)
 #                    main → production, lusted.vercel.app
 #
 # Branches (README "Deploy"): work happens on a branch, reaches dev by pull request, and reaches main by a pull
@@ -35,6 +35,8 @@ permissions:
 
 env:
   NODE_VERSION: 24
+  # pinned, not @latest: it is handed the deploy token and its output is parsed — bump here, to a release two weeks old
+  VERCEL_CLI: vercel@64.2.0
 
 jobs:
   branch-rules:
@@ -344,28 +346,47 @@ jobs:
       # The CLI finds the project through VERCEL_ORG_ID and VERCEL_PROJECT_ID; it is not given --scope, because a
       # team-scoped token cannot answer the "load user" call that --scope (and `vercel alias`) make — the alias is set
       # through the REST API instead, which takes the team id directly.
-      - name: Deploy a preview and point lusted-dev.vercel.app at it
+      - name: Deploy a preview and point dev.lusted.lk and lusted-dev.vercel.app at it
         if: github.ref == 'refs/heads/dev'
         run: |
           # the deployment's own address (lusted-<hash>-<team>.vercel.app) — never lusted-dev or lusted.vercel.app, which the
           # CLI also prints in its hints
-          url="$(npx --yes vercel@latest deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -oE 'https://lusted-[a-z0-9]{6,}-[a-z0-9-]+\.vercel\.app' | head -1)"
+          url="$(npx --yes "$VERCEL_CLI" deploy --yes --token "$VERCEL_TOKEN" 2>&1 | tee /dev/stderr | grep -oE 'https://lusted-[a-z0-9]{6,}-[a-z0-9-]+\.vercel\.app' | head -1)"
           [ -n "$url" ] || { echo "::error::Could not read the preview deployment's URL from the Vercel CLI output."; exit 1; }
           host="${url#https://}"
           id="$(curl -sS "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" -H "Authorization: Bearer $VERCEL_TOKEN" | jq -r '.id // empty')"
           [ -n "$id" ] || { echo "::error::Vercel has no deployment at $host."; exit 1; }
-          res="$(curl -sS -X POST "https://api.vercel.com/v2/deployments/$id/aliases?teamId=$VERCEL_ORG_ID" \
-            -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
-            -d '{"alias":"lusted-dev.vercel.app"}')"
+          point() {
+            curl -sS -X POST "https://api.vercel.com/v2/deployments/$id/aliases?teamId=$VERCEL_ORG_ID" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" -d "{\"alias\":\"$1\"}"
+          }
+          res="$(point lusted-dev.vercel.app)"
           echo "$res"
           [ "$(echo "$res" | jq -r '.alias // empty')" = "lusted-dev.vercel.app" ] || { echo "::error::Vercel did not point lusted-dev.vercel.app at $host."; exit 1; }
           echo "lusted-dev.vercel.app → $url" >> "$GITHUB_STEP_SUMMARY"
+          # dev.lusted.lk is the dev site's own address (a CNAME to Vercel in Cloudflare; the proxy treats any dev. host as
+          # the dev site). Vercel only aliases a custom domain it holds a certificate for, so a missing one is asked for and
+          # the alias tried again; that only works once the DNS reaches Vercel, so until then this is a warning, not a
+          # failed deploy — lusted-dev.vercel.app is already pointed.
+          res="$(point dev.lusted.lk)"
+          if [ "$(echo "$res" | jq -r '.error.code // empty')" = "cert_missing" ]; then
+            curl -sS -X POST "https://api.vercel.com/v8/certs?teamId=$VERCEL_ORG_ID" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" -d '{"cns":["dev.lusted.lk"]}'
+            echo
+            res="$(point dev.lusted.lk)"
+          fi
+          echo "$res"
+          if [ "$(echo "$res" | jq -r '.alias // empty')" = "dev.lusted.lk" ]; then
+            echo "dev.lusted.lk → $url" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::dev.lusted.lk is not pointed at this deploy yet ($(echo "$res" | jq -r '.error.message // "no answer"')) — usually its DNS has not reached Vercel."
+          fi
 
       - name: Deploy to production
         if: github.ref == 'refs/heads/main'
         run: |
-          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
-          echo "lusted.vercel.app ← $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          npx --yes "$VERCEL_CLI" deploy --prod --yes --token "$VERCEL_TOKEN"
+          echo "lusted.lk ← $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
 
       # the release: a tag v<version> on this commit and a GitHub release with the notes written from the pull requests
       # since the last one (once per version — a re-run of the deploy doesn't cut a second)

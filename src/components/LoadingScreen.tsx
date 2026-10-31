@@ -6,8 +6,9 @@ import wordmark from "@/assets/brand/wordmark-dark.png";
 
 // The first thing you see: two wine-velvet curtains drawn across the screen, the Lusted wordmark unveiled out of a
 // candlelit glow with rose-gold dust drifting up through it, a ribbon of satin light sliding across the letters and a
-// thin rose line drawing itself underneath — then light leaks through the seam and the curtains are drawn aside. Shown once per visit (sessionStorage); returning to the site in the same
-// tab skips it (the inline script in layout.tsx hides it before paint). With reduced motion it simply fades.
+// thin rose line drawing itself underneath — then light leaks through the seam and the curtains are drawn aside. Shown once per visit (sessionStorage), and only to a
+// visit that begins on the home page; returning to the site in the same tab, or arriving on any other page, skips it (the
+// inline script in layout.tsx hides it before paint). With reduced motion it simply fades.
 const MIN_MS = 2000;
 // how long the curtains take to clear (CSS: 0.15 s delay + 1.9 s draw) before the overlay is removed
 const OPEN_MS = 2150;
@@ -73,7 +74,7 @@ export default function LoadingScreen() {
         </div>
         <span className="intro-line" />
         <p className="intro-tag">
-          undressing the site for you
+          slipping out of something comfortable
           <span className="intro-dots">
             <i>.</i>
             <i>.</i>

@@ -15,8 +15,8 @@ test("hero: 27 slides, one active, the first preloaded, both calls to action", a
   for (const alt of await page.locator("#top .hero-slide img").evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toMatch(/Model/);
   const first = slides.first().locator("img");
   await expect.poll(() => first.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 1000)).toBe(true);
-  await expect(page.locator("#top").getByRole("link", { name: /Find your temptation/ })).toHaveAttribute("href", "/products");
-  const whisper = page.locator("#top").getByRole("link", { name: /Whisper to us/ });
+  await expect(page.locator("#top").getByRole("link", { name: /Shop everything naughty/ })).toHaveAttribute("href", "/products");
+  const whisper = page.locator("#top").getByRole("link", { name: /Tell us your fantasy/ });
   expect(await whisper.getAttribute("href")).toContain("wa.me");
   await expect(page.locator("#top h1")).toContainText(/Dressed to tempt/);
   // the arrowhead in the corner glides to the next section
@@ -29,7 +29,7 @@ test("hero: 27 slides, one active, the first preloaded, both calls to action", a
 test("after dark: the filmstrip band runs two strips of twenty frames, none shared with the hero, all linking into the collection", async ({ prepared: page }) => {
   const band = page.locator("#after-dark");
   await band.scrollIntoViewIfNeeded();
-  await expect(band.locator("h2")).toContainText(/The night/);
+  await expect(band.locator("h2")).toContainText(/hems up/);
   await expect(band.locator(".strip")).toHaveCount(2);
   await expect(band.locator(".strip-set:not(.is-dup) li")).toHaveCount(40);
   // the seamless loop is the same eighteen frames again, hidden from assistive tech and out of the tab order
@@ -49,8 +49,8 @@ test("after dark: the filmstrip band runs two strips of twenty frames, none shar
   await page.waitForTimeout(600);
   expect(await x(0)).toBeCloseTo(a2, 0);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(band.getByRole("link", { name: /Steal the night/ })).toHaveAttribute("href", "/products?cat=after-dark");
-  await expect(band.getByRole("link", { name: /See everything/ })).toHaveAttribute("href", "/products");
+  await expect(band.getByRole("link", { name: /Shop for trouble/ })).toHaveAttribute("href", "/products?cat=after-dark");
+  await expect(band.getByRole("link", { name: /Or see it all/ })).toHaveAttribute("href", "/products");
   // no photo appears both in the strips and in the top hero
   const files = (loc: import("@playwright/test").Locator) =>
     loc.evaluateAll((imgs) => imgs.map((i) => decodeURIComponent(i.getAttribute("src") ?? "").match(/(?:main|after-dark)-\d+/)?.[0] ?? "").filter(Boolean));
@@ -80,8 +80,8 @@ test("after dark reel: a tapped frame lifts its row over the blurred page, still
   await expect(reel.locator(".reel-backdrop")).toHaveCSS("backdrop-filter", /blur/);
   await expect(reel.locator(".strip-viewport")).toHaveClass(/is-reverse/);
   await expect(reel.locator(".strip-set:not(.is-dup) a")).toHaveCount(20); // the row's own twenty frames, now links
-  await expect(reel.locator("#reel-title")).toContainText(/past midnight/);
-  await expect(reel.getByRole("link", { name: /Watch every piece/ })).toHaveAttribute("href", "/products");
+  await expect(reel.locator("#reel-title")).toContainText(/survives the night/);
+  await expect(reel.getByRole("link", { name: /Browse every bad idea/ })).toHaveAttribute("href", "/products");
   await expect(reel.getByRole("button", { name: /Close the reel/ })).toBeFocused();
   await expect(page.locator("html")).toHaveCSS("overflow", "hidden"); // the page behind does not scroll
   // the reel's frames are larger than the row's
@@ -93,8 +93,8 @@ test("after dark reel: a tapped frame lifts its row over the blurred page, still
   await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
   // the first row's reel carries its own line
   await band.locator(".strip-viewport").nth(0).locator(".strip-set:not(.is-dup) button").nth(1).click({ force: true });
-  await expect(page.locator("#reel-title")).toContainText(/Imagine it on/);
-  await expect(page.locator(".reel").getByRole("link", { name: /Undress the whole collection/ })).toHaveAttribute("href", "/products");
+  await expect(page.locator("#reel-title")).toContainText(/Picture it on you/);
+  await expect(page.locator(".reel").getByRole("link", { name: /Raid the whole collection/ })).toHaveAttribute("href", "/products");
   await page.locator(".reel-backdrop").click({ position: { x: 10, y: 10 }, force: true });
   await expect(page.locator(".reel")).toHaveCount(0);
 });
@@ -119,6 +119,9 @@ test("hero slideshow advances when motion is allowed and holds with reduced moti
 test("sale: the four bikinis at exactly 20% off, prices struck through, each linking to its product", async ({ prepared: page }) => {
   const sale = page.locator("#sale");
   await expect(sale.locator("h2")).toContainText(`${CATALOG.maxDiscount}% off`);
+  // the band names what is on sale: the bikini sale while it is all swim
+  await expect(sale.locator(".eyebrow")).toHaveText(CATALOG.saleBand!.eyebrow);
+  await expect(sale.locator("h2")).toHaveText(`${CATALOG.saleBand!.lead} ${CATALOG.saleBand!.offer}`);
   const cards = sale.locator(".sale-card");
   const shown = Math.min(4, CATALOG.sale.length); // the band shows up to four
   await expect(cards).toHaveCount(shown);
@@ -134,14 +137,14 @@ test("sale: the four bikinis at exactly 20% off, prices struck through, each lin
     await expect(c.locator("h3")).not.toBeEmpty();
     await expect(c.locator(".sale-card-blurb")).not.toBeEmpty();
   }
-  await expect(sale.getByRole("link", { name: /Shop the sale|sale/i }).last()).toHaveAttribute("href", "/products?sale=1");
+  await expect(sale.getByRole("link", { name: /Shop the sale|sale/i }).last()).toHaveAttribute("href", CATALOG.saleBand!.href);
   await cards.first().click();
   await expect(page).toHaveURL(new RegExp(`/products/${hrefs[0]}$`));
 });
 
 test("collections: three cards open the shop filtered by category, plus the all-products button", async ({ prepared: page }) => {
   const grid = page.locator("#collections");
-  await expect(grid.getByRole("link", { name: /Tempt me with everything/ })).toHaveAttribute("href", "/products");
+  await expect(grid.getByRole("link", { name: /Show me all of it/ })).toHaveAttribute("href", "/products");
   const cards = grid.locator(".col-card");
   await expect(cards).toHaveCount(3);
   const expected = [
@@ -168,7 +171,30 @@ test("best sellers: the six ranked pieces in order, with the badge, linking to t
   const hrefs = await cards.locator(".product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
   expect(hrefs).toEqual(CATALOG.bestSellers.slice(0, 6));
   for (let i = 0; i < six; i++) await expect(cards.nth(i).locator(".badge", { hasText: "Best seller" })).toHaveCount(1);
-  await expect(sec.getByRole("link", { name: /See all|best/i }).last()).toHaveAttribute("href", "/products?best=1&sort=best");
+  await expect(sec.getByRole("link", { name: /usual suspects/ }).last()).toHaveAttribute("href", "/products?best=1&sort=best");
+});
+
+test("new in: the pieces with the New badge, newest first, right after best sellers, linking to the newest-first shop", async ({ prepared: page }) => {
+  const sec = page.locator("#new-in");
+  test.skip(CATALOG.newest.length < 3, "fewer than three new pieces: the row stays hidden");
+  const cards = sec.locator(".product-card");
+  await expect(cards).toHaveCount(CATALOG.newest.length);
+  const hrefs = await cards.locator(".product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
+  expect(hrefs).toEqual(CATALOG.newest);
+  // newest first by the catalogue's own dates, and every one wears the same badge the shop gives it
+  const dates = hrefs.map((s) => CATALOG.addedOf(s!));
+  expect(dates).toEqual([...dates].sort().reverse());
+  for (let i = 0; i < CATALOG.newest.length; i++) await expect(cards.nth(i).locator(".badge", { hasText: "New" })).toHaveCount(1);
+  const ids = await page.locator("main > section[id]").evaluateAll((els) => els.map((e) => e.id));
+  expect(ids.indexOf("new-in")).toBe(ids.indexOf("best-sellers") + 1);
+  await expect(sec.locator("h2")).toBeVisible();
+  const link = sec.getByRole("link", { name: "Shop the new sins" });
+  await expect(link).toHaveAttribute("href", "/products?new=1&sort=new");
+  await link.click();
+  await expect(page).toHaveURL(/\/products\?new=1&sort=new$/);
+  await expect(main(page).getByRole("combobox", { name: "Sort" })).toHaveValue("new");
+  const shop = await main(page).locator(".product-card .product-info").evaluateAll((as) => as.map((a) => (a as HTMLAnchorElement).getAttribute("href")!.split("/").pop()));
+  expect(shop).toEqual(CATALOG.newest);
 });
 
 test("how it works: three steps, the ordering anchor and the WhatsApp button", async ({ prepared: page }) => {
@@ -250,7 +276,7 @@ test("about: the photo wall holds seven prints with alt text, the promises and b
   await expect(prints).toHaveCount(7);
   for (let i = 0; i < 7; i++) expect(await prints.nth(i).getAttribute("alt")).toMatch(/Model|Close-up/);
   await expect(about.locator(".about-promises li")).toHaveCount(4);
-  expect(await about.getByRole("link", { name: /Tempt me/ }).getAttribute("href")).toContain("wa.me");
+  expect(await about.getByRole("link", { name: /Order something wicked/ }).getAttribute("href")).toContain("wa.me");
   await expect(about.getByRole("link", { name: /Read our story/ })).toHaveAttribute("href", "/about");
   await about.getByRole("link", { name: /Read our story/ }).click();
   await expect(page).toHaveURL(/\/about$/);
@@ -258,8 +284,8 @@ test("about: the photo wall holds seven prints with alt text, the promises and b
 
 test("contact: WhatsApp, email and Instagram links, hours, the QR code encodes the WhatsApp link", async ({ prepared: page }) => {
   const c = page.locator("#contact");
-  expect(await c.getByRole("link", { name: /Message us on WhatsApp/ }).getAttribute("href")).toContain(`wa.me/${CATALOG.whatsapp}`);
-  await expect(c.getByRole("link", { name: "Write to us" })).toHaveAttribute("href", `mailto:${CATALOG.email}`);
+  expect(await c.getByRole("link", { name: /Slide into our WhatsApp/ }).getAttribute("href")).toContain(`wa.me/${CATALOG.whatsapp}`);
+  await expect(c.getByRole("link", { name: "Or write us something steamy" })).toHaveAttribute("href", `mailto:${CATALOG.email}`);
   const list = c.locator(".contact-list li");
   await expect(list).toHaveCount(4);
   await expect(list.nth(1).locator("a")).toHaveAttribute("href", `https://instagram.com/${CATALOG.instagram}`);
@@ -273,7 +299,7 @@ test("contact: WhatsApp, email and Instagram links, hours, the QR code encodes t
 test("footer: every link resolves, social links open in new tabs, the year is current", async ({ prepared: page, request }) => {
   const footer = page.locator("footer.footer");
   const links = await footer.locator(".footer-cols a").evaluateAll((as) => as.map((a) => [a.textContent!.trim(), (a as HTMLAnchorElement).getAttribute("href")!, (a as HTMLAnchorElement).target]));
-  expect(links.map(([t]) => t)).toEqual(["All products", "Lace Secrets", "Sun Kissed", "Midnight Sins", "Sale", "Size guide", "How ordering works", "Delivery, returns & FAQ", "Contact", "About us", "Privacy policy", "Terms & conditions", "Instagram", "WhatsApp", "Email"]);
+  expect(links.map(([t]) => t)).toEqual(["All products", "Lace Secrets", "Sun Kissed", "Midnight Sins", "Sale", "Gift vouchers", "Size guide", "How ordering works", "Delivery, returns & FAQ", "Contact", "About us", "Privacy policy", "Terms & conditions", "Instagram", "WhatsApp", "Email"]);
   for (const [label, href, target] of links) {
     if (href.startsWith("/")) {
       const r = await request.get(href.split("#")[0]);
@@ -291,11 +317,16 @@ test("footer: every link resolves, social links open in new tabs, the year is cu
 test("newsletter: the browser blocks a bad address, a good one reports the sign-up state", async ({ prepared: page }) => {
   const form = page.locator("form.news-form");
   const input = form.getByRole("textbox", { name: "Email address" });
-  await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
+  await expect(form.locator(".news-note")).toHaveText("No spam. Just the filthy stuff, first.");
+  // the consent line: what they get, the way out, the policy — and it is read out with the field
+  const consent = form.locator(".news-consent");
+  await expect(consent).toContainText("unsubscribe any time", { ignoreCase: true });
+  await expect(consent.getByRole("link", { name: "privacy policy" })).toHaveAttribute("href", "/privacy");
+  await expect(input).toHaveAccessibleDescription(/unsubscribe any time/i);
   await input.fill("not-an-email");
   await form.getByRole("button", { name: /Subscribe/ }).click();
   expect(await input.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false); // native validation stops the submit
-  await expect(form.locator(".news-note")).toHaveText("No spam. Just the pretty, filthy things — first.");
+  await expect(form.locator(".news-note")).toHaveText("No spam. Just the filthy stuff, first.");
   await input.fill("someone@example.com");
   const [res] = await Promise.all([page.waitForResponse((r) => r.url().includes("/api/subscribe")), form.getByRole("button", { name: /Subscribe/ }).click()]);
   expect([200, 501, 502]).toContain(res.status());
@@ -303,7 +334,7 @@ test("newsletter: the browser blocks a bad address, a good one reports the sign-
   await expect(note).toHaveAttribute("role", "status");
   if (res.status() === 501) await expect(note).toContainText("Sign-ups open soon");
   else if (res.status() === 200) {
-    await expect(note).toContainText("whisper");
+    await expect(note).toContainText("You’re in");
     await expect(input).toHaveValue("");
   }
 });

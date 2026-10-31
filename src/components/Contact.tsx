@@ -26,23 +26,23 @@ function WhatsAppQr() {
 
 export default function Contact() {
   return (
-    <section id="contact" className="section contact">
+    <section id="contact" className="section contact" data-wa-source="contact">
       <div className="container contact-wrap">
         <div className="contact-copy" data-reveal>
-          <p className="eyebrow">Say it out loud</p>
+          <p className="eyebrow">Don’t be shy</p>
           <h2 className="h1 contact-title">
-            Tell us what <em>you want taken off</em>
+            Tell us <em>what you’re aching for</em>
           </h2>
           <p className="lede contact-lede">
-            Send us the name of the piece that’s been keeping you up — or a screenshot of it, we won’t ask where you found it — and we’ll confirm the size, the price, and how quietly it gets to your door.
+            Send the piece that’s been on your mind all week — a name, a screenshot, a breathless “this one” — and we’ll come back with your size, the price, and how discreetly we can get it into your hands.
           </p>
 
           <div className="contact-actions">
             <a className="text-link accent" href={askLink} target="_blank" rel="noopener noreferrer">
-              Message us on WhatsApp <LongArrow />
+              Slide into our WhatsApp <LongArrow />
             </a>
             <a className="text-link" href={emailLink}>
-              Write to us
+              Or write us something steamy
             </a>
           </div>
 
@@ -50,9 +50,9 @@ export default function Contact() {
             <WhatsAppQr />
             <p>
               <span className="contact-qr-tease">
-                Go on, <em>scan me.</em>
+                Scan me. <em>I dare you.</em>
               </span>
-              Our chat opens in a heartbeat — and whatever you tell us in it stays between the sheets.
+              Our chat opens before you can change your mind — and whatever you confess in it stays between us and the sheets.
             </p>
           </div>
         </div>

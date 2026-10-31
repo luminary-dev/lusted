@@ -33,6 +33,7 @@
 /* gallery: the main view large, the other views as small thumbnails underneath */
 .pdp-thumbs {
   display: flex;
+  flex-wrap: wrap; /* up to five thumbnails with the three optional photos — more than a phone's width holds */
   gap: 10px;
 }
 
@@ -99,15 +100,19 @@
   transition: transform 0.6s var(--ease);
 }
 
+/* The view's name sits on the photo, so it brings its own ground: a scrim that deepens towards the edge, tall enough
+   that a pale shot (ivory satin on white sheets) still has dark behind every letter. The lighter wash it had left the
+   label faint over exactly those photos. */
 .pdp-thumb span {
   position: absolute;
   inset: auto 0 0;
-  padding: 14px 0 6px;
-  background: linear-gradient(transparent, rgba(30, 10, 14, 0.6));
+  padding: 24px 0 7px;
+  background: linear-gradient(rgba(30, 10, 14, 0), rgba(30, 10, 14, 0.55) 45%, rgba(30, 10, 14, 0.8));
   color: #fff6f2;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-size: var(--step--2); /* 9px uppercase read as a utility label, not lingerie */
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-shadow: 0 1px 2px rgba(30, 10, 14, 0.4);
   text-transform: uppercase;
   text-align: center;
 }
@@ -133,11 +138,255 @@
   border-radius: 999px;
   background: rgba(255, 248, 245, 0.85);
   backdrop-filter: blur(10px);
-  font-size: 10.5px;
+  font-size: var(--step--2);
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #2e1418;
+}
+
+/* the main photo is a button that opens it full screen (PdpViewer.tsx): it lies over the whole frame, clear, with a
+   small magnifier in the corner so a phone, which has no zoom cursor, still says the photo opens. Its focus ring is
+   drawn inside, since the frame clips anything outside it. */
+.pdp-zoom {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-raised);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 12px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.pdp-zoom:focus-visible {
+  outline-offset: -4px;
+  border-radius: inherit;
+}
+
+.pdp-zoom svg {
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 8px;
+  border-radius: 50%;
+  background: rgba(255, 248, 245, 0.85);
+  backdrop-filter: blur(10px);
+  color: #2e1418;
+  transition: transform 0.4s var(--ease);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pdp-zoom:hover svg {
+    transform: scale(1.12);
+  }
+}
+
+/* ───────── the photos full screen (PdpViewer.tsx) ─────────
+   The whole window, on the page's own paper so it follows the theme, the photo contained in it; the bar, the arrows
+   and the counter float over it as frosted circles like the gallery's view label. */
+
+.pv-dialog {
+  z-index: var(--z-overlay);
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.pv-dialog::backdrop {
+  background: var(--paper);
+}
+
+.pv-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none; /* every gesture here is the viewer's: swipe, pinch and pan, never the page's own zoom */
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: zoom-in;
+}
+
+.pv-stage.is-zoomed {
+  cursor: grab;
+}
+
+.pv-stage.is-zoomed.is-held {
+  cursor: grabbing;
+}
+
+.pv-track {
+  display: flex;
+  height: 100%;
+  transition: transform var(--dur-3) var(--ease);
+}
+
+.pv-slide {
+  position: relative;
+  flex: 0 0 100%;
+  overflow: hidden;
+}
+
+.pv-frame {
+  position: absolute;
+  inset: 0;
+  transition: transform var(--dur-3) var(--ease);
+}
+
+/* a finger or the mouse moves the photo directly; easing would make it lag behind */
+.pv-stage.is-held .pv-track,
+.pv-stage.is-held .pv-frame {
+  transition: none;
+}
+
+.pv-img {
+  object-fit: contain;
+  -webkit-user-drag: none;
+}
+
+.pv-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: max(var(--space-3), env(safe-area-inset-top)) max(var(--space-3), env(safe-area-inset-right)) var(--space-3) max(var(--space-3), env(safe-area-inset-left));
+  pointer-events: none; /* only its buttons take taps; the photo under the rest of it can still be dragged */
+}
+
+.pv-count {
+  margin-right: auto;
+}
+
+.pv-count-n {
+  display: block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.pv-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  color: var(--ink);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background var(--dur-1) var(--ease), opacity var(--dur-2) var(--ease);
+}
+
+.pv-btn:hover {
+  background: var(--paper);
+}
+
+.pv-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pv-btn[aria-disabled="true"] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pv-prev,
+.pv-next {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.pv-prev {
+  left: max(var(--space-3), env(safe-area-inset-left));
+}
+
+.pv-next {
+  right: max(var(--space-3), env(safe-area-inset-right));
+}
+
+.pv-hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(var(--space-4), env(safe-area-inset-bottom));
+  translate: -50% 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  font-size: var(--step--1);
+  color: var(--ink-2);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* the gesture a shopper actually has: fingers on a phone, the mouse and keys on a desktop */
+.pv-hint-mouse {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pv-hint-touch {
+    display: none;
+  }
+
+  .pv-hint-mouse {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pv-dialog[open] {
+    animation: pv-in var(--dur-2) var(--ease);
+  }
+
+  .pv-hint {
+    animation: pv-hint-out var(--dur-2) var(--ease) 3s both; /* says it once, then gets out of the photo's way */
+  }
+}
+
+@keyframes pv-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pv-hint-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* without motion the photo still changes and zooms, just at once rather than sliding or growing */
+@media (prefers-reduced-motion: reduce) {
+  .pv-track,
+  .pv-frame,
+  .pdp-zoom svg {
+    transition: none;
+  }
 }
 
 /* product names stay in the serif for legibility */
@@ -198,10 +447,11 @@
 }
 
 .buy-label .buy-warn {
-  color: var(--rose);
+  color: var(--rose-ink); /* --rose doesn't clear 4.5:1 at this size (see 01-base.css) */
 }
 
-.buy-label a {
+.buy-label a,
+.buy-label .buy-guide {
   margin-left: auto;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -209,6 +459,24 @@
   color: var(--ink-2);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.buy-label .buy-guide {
+  /* a button, so it opens the chart over the piece, but it reads as the link it replaced. The padding lifts a
+     21px-tall line to a 45px target (WCAG 2.5.8); the matching negative margin keeps the row exactly where it was. */
+  padding-block: 12px;
+  margin-block: -12px;
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+/* a single-colour piece has no picker, so this line is the only place its colour is named */
+.buy-label-static {
+  margin-bottom: var(--space-5);
 }
 
 .buy-colors {
@@ -255,6 +523,155 @@
 .buy-whatsapp {
   width: 100%;
   margin-top: -12px;
+}
+
+/* "Drop a hint" (HintButton.tsx): a quiet line under the order buttons, read as a link, and the small popover it opens
+   where there is no share sheet. Also on /favourites, beside "Ask about these". */
+.hint {
+  position: relative;
+}
+
+.buy .hint {
+  justify-self: center;
+  margin-block: -18px -8px; /* the button's 44px target, without the gap it would leave around a 20px line */
+}
+
+.hint-btn {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.hint-btn:hover,
+.hint-btn[aria-expanded="true"] {
+  color: var(--ink);
+}
+
+.hint-pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  z-index: var(--z-sticky);
+  display: grid;
+  width: 232px;
+  padding: 6px;
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  box-shadow: 0 14px 36px var(--shadow);
+}
+
+.hint-pop.is-start {
+  left: 0;
+}
+
+.hint-pop.is-end {
+  right: 0;
+}
+
+.hint-pop.is-centre {
+  left: 50%;
+  translate: -50% 0;
+}
+
+.hint-pop a,
+.hint-pop button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hint-pop a:hover,
+.hint-pop button:hover {
+  background: var(--row-hover);
+}
+
+.hint-pop svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hint-note {
+  padding: 4px 12px 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* the trust strip under the WhatsApp button (here and in the bag): four promises, two to a row, and the way to the
+   help page — small and quiet, so it reassures without competing with the button above it. The columns are only as
+   wide as their words, and give way (the words wrap) only when the room runs out. */
+.trust {
+  display: grid;
+  gap: 10px;
+}
+
+.buy .trust {
+  margin-top: -4px;
+}
+
+.trust-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 8px 28px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.trust-list li {
+  display: flex;
+  gap: 9px;
+}
+
+.trust-list svg {
+  width: 15px;
+  height: 15px;
+  margin-top: 2px; /* centred on the first line of a label that wraps */
+  color: var(--rose-ink);
+}
+
+.trust-link {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px; /* a tap target on its own line, not a link in running text */
+  font-size: 12.5px;
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.25s;
+}
+
+.trust-link:hover {
+  color: var(--ink);
+}
+
+.trust-link svg {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.3s var(--ease);
+}
+
+.trust-link:hover svg {
+  transform: translateX(2px);
 }
 
 .btn-ghost {
@@ -323,7 +740,8 @@
 .pdp-moments {
   margin-top: 14px;
   font-family: var(--headline);
-  font-size: 28px;
+  /* fixed at 28px this script line out-shouted the product name on a phone, where the name bottoms out at 26px */
+  font-size: clamp(22px, 1.8vw, 28px);
   line-height: 1.3;
   color: var(--rose-ink);
 }
@@ -364,10 +782,191 @@
   background: var(--wine);
 }
 
-.related {
-  margin-top: var(--section);
+/* "Details & care" under the buy box: fabric, construction and care, a short list set like the buy labels. The
+   bullets are the browser's own markers (the base reset takes them away), so the list keeps its list semantics. */
+.pdp-details {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--hair);
+}
+
+.pdp-details-title {
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pdp-details ul {
+  display: grid;
+  gap: 6px;
+  padding-left: 1.1em;
+  list-style: disc;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.pdp-details li::marker {
+  color: var(--rose);
+}
+
+/* "Complete the set" and "More from …" below the piece: one section's worth of room between rows, with the hairline
+   halfway. This rule's margin and a second rule's padding (each a full --section) used to stack, leaving some 320px of
+   nothing under "Details & care" on a laptop. */
+.related,
+.pairs {
+  margin-top: calc(var(--section) / 2);
+  padding-top: calc(var(--section) / 2);
+  border-top: 1px solid var(--hair);
 }
 
 .related-grid {
   grid-template-columns: repeat(4, 1fr);
+}
+
+/* the shopper's own row, after the shop's: set apart the same way as the two above it */
+.recent {
+  margin-top: var(--section);
+  padding-top: var(--section);
+  border-top: 1px solid var(--hair);
+}
+
+.recent-clear {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.recent-clear:hover {
+  color: var(--ink);
+}
+
+/* ───────── the product page in the dark ─────────
+   The fit meter is a graphic carrying meaning, so it needs 3:1 against its surface. Dark --wine (#8c2340) on the
+   dark paper (#1b0e11) doesn't reach it; the lifted rose does. */
+
+:root[data-theme="dark"] .buy-fit-meter[data-fit="-1"] i:nth-child(1),
+:root[data-theme="dark"] .buy-fit-meter[data-fit="0"] i:nth-child(2),
+:root[data-theme="dark"] .buy-fit-meter[data-fit="1"] i:nth-child(3) {
+  background: var(--rose);
+}
+
+/* ───────── the buy bar on a phone ─────────
+   The gallery is 9:16, so on a 375px screen the name, price, sizes and button all sit below the fold: a shopper has
+   to scroll a full screen to learn what the piece costs. The bar carries the price and the button with them, and
+   only once the real ones have scrolled away. Desktop never sees it — there, both are already beside the photo. */
+
+.buy-bar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .buy-bar {
+    position: fixed;
+    z-index: var(--z-sticky);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: var(--nav-bg);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--hair);
+    transform: translateY(100%);
+    transition: transform var(--dur-3) var(--ease);
+  }
+
+  .buy-bar.is-shown {
+    transform: none;
+  }
+
+  .buy-bar-price {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  .buy-bar-price span {
+    font-size: var(--step--2);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .buy-bar-price strong {
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .buy-bar .btn {
+    flex: none;
+    min-height: 48px;
+  }
+
+  .buy-bar.is-asking .buy-bar-price {
+    display: none;
+  }
+
+  .buy-bar.is-asking .btn {
+    flex: 1;
+  }
+
+  /* the bar would otherwise cover the last of the page */
+  .pdp {
+    padding-bottom: 88px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buy-bar {
+    transition: none;
+  }
+}
+
+/* ───────── a size that's gone ─────────
+   Struck through and quieter, never removed: a shopper looking for their size needs to see that it exists and is
+   out, not be left wondering whether the piece is made in it at all. It can still be picked — that's how a shopper
+   asks for it back — so it keeps a readable colour rather than fading like a control that does nothing. */
+
+.size-chips button.is-gone {
+  position: relative;
+  border-style: dashed;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.size-chips button.is-gone.is-active {
+  border-style: solid;
+  color: var(--cream);
+}
+
+/* "Tell me the second it's back" is longer than "Add to bag": a little less padding keeps it on one line at 320px, and
+   it keeps the button's height where a phone stacks the buttons (10-bag-shop-responsive.css). In the phone's bar it
+   takes the whole width — nothing can be bought, so the price gives way to the ask (the media query above). */
+.buy-ask {
+  min-height: 52px;
+  padding: 0 18px;
+}
+
+/* what the photographs are showing — the line that turns a model shot into a size */
+.buy-model {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--muted);
 }
