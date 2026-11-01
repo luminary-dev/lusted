@@ -30,8 +30,8 @@ function RevealPicture() {
 
 export const metadata: Metadata = {
   title: "Lusted — Revealing soon",
-  description: "Something is being unwrapped. Lingerie, swim and after dark — made to tempt, cut to come off, sent so no one knows. Revealing 1 November.",
-  openGraph: { title: "Lusted — Revealing soon", description: "Something is being unwrapped. Revealing 1 November." },
+  description: "Something is being unwrapped. Lingerie, swim and after dark — made to tempt, cut to come off, sent so no one knows. Revealing 26 November.",
+  openGraph: { title: "Lusted — Revealing soon", description: "Something is being unwrapped. Revealing 26 November." },
   // a teaser, not a page to be found by: until reveal day it stands in for every URL, and those shouldn't be indexed
   // as copies of it; afterwards /revealing-soon itself stays out of search results
   robots: { index: false, follow: true },
