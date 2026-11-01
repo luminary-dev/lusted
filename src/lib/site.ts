@@ -9,7 +9,7 @@ export const site = {
   hours: "9AM – 7PM",
   responseTime: "We typically reply within 24 hours (Mon – Sun).",
   // Reveal day. Until this moment every page shows the "Revealing soon" page (src/proxy.ts); ?preview=1 lets you through.
-  revealAt: "2026-11-01T19:00:00+05:30",
+  revealAt: "2026-11-26T19:00:00+05:30",
   // Puts the "Revealing soon" page in front of the site until revealAt (src/proxy.ts). Deployments with
   // REVEAL_GATE=off in the environment (Vercel's Preview environment, so lusted-dev.vercel.app) and hosts beginning
   // with "dev." always show the real site; anywhere else, open any page with ?preview=1 once to get through.
