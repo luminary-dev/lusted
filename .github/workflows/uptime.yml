@@ -102,8 +102,9 @@ jobs:
             [[ $got == "308 $base/" || $got == "308 $base" ]]
           }
 
-          # the version and a path are read from the code, so a bump of IMAGE_VERSION or a renamed photo is followed
-          version="$(sed -nE 's/^const IMAGE_VERSION = ([0-9]+);.*/\1/p' src/lib/cdn.ts)"
+          # the version and a path are read from the code, so a bump of IMAGE_VERSION or a renamed photo is followed;
+          # exported or not (next.config.ts and the tests import it)
+          version="$(sed -nE 's/^(export )?const IMAGE_VERSION = ([0-9]+);.*/\2/p' src/lib/cdn.ts)"
           photo_path="$(jq -r '.images | keys[0] // empty' src/lib/image-manifest.json)"
           # shellcheck disable=SC2329 # called by name, through check()
           photo() {
