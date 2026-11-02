@@ -115,6 +115,7 @@ const jadeDragonCheongsamSide = img("products/jade-dragon-cheongsam-side.webp");
 const wisteriaEmbroideredBustierSetBack = img("products/wisteria-embroidered-bustier-set-back.webp");
 const wisteriaEmbroideredBustierSetSide = img("products/wisteria-embroidered-bustier-set-side.webp");
 const amethystSinSlingBodysuitBack = img("products/amethyst-sin-sling-bodysuit-back.webp");
+const amethystSinSlingBodysuitSide = img("products/amethyst-sin-sling-bodysuit-side.a2309fbc.webp");
 const roseLaceBalconetteBraWine = img("products/rose-lace-balconette-bra--wine.webp");
 const roseLaceBalconetteBraWineBack = img("products/rose-lace-balconette-bra--wine-back.webp");
 const roseLaceBalconetteBraWineSide = img("products/rose-lace-balconette-bra--wine-side.webp");
@@ -217,7 +218,7 @@ export const productViews: Partial<Record<keyof typeof productImages, Partial<Re
   "bloom-lace-up-ruffle-mini": { back: bloomLaceUpRuffleMiniBack, side: bloomLaceUpRuffleMiniSide },
   "jade-dragon-cheongsam": { back: jadeDragonCheongsamBack, side: jadeDragonCheongsamSide },
   "wisteria-embroidered-bustier-set": { back: wisteriaEmbroideredBustierSetBack, side: wisteriaEmbroideredBustierSetSide },
-  "amethyst-sin-sling-bodysuit": { back: amethystSinSlingBodysuitBack },
+  "amethyst-sin-sling-bodysuit": { back: amethystSinSlingBodysuitBack, side: amethystSinSlingBodysuitSide },
 };
 
 // other colourways of a piece: { slug: { colour: { front, back?, side? } } }
