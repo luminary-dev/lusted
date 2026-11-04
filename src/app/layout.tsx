@@ -7,6 +7,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import Footer from "@/components/Footer";
 import BagDrawer from "@/components/shop/BagDrawer";
 import BagToast from "@/components/shop/BagToast";
+import ChatWidget from "@/components/ChatWidget";
 import PhotoMorphProvider from "@/components/shop/PhotoMorph";
 import SearchDialog from "@/components/SearchDialog";
 import SiteAnalytics from "@/components/SiteAnalytics";
@@ -94,6 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <BagDrawer />
         <BagToast />
         <SearchDialog />
+        <ChatWidget />
         <SiteAnalytics />
       </body>
     </html>
