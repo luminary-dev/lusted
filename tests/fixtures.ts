@@ -166,7 +166,7 @@ export const CATALOG = {
   priceRange: [Math.min(...photographed.map(priceOf)), Math.max(...photographed.map(priceOf))],
   perPage: 15,
   pages: Math.ceil(photographed.length / 15),
-  whatsapp: "6581234567",
+  whatsapp: "94707294885",
   email: "support@lusted.lk",
   instagram: "lusted.lk",
   // the hero piece's details (fabric, construction, care) come from the catalogue like everything above
