@@ -2,8 +2,8 @@
 export const site = {
   name: "Lusted",
   tagline: "Lingerie that doesn’t stay on.",
-  whatsappDisplay: "+65 8123 4567",
-  whatsappNumber: "6581234567", // digits only, used for wa.me links
+  whatsappDisplay: "+94 70 729 4885",
+  whatsappNumber: "94707294885", // digits only, used for wa.me links
   instagramHandle: "lusted.lk",
   email: "support@lusted.lk",
   hours: "9AM – 7PM",
