@@ -18,9 +18,9 @@ type Turn = { role: "user" | "assistant"; content: string };
 
 const KEY = "lusted-chat";
 const MAX_TURNS = 24; // the route takes twelve exchanges (src/app/api/chat/route.ts)
-const GREETING = "Well, hello. Tell me what you're in the mood for — a night, a size, a set to be peeled out of — and I'll find the piece that gets you there.";
-const STARTERS = ["Dress me for date night", "Help me find my size", "Something to wear by the pool", "How does ordering work?"];
-const OFF_DUTY = "I'm not taking questions right now — but a real person is, on WhatsApp. Tell them what you're after.";
+const GREETING = "Hello, trouble. Tell me what you're aching to be seen in — or slowly taken out of — and I'll find the piece that ruins your plans for the night.";
+const STARTERS = ["Dress me for a night I’ll regret", "What comes off fastest?", "Help me find my size", "How do I order?"];
+const OFF_DUTY = "I’ve slipped away for a moment — but a real person is waiting on WhatsApp, and they never keep anyone hanging. Tell them what you’re craving.";
 
 // [Name](/products/slug) becomes a link (only to a piece that exists); stray markdown emphasis is dropped
 const LINK = /\[([^\]]+)\]\((\/products\/[a-z0-9-]+)\)/g;
@@ -201,7 +201,10 @@ export default function ChatWidget() {
         <header className="chat-head">
           <div>
             <p className="chat-title">Ask us</p>
-            <p className="chat-sub">Our shop assistant (AI) — a real person is on WhatsApp</p>
+            <p className="chat-sub">
+              <span className="chat-live" aria-hidden="true" />
+              Shop assistant (AI) · real people on WhatsApp
+            </p>
           </div>
           {turns.length > 0 && (
             <button type="button" className="chat-restart" onClick={startOver}>
@@ -272,7 +275,7 @@ export default function ChatWidget() {
             rows={1}
             maxLength={800}
             value={draft}
-            placeholder="Tell me what you want…"
+            placeholder="Tell me what you’re craving…"
             disabled={full}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
