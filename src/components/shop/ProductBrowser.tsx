@@ -376,7 +376,7 @@ export default function ProductBrowser() {
               </button>
               {/* never a dead end: four pieces to carry on with */}
               <div className="empty-suggest">
-                <p className="empty-suggest-head">Meanwhile, these never disappoint</p>
+                <p className="empty-suggest-head">Meanwhile, these never leave anyone wanting</p>
                 <div className="empty-suggest-grid">
                   {bestSellers.slice(0, 4).map((p) => (
                     <ProductCard key={p.slug} product={p} sizes="(min-width: 901px) 20vw, 44vw" />
