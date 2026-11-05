@@ -1,7 +1,8 @@
 /* ───────── "Ask us" (ChatWidget.tsx) ─────────
-   A wine pill bottom right that opens a small panel over the page: the conversation, a few first questions to tap,
-   and the box to type in. On a phone the panel is a sheet across the bottom of the screen. It sits under the bag,
-   the search and the toasts, and lifts out of the way of a product page's buy bar. */
+   A note slipped across the counter: a wine-to-rose pill bottom right, breathing softly, opens a small panel with a
+   velvet header, the conversation in small, close-set type, and a rounded field to whisper back in. Every message
+   drifts up into place; the panel unfolds from the pill's corner. On a phone it's a sheet across the bottom of the
+   screen. It sits under the bag, the search and the toasts, and lifts out of the way of a product page's buy bar. */
 
 .chat-launcher {
   position: fixed;
@@ -10,38 +11,70 @@
   bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  gap: 8px;
+  padding: 9px 18px 9px 14px;
   border: 0;
   border-radius: 999px;
-  background: var(--wine);
+  background: linear-gradient(135deg, var(--wine-2), var(--wine) 45%, var(--rose));
   color: #fff;
-  font: inherit;
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--wine) 35%, transparent);
+  font-family: var(--headline);
+  font-size: 22px;
+  line-height: 1;
+  box-shadow:
+    0 10px 26px color-mix(in srgb, var(--wine) 38%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
   cursor: pointer;
   transition:
-    transform var(--dur-2) var(--ease),
+    transform var(--dur-3) var(--ease),
     opacity var(--dur-2) var(--ease),
-    bottom var(--dur-3) var(--ease);
+    bottom var(--dur-3) var(--ease),
+    box-shadow var(--dur-3) var(--ease);
+}
+
+/* a slow, warm breath around the pill — enough to be noticed, never enough to nag */
+.chat-launcher::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--rose) 55%, transparent);
+  opacity: 0;
+  animation: chat-breathe 3.6s var(--ease) infinite;
+  pointer-events: none;
+}
+
+@keyframes chat-breathe {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.96);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
 }
 
 .chat-launcher:hover {
   transform: translateY(-2px);
+  box-shadow:
+    0 14px 32px color-mix(in srgb, var(--wine) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .chat-launcher svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
+}
+
+.chat-launcher span {
+  padding-top: 2px; /* Parisienne sits high */
 }
 
 .chat-launcher.is-hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px);
+  transform: translateY(8px) scale(0.9);
 }
 
 /* clear of the product page's buy bar once it has slid up */
@@ -56,20 +89,23 @@ body:has(.buy-bar.is-shown) .chat-launcher {
   bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  width: min(400px, calc(100vw - var(--space-5) * 2));
-  height: min(600px, calc(100dvh - 120px));
+  width: min(360px, calc(100vw - var(--space-5) * 2));
+  height: min(540px, calc(100dvh - 120px));
+  overflow: hidden;
   border: 1px solid var(--hair);
-  border-radius: var(--radius);
-  background: var(--paper);
+  border-radius: 20px;
+  background: radial-gradient(120% 60% at 100% 0%, color-mix(in srgb, var(--rose) 9%, transparent), transparent 60%), var(--paper);
   color: var(--ink);
-  box-shadow: 0 24px 60px var(--shadow), 0 4px 14px var(--shadow);
+  box-shadow:
+    0 30px 70px -10px color-mix(in srgb, var(--wine) 30%, transparent),
+    0 6px 18px var(--shadow);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(16px) scale(0.98);
+  transform: translateY(14px) scale(0.94);
   transform-origin: 100% 100%;
   transition:
     opacity var(--dur-2) var(--ease),
-    transform var(--dur-3) var(--ease);
+    transform 460ms cubic-bezier(0.2, 0.9, 0.25, 1.1);
 }
 
 .chat-panel.is-open {
@@ -81,9 +117,10 @@ body:has(.buy-bar.is-shown) .chat-launcher {
 .chat-head {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-4) var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--hair);
+  gap: var(--space-2);
+  padding: 14px 12px 12px 18px;
+  background: linear-gradient(135deg, var(--wine-2), var(--wine) 60%, color-mix(in srgb, var(--wine) 70%, var(--rose)));
+  color: #fff;
 }
 
 .chat-head > div {
@@ -93,49 +130,95 @@ body:has(.buy-bar.is-shown) .chat-launcher {
 
 .chat-title {
   margin: 0;
-  font-family: var(--script);
-  font-size: var(--step-4);
+  font-family: var(--headline);
+  font-size: 26px;
   line-height: 1;
-  color: var(--rose-ink);
 }
 
 .chat-sub {
-  margin: var(--space-1) 0 0;
-  font-size: var(--step--2);
-  letter-spacing: 0.04em;
-  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 5px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* the little light that says someone's there */
+.chat-live {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f4a3b4;
+  box-shadow: 0 0 0 0 rgba(244, 163, 180, 0.6);
+  animation: chat-live 2.4s ease-out infinite;
+}
+
+@keyframes chat-live {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 163, 180, 0.6);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(244, 163, 180, 0);
+  }
 }
 
 .chat-restart {
-  padding: var(--space-1) var(--space-2);
+  padding: 4px 6px;
   border: 0;
   background: none;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.8);
   font: inherit;
-  font-size: var(--step--2);
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
 }
 
+.chat-head .icon-btn {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #fff;
+}
+
+.chat-head .icon-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
 .chat-log {
   flex: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5);
+  gap: 10px;
+  padding: 16px 16px 12px;
 }
 
 .chat-msg {
-  max-width: 88%;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
-  font-size: var(--step-0);
-  line-height: 1.5;
+  max-width: 86%;
+  padding: 9px 13px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  animation: chat-in 360ms var(--ease) both;
+}
+
+@keyframes chat-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 
 .chat-msg p {
@@ -143,64 +226,70 @@ body:has(.buy-bar.is-shown) .chat-launcher {
 }
 
 .chat-msg p + p {
-  margin-top: var(--space-2);
+  margin-top: 6px;
 }
 
 .chat-msg.is-assistant {
   align-self: flex-start;
   background: var(--cream-2);
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 5px;
 }
 
 .chat-msg.is-assistant p a {
   color: var(--rose-ink);
   font-weight: 600;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
 .chat-msg.is-user {
   align-self: flex-end;
-  background: var(--wine);
+  background: linear-gradient(135deg, var(--wine), color-mix(in srgb, var(--wine) 75%, var(--rose)));
   color: #fff;
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 5px;
   white-space: pre-wrap;
 }
 
 .chat-starters {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 6px;
+  animation: chat-in 360ms 120ms var(--ease) both;
 }
 
 .chat-starters button {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--hair);
+  padding: 6px 11px;
+  border: 1px solid color-mix(in srgb, var(--rose) 45%, transparent);
   border-radius: 999px;
-  background: none;
-  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  color: var(--rose-ink);
   font: inherit;
-  font-size: var(--step--1);
+  font-size: 11.5px;
   cursor: pointer;
-  transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  transition:
+    background var(--dur-2) var(--ease),
+    color var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease);
 }
 
 .chat-starters button:hover {
-  border-color: var(--rose);
-  color: var(--rose-ink);
+  background: var(--wine);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .chat-typing {
   display: inline-flex;
   gap: 4px;
-  padding: 6px 0;
+  padding: 5px 0;
 }
 
 .chat-typing span {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--muted);
+  background: var(--rose);
   animation: chat-dot 1.2s var(--ease) infinite;
 }
 
@@ -227,23 +316,28 @@ body:has(.buy-bar.is-shown) .chat-launcher {
 
 .chat-pieces {
   display: grid;
-  gap: var(--space-2);
-  margin: var(--space-3) 0 0;
+  gap: 6px;
+  margin: 8px 0 2px;
   padding: 0;
   list-style: none;
 }
 
 .chat-pieces a {
   display: grid;
-  grid-template-columns: 40px 1fr auto;
+  grid-template-columns: 32px 1fr auto;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-1);
+  gap: 10px;
+  padding: 4px;
   border-radius: 10px;
   background: var(--paper);
   color: var(--ink);
   text-decoration: none;
-  font-weight: 400;
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+
+.chat-pieces a:hover {
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .chat-piece-media {
@@ -258,46 +352,70 @@ body:has(.buy-bar.is-shown) .chat-launcher {
 }
 
 .chat-piece-name {
-  font-size: var(--step--1);
+  font-size: 12px;
   line-height: 1.3;
 }
 
 .chat-piece-price {
-  padding-right: var(--space-2);
-  font-size: var(--step--1);
+  padding-right: 6px;
+  font-size: 11.5px;
   color: var(--muted);
 }
 
 .chat-wa {
   align-self: flex-start;
+  padding: 9px 16px;
+  font-size: 12px;
+  animation: chat-in 360ms var(--ease) both;
+}
+
+.chat-wa svg {
+  width: 15px;
+  height: 15px;
 }
 
 .chat-note {
   margin: 0;
-  font-size: var(--step--1);
+  font-size: 11.5px;
   color: var(--muted);
 }
 
 .chat-form {
   display: flex;
   align-items: flex-end;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
-  border-top: 1px solid var(--hair);
+  gap: 8px;
+  margin: 0 12px 12px;
+  padding: 4px 4px 4px 14px;
+  border: 1px solid var(--hair);
+  border-radius: 22px;
+  background: var(--paper);
+  transition: border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease);
+}
+
+.chat-form:focus-within {
+  border-color: color-mix(in srgb, var(--rose) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rose) 14%, transparent);
 }
 
 .chat-form textarea {
   flex: 1;
-  min-height: 44px;
-  max-height: 120px;
-  padding: var(--space-3) 0;
+  min-height: 36px;
+  max-height: 110px;
+  padding: 8px 0;
   border: 0;
   background: none;
   color: var(--ink);
   font: inherit;
   font-size: 16px; /* never smaller: iOS zooms the page into a smaller field */
+  line-height: 1.3;
   resize: none;
   field-sizing: content;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chat-form textarea {
+    font-size: 13px; /* a mouse and keyboard: no zoom to dodge, so it matches the messages */
+  }
 }
 
 .chat-form textarea:focus {
@@ -310,12 +428,25 @@ body:has(.buy-bar.is-shown) .chat-launcher {
 
 .chat-send {
   flex: none;
-  background: var(--wine);
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: linear-gradient(135deg, var(--wine), var(--rose));
   color: #fff;
+  transition: transform var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease);
+}
+
+.chat-send svg {
+  width: 15px;
+  height: 15px;
+}
+
+.chat-send:not(:disabled):hover {
+  transform: scale(1.06);
 }
 
 .chat-send:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: default;
 }
 
@@ -325,16 +456,22 @@ body:has(.buy-bar.is-shown) .chat-launcher {
   }
 
   .chat-launcher {
-    padding: var(--space-3);
+    padding: 13px;
+  }
+
+  .chat-launcher svg {
+    width: 20px;
+    height: 20px;
   }
 
   .chat-panel {
     right: 0;
     bottom: 0;
     width: 100%;
-    height: min(78dvh, 640px);
-    border-radius: var(--radius) var(--radius) 0 0;
+    height: min(76dvh, 600px);
+    border-radius: 20px 20px 0 0;
     padding-bottom: env(safe-area-inset-bottom);
+    transform-origin: 50% 100%;
   }
 }
 
@@ -344,8 +481,20 @@ body:has(.buy-bar.is-shown) .chat-launcher {
     transition: opacity var(--dur-1) linear;
   }
 
+  .chat-launcher::after,
+  .chat-live,
   .chat-typing span {
     animation: none;
+  }
+
+  .chat-msg,
+  .chat-starters,
+  .chat-wa {
+    animation: none;
+  }
+
+  .chat-log {
+    scroll-behavior: auto;
   }
 }
 
