@@ -18,7 +18,7 @@ const values = [
   { icon: Heart, title: "Every mood, every sin", text: "Lingerie, swim and after-dark pieces for your soft moods, your filthy ones, and the nights you can’t decide — never one idea of sexy." },
   { icon: Butterfly, title: "Fabric made for hands", text: "Lined lace, satin and silk, chosen for how they feel when someone can’t keep their hands off you — made to be tugged at, and to survive it." },
   { icon: Lock, title: "Our lips are sealed", text: "A plain, unbranded box and private one-to-one ordering. What you wear, and who gets to see it, stays between us." },
-  { icon: ChatDouble, title: "A real person, zero judgement", text: "Every order and every sizing question is answered by our team on WhatsApp — never a bot, and never a raised eyebrow, whatever you’re into." },
+  { icon: ChatDouble, title: "A real person, zero judgement", text: "Every order and every fitting is settled by a real person on WhatsApp — someone who’s heard it all and never raises an eyebrow, whatever you’re into." },
 ];
 
 // how an order goes, start to doorstep

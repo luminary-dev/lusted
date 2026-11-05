@@ -202,7 +202,7 @@ const chapters: Chapter[] = [
       },
       {
         q: "Will I know when it’s coming?",
-        a: <p>Yes. We tell you on WhatsApp the moment it’s on its way, and you can ask us where it is any time after that.</p>,
+        a: <p>Always — we’d never leave you wondering when it’s coming. We tell you on WhatsApp the moment it’s on its way, and you can ask us where it is any time after that.</p>,
       },
       {
         q: "Does it come wrapped?",
