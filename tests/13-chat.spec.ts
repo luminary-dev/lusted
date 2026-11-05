@@ -44,7 +44,7 @@ test.describe("chat: the panel", () => {
     await expect(panel(page)).toBeHidden();
     await launcher(page).click();
     await expect(panel(page)).toBeVisible();
-    await expect(panel(page)).toContainText("Our shop assistant (AI)");
+    await expect(panel(page)).toContainText("Shop assistant (AI)");
     await expect(panel(page).getByRole("button", { name: "Help me find my size" })).toBeVisible();
     await expect(box(page)).toBeFocused();
     await page.keyboard.press("Escape");
@@ -82,15 +82,15 @@ test.describe("chat: the panel", () => {
     await reply(page, "Mm, tell me more.");
     await go(page, "/");
     await launcher(page).click();
-    await panel(page).getByRole("button", { name: "Dress me for date night" }).click();
+    await panel(page).getByRole("button", { name: "Dress me for a night I’ll regret" }).click();
     await expect(panel(page).locator(".chat-msg.is-assistant").last()).toHaveText("Mm, tell me more.");
     await page.reload();
     await go(page, "/");
     await launcher(page).click();
-    await expect(panel(page).locator(".chat-msg.is-user")).toHaveText("Dress me for date night");
+    await expect(panel(page).locator(".chat-msg.is-user")).toHaveText("Dress me for a night I’ll regret");
     await panel(page).getByRole("button", { name: "Start over" }).click();
     await expect(panel(page).locator(".chat-msg.is-user")).toHaveCount(0);
-    await expect(panel(page).getByRole("button", { name: "Dress me for date night" })).toBeVisible();
+    await expect(panel(page).getByRole("button", { name: "Dress me for a night I’ll regret" })).toBeVisible();
   });
 
   test("when chat is switched off it sends the shopper to WhatsApp", async ({ prepared: page }) => {
@@ -99,7 +99,7 @@ test.describe("chat: the panel", () => {
     await launcher(page).click();
     await box(page).fill("hello");
     await page.keyboard.press("Enter");
-    await expect(panel(page)).toContainText("a real person is, on WhatsApp");
+    await expect(panel(page)).toContainText("a real person is waiting on WhatsApp");
     await expect(panel(page).getByRole("link", { name: "Continue on WhatsApp" })).toHaveAttribute("href", /^https:\/\/wa\.me\//);
   });
 
