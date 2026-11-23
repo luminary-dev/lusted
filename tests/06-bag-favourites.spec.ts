@@ -147,7 +147,7 @@ test.describe("bag", () => {
 test.describe("favourites", () => {
   test("empty state, saving from cards and the product page, the list, the WhatsApp ask, removing", async ({ prepared: page }) => {
     await go(page, "/favourites");
-    await expect(main(page).locator(".fav-empty")).toContainText("No favourites yet.");
+    await expect(main(page).locator(".fav-empty")).toContainText("Nothing’s got you hot and bothered yet.");
     await main(page).locator(".fav-empty").getByRole("link", { name: /Browse the shop/ }).click();
     await expect(page).toHaveURL(/\/products$/);
     const first = main(page).locator(".product-grid .product-card").nth(0);

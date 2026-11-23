@@ -18,7 +18,7 @@ export default function FavouritesList() {
   if (!saved.length) {
     return (
       <div className="empty fav-empty">
-        <h2 className="h3">No favourites yet.</h2>
+        <h2 className="h3">Nothing’s got you hot and bothered yet.</h2>
         <p>Tap the heart on any piece that gets your pulse going, and it’ll be waiting for you here.</p>
         <Link href="/products" className="btn btn-wine">
           Browse the shop, go on <ArrowRight className="arrow" />

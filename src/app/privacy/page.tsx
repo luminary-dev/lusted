@@ -51,6 +51,11 @@ const sections: LegalSection[] = [
           To see how the site is used and how quickly it loads, we use Vercel Web Analytics and Speed Insights, which count visits without cookies or
           personal identifiers.
         </p>
+        <p>
+          If you use “Ask us”, the chat assistant on the site, what you type is sent to Anthropic to write the reply. The conversation is kept only
+          in this browser tab until you close it or start over; we don’t store it. Please don’t share your address, phone number or other personal
+          details there — give them to us on WhatsApp when you order.
+        </p>
       </>
     ),
   },
@@ -94,6 +99,7 @@ const sections: LegalSection[] = [
           </li>
           <li>Vercel, in the USA — it hosts this website, so it handles your visit and anything you send through the site.</li>
           <li>Cloudflare — it runs the lusted.lk domain name (DNS) and stores the shop’s product photos, not your personal information.</li>
+          <li>Anthropic, in the USA — it writes the replies in the “Ask us” chat, so it receives what you type there.</li>
           <li>Our email newsletter provider — your email address, only if you subscribe.</li>
         </ul>
       </>
@@ -104,7 +110,7 @@ const sections: LegalSection[] = [
     title: "International transfers",
     body: (
       <p>
-        Some of these providers, such as Meta and Vercel, process your information outside Sri Lanka. We only use established services that protect
+        Some of these providers, such as Meta, Vercel and Anthropic, process your information outside Sri Lanka. We only use established services that protect
         it with appropriate safeguards, in line with the Personal Data Protection Act. If you have questions about where your information goes,
         message us on <a href={whatsappLink("Hi Lusted, I have a privacy question.")}>WhatsApp</a> or email <a href={emailLink}>{site.email}</a>.
       </p>
@@ -157,7 +163,7 @@ export default function PrivacyPage() {
           What’s in the box <em>stays in the box.</em>
         </>
       }
-      updated="29 October 2026"
+      updated="5 November 2026"
       intro={<p>Lingerie is personal. So is what we know about you. Here’s exactly how we keep it quiet — in plain language.</p>}
       sections={sections}
     />
